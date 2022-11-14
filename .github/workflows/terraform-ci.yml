@@ -29,7 +29,7 @@ permissions:
 env:
   # Go language version to use for building. This value should also be updated
   # in the testing workflow if changed.
-  GO_VERSION: '1.18'
+  GO_VERSION: '1.19'
   
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -43,10 +43,14 @@ jobs:
         uses: dell/common-github-actions/go-code-formatter-linter-vetter@main
         with:
           directories: ./...
+      - uses: WillAbides/setup-go-faster@v1.7.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
       - name: Run the static check
         uses: dominikh/staticcheck-action@v1.2.0
         with:
           version: "2022.1"
+          install-go: false
  sanitize:
     name: Check for forbidden words
     runs-on: ubuntu-latest
@@ -77,17 +81,19 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v3
       - name: Run Go Security
-        uses: securego/gosec@master
+        uses: dell/common-github-actions/gosec-runner@main
+        with:
+          directories: ./...
         
  generate:
-    runs-on: ubuntu-latest
     name: Generate
+    runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
-      - uses: actions/checkout@v3
-      - run: go generate
+      - run: go generate ./...
       - name: git diff
         run: |
           git diff --compact-summary --exit-code || \
@@ -105,30 +111,15 @@ jobs:
             directories: .
             options: -ri
  test:
-  name: Terraform Provider Acceptance Tests
+  name: Terraform Provider Unit Tests
   needs: [build, ]
   runs-on: ubuntu-latest
-  timeout-minutes: 15
-  strategy:
-    fail-fast: false
-    matrix:
-      # list whatever Terraform versions here you would like to support
-      terraform:
-        - '1.0.*'
-        - '1.1.*'
-        - '1.2.*'
+  timeout-minutes: 60
   steps:
     - uses: actions/setup-go@v3
       with:
         go-version: ${{ env.GO_VERSION }}
-    - uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: ${{ matrix.terraform }}
-        terraform_wrapper: false
     - uses: actions/checkout@v3
     - run: go mod download
     - run: go test -v -cover ./clients/
-    - env:
-        TF_ACC: "1"
-      run: go test -v -cover ./ome/
-      timeout-minutes: 10
+      timeout-minutes: 60

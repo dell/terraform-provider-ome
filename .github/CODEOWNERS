@@ -1,0 +1,16 @@
+# CODEOWNERS
+#
+# documentation for this file can be found at:
+# https://help.github.com/en/articles/about-code-owners
+
+# These are the default owners for the code and will
+# be requested for review when someone opens a pull request.
+# order is alphabetical for easier maintenance.
+#
+# Manisha Agarwal (manishaagarwal1311)
+# Naveen Patil (naveen-patil-dell)
+# Sachin Apagundi (sachin-apa)
+# Sooraj Bhardwaj(SoorajBharadwaj07)
+
+# for all files:
+* @sachin-apa

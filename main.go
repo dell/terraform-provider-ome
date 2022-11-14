@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 
+//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --rendered-website-dir docs
 var (
 	version string = "dev"
 )
@@ -20,7 +21,7 @@ func main() {
 	flag.Parse()
 
 	err := providerserver.Serve(context.Background(), ome.New(version), providerserver.ServeOpts{
-		Address: "registry.terraform.io/hashicorp/ome",
+		Address: "registry.terraform.io/dell/ome",
 		Debug:   debug,
 	})
 

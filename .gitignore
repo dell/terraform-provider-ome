@@ -27,6 +27,7 @@ website/node_modules
 *.iml
 .vscode/
 website/vendor
+terraform-provider-ome
 
 # Test exclusions
 !command/test-fixtures/**/*.tfstate
