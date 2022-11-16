@@ -10,6 +10,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 )
 
+const (
+	//SkipTestMsg
+	SkipTestMsg = "Skipping the test because eith TF_ACC or ACC_DETAIL is not set to 1"
+)
+
 var testProvider tfsdk.Provider
 var testProviderFactory map[string]func() (tfprotov6.ProviderServer, error)
 var omeUserName = os.Getenv("OME_USERNAME")
@@ -19,6 +24,7 @@ var DeviceSvcTag1 = os.Getenv("DEVICESVCTAG1")
 var DeviceSvcTag2 = os.Getenv("DEVICESVCTAG2")
 var DeviceID1 = os.Getenv("DEVICEID1")
 var DeviceID2 = os.Getenv("DEVICEID2")
+var DeviceID3 = os.Getenv("DEVICEID3") // Not capable for deployment
 var ShareUser = os.Getenv("SHAREUSERNAME")
 var SharePassword = os.Getenv("SHAREPASSWORD")
 var ShareIP = os.Getenv("SHAREIP")
@@ -47,4 +53,8 @@ func testAccPreCheck(t *testing.T) {
 
 	testProvider.Configure(context.Background(), tfsdk.ConfigureProviderRequest{}, &tfsdk.ConfigureProviderResponse{})
 
+}
+
+func skipTest() bool {
+	return os.Getenv("TF_ACC") == "" && os.Getenv("ACC_DETAIL") == ""
 }

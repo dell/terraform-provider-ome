@@ -654,7 +654,7 @@ var testAccUpdateTemplateSuccess = `
 
 	resource "ome_template" "terraform-acceptance-test-2" {
 		name = "` + TemplateName2 + `"
-		refdevice_id = ` + DeviceID2 + `
+		refdevice_servicetag = "` + DeviceSvcTag2 + `"
 		identity_pool_name = "IO1"
 		job_retry_count  = 10
 		sleep_interval = 60
@@ -841,7 +841,7 @@ resource "ome_template" "terraform-acceptance-test-1" {
 
 resource "ome_template" "terraform-acceptance-test-2" {
 	name = "` + TemplateName1 + `"
-	refdevice_id = ` + DeviceID2 + `
+	refdevice_servicetag = "` + DeviceSvcTag2 + `"
 	job_retry_count  = 15
 	sleep_interval = 60
 }
@@ -916,7 +916,7 @@ provider "ome" {
 resource "ome_template" "terraform-clone-template-test" {
 	name = "clone-template-test"
 	reftemplate_name = "invalid-template-name"
-	refdevice_id = ` + DeviceID2 + `
+	refdevice_servicetag = "` + DeviceSvcTag2 + `"
 }
 `
 

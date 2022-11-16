@@ -1,0 +1,280 @@
+package clients
+
+import (
+	"terraform-provider-ome/models"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestClient_CreateBaseline(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name string
+		args models.ConfigurationBaselinePayload
+	}{
+		{"Create Baseline Successfully", models.ConfigurationBaselinePayload{
+			Name:        "TestAccCreateBaseline",
+			Description: "Test Acc Description for create baseline",
+			TemplateID:  326,
+			BaselineTargets: []models.BaselineTarget{
+				{
+					ID: 10093,
+					Type: models.BaselineTargetType{
+						ID:   1,
+						Name: "DEVICE",
+					},
+				},
+				{
+					ID: 10104,
+					Type: models.BaselineTargetType{
+						ID:   1,
+						Name: "DEVICE",
+					},
+				},
+			},
+			NotificationSettings: &models.NotificationSettings{
+				NotificationType: "NOTIFY_ON_SCHEDULE",
+				EmailAddresses:   []string{"test@testdell.com"},
+				Schedule: models.BaselineNotificationSchedule{
+					Cron: "0 00 00 * * ? *",
+				},
+				OutputFormat: "HTML",
+			},
+		}},
+		{"Create Baseline Failure - Invalid template ID", models.ConfigurationBaselinePayload{
+			Name:        "TestAccCreateBaselineFailure",
+			Description: "Test Acc Description for create baseline failure",
+			TemplateID:  -1,
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			baseline, err := c.CreateBaseline(tt.args)
+			if err != nil {
+				assert.NotNil(t, err)
+				assert.Empty(t, baseline.ID)
+				assert.ErrorContains(t, err, "Unable to process the request because the template ID -1 provided is invalid.")
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.args.Name, baseline.Name)
+				assert.NotNil(t, baseline.ID)
+				assert.Equal(t, 2, len(baseline.BaselineTargets))
+				assert.Equal(t, "NOTIFY_ON_SCHEDULE", baseline.NotificationSettings.NotificationType)
+				assert.Equal(t, 1, len(baseline.NotificationSettings.EmailAddresses))
+				assert.Equal(t, "0 00 00 * * ? *", baseline.NotificationSettings.Schedule.Cron)
+				assert.Equal(t, "HTML", baseline.NotificationSettings.OutputFormat)
+			}
+		})
+	}
+}
+
+func TestClient_UpdateBaseline(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name string
+		args models.ConfigurationBaselinePayload
+	}{
+		{"Update Baseline Successfully", models.ConfigurationBaselinePayload{
+			ID:          100,
+			Name:        "TestAccCreateBaseline",
+			Description: "Test Acc Description for create baseline",
+			TemplateID:  326,
+			BaselineTargets: []models.BaselineTarget{
+				{
+					ID: 10093,
+					Type: models.BaselineTargetType{
+						ID:   1,
+						Name: "DEVICE",
+					},
+				},
+				{
+					ID: 10104,
+					Type: models.BaselineTargetType{
+						ID:   1,
+						Name: "DEVICE",
+					},
+				},
+			},
+			NotificationSettings: &models.NotificationSettings{
+				NotificationType: "NOTIFY_ON_SCHEDULE",
+				EmailAddresses:   []string{"test@testdell.com"},
+				Schedule: models.BaselineNotificationSchedule{
+					Cron: "0 00 00 * * ? *",
+				},
+				OutputFormat: "HTML",
+			},
+		}},
+		{"Update Baseline Failure - Invalid template ID", models.ConfigurationBaselinePayload{
+			ID:          101,
+			Name:        "TestAccCreateBaselineFailure",
+			Description: "Test Acc Description for create baseline failure",
+			TemplateID:  -1,
+		}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			baseline, err := c.UpdateBaseline(tt.args)
+			if err != nil {
+				assert.NotNil(t, err)
+				assert.Empty(t, baseline.ID)
+				assert.ErrorContains(t, err, "Unable to process the request because the template ID -1 provided is invalid.")
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.args.Name, baseline.Name)
+				assert.NotNil(t, baseline.ID)
+				assert.Equal(t, 2, len(baseline.BaselineTargets))
+				assert.Equal(t, "NOTIFY_ON_SCHEDULE", baseline.NotificationSettings.NotificationType)
+				assert.Equal(t, 1, len(baseline.NotificationSettings.EmailAddresses))
+				assert.Equal(t, "0 00 00 * * ? *", baseline.NotificationSettings.Schedule.Cron)
+				assert.Equal(t, "HTML", baseline.NotificationSettings.OutputFormat)
+			}
+		})
+	}
+}
+
+func TestClient_DeleteBaseline(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name  string
+		args  []int64
+		isErr bool
+	}{
+		{"Delete Baseline Successfully", []int64{10001}, false},
+		{"Delete Baseline Failure - Invalid template ID", []int64{10002}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := c.DeleteBaseline(tt.args)
+			if tt.isErr {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
+		})
+	}
+}
+
+func TestClient_GetBaselineByID(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name       string
+		baselineID int64
+	}{
+		{"Get Baseline By ID Successfully", 1},
+		{"Get Baseline By ID Failure", -1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			baseline, err := c.GetBaselineByID(tt.baselineID)
+			if tt.baselineID == -1 {
+				assert.NotNil(t, err)
+				assert.Empty(t, baseline.ID)
+				assert.ErrorContains(t, err, "Unable to process the request because an error occurred.")
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, "Baseline Name", baseline.Name)
+				assert.NotNil(t, baseline.ID)
+				assert.Equal(t, 2, len(baseline.BaselineTargets))
+				assert.Equal(t, "NOTIFY_ON_NON_COMPLIANCE", baseline.NotificationSettings.NotificationType)
+				assert.Equal(t, 1, len(baseline.NotificationSettings.EmailAddresses))
+				assert.Equal(t, "0 00 00 * * ? *", baseline.NotificationSettings.Schedule.Cron)
+				assert.Equal(t, "html", baseline.NotificationSettings.OutputFormat)
+			}
+		})
+	}
+}
+
+func TestClient_GetBaselineDeviceComplianceReportByID(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name       string
+		baselineID int64
+	}{
+		{"Get Baseline Device Compliance Reports By ID Successfully", 14},
+		{"Get Baseline Device Compliance Reports By ID Failure", -1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			baselineDevComplianceReportStr, err := c.GetBaselineDevComplianceReportsByID(tt.baselineID)
+			if tt.baselineID == 14 {
+				assert.Nil(t, err)
+				assert.NotEmpty(t, baselineDevComplianceReportStr)
+				assert.Contains(t, baselineDevComplianceReportStr, "\"Id\": 11803")
+			} else if tt.baselineID == -1 {
+				assert.NotNil(t, err)
+				assert.Empty(t, baselineDevComplianceReportStr)
+			}
+
+		})
+	}
+}
+
+func TestClient_GetBaselineDeviceAttrComplianceReportByID(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name       string
+		baselineID int64
+		deviceID   int64
+	}{
+		{"Get Baseline Device Compliance Attribute Reports By ID Successfully", 14, 11803},
+		{"Get Baseline Device Compliance Attribute Reports By ID Failure", -1, -1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			baselineDevAttrComplianceReportStr, err := c.GetBaselineDevAttrComplianceReportsByID(tt.baselineID, tt.deviceID)
+			if tt.baselineID == 14 && tt.deviceID == 11803 {
+				assert.Nil(t, err)
+				assert.NotEmpty(t, baselineDevAttrComplianceReportStr)
+				assert.Contains(t, baselineDevAttrComplianceReportStr, "\"DeviceId\": 11803")
+				assert.Contains(t, baselineDevAttrComplianceReportStr, "\"BaselineId\": 14")
+			} else if tt.baselineID == -1 && tt.deviceID == -1 {
+				assert.NotNil(t, err)
+				assert.Empty(t, baselineDevAttrComplianceReportStr)
+			}
+
+		})
+	}
+}

@@ -8,6 +8,7 @@ type Devices struct {
 
 // Device - embedded device response from the Devices
 type Device struct {
-	ID               int64  `json:"Id"`
-	DeviceServiceTag string `json:"DeviceServiceTag"`
+	ID                 int64   `json:"Id"`
+	DeviceServiceTag   string  `json:"DeviceServiceTag"`
+	DeviceCapabilities []int64 `json:"DeviceCapabilities,omitempty"`
 }
