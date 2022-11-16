@@ -1,7 +1,6 @@
 package ome
 
 import (
-	"os"
 	"regexp"
 	"terraform-provider-ome/clients"
 	"testing"
@@ -17,8 +16,8 @@ const (
 )
 
 func TestTemplateDeploy_InvalidTemplate(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -34,8 +33,8 @@ func TestTemplateDeploy_InvalidTemplate(t *testing.T) {
 }
 
 func TestTemplateDeploy_MutuallyExclusive1(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -51,8 +50,8 @@ func TestTemplateDeploy_MutuallyExclusive1(t *testing.T) {
 }
 
 func TestTemplateDeploy_InvalidDevices(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -68,8 +67,8 @@ func TestTemplateDeploy_InvalidDevices(t *testing.T) {
 }
 
 func TestTemplateDeploy_InvalidTemplateIDOrNameForUpdate(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -92,8 +91,8 @@ func TestTemplateDeploy_InvalidTemplateIDOrNameForUpdate(t *testing.T) {
 }
 
 func TestTemplateDeploy_CreateDeploySuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -112,8 +111,8 @@ func TestTemplateDeploy_CreateDeploySuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_UpdateDeploySuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -139,8 +138,8 @@ func TestTemplateDeploy_UpdateDeploySuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_UpdateDeployWithGroupNames(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -166,8 +165,8 @@ func TestTemplateDeploy_UpdateDeployWithGroupNames(t *testing.T) {
 }
 
 func TestTemplateDeploy_CreateDeployBootNetworkISOSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -194,8 +193,8 @@ func TestTemplateDeploy_CreateDeployBootNetworkISOSuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_CreateDeployWithScheduleSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -215,8 +214,8 @@ func TestTemplateDeploy_CreateDeployWithScheduleSuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_CreateDeployWithOptionsSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -237,8 +236,8 @@ func TestTemplateDeploy_CreateDeployWithOptionsSuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_CreateDeployWithAttributesSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -257,8 +256,8 @@ func TestTemplateDeploy_CreateDeployWithAttributesSuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_UpdateDeployWithParamsSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -300,8 +299,8 @@ func TestTemplateDeploy_UpdateDeployWithParamsSuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_UpdateDeployWithScheduleSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -328,8 +327,8 @@ func TestTemplateDeploy_UpdateDeployWithScheduleSuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_ImportDeploymentError(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -349,8 +348,8 @@ func TestTemplateDeploy_ImportDeploymentError(t *testing.T) {
 }
 
 func TestTemplateDeploy_ImportDeploymentErrorForNoProfile(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -370,8 +369,8 @@ func TestTemplateDeploy_ImportDeploymentErrorForNoProfile(t *testing.T) {
 }
 
 func TestTemplateDeploy_ImportDeploymentSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	assertTFImportState := func(s []*terraform.InstanceState) error {

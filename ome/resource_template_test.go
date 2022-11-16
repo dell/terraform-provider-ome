@@ -2,7 +2,6 @@ package ome
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 	"terraform-provider-ome/clients"
@@ -25,9 +24,10 @@ const (
 )
 
 func TestTemplateCreation_CreateTemplatesSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testProviderFactory,
@@ -44,8 +44,8 @@ func TestTemplateCreation_CreateTemplatesSuccess(t *testing.T) {
 
 // The identity pool and Vlans does not get cloned into the new template in OME.
 func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -70,8 +70,8 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplateByCloningSuccessForDeploymentToCompliance(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -96,8 +96,8 @@ func TestTemplateCreation_CreateTemplateByCloningSuccessForDeploymentToComplianc
 }
 
 func TestTemplateCreation_CreateTemplateByCloningSuccessForComplianceToCompliance(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -122,8 +122,8 @@ func TestTemplateCreation_CreateTemplateByCloningSuccessForComplianceToComplianc
 }
 
 func TestTemplateCreation_CreateTemplateByCloningFailureForRefTemplateAndDevice(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -143,8 +143,8 @@ func TestTemplateCreation_CreateTemplateByCloningFailureForRefTemplateAndDevice(
 }
 
 func TestTemplateCreation_CreateTemplateByCloningFailure(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -160,8 +160,8 @@ func TestTemplateCreation_CreateTemplateByCloningFailure(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplateByCloningFailureForComplainceToDeployment(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -177,8 +177,8 @@ func TestTemplateCreation_CreateTemplateByCloningFailureForComplainceToDeploymen
 }
 
 func TestTemplateCreation_CreateUpdateSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -201,8 +201,8 @@ func TestTemplateCreation_CreateUpdateSuccess(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplatesInvalidSvcTag(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -220,8 +220,8 @@ func TestTemplateCreation_CreateTemplatesInvalidSvcTag(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplatesInvalidDevID(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -239,8 +239,8 @@ func TestTemplateCreation_CreateTemplatesInvalidDevID(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplateEmptyDeviceDetails(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -258,8 +258,8 @@ func TestTemplateCreation_CreateTemplateEmptyDeviceDetails(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplateInvalidFqdds(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -277,8 +277,8 @@ func TestTemplateCreation_CreateTemplateInvalidFqdds(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplateInvalidTemplateViewType(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -296,8 +296,8 @@ func TestTemplateCreation_CreateTemplateInvalidTemplateViewType(t *testing.T) {
 }
 
 func TestTemplateUpdation_UpdateTemplateWithInvalidAttributeId(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -316,8 +316,8 @@ func TestTemplateUpdation_UpdateTemplateWithInvalidAttributeId(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplateWithExistingName(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -340,8 +340,8 @@ func TestTemplateCreation_CreateTemplateWithExistingName(t *testing.T) {
 }
 
 func TestTemplateImport_ImportTemplateError(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -361,8 +361,8 @@ func TestTemplateImport_ImportTemplateError(t *testing.T) {
 }
 
 func TestTemplateImport_ImportTemplateSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	assertTFImportState := func(s []*terraform.InstanceState) error {
@@ -654,7 +654,7 @@ var testAccUpdateTemplateSuccess = `
 
 	resource "ome_template" "terraform-acceptance-test-2" {
 		name = "` + TemplateName2 + `"
-		refdevice_id = ` + DeviceID2 + `
+		refdevice_servicetag = "` + DeviceSvcTag2 + `"
 		identity_pool_name = "IO1"
 		job_retry_count  = 10
 		sleep_interval = 60
@@ -841,7 +841,7 @@ resource "ome_template" "terraform-acceptance-test-1" {
 
 resource "ome_template" "terraform-acceptance-test-2" {
 	name = "` + TemplateName1 + `"
-	refdevice_id = ` + DeviceID2 + `
+	refdevice_servicetag = "` + DeviceSvcTag2 + `"
 	job_retry_count  = 15
 	sleep_interval = 60
 }
@@ -916,7 +916,7 @@ provider "ome" {
 resource "ome_template" "terraform-clone-template-test" {
 	name = "clone-template-test"
 	reftemplate_name = "invalid-template-name"
-	refdevice_id = ` + DeviceID2 + `
+	refdevice_servicetag = "` + DeviceSvcTag2 + `"
 }
 `
 

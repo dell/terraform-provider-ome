@@ -10,6 +10,8 @@ const (
 	AuthTokenHeader = "x-auth-token" // #nosec G101
 	// SuccessStatusID - job success status ID
 	SuccessStatusID = 2060
+	// RunningStatusID - job success status ID
+	RunningStatusID = 2050
 	// waitTime - sleep interval between retries
 	waitTime = 5 * time.Second
 	// Retries - Number of http retries
@@ -26,6 +28,14 @@ const (
 	SessionAPI = "/api/SessionService/Sessions"
 	// TemplateAPI - api used to manage templates
 	TemplateAPI = "/api/TemplateService/Templates"
+	// BaselineAPI - api used to manage baselines
+	BaselineAPI = "/api/TemplateService/Baselines"
+	// BaselineByIDAPI - api used to manage baseline by ID
+	BaselineByIDAPI = "/api/TemplateService/Baselines(%d)"
+	// BaselineDeviceComplianceReportsAPI - api used to fetch baseline device compliance report
+	BaselineDeviceComplianceReportsAPI = "/api/TemplateService/Baselines(%d)/DeviceConfigComplianceReports"
+	// BaselineDeviceAttrComplianceReportsAPI - api used to fetch baseline device attributes compliance report
+	BaselineDeviceAttrComplianceReportsAPI = "/api/TemplateService/Baselines(%d)/DeviceConfigComplianceReports(%d)/DeviceComplianceDetails"
 	// JobAPI - api used to manage jobs
 	JobAPI = "/api/JobService/Jobs"
 	// IdentityPoolAPI - api used to manage IdentityPools
@@ -54,6 +64,8 @@ const (
 	DeleteProfileAPI = "/api/ProfileService/Actions/ProfileService.Delete"
 	//CloneTemplateAPI - api to clone a template
 	CloneTemplateAPI = "/api/TemplateService/Actions/TemplateService.Clone"
+	//BaseLineRemoveAPI - api to remove a baseline
+	BaseLineRemoveAPI = "/api/TemplateService/Actions/TemplateService.RemoveBaseline"
 )
 
 // Messages constants
@@ -66,6 +78,8 @@ const (
 	ErrEmptyBodyMsg = "body cannot be empty"
 	// ErrInvalidDeviceIdentifiers - error message for invalid device service tag
 	ErrInvalidDeviceIdentifiers = "invalid device servicetag or id"
+	// ErrComplianceTemplateIDOrName - error message when either compliance template ID or name is not given
+	ErrComplianceTemplateIDOrName = "either compliance template ID or template name is expected"
 	// ErrEmptyDeviceDetails - error message when both device service tag and device id not given
 	ErrEmptyDeviceDetails = "either Device ID or Servicetag is required"
 	// ErrInvalidFqdds = error message for invalid fqdds
@@ -114,6 +128,36 @@ const (
 	ErrImportDeployment = "Unable to import deployment"
 	// ErrImportNoProfiles - message returned when import deployment fails for no existing profile
 	ErrImportNoProfiles = "no deployment profiles exist for the template - %s"
+	// ErrScheduleNotification - message returned when email address are not provided when schedule notification is true
+	ErrScheduleNotification = "please provide a valid email address, when schedule notification is set to true"
+	// ErrGnrCreateBaseline - summary returned when failed to create baseline
+	ErrGnrCreateBaseline = "error creating a baseline"
+	// ErrGnrUpdateBaseline - summary returned when failed to update baseline
+	ErrGnrUpdateBaseline = "error updating a baseline"
+	// ErrGnrDeleteBaseline - summary returned when failed to delete baseline
+	ErrGnrDeleteBaseline = "error deleting a baseline"
+	// ErrGnrReadBaseline - summary returned when failed to read baseline
+	ErrGnrReadBaseline = "error reading a baseline"
+	// ErrGnrImportBaseline - message returned when import baseline fails
+	ErrGnrImportBaseline = "Unable to import baseline"
+	// ErrInvalidEmailAddress - message returned when invalid email address is provided
+	ErrInvalidEmailAddress = "invalid email address %s"
+	// ErrInvalidCronExpression - message returned when invalid cron expression is not provided
+	ErrInvalidCronExpression = "cron value is required when notification is scheduled"
+	// ErrInvalidRefTemplateNameorID - refernce template name required
+	ErrInvalidRefTemplateNameorID = "either reference template Id or template name is required"
+	// ErrInvalidRefTemplateType - template type is not comliance
+	ErrInvalidRefTemplateType = "reference template id or name should be of type compliance"
+	// ErrBaselineCreationTask - baseline report generation task failed
+	ErrBaselineCreationTask = "baseline report generation task failed"
+	// ErrDeviceNotCapable - device capablity
+	ErrDeviceNotCapable = "device with %v are not capable for deployments"
+	// ErrBaseLineJobIsRunning - device capablity
+	ErrBaseLineJobIsRunning = "job with id %d is already running please wait for sometime and try again"
+	// WarningBaselineDeviceCapability - message returned when create baseline has incompatible devices
+	WarningBaselineDeviceCapability = "%v devices are not valid to create baseline"
+	// ErrBaselineNameNotFound - message returned when provided baseline name does not exist
+	ErrBaselineNameNotFound = "baseline not found: %s"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job
@@ -122,6 +166,8 @@ var FailureStatusIDs = []any{2070, 2090, 2100, 2101, 2102, 2103}
 const (
 	// ValidFQDDS = Valid FQDDS supported in template creation
 	ValidFQDDS string = "iDRAC,System,BIOS,NIC,LifeCycleController,RAID,EventFilters"
+	// ValidOutputFormat - valid output formats
+	ValidOutputFormat string = "html,csv,pdf,xls"
 	// ValidTemplateViewTypes = Valid template view types supported in template creation
 	ValidTemplateViewTypes string = "Deployment,Compliance"
 )

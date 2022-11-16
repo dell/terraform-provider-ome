@@ -165,3 +165,38 @@ func TestClientPreReqHook(t *testing.T) {
 	}
 	ClientPreReqHook(c, request)
 }
+
+func TestGetJob(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name  string
+		id    int64
+		jr    JobResp
+		isErr bool
+	}{
+		{"Get Job respone success", 1, JobResp{ID: 1, LastRunStatus: JobStatus{ID: 2060}}, false},
+		{"Get Job respone failure", 2, JobResp{ID: 1, LastRunStatus: JobStatus{ID: 2070}}, false},
+		{"Get Job respone warning", 3, JobResp{ID: 1, LastRunStatus: JobStatus{ID: 2090}}, false},
+		{"Get Job respone error", 4, JobResp{ID: 1, LastRunStatus: JobStatus{ID: 2016}}, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resp, err := c.GetJob(tt.id)
+			if tt.isErr {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.NotNil(t, resp)
+				assert.Equal(t, tt.jr.LastRunStatus.ID, resp.LastRunStatus.ID)
+			}
+		})
+	}
+}
