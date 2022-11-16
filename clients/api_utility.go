@@ -22,15 +22,27 @@ type AuthReq struct {
 	SessionType string `json:"SessionType"`
 }
 
-// LastRunStatus is the status returned by the jobs API
-type LastRunStatus struct {
+// JobStatus is the status returned by the jobs API
+type JobStatus struct {
 	ID   int    `json:"Id"`
 	Name string `json:"Name"`
 }
 
 // JobResp is the response returned by the jobs API
 type JobResp struct {
-	LastRunStatus LastRunStatus `json:"LastRunStatus"`
+	ID             int64     `json:"Id"`
+	JobName        string    `json:"JobName"`
+	JobDescription string    `json:"JobDescription"`
+	NextRun        string    `json:"NextRun"`
+	LastRun        string    `json:"LastRun"`
+	StartTime      string    `json:"StartTime"`
+	EndTime        string    `json:"EndTime"`
+	Schedule       string    `json:"Schedule"`
+	State          string    `json:"State"`
+	CreatedBy      string    `json:"CreatedBy"`
+	LastRunStatus  JobStatus `json:"LastRunStatus"`
+	JobType        JobStatus `json:"JobType"`
+	JobStatus      JobStatus `json:"JobStatus"`
 }
 
 // LastExecutionDetail is response returned by LastExecutionDetail job API
@@ -120,6 +132,18 @@ func (c *Client) TrackJob(jobID int64, maxRetries int64, sleepInterval int64) (b
 	}
 
 	return status, message
+}
+
+// GetJob - returns a job detail for job id
+func (c *Client) GetJob(jobID int64) (JobResp, error) {
+	api := fmt.Sprintf(JobAPI+"(%d)", jobID)
+	resp, err := c.Get(api, nil, nil)
+	if err != nil {
+		return JobResp{}, err
+	}
+	jr := &JobResp{}
+	parseResponse(c, resp, &jr)
+	return *jr, nil
 }
 
 func parseResponse(c *Client, resp *http.Response, in interface{}) {

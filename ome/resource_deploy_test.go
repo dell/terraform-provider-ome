@@ -1,7 +1,6 @@
 package ome
 
 import (
-	"os"
 	"regexp"
 	"terraform-provider-ome/clients"
 	"testing"
@@ -17,8 +16,8 @@ const (
 )
 
 func TestTemplateDeploy_InvalidTemplate(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -42,10 +41,9 @@ func TestTemplateDeploy_InvalidTemplate(t *testing.T) {
 }
 
 func TestTemplateDeploy_CreateAndUpdateDeploySuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
-
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testProviderFactory,
@@ -73,8 +71,8 @@ func TestTemplateDeploy_CreateAndUpdateDeploySuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_CreateUpdateDeployWithScheduleSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -102,8 +100,8 @@ func TestTemplateDeploy_CreateUpdateDeployWithScheduleSuccess(t *testing.T) {
 }
 
 func TestTemplateDeploy_ImportDeploymentError(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	assertTFImportState := func(s []*terraform.InstanceState) error {
@@ -149,8 +147,8 @@ func TestTemplateDeploy_ImportDeploymentError(t *testing.T) {
 }
 
 func TestTemplateDeploy_CreateDeployBootNetworkISOSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
