@@ -138,6 +138,8 @@ const (
 	ErrGnrDeleteBaseline = "error deleting a baseline"
 	// ErrGnrReadBaseline - summary returned when failed to read baseline
 	ErrGnrReadBaseline = "error reading a baseline"
+	// ErrGnrImportBaseline - message returned when import baseline fails
+	ErrGnrImportBaseline = "Unable to import baseline"
 	// ErrInvalidEmailAddress - message returned when invalid email address is provided
 	ErrInvalidEmailAddress = "invalid email address %s"
 	// ErrInvalidCronExpression - message returned when invalid cron expression is not provided
@@ -154,6 +156,8 @@ const (
 	ErrBaseLineJobIsRunning = "job with id %d is already running please wait for sometime and try again"
 	// WarningBaselineDeviceCapability - message returned when create baseline has incompatible devices
 	WarningBaselineDeviceCapability = "%v devices are not valid to create baseline"
+	// ErrBaselineNameNotFound - message returned when provided baseline name does not exist
+	ErrBaselineNameNotFound = "baseline not found: %s"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job

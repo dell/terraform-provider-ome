@@ -56,5 +56,5 @@ func testAccPreCheck(t *testing.T) {
 }
 
 func skipTest() bool {
-	return os.Getenv("TF_ACC") == "" && os.Getenv("ACC_DETAIL") == ""
+	return os.Getenv("TF_ACC") == "" || os.Getenv("ACC_DETAIL") == ""
 }

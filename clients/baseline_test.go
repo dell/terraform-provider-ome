@@ -278,3 +278,63 @@ func TestClient_GetBaselineDeviceAttrComplianceReportByID(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_GetBaselineByName(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name         string
+		baselineName string
+	}{
+		{"Get Baseline By Name from first page in response successfully", "TestAccBaseline1"},
+		{"Get Baseline By Name from second page in response successfully", "TestAccBaseline2"},
+		{"Get Baseline By Name from third page in response successfully", "TestAccBaseline3"},
+		{"Get Baseline By Invalid Name failure", "test_acc_invalid_baseline"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			baseline, err := c.GetBaselineByName(tt.baselineName)
+			if tt.baselineName == "test_acc_invalid_baseline" {
+				assert.NotNil(t, err)
+				assert.Equal(t, models.OmeBaseline{}, baseline)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.baselineName, baseline.Name)
+			}
+		})
+	}
+}
+
+func TestBaselineUnAuth(t *testing.T) {
+
+	ts := createNewTLSServerWithPort(t, 8235, mockPortUnAuth)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	response, err := c.GetBaselineByName("unauth_baseline1")
+	assert.NotNil(t, err)
+	assert.Equal(t, "", response.Name)
+}
+
+func TestBaselineInvalidJson(t *testing.T) {
+
+	ts := createNewTLSServerWithPort(t, 8236, mockPortInValidJSON)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	response, err := c.GetBaselineByName("invalid_json_baseline1")
+	assert.NotNil(t, err)
+	assert.Equal(t, "", response.Name)
+}

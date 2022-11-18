@@ -40,12 +40,18 @@ type OmeBaseline struct {
 	TemplateName            string                  `json:"TemplateName"`
 	TemplateType            int64                   `json:"TemplateType"`
 	TaskID                  int64                   `json:"TaskId"`
-	PercentageComplete      int64                   `json:"PercentageComplete"`
+	PercentageComplete      string                  `json:"PercentageComplete"`
 	TaskStatus              int64                   `json:"TaskStatus"`
 	LastRun                 string                  `json:"LastRun"`
 	BaselineTargets         []BaselineTarget        `json:"BaselineTargets"`
 	ConfigComplianceSummary ConfigComplianceSummary `json:"ConfigComplianceSummary"`
 	NotificationSettings    *NotificationSettings   `json:"NotificationSettings,omitempty"`
+}
+
+// OmeBaselines contains the list of ome baseline details in the response
+type OmeBaselines struct {
+	Value    []OmeBaseline `json:"value"`
+	NextLink string        `json:"@odata.nextLink"`
 }
 
 // ConfigComplianceSummary - holds compliance summary returned in GET Baseline by ID
