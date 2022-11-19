@@ -573,6 +573,8 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req tfsd
 		return
 	}
 
+	defer omeClient.RemoveSession()
+
 	baseline, err := omeClient.GetBaselineByName(baselineName)
 	if err != nil {
 		resp.Diagnostics.AddError(clients.ErrImportDeployment, err.Error())
