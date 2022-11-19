@@ -573,13 +573,16 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req tfsd
 		return
 	}
 
-	baseline ,err := omeClient.GetBaselineByName(baselineName)
+	baseline, err := omeClient.GetBaselineByName(baselineName)
 	if err != nil {
 		resp.Diagnostics.AddError(clients.ErrImportDeployment, err.Error())
 		return
 	}
 	updateBaselineState(ctx, &state, &state, baseline, clients.ServiceTags, omeClient)
 	//Save into State
+	state.EmailAddresses.ElemType = types.StringType
+	state.DeviceIDs.ElemType = types.Int64Type
+
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
