@@ -28,6 +28,7 @@ website/node_modules
 .vscode/
 website/vendor
 terraform-provider-ome
+demo/*
 
 # Test exclusions
 !command/test-fixtures/**/*.tfstate

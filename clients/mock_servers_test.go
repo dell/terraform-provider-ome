@@ -52,7 +52,7 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 		}
 
 		shouldReturn6 := mockBaselineAPIs(r, w) || mockGetBaselineByIDAPI(r, w) ||
-			mockGetBaselineDevComplianceReportByIDAPI(r, w) || mockGetBaselineDevAttrComplianceReportByIDAPI(r, w)
+			mockGetBaselineDevComplianceReportByIDAPI(r, w) || mockGetBaselineDevAttrComplianceReportByIDAPI(r, w) || mockGetBaselineByNameAPI(r, w)
 		if shouldReturn6 {
 			return
 		}
@@ -1845,6 +1845,174 @@ func mockCloneTemplateAPI(r *http.Request, w http.ResponseWriter) bool {
 				}
 			}`))
 		}
+		return true
+	}
+	return false
+}
+
+func mockGetBaselineByNameAPI(r *http.Request, w http.ResponseWriter) bool {
+	// first page
+	if (r.URL.Path == BaselineAPI && r.URL.RawQuery == "") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.Baseline)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.Baseline",
+					"@odata.id": "/api/TemplateService/Baselines(162)",
+					"Id": 162,
+					"Name": "TestAccBaseline1",
+					"Description": null,
+					"TemplateId": 745,
+					"TemplateName": "test_acc_compliance_template",
+					"TemplateType": 2,
+					"TaskId": 12399,
+					"PercentageComplete": "100",
+					"TaskStatus": 2060,
+					"LastRun": "2022-11-18 04:32:16.838",
+					"BaselineTargets": [
+						{
+							"Id": 12152,
+							"Type": {
+								"Id": 1000,
+								"Name": "DEVICE"
+							}
+						}
+					],
+					"ConfigComplianceSummary": {
+						"ComplianceStatus": "NOT_INVENTORIED",
+						"NumberOfCritical": 0,
+						"NumberOfWarning": 0,
+						"NumberOfNormal": 0,
+						"NumberOfIncomplete": 1
+					},
+					"NotificationSettings": {
+						"NotificationType": "NOTIFY_ON_SCHEDULE",
+						"Schedule": {
+							"Cron": "0 10 5 * * ? *",
+							"StartTime": "2022-11-18 05:10:59.780",
+							"EndTime": null
+						},
+						"EmailAddresses": [
+							"dell@dell.com"
+						],
+						"OutputFormat": "html"
+					},
+					"DeviceConfigComplianceReports@odata.navigationLink": "/api/TemplateService/Baselines(162)/DeviceConfigComplianceReports"
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Baselines?skip=1&top=1"
+		}`))
+		return true
+	}
+	// second page
+	if (r.URL.Path == BaselineAPI && strings.EqualFold(r.URL.RawQuery, "skip=1&top=1")) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.Baseline)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.Baseline",
+					"@odata.id": "/api/TemplateService/Baselines(163)",
+					"Id": 163,
+					"Name": "TestAccBaseline2",
+					"Description": null,
+					"TemplateId": 745,
+					"TemplateName": "test_acc_compliance_template",
+					"TemplateType": 2,
+					"TaskId": 12400,
+					"PercentageComplete": "100",
+					"TaskStatus": 2060,
+					"LastRun": "2022-11-18 04:32:16.838",
+					"BaselineTargets": [
+						{
+							"Id": 12152,
+							"Type": {
+								"Id": 1000,
+								"Name": "DEVICE"
+							}
+						}
+					],
+					"ConfigComplianceSummary": {
+						"ComplianceStatus": "NOT_INVENTORIED",
+						"NumberOfCritical": 0,
+						"NumberOfWarning": 0,
+						"NumberOfNormal": 0,
+						"NumberOfIncomplete": 1
+					},
+					"NotificationSettings": {
+						"NotificationType": "NOTIFY_ON_SCHEDULE",
+						"Schedule": {
+							"Cron": "0 10 5 * * ? *",
+							"StartTime": "2022-11-18 05:10:59.780",
+							"EndTime": null
+						},
+						"EmailAddresses": [
+							"dell@dell.com"
+						],
+						"OutputFormat": "html"
+					},
+					"DeviceConfigComplianceReports@odata.navigationLink": "/api/TemplateService/Baselines(163)/DeviceConfigComplianceReports"
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Baselines?skip=2&top=1"
+		}`))
+		return true
+	}
+	// third page
+	if (r.URL.Path == BaselineAPI && strings.EqualFold(r.URL.RawQuery, "skip=2&top=1")) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.Baseline)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.Baseline",
+					"@odata.id": "/api/TemplateService/Baselines(164)",
+					"Id": 164,
+					"Name": "TestAccBaseline3",
+					"Description": null,
+					"TemplateId": 745,
+					"TemplateName": "test_acc_compliance_template",
+					"TemplateType": 2,
+					"TaskId": 12401,
+					"PercentageComplete": "100",
+					"TaskStatus": 2050,
+					"LastRun": "2022-11-18 04:32:16.838",
+					"BaselineTargets": [
+						{
+							"Id": 12152,
+							"Type": {
+								"Id": 1000,
+								"Name": "DEVICE"
+							}
+						}
+					],
+					"ConfigComplianceSummary": {
+						"ComplianceStatus": "NOT_INVENTORIED",
+						"NumberOfCritical": 0,
+						"NumberOfWarning": 0,
+						"NumberOfNormal": 0,
+						"NumberOfIncomplete": 1
+					},
+					"NotificationSettings": {
+						"NotificationType": "NOTIFY_ON_SCHEDULE",
+						"Schedule": {
+							"Cron": "0 10 5 * * ? *",
+							"StartTime": "2022-11-18 05:10:59.780",
+							"EndTime": null
+						},
+						"EmailAddresses": [
+							"dell@dell.com"
+						],
+						"OutputFormat": "html"
+					},
+					"DeviceConfigComplianceReports@odata.navigationLink": "/api/TemplateService/Baselines(164)/DeviceConfigComplianceReports"
+				}
+			]
+		}`))
 		return true
 	}
 	return false

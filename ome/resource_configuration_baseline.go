@@ -388,26 +388,28 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req tfsdk.Upd
 		"jobid": state.TaskID.Value,
 	})
 
-	jr, err := omeClient.GetJob(state.TaskID.Value)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrGnrUpdateBaseline,
-			err.Error(),
-		)
-		return
-	}
-	tflog.Debug(ctx, "resource_configuration_baseline update job status is", map[string]interface{}{
-		"jobid":  state.TaskID.Value,
-		"status": jr.LastRunStatus.ID,
-	})
+	if state.TaskID.Value != 0 {
+		jr, err := omeClient.GetJob(state.TaskID.Value)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				clients.ErrGnrUpdateBaseline,
+				err.Error(),
+			)
+			return
+		}
+		tflog.Debug(ctx, "resource_configuration_baseline update job status is", map[string]interface{}{
+			"jobid":  state.TaskID.Value,
+			"status": jr.LastRunStatus.ID,
+		})
 
-	//if job is running during update, throw error
-	if jr.LastRunStatus.ID == clients.RunningStatusID {
-		resp.Diagnostics.AddError(
-			clients.ErrGnrUpdateBaseline,
-			clients.ErrBaseLineJobIsRunning,
-		)
-		return
+		//if job is running during update, throw error
+		if jr.LastRunStatus.ID == clients.RunningStatusID {
+			resp.Diagnostics.AddError(
+				clients.ErrGnrUpdateBaseline,
+				clients.ErrBaseLineJobIsRunning,
+			)
+			return
+		}
 	}
 
 	tflog.Info(ctx, "resource_configuration_baseline update Validating Template Details")
@@ -551,6 +553,8 @@ func (r resourceConfigurationBaseline) Delete(ctx context.Context, req tfsdk.Del
 func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
 	// Save the import identifier in the id attribute
 	var state models.ConfigureBaselines
+	baselineName := req.ID
+
 	omeClient, err := clients.NewClient(*r.p.clientOpt)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -569,6 +573,12 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req tfsd
 		return
 	}
 
+	baseline ,err := omeClient.GetBaselineByName(baselineName)
+	if err != nil {
+		resp.Diagnostics.AddError(clients.ErrImportDeployment, err.Error())
+		return
+	}
+	updateBaselineState(ctx, &state, &state, baseline, clients.ServiceTags, omeClient)
 	//Save into State
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)

@@ -57,6 +57,15 @@ func (c *Client) GetBaselineByID(id int64) (models.OmeBaseline, error) {
 	return omeBaseline, err
 }
 
+// GetBaselineByName gets the baseline details by baseline name .
+func (c *Client) GetBaselineByName(name string) (models.OmeBaseline, error) {
+	omeBaseline, err := c.getBaseline(BaselineAPI, name)
+	if err != nil {
+		return models.OmeBaseline{}, err
+	}
+	return omeBaseline, nil
+}
+
 // GetBaselineDevComplianceReportsByID gets baseline device compliance report by baseline ID as string
 func (c *Client) GetBaselineDevComplianceReportsByID(baselineID int64) (string, error) {
 	response, err := c.Get(fmt.Sprintf(BaselineDeviceComplianceReportsAPI, baselineID), nil, nil)
@@ -77,4 +86,27 @@ func (c *Client) GetBaselineDevAttrComplianceReportsByID(baselineID int64, devic
 
 	respData, _ := c.GetBodyData(response.Body)
 	return string(respData), err
+}
+
+func (c *Client) getBaseline(url, name string) (models.OmeBaseline, error) {
+	omeBaselines := models.OmeBaselines{}
+	response, err := c.Get(url, nil, nil)
+	if err != nil {
+		return models.OmeBaseline{}, err
+	}
+
+	respData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshal(respData, &omeBaselines)
+	if err != nil {
+		return models.OmeBaseline{}, err
+	}
+	for _, omeBaseline := range omeBaselines.Value {
+		if omeBaseline.Name == name {
+			return omeBaseline, nil
+		}
+	}
+	for omeBaselines.NextLink != "" {
+		return c.getBaseline(omeBaselines.NextLink, name)
+	}
+	return models.OmeBaseline{}, fmt.Errorf(ErrBaselineNameNotFound, name)
 }
