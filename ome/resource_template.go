@@ -884,7 +884,6 @@ func (r resourceTemplate) ImportState(ctx context.Context, req tfsdk.ImportResou
 
 	omeAttributes, err := omeClient.GetTemplateAttributes(omeTemplateData.ID, []models.Attribute{}, true)
 	if err != nil {
-		fmt.Printf("Error in get template attr: %s", err.Error())
 		resp.Diagnostics.AddError(
 			"unable to get template attributes:",
 			err.Error(),

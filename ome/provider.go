@@ -151,9 +151,10 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 
 func (p *provider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceType, diag.Diagnostics) {
 	return map[string]tfsdk.ResourceType{
-		"ome_template":               resourceTemplateType{},
-		"ome_deployment":             resourceDeploymentType{},
-		"ome_configuration_baseline": resourceConfigurationBaselineType{},
+		"ome_template":                  resourceTemplateType{},
+		"ome_deployment":                resourceDeploymentType{},
+		"ome_configuration_baseline":    resourceConfigurationBaselineType{},
+		"ome_configuration_compliance": resourceConfigurationComplianceType{},
 	}, nil
 }
 

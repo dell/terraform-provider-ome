@@ -46,7 +46,7 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 			return
 		}
 
-		shouldReturn5 := mockGetServerProfileInfoByTemplateNameAPIs(r, w)
+		shouldReturn5 := mockGetServerProfileInfoByTemplateNameAPIs(r, w) || mockConfigRemediationAPIs(r, w) || mockDeviceComplianceReportAPIs(r, w)
 		if shouldReturn5 {
 			return
 		}
@@ -2012,6 +2012,150 @@ func mockGetBaselineByNameAPI(r *http.Request, w http.ResponseWriter) bool {
 					"DeviceConfigComplianceReports@odata.navigationLink": "/api/TemplateService/Baselines(164)/DeviceConfigComplianceReports"
 				}
 			]
+		}`))
+		return true
+	}
+	return false
+}
+
+func mockConfigRemediationAPIs(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == BaseLineConfigRemediationAPI) && r.Method == "POST" {
+		requestStruct := models.ConfigurationRemediationPayload{}
+		err := json.NewDecoder(r.Body).Decode(&requestStruct)
+		if err != nil {
+			return false
+		}
+		if requestStruct.ID == 100 {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`12345`))
+		} else if requestStruct.ID == 101 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM9021",
+							"RelatedProperties": [],
+							"Message": "Unable to deploy the template.",
+							"MessageArgs": [],
+							"Severity": "Warning",
+							"Resolution": "Review the reason and initiate necessary resolution."
+						}
+					]
+				}
+			}`))
+		}
+		return true
+	}
+	return false
+}
+
+func mockDeviceComplianceReportAPIs(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == fmt.Sprintf(BaseLineConfigDeviceCompReport, 185) && r.URL.RawQuery == "") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.DeviceConfigComplianceReports)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.DeviceConfigComplianceReports",
+					"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12328)",
+					"Id": 12328,
+					"DeviceName": "MINWINPC",
+					"IpAddress": "192.168.0.1",
+					"IpAddresses": [
+						"192.168.0.1"
+					],
+					"Model": "PowerEdge MX740c",
+					"ServiceTag": "MXL1234",
+					"ComplianceStatus": 2,
+					"DeviceType": 1000,
+					"InventoryTime": "2022-11-22 00:00:37.638264",
+					"DeviceComplianceDetails": {
+						"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12328)/DeviceComplianceDetails"
+					}
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports?skip=1&top=1"
+		}`))
+		return true
+	}
+	if (r.URL.Path == fmt.Sprintf(BaseLineConfigDeviceCompReport, 185) && strings.EqualFold(r.URL.RawQuery, "skip=1&top=1")) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.DeviceConfigComplianceReports)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.DeviceConfigComplianceReports",
+					"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12329)",
+					"Id": 12329,
+					"DeviceName": "MINWINPC1",
+					"IpAddress": "192.168.0.2",
+					"IpAddresses": [
+						"192.168.0.2"
+					],
+					"Model": "PowerEdge MX740c",
+					"ServiceTag": "MXL1235",
+					"ComplianceStatus": 2,
+					"DeviceType": 1000,
+					"InventoryTime": "2022-11-22 00:00:37.638264",
+					"DeviceComplianceDetails": {
+						"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12329)/DeviceComplianceDetails"
+					}
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports?skip=2&top=1"
+		}`))
+		return true
+	}
+	if (r.URL.Path == fmt.Sprintf(BaseLineConfigDeviceCompReport, 185) && strings.EqualFold(r.URL.RawQuery, "skip=2&top=1")) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.DeviceConfigComplianceReports)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.DeviceConfigComplianceReports",
+					"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12330)",
+					"Id": 12330,
+					"DeviceName": "MINWINPC2",
+					"IpAddress": "192.168.0.3",
+					"IpAddresses": [
+						"192.168.0.3"
+					],
+					"Model": "PowerEdge MX740c",
+					"ServiceTag": "MXL1236",
+					"ComplianceStatus": 2,
+					"DeviceType": 1000,
+					"InventoryTime": "2022-11-22 00:00:37.638264",
+					"DeviceComplianceDetails": {
+						"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12330)/DeviceComplianceDetails"
+					}
+				}
+			]
+		}`))
+		return true
+	}
+	if (r.URL.Path == fmt.Sprintf(BaseLineConfigDeviceCompReport, 186)) && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{
+			"error": {
+				"code": "Base.1.0.GeneralError",
+				"message": "A general error has occurred. See ExtendedInfo for more information.",
+				"@Message.ExtendedInfo": [
+					{
+						"MessageId": "CGEN1008",
+						"RelatedProperties": [],
+						"Message": "Unable to process the request because an error occurred.",
+						"MessageArgs": [],
+						"Severity": "Critical",
+						"Resolution": "Retry the operation. If the issue persists, contact your system administrator."
+					}
+				]
+			}
 		}`))
 		return true
 	}

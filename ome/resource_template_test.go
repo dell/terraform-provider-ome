@@ -396,7 +396,6 @@ func checkResourceCreation(t *testing.T, p tfsdk.Provider) resource.TestCheckFun
 	return func(s *terraform.State) error {
 		templateAPI := "/api/TemplateService/Templates?$filter=Name eq '%s'"
 		template1URL := fmt.Sprintf(templateAPI, TemplateName1)
-		fmt.Println("Ome template 1 url", template1URL)
 		template2URL := fmt.Sprintf(templateAPI, TemplateName2)
 		provider := p.(*provider)
 		omeClient, err := clients.NewClient(*provider.clientOpt)
@@ -420,7 +419,6 @@ func checkResourceCreation(t *testing.T, p tfsdk.Provider) resource.TestCheckFun
 		}
 
 		omeTemplate1 := omeTemplates1.Value[0]
-		fmt.Println("Ome template 1", omeTemplate1)
 		assert.Equal(t, TemplateName1, omeTemplate1.Name)
 		assert.Equal(t, int64(2), omeTemplate1.ViewTypeID)
 

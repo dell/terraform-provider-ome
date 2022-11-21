@@ -21,3 +21,50 @@ func DeviceMutuallyExclusive(serviceTags []string, devIDs []int64) (string, erro
 	}
 	return usedDeviceInput, nil
 }
+
+// CompareInt64 compares the two array and reurns the diff
+func CompareInt64(comparing, comparedTo []int64) []int64 {
+	compareToMap := make(map[int64]int64)
+	for _, val := range comparedTo {
+		compareToMap[val]++
+	}
+
+	var diff []int64
+	for _, val := range comparing {
+		if compareToMap[val] > 0 {
+			compareToMap[val]--
+			continue
+		}
+		diff = append(diff, val)
+	}
+	return diff
+}
+
+// CompareString compares the two array and returns the diff
+func CompareString(comparing, comparedTo []string) []string {
+	compareToMap := make(map[string]int64)
+	for _, val := range comparedTo {
+		compareToMap[val]++
+	}
+
+	var diff []string
+	for _, val := range comparing {
+		if compareToMap[val] > 0 {
+			compareToMap[val]--
+			continue
+		}
+		diff = append(diff, val)
+	}
+	return diff
+}
+
+// FindElementInIntArray finds the element in an array
+func FindElementInIntArray(arr []int64, find int64) int {
+	index := -1
+	for i := 0; i < len(arr); i++ {
+		if arr[i] == find {
+			index = i
+		}
+	}
+	return index
+}

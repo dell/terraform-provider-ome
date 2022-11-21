@@ -1,10 +1,19 @@
 package clients
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 )
+
+// PaginationData common
+type PaginationData struct {
+	OdataContext string                   `json:"@odata.context"`
+	OdataCount   int64                    `json:"@odata.count"`
+	Value        []map[string]interface{} `json:"value"`
+	NextLink     string                   `json:"@odata.nextLink"`
+}
 
 // AuthReq holds payload for authentication to create a session
 type AuthReq struct {
@@ -163,4 +172,39 @@ func ClientPreReqHook(c *Client, r *http.Request) {
 	if c.GetSessionToken() != "" {
 		r.Header.Set(AuthTokenHeader, c.GetSessionToken())
 	}
+}
+
+// GetPaginatedData - returns all the paginated data
+func (c *Client) GetPaginatedData(url string, in interface{}) error {
+
+	response, err := c.Get(url, nil, nil)
+	if err != nil {
+		return err
+	}
+	var allData []map[string]interface{}
+	pd := PaginationData{}
+	bodyData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshal(bodyData, &pd)
+	if err != nil {
+		return err
+	}
+	allData = append(allData, pd.Value...)
+	for pd.NextLink != "" {
+		response, err := c.Get(pd.NextLink, nil, nil)
+		if err != nil {
+			return err
+		}
+		pd = PaginationData{}
+		bodyData, _ := c.GetBodyData(response.Body)
+		err = c.JSONUnMarshal(bodyData, &pd)
+		if err != nil {
+			return err
+		}
+		allData = append(allData, pd.Value...)
+	}
+
+	jsonString, _ := json.Marshal(allData)
+	_ = json.Unmarshal(jsonString, &in)
+
+	return nil
 }

@@ -66,6 +66,10 @@ const (
 	CloneTemplateAPI = "/api/TemplateService/Actions/TemplateService.Clone"
 	//BaseLineRemoveAPI - api to remove a baseline
 	BaseLineRemoveAPI = "/api/TemplateService/Actions/TemplateService.RemoveBaseline"
+	//BaseLineConfigRemediationAPI - api to remediate a baseline
+	BaseLineConfigRemediationAPI = "/api/TemplateService/Actions/TemplateService.Remediate"
+	//BaseLineConfigDeviceCompReport - api to get device compliance report of a baseline
+	BaseLineConfigDeviceCompReport = "/api/TemplateService/Baselines(%d)/DeviceConfigComplianceReports"
 )
 
 // Messages constants
@@ -158,6 +162,26 @@ const (
 	WarningBaselineDeviceCapability = "%v devices are not valid to create baseline"
 	// ErrBaselineNameNotFound - message returned when provided baseline name does not exist
 	ErrBaselineNameNotFound = "baseline not found: %s"
+	// ErrGnrBaseLineCreateRemediation - message returned when there is a error in baseline remediation for configuration
+	ErrGnrBaseLineCreateRemediation = "baseline configuration remediation create error"
+	// ErrGnrBaseLineRemediation - message returned when there is a error in baseline remediation for configuration
+	ErrGnrBaseLineReadRemediation = "baseline configuration remediation read error"
+	// ErrGnrBaseLineRemediation - message returned when there is a baseline report generation in progress
+	ErrBaseLineReportInProgress = "inventory update is in progress, retry after some time"
+	// ErrBaseLineInvalidDevices - message returned when baseline has invalid devices
+	ErrBaseLineInvalidDevices = "devices %v are not part of a baseline"
+	// ErrBaseLineInvalid - message returned when baseline name or id is invalid
+	ErrBaseLineInvalid = "either baseline name or id is required"
+	// ErrBaseLineUpdateRemediation - message returned when there is a error in baseline remediation for configuration
+	ErrBaseLineUpdateRemediation = "baseline configuration remediation update error"
+	// ErrBaseLineUpdateRemediation - message returned when baseline name or id is changed
+	ErrBaseLineModified = "baseline name or id cannot be modified"
+	// ErrBaseLineTargetsSize - message returned when min length is not satisfied
+	ErrBaseLineTargetsSize = "list must contain at least %d elements"
+	// ErrBaseLineTargetsSize - message returned when min length is not satisfied
+	ErrBaseLineComplianceStatus = "supported value is %s"
+	// ErrBaselineReportForDevice - message returned when device report is not avaiable for a servicetag
+	ErrBaselineReportForDevice = "device reports not found for baseline %d and device %s"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job
@@ -170,6 +194,8 @@ const (
 	ValidOutputFormat string = "html,csv,pdf,xls"
 	// ValidTemplateViewTypes = Valid template view types supported in template creation
 	ValidTemplateViewTypes string = "Deployment,Compliance"
+	// ValidTemplateViewTypes = Valid template view types supported in template creation
+	ValidComplainceStatus string = "Compliant"
 )
 
 // constants for Vlan attributes

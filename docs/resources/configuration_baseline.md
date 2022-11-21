@@ -3,12 +3,12 @@
 page_title: "ome_configuration_baseline Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing configuration baselines on OpenManage Enterprise.
+  Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for the following parameters: baseline_name, description, device_ids, device_servicetags, schedule_notification, notification_on_schedule, email_addresses, output_format, cron, job_retry_count, sleep_interval.
 ---
 
 # ome_configuration_baseline (Resource)
 
-Resource for managing configuration baselines on OpenManage Enterprise.
+Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for the following parameters: `baseline_name`, `description`, `device_ids`, `device_servicetags`, `schedule_notification`, `notification_on_schedule`, `email_addresses`, `output_format`, `cron`, `job_retry_count`, `sleep_interval`.
 
 ## Example Usage
 
