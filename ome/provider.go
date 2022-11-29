@@ -160,6 +160,7 @@ func (p *provider) GetDataSources(ctx context.Context) (map[string]tfsdk.DataSou
 	return map[string]tfsdk.DataSourceType{
 		"ome_template_info":     templateDataSourceType{},
 		"ome_groupdevices_info": groupDevicesDataSourceType{},
+		"ome_vlannetworks_info": vlanNetowrksDataSourceType{},
 	}, nil
 }
 

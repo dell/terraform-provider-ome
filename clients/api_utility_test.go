@@ -3,6 +3,7 @@ package clients
 import (
 	"fmt"
 	"net/http"
+	"terraform-provider-ome/models"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -164,4 +165,45 @@ func TestClientPreReqHook(t *testing.T) {
 		})
 	}
 	ClientPreReqHook(c, request)
+}
+
+func TestClient_GetPaginatedData(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	type args struct {
+		url string
+		in  []models.Device
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantData []models.Device
+		wantErr  bool
+	}{
+		{"Test", args{fmt.Sprintf(GroupServiceDevicesAPI, 1013), []models.Device{}}, []models.Device{
+			{ID: 10337},
+			{ID: 10338},
+		}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := c.GetPaginatedData(tt.args.url, &tt.args.in)
+			if tt.wantErr {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+				for i, d := range tt.wantData {
+					assert.Equal(t, d.ID, tt.args.in[i].ID)
+				}
+
+			}
+
+		})
+	}
 }

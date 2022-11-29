@@ -18,12 +18,12 @@ type validFqddsValidator struct {
 
 // Description returns a plain text description of the validator's behavior, suitable for a practitioner to understand its impact.
 func (v validFqddsValidator) Description(ctx context.Context) string {
-	return fmt.Sprintf("Allowed values are  either all or one of these FQDDS: %s", clients.ValidFQDDS)
+	return fmt.Sprintf("Allowed values are : %s", clients.ValidFQDDS)
 }
 
 // MarkdownDescription returns a markdown formatted description of the validator's behavior, suitable for a practitioner to understand its impact.
 func (v validFqddsValidator) MarkdownDescription(ctx context.Context) string {
-	return fmt.Sprintf("Allowed values are  either all or one of these FQDDS: %s", clients.ValidFQDDS)
+	return v.Description(ctx)
 }
 
 // Validate runs the main validation logic of the validator, reading configuration data out of `req` and updating `resp` with diagnostics.
@@ -39,29 +39,24 @@ func (v validFqddsValidator) Validate(ctx context.Context, req tfsdk.ValidateAtt
 		return
 	}
 	inputFqdds := fqdds.Value
-	multipleFqdds := []string{}
-	if strings.Contains(inputFqdds, ",") {
-		multipleFqdds = strings.Split(inputFqdds, ",")
-	}
-	if len(multipleFqdds) == 0 {
-		if strings.Contains(clients.ValidFQDDS, inputFqdds) {
-			return
+	multipleInputFqdds := strings.Split(inputFqdds, ",")
+	multipleValidFqdds := strings.Split(clients.ValidFQDDS, ",")
+	isValid := false
+
+	for _, inpFqdds := range multipleInputFqdds {
+		inputFqddsVal := strings.TrimSpace(inpFqdds)
+		isValid = false
+		for _, validFqdds := range multipleValidFqdds {
+			if strings.EqualFold(validFqdds, inputFqddsVal) {
+				isValid = true
+				break
+			}
 		}
-		resp.Diagnostics.AddAttributeError(
-			req.AttributePath,
-			clients.ErrInvalidFqdds,
-			fmt.Sprintf("FQDDS provided is not in this list of allowed values  %s", clients.ValidFQDDS),
-		)
-		return
-	}
-	for _, inpFqdds := range multipleFqdds {
-		if strings.Contains(clients.ValidFQDDS, strings.TrimSpace(inpFqdds)) {
-			continue
-		} else {
+		if !isValid {
 			resp.Diagnostics.AddAttributeError(
 				req.AttributePath,
 				clients.ErrInvalidFqdds,
-				fmt.Sprintf("FQDDS provided is not in this list of allowed values  :  %s", clients.ValidFQDDS),
+				v.Description(ctx),
 			)
 			break
 		}
@@ -74,12 +69,12 @@ type validTemplateViewTypeValidator struct {
 
 // Description returns a plain text description of the validator's behavior, suitable for a practitioner to understand its impact.
 func (v validTemplateViewTypeValidator) Description(ctx context.Context) string {
-	return fmt.Sprintf("Allowed values are  either all or one of these FQDDS: %s", clients.ValidFQDDS)
+	return fmt.Sprintf("Allowed values are  :  %s ", clients.ValidTemplateViewTypes)
 }
 
 // MarkdownDescription returns a markdown formatted description of the validator's behavior, suitable for a practitioner to understand its impact.
 func (v validTemplateViewTypeValidator) MarkdownDescription(ctx context.Context) string {
-	return fmt.Sprintf("Allowed values are  either all or one of these FQDDS: %s", clients.ValidFQDDS)
+	return v.Description(ctx)
 }
 
 // Validate runs the main validation logic of the validator, reading configuration data out of `req` and updating `resp` with diagnostics.
@@ -97,13 +92,13 @@ func (v validTemplateViewTypeValidator) Validate(ctx context.Context, req tfsdk.
 
 	validTemplateViewTypes := strings.Split(clients.ValidTemplateViewTypes, ",")
 	for _, validTemplateViewType := range validTemplateViewTypes {
-		if templateViewType.Value == validTemplateViewType {
+		if strings.EqualFold(strings.TrimSpace(templateViewType.Value), validTemplateViewType) {
 			return
 		}
 	}
 	resp.Diagnostics.AddAttributeError(
 		req.AttributePath,
 		clients.ErrInvalidTemplateViewType,
-		fmt.Sprintf("Allowed values are either all or one of  :  %s", clients.ValidTemplateViewTypes),
+		v.Description(ctx),
 	)
 }

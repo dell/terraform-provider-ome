@@ -54,6 +54,8 @@ const (
 	DeleteProfileAPI = "/api/ProfileService/Actions/ProfileService.Delete"
 	//CloneTemplateAPI - api to clone a template
 	CloneTemplateAPI = "/api/TemplateService/Actions/TemplateService.Clone"
+	//VlanNetworksAPI - api to vlan networks
+	VlanNetworksAPI = "/api/NetworkConfigurationService/Networks"
 )
 
 // Messages constants
@@ -114,6 +116,17 @@ const (
 	ErrImportDeployment = "Unable to import deployment"
 	// ErrImportNoProfiles - message returned when import deployment fails for no existing profile
 	ErrImportNoProfiles = "no deployment profiles exist for the template - %s"
+
+	// ErrCreateTemplate - message returned when template creation fails
+	ErrCreateTemplate = "Unable to create template"
+	// ErrReadTemplate - message returned when template read fails
+	ErrReadTemplate = "Unable to read template"
+	// ErrUpdateTemplate - message returned when update template fails
+	ErrUpdateTemplate = "Unable to update template"
+	// ErrDeleteTemplate - message returned when template delete fails
+	ErrDeleteTemplate = "Unable to delete template"
+	// ErrImportTemplate - message returned when import template fails
+	ErrImportTemplate = "Unable to import template"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job
@@ -121,7 +134,7 @@ var FailureStatusIDs = []any{2070, 2090, 2100, 2101, 2102, 2103}
 
 const (
 	// ValidFQDDS = Valid FQDDS supported in template creation
-	ValidFQDDS string = "iDRAC,System,BIOS,NIC,LifeCycleController,RAID,EventFilters"
+	ValidFQDDS string = "All,iDRAC,System,BIOS,NIC,LifeCycleController,RAID,EventFilters"
 	// ValidTemplateViewTypes = Valid template view types supported in template creation
 	ValidTemplateViewTypes string = "Deployment,Compliance"
 )
