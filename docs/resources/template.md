@@ -3,12 +3,12 @@
 page_title: "ome_template Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing template on OpenManage Enterprise.
+  Resource for managing template on OpenManage Enterprise. Updates are supported for the following parameters: name, description, attributes, job_retry_count, sleep_interval, identity_pool_name, vlan.
 ---
 
 # ome_template (Resource)
 
-Resource for managing template on OpenManage Enterprise.
+Resource for managing template on OpenManage Enterprise. Updates are supported for the following parameters: `name`, `description`, `attributes`, `job_retry_count`, `sleep_interval`, `identity_pool_name`, `vlan`.
 
 ## Example Usage
 

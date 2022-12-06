@@ -27,7 +27,7 @@ const (
 // Order Resource schema
 func (r resourceTemplateType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Resource for managing template on OpenManage Enterprise.",
+		MarkdownDescription: "Resource for managing template on OpenManage Enterprise. Updates are supported for the following parameters: `name`, `description`, `attributes`, `job_retry_count`, `sleep_interval`, `identity_pool_name`, `vlan`.",
 		Version:             1,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {

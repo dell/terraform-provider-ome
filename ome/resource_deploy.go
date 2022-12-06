@@ -20,7 +20,7 @@ type resourceDeploymentType struct{}
 // Template Deployment Resource schema
 func (r resourceDeploymentType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Resource for managing template deployment on OpenManage Enterprise.",
+		MarkdownDescription: "Resource for managing template deployment on OpenManage Enterprise. Updates are supported for the following parameters: `device_ids`, `device_servicetags`, `boot_to_network_iso`, `forced_shutdown`, `options_time_to_wait_before_shutdown`, `power_state_off`, `options_precheck_only`, `options_strict_checking_vlan`, `options_continue_on_warning`, `run_later`, `cron`, `device_attributes`, `job_retry_count`, `sleep_interval`.",
 		Version:             1,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
