@@ -396,8 +396,11 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 	//PropogateVlan is default true and is not available in the response from OME,hence setting it to true here to persist in state
 	omeVlan.PropagateVLAN = true
 	template.RefdeviceServicetag.Value = plan.RefdeviceServicetag.Value
-	template.RefdeviceID.Value = plan.RefdeviceID.Value
+
 	template.ReftemplateName.Value = plan.ReftemplateName.Value
+	if plan.ReftemplateName.Value != "" {
+		template.RefdeviceID.Value = omeTemplateData.SourceDeviceID
+	}
 	template.ViewType.Value = plan.ViewType.Value
 	template.FQDDS.Value = plan.FQDDS.Value // The default value of fqdds is set to `All`. So if the config doesn't have any value specified, the default value in the plan is `All`.
 	template.JobRetryCount = plan.JobRetryCount

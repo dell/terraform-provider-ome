@@ -1376,6 +1376,26 @@ func mockUnassignProfileAPI(r *http.Request, w http.ResponseWriter) bool {
 					]
 				}
 			}`))
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CGEN6002",
+							"RelatedProperties": [],
+							"Message": "Unable to complete the request because the input value for ProfileIds is missing or an invalid value is entered.",
+							"MessageArgs": [
+								"ProfileIds"
+							],
+							"Severity": "Critical",
+							"Resolution": "Enter a valid value and retry the operation."
+						}
+					]
+				}
+			}`))
 		}
 
 		return true

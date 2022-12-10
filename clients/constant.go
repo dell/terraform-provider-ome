@@ -100,14 +100,18 @@ const (
 	ErrDeviceMutuallyExclusive = "please provide one of the device IDs or service tags"
 	// ErrInvalidTemplate - message returned when invalid template id or name
 	ErrInvalidTemplate = "please provide a valid template ID or name"
-	// ErrPlanToTfsdkConversion - message returned when converting the plan to tfsdk
-	ErrPlanToTfsdkConversion = "Error occured converting the plan values to tfsdk struct"
 	// ErrStateToTfsdkConversion - message returned when converting the state to tfsdk
 	ErrStateToTfsdkConversion = "Error occured converting the state values to tfsdk struct"
 	// ErrStateToTfsdkConversion - message returned when template id or name changed
 	ErrTemplateChanges = "template id or name cannot be changed"
-	// ErrTemplateDeploymentGeneral - message returned when template deployment fails
-	ErrTemplateDeploymentGeneral = "unable to create or update or delete the template deployment resource"
+	// ErrTemplateDeploymentCreate - message returned when template deployment fails
+	ErrTemplateDeploymentCreate = "unable to create template deployment resource"
+	// ErrTemplateDeploymentUpdate - message returned when template deployment fails
+	ErrTemplateDeploymentUpdate = "unable to update template deployment resource"
+	// ErrTemplateDeploymentRead - message returned when template deployment fails
+	ErrTemplateDeploymentRead = "unable to read template deployment resource"
+	// ErrTemplateDeploymentDelete - message returned when template deployment fails
+	ErrTemplateDeploymentDelete = "unable to delete template deployment resource"
 	// ErrCreateClient - message returned when client creation fails
 	ErrCreateClient = "Unable to create client"
 	// ErrCreateSession - message returned when session creation fails

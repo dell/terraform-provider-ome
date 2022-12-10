@@ -2,7 +2,6 @@ package ome
 
 import (
 	"context"
-	"fmt"
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
@@ -133,8 +132,6 @@ func (g vlanNetowrksDataSource) Read(ctx context.Context, req tfsdk.ReadDataSour
 		}
 		state.VlanNetworks = append(state.VlanNetworks, vlanNetTsfdk)
 	}
-
-	fmt.Println("[DEBUG]-Resource State: ", state)
 
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)

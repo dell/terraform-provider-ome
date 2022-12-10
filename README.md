@@ -26,7 +26,7 @@ For general information about Terraform, visit the [official website][tf-website
   * [Support](https://github.com/dell/terraform-provider-ome/blob/main/about/SUPPORT.md)
   * [Security](https://github.com/dell/terraform-provider-ome/blob/main/about/SECURITY.md)
   * [Additional Information](https://github.com/dell/terraform-provider-ome/blob/main/about/ADDITIONAL_INFORMATION.md)
-    * [Additional Information](https://github.com/dell/terraform-provider-ome/blob/main/about/ATTRIBUTION.md)
+  * [Attribution](https://github.com/dell/terraform-provider-ome/blob/main/about/ATTRIBUTION.md)
 
 ## Supported Platforms
   * Dell OpenManage Enterprise versions 3.9.0 (Build 55) and above.

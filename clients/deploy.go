@@ -48,10 +48,13 @@ func (c *Client) DeleteDeployment(deleteDeploymentReq models.ProfileDeleteReques
 	}
 
 	respData, _ := c.GetBodyData(response.Body)
-	val, _ := strconv.ParseInt(string(respData), 10, 64)
-	jobStatus, statusMessage := c.TrackJob(val, 10, 10)
-	if !jobStatus {
-		return fmt.Errorf(statusMessage)
+	jobID, _ := strconv.ParseInt(string(respData), 10, 64)
+
+	if jobID != 0 {
+		jobStatus, statusMessage := c.TrackJob(jobID, 10, 10)
+		if !jobStatus {
+			return fmt.Errorf(statusMessage)
+		}
 	}
 	_, err = c.Post(DeleteProfileAPI, nil, data)
 	if err != nil {

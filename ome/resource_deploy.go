@@ -205,7 +205,6 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
-		fmt.Println(clients.ErrPlanToTfsdkConversion)
 		return
 	}
 	templateDeploymentState := models.TemplateDeployment{}
@@ -264,7 +263,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	usedDeviceInput, err := clients.DeviceMutuallyExclusive(serviceTags, devIDs)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentCreate, err.Error(),
 		)
 		return
 	}
@@ -272,7 +271,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	devices, err := omeClient.GetDevices(serviceTags, devIDs, []string{})
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentCreate, err.Error(),
 		)
 		return
 	}
@@ -315,7 +314,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	deploymentJobID, err := omeClient.CreateDeployment(deploymentRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentCreate, err.Error(),
 		)
 		return
 	}
@@ -329,7 +328,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 		isSuccess, message := omeClient.TrackJob(deploymentJobID, plan.JobRetryCount.Value, plan.SleepInterval.Value)
 		if !isSuccess {
 			resp.Diagnostics.AddWarning(
-				clients.ErrTemplateDeploymentGeneral, message,
+				clients.ErrTemplateDeploymentCreate, message,
 			)
 		}
 	}
@@ -462,7 +461,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 
 	if (plan.TemplateID.Value != 0 && plan.TemplateID.Value != state.TemplateID.Value) || (plan.TemplateName.Value != "" && plan.TemplateName.Value != state.TemplateName.Value) {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral,
+			clients.ErrTemplateDeploymentUpdate,
 			clients.ErrTemplateChanges,
 		)
 		return
@@ -490,7 +489,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	usedDeviceInput, err := clients.DeviceMutuallyExclusive(serviceTags, devIDs)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentUpdate, err.Error(),
 		)
 		return
 	}
@@ -498,7 +497,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	planDevices, err := omeClient.GetDevices(serviceTags, devIDs, []string{})
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentUpdate, err.Error(),
 		)
 		return
 	}
@@ -524,7 +523,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(state.TemplateName.Value)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentUpdate, err.Error(),
 		)
 		return
 	}
@@ -581,7 +580,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 		deploymentJobID, err := omeClient.CreateDeployment(deploymentRequest)
 		if err != nil {
 			resp.Diagnostics.AddError(
-				clients.ErrTemplateDeploymentGeneral, err.Error(),
+				clients.ErrTemplateDeploymentUpdate, err.Error(),
 			)
 			return
 		}
@@ -612,7 +611,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 		err = deleteProfiles(ctx, omeClient, profileArr)
 		if err != nil {
 			resp.Diagnostics.AddError(
-				clients.ErrTemplateDeploymentGeneral,
+				clients.ErrTemplateDeploymentUpdate,
 				err.Error(),
 			)
 			return
@@ -672,7 +671,7 @@ func (r resourceDeployment) Delete(ctx context.Context, req tfsdk.DeleteResource
 	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(statetemplateDeployment.TemplateName.Value)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentDelete, err.Error(),
 		)
 		return
 	}
@@ -690,7 +689,7 @@ func (r resourceDeployment) Delete(ctx context.Context, req tfsdk.DeleteResource
 	err = deleteProfiles(ctx, omeClient, profileArr)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral,
+			clients.ErrTemplateDeploymentDelete,
 			err.Error(),
 		)
 		return
@@ -808,8 +807,8 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 	deviceAttributeObjects := []attr.Value{}
 	deviceAttributeObject := types.Object{
 		AttrTypes: map[string]attr.Type{
-			"device_ids": types.ListType{
-				ElemType: types.Int64Type,
+			"device_servicetags": types.SetType{
+				ElemType: types.StringType,
 			},
 			"attributes": types.ListType{
 				ElemType: types.ObjectType{
@@ -823,8 +822,8 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 			},
 		},
 		Attrs: map[string]attr.Value{
-			"device_ids": devIDsTfsdk,
-			"attributes": attributesTfsdk,
+			"device_servicetags": devSTsTfsdk,
+			"attributes":         attributesTfsdk,
 		},
 	}
 
@@ -833,8 +832,8 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 	deviceAttributeTfsdk := types.List{
 		ElemType: types.ObjectType{
 			AttrTypes: map[string]attr.Type{
-				"device_ids": types.ListType{
-					ElemType: types.Int64Type,
+				"device_servicetags": types.SetType{
+					ElemType: types.StringType,
 				},
 				"attributes": types.ListType{
 					ElemType: types.ObjectType{
