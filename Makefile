@@ -25,6 +25,7 @@ integration_test:
 test: unit_test integration_test
 	
 generate:
+	go install
 	go generate
 
 download:

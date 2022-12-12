@@ -3,12 +3,12 @@
 page_title: "ome_template Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing template on OpenManage Enterprise. Updates are supported for the following parameters: name, description, attributes, job_retry_count, sleep_interval, identity_pool_name, vlan.
+  Resource for managing template on OpenManage Enterprise.Updates are supported for the following parameters: name, description, attributes, job_retry_count, sleep_interval, identity_pool_name, vlan.
 ---
 
 # ome_template (Resource)
 
-Resource for managing template on OpenManage Enterprise. Updates are supported for the following parameters: `name`, `description`, `attributes`, `job_retry_count`, `sleep_interval`, `identity_pool_name`, `vlan`.
+Resource for managing template on OpenManage Enterprise.Updates are supported for the following parameters: `name`, `description`, `attributes`, `job_retry_count`, `sleep_interval`, `identity_pool_name`, `vlan`.
 
 ## Example Usage
 
@@ -31,14 +31,14 @@ resource "ome_template" "template_2" {
 
 - `attributes` (List of Object) List of attributes associated with a template. This field is ignored while creating a template. (see [below for nested schema](#nestedatt--attributes))
 - `description` (String) Description of the template
-- `fqdds` (String) Comma seperated values of components from a specified server, should be one of these iDRAC, System, BIOS, NIC, LifeCycleController, RAID, and EventFilters.
+- `fqdds` (String) Comma seperated values of components from a specified server, should be one of these iDRAC, System, BIOS, NIC, LifeCycleController, RAID, and EventFilters. This field cannot be updated.
 - `identity_pool_name` (String) Identity Pool name to be attached with template.
 - `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource.
-- `refdevice_id` (Number) Target device id from which the template needs to be created.
-- `refdevice_servicetag` (String) Target device servicetag from which the template needs to be created.
-- `reftemplate_name` (String) Reference Template name from which the template needs to be cloned.
+- `refdevice_id` (Number) Target device id from which the template needs to be created. This field cannot be updated.
+- `refdevice_servicetag` (String) Target device servicetag from which the template needs to be created. This field cannot be updated.
+- `reftemplate_name` (String) Reference Template name from which the template needs to be cloned. This field cannot be updated.
 - `sleep_interval` (Number) Sleep time interval for job polling in seconds.
-- `view_type` (String) OME template view type, supported types are Deployment, Compliance.
+- `view_type` (String) OME template view type, supported types are Deployment, Compliance. This field cannot be updated.
 - `vlan` (Object) VLAN details to be attached with template. (see [below for nested schema](#nestedatt--vlan))
 
 ### Read-Only
@@ -75,7 +75,7 @@ Optional:
 - `is_nic_bonded` (Boolean)
 - `nic_identifier` (String)
 - `port` (Number)
-- `tagged_networks` (List of Number)
+- `tagged_networks` (Set of Number)
 - `untagged_network` (Number)
 
 

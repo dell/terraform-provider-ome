@@ -53,7 +53,7 @@ type Vlan struct {
 // VlanAttributes list of vlan attributes
 type VlanAttributes struct {
 	UntaggedNetwork types.Int64  `tfsdk:"untagged_network"`
-	TaggedNetworks  types.List   `tfsdk:"tagged_networks"`
+	TaggedNetworks  types.Set    `tfsdk:"tagged_networks"`
 	IsNicBonded     types.Bool   `tfsdk:"is_nic_bonded"`
 	Port            types.Int64  `tfsdk:"port"`
 	NicIdentifier   types.String `tfsdk:"nic_identifier"`

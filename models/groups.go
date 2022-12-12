@@ -18,5 +18,5 @@ type GroupDevicesData struct {
 	ID                types.String `tfsdk:"id"`
 	DeviceIDs         types.List   `tfsdk:"device_ids"`
 	DeviceServicetags types.List   `tfsdk:"device_servicetags"`
-	DeviceGroupNames  types.List   `tfsdk:"device_group_names"`
+	DeviceGroupNames  types.Set    `tfsdk:"device_group_names"`
 }

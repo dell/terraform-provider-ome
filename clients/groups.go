@@ -58,7 +58,7 @@ func (c *Client) GetDevicesByGroupName(groupName string) (models.Devices, error)
 	}
 
 	if len(groups.Value) == 0 {
-		return models.Devices{}, fmt.Errorf("invalid group name")
+		return models.Devices{}, nil
 	}
 	devices, err := c.GetDevicesByGroupID(groups.Value[0].ID)
 	return devices, err

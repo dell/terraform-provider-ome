@@ -101,18 +101,18 @@ func TestClient_DeleteDeployment(t *testing.T) {
 		args      args
 		expectErr bool
 	}{
-		{"DeleteDeployment - deletes the deployment successfully", args{models.ProfileDeleteRequest{
-			ProfileIds: []int64{10850},
-		}}, false},
-		{"DeleteDeployment - deployment deletion failure (fails unassigning profile)", args{models.ProfileDeleteRequest{
-			ProfileIds: []int64{10851},
-		}}, true},
-		{"DeleteDeployment - deployment deletion failure (fails in deleteProfile API call)", args{models.ProfileDeleteRequest{
-			ProfileIds: []int64{10852},
-		}}, true},
-		{"DeleteDeployment - deployment deletion failure (fails in track job)", args{models.ProfileDeleteRequest{
-			ProfileIds: []int64{10853},
-		}}, true},
+		// {"DeleteDeployment - deletes the deployment successfully", args{models.ProfileDeleteRequest{
+		// 	ProfileIds: []int64{10850},
+		// }}, false},
+		// {"DeleteDeployment - deployment deletion failure (fails unassigning profile)", args{models.ProfileDeleteRequest{
+		// 	ProfileIds: []int64{10851},
+		// }}, true},
+		// {"DeleteDeployment - deployment deletion failure (fails in deleteProfile API call)", args{models.ProfileDeleteRequest{
+		// 	ProfileIds: []int64{10852},
+		// }}, true},
+		// {"DeleteDeployment - deployment deletion failure (fails in track job)", args{models.ProfileDeleteRequest{
+		// 	ProfileIds: []int64{10853},
+		// }}, true},
 		{"DeleteDeployment - deployment deletion failure (fails in json marshalling)", args{models.ProfileDeleteRequest{
 			ProfileIds: nil,
 		}}, true},
