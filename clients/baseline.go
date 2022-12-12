@@ -67,14 +67,13 @@ func (c *Client) GetBaselineByName(name string) (models.OmeBaseline, error) {
 }
 
 // GetBaselineDevComplianceReportsByID gets baseline device compliance report by baseline ID as string
-func (c *Client) GetBaselineDevComplianceReportsByID(baselineID int64) (string, error) {
-	response, err := c.Get(fmt.Sprintf(BaselineDeviceComplianceReportsAPI, baselineID), nil, nil)
+func (c *Client) GetBaselineDevComplianceReportsByID(baselineID int64) ([]models.OMEComplianceReports, error) {
+	cr := []models.OMEComplianceReports{}
+	err := c.GetPaginatedData(fmt.Sprintf(BaselineDeviceComplianceReportsAPI, baselineID), &cr)
 	if err != nil {
-		return "", err
+		return []models.OMEComplianceReports{}, err
 	}
-
-	respData, _ := c.GetBodyData(response.Body)
-	return string(respData), err
+	return cr, err
 }
 
 // GetBaselineDevAttrComplianceReportsByID gets baseline device attribute compliance report by baseline ID and device ID as string
@@ -83,7 +82,6 @@ func (c *Client) GetBaselineDevAttrComplianceReportsByID(baselineID int64, devic
 	if err != nil {
 		return "", err
 	}
-
 	respData, _ := c.GetBodyData(response.Body)
 	return string(respData), err
 }

@@ -175,6 +175,8 @@ const (
 	WarningBaselineDeviceCapability = "%v devices are not valid to create baseline"
 	// ErrBaselineNameNotFound - message returned when provided baseline name does not exist
 	ErrBaselineNameNotFound = "baseline not found: %s"
+	// ErrGnrConfigurationReport - message returned when report could not be fetched
+	ErrGnrConfigurationReport = "unable to fetch the report"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job

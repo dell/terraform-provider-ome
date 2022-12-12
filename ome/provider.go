@@ -159,9 +159,10 @@ func (p *provider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceT
 
 func (p *provider) GetDataSources(ctx context.Context) (map[string]tfsdk.DataSourceType, diag.Diagnostics) {
 	return map[string]tfsdk.DataSourceType{
-		"ome_template_info":     templateDataSourceType{},
-		"ome_groupdevices_info": groupDevicesDataSourceType{},
-		"ome_vlannetworks_info": vlanNetowrksDataSourceType{},
+		"ome_template_info":            templateDataSourceType{},
+		"ome_groupdevices_info":        groupDevicesDataSourceType{},
+		"ome_vlannetworks_info":        vlanNetowrksDataSourceType{},
+		"ome_configration_report_info": configurationReportDataSourceType{},
 	}, nil
 }
 

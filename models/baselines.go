@@ -92,3 +92,33 @@ type BaselineNotificationSchedule struct {
 type BaseLineIDsData struct {
 	BaselineIDs []int64 `json:"BaselineIds"`
 }
+
+type ConfigurationReports struct {
+	ID                     types.String             `tfsdk:"id"`
+	BaseLineName           types.String             `tfsdk:"baseline_name"`
+	FetchAttributes        types.Bool               `tfsdk:"fetch_attributes"`
+	ComplianceReportDevice []ComplianceReportDevice `tfsdk:"compliance_report_device"`
+}
+
+type ComplianceReportDevice struct {
+	DeviceID                types.Int64  `tfsdk:"device_id"`
+	DeviceName              types.String `tfsdk:"device_name"`
+	Model                   types.String `tfsdk:"model"`
+	DeviceServiceTag        types.String `tfsdk:"device_servicetag"`
+	ComplianceStatus        types.String `tfsdk:"compliance_status"`
+	DeviceType              types.Int64  `tfsdk:"device_type"`
+	InventoryTime           types.String `tfsdk:"inventory_time"`
+	DeviceComplianceDetails types.String `tfsdk:"device_compliance_details"`
+}
+
+type OMEComplianceReports struct {
+	ID               int64    `json:"Id"`
+	DeviceName       string   `json:"DeviceName"`
+	IPAddress        string   `json:"IpAddress"`
+	IPAddresses      []string `json:"IpAddresses"`
+	Model            string   `json:"Model"`
+	ServiceTag       string   `json:"ServiceTag"`
+	ComplianceStatus int64    `json:"ComplianceStatus"`
+	DeviceType       int64    `json:"DeviceType"`
+	InventoryTime    string   `json:"InventoryTime"`
+}
