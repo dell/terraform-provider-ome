@@ -167,7 +167,6 @@ func TestClientPreReqHook(t *testing.T) {
 	ClientPreReqHook(c, request)
 }
 
-
 func TestGetJob(t *testing.T) {
 
 	ts := createNewTLSServer(t)
