@@ -174,7 +174,7 @@ func (c *Client) GetDeviceTypeID(deviceType string) (int64, error) {
 	}
 
 	for _, dt2 := range dt.Value {
-		if dt2.Name == deviceType {
+		if strings.EqualFold(dt2.Name, deviceType) {
 			deviceTypeID = dt2.ID
 			break
 		}
@@ -378,6 +378,18 @@ func (c *Client) CloneTemplateByRefTemplateID(cloneTemplateRequest models.OMEClo
 		return -1, err
 	}
 
+	respData, _ := c.GetBodyData(response.Body)
+	newTemplateID, _ := strconv.ParseInt(string(respData), 10, 64)
+	return newTemplateID, nil
+}
+
+// ImportTemplate - method to clone template using reference template ID.
+func (c *Client) ImportTemplate(importTemplateRequest models.OMEImportTemplate) (int64, error) {
+	data, _ := c.JSONMarshal(importTemplateRequest)
+	response, err := c.Post(ImportTemplateAPI, nil, data)
+	if err != nil {
+		return -1, err
+	}
 	respData, _ := c.GetBodyData(response.Body)
 	newTemplateID, _ := strconv.ParseInt(string(respData), 10, 64)
 	return newTemplateID, nil

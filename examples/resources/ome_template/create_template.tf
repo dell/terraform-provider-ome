@@ -168,3 +168,16 @@ resource "ome_template" "template_6" {
   reftemplate_name = "template_5"
   view_type        = "Compliance"
 }
+
+# Create a deployment template from a XML.
+resource "ome_template" "template_7" {
+	name = "template_7"
+	content = file("../testdata/test_acc_template.xml")
+}
+
+# Create a compliance template from a XML.
+resource "ome_template" "template_8" {
+	name = "template_8"
+	content = file("../testdata/test_acc_template.xml")
+	view_type = "Compliance"
+}

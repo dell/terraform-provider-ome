@@ -64,6 +64,8 @@ const (
 	DeleteProfileAPI = "/api/ProfileService/Actions/ProfileService.Delete"
 	//CloneTemplateAPI - api to clone a template
 	CloneTemplateAPI = "/api/TemplateService/Actions/TemplateService.Clone"
+	//ImportTemplateAPI - api to import a template
+	ImportTemplateAPI = "/api/TemplateService/Actions/TemplateService.Import"
 	//VlanNetworksAPI - api to vlan networks
 	VlanNetworksAPI = "/api/NetworkConfigurationService/Networks"
 	//BaseLineRemoveAPI - api to remove a baseline
@@ -88,6 +90,8 @@ const (
 	ErrInvalidFqdds = "Invalid FQDDS for template creation"
 	// ErrInvalidTemplateViewType - error message for invalid template view type
 	ErrInvalidTemplateViewType = "Invalid template view type for template creation"
+	// ErrInvalidTemplateDeviceType - error message for invalid template device type
+	ErrInvalidTemplateDeviceType = "Invalid template device type for template creation"
 	// SuccessMsg - job success message
 	SuccessMsg = "Successfully completed the job"
 	// JobIncompleteMsg - job incomplete message after retries
@@ -187,6 +191,8 @@ const (
 	ValidOutputFormat string = "html,csv,pdf,xls"
 	// ValidTemplateViewTypes = Valid template view types supported in template creation
 	ValidTemplateViewTypes string = "Deployment,Compliance"
+	// ValidTemplateViewTypes = Valid template view types supported in template creation
+	ValidTemplateDeviceTypes string = "Server,Chassis"
 )
 
 // constants for Vlan attributes
