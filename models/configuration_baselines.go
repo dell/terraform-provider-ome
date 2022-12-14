@@ -141,3 +141,36 @@ type OMEDeviceComplianceReport struct {
 type DeviceComplianceDetails struct {
 	OdataID string `json:"@odata.id"`
 }
+
+// ConfigurationReports holds baseline reports details
+type ConfigurationReports struct {
+	ID                     types.String             `tfsdk:"id"`
+	BaseLineName           types.String             `tfsdk:"baseline_name"`
+	FetchAttributes        types.Bool               `tfsdk:"fetch_attributes"`
+	ComplianceReportDevice []ComplianceReportDevice `tfsdk:"compliance_report_device"`
+}
+
+// ComplianceReportDevice holds device report
+type ComplianceReportDevice struct {
+	DeviceID                types.Int64  `tfsdk:"device_id"`
+	DeviceName              types.String `tfsdk:"device_name"`
+	Model                   types.String `tfsdk:"model"`
+	DeviceServiceTag        types.String `tfsdk:"device_servicetag"`
+	ComplianceStatus        types.String `tfsdk:"compliance_status"`
+	DeviceType              types.Int64  `tfsdk:"device_type"`
+	InventoryTime           types.String `tfsdk:"inventory_time"`
+	DeviceComplianceDetails types.String `tfsdk:"device_compliance_details"`
+}
+
+// OMEComplianceReports - ome compliance report
+type OMEComplianceReports struct {
+	ID               int64    `json:"Id"`
+	DeviceName       string   `json:"DeviceName"`
+	IPAddress        string   `json:"IpAddress"`
+	IPAddresses      []string `json:"IpAddresses"`
+	Model            string   `json:"Model"`
+	ServiceTag       string   `json:"ServiceTag"`
+	ComplianceStatus int64    `json:"ComplianceStatus"`
+	DeviceType       int64    `json:"DeviceType"`
+	InventoryTime    string   `json:"InventoryTime"`
+}

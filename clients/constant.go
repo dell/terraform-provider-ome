@@ -72,6 +72,8 @@ const (
 	BaseLineConfigDeviceCompReport = "/api/TemplateService/Baselines(%d)/DeviceConfigComplianceReports"
 	//VlanNetworksAPI - api to vlan networks
 	VlanNetworksAPI = "/api/NetworkConfigurationService/Networks"
+	//ImportTemplateAPI - api to import a template
+	ImportTemplateAPI = "/api/TemplateService/Actions/TemplateService.Import"
 )
 
 // Messages constants
@@ -185,6 +187,17 @@ const (
 	// ErrBaselineReportForDevice - message returned when device report is not avaiable for a servicetag
 	ErrBaselineReportForDevice = "device reports not found for baseline %d and device %s"
 	// ErrCreateTemplate - message returned when template creation fails
+	// ErrInvalidTemplateDeviceType - error message for invalid template device type
+	ErrInvalidTemplateDeviceType = "Invalid template device type for template creation"
+	// ErrTemplateDeploymentCreate - message returned when template deployment fails
+	ErrTemplateDeploymentCreate = "unable to create template deployment resource"
+	// ErrTemplateDeploymentUpdate - message returned when template deployment fails
+	ErrTemplateDeploymentUpdate = "unable to update template deployment resource"
+	// ErrTemplateDeploymentRead - message returned when template deployment fails
+	ErrTemplateDeploymentRead = "unable to read template deployment resource"
+	// ErrTemplateDeploymentDelete - message returned when template deployment fails
+	ErrTemplateDeploymentDelete = "unable to delete template deployment resource"
+	// ErrCreateTemplate - message returned when template creation fails
 	ErrCreateTemplate = "Unable to create template"
 	// ErrReadTemplate - message returned when template read fails
 	ErrReadTemplate = "Unable to read template"
@@ -194,14 +207,8 @@ const (
 	ErrDeleteTemplate = "Unable to delete template"
 	// ErrImportTemplate - message returned when import template fails
 	ErrImportTemplate = "Unable to import template"
-	// ErrTemplateDeploymentCreate - message returned when template deployment fails
-	ErrTemplateDeploymentCreate = "unable to create template deployment resource"
-	// ErrTemplateDeploymentUpdate - message returned when template deployment fails
-	ErrTemplateDeploymentUpdate = "unable to update template deployment resource"
-	// ErrTemplateDeploymentRead - message returned when template deployment fails
-	ErrTemplateDeploymentRead = "unable to read template deployment resource"
-	// ErrTemplateDeploymentDelete - message returned when template deployment fails
-	ErrTemplateDeploymentDelete = "unable to delete template deployment resource"
+	// ErrGnrConfigurationReport - message returned when report could not be fetched
+	ErrGnrConfigurationReport = "unable to fetch the report"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job
@@ -216,6 +223,8 @@ const (
 	ValidTemplateViewTypes string = "Deployment,Compliance"
 	// ValidComplainceStatus = Valid compliance status supported
 	ValidComplainceStatus string = "Compliant"
+	// ValidTemplateDeviceTypes = Valid template device types supported in template creation
+	ValidTemplateDeviceTypes string = "Server,Chassis"
 )
 
 // constants for Vlan attributes

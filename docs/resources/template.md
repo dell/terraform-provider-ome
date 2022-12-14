@@ -30,7 +30,9 @@ resource "ome_template" "template_2" {
 ### Optional
 
 - `attributes` (List of Object) List of attributes associated with a template. This field is ignored while creating a template. (see [below for nested schema](#nestedatt--attributes))
+- `content` (String) The XML content of template.. This field cannot be updated.
 - `description` (String) Description of the template
+- `device_type` (String) OME template device type, supported types are Server, Chassis. This field cannot be updated and is applicable only for importing xml.
 - `fqdds` (String) Comma seperated values of components from a specified server, should be one of these iDRAC, System, BIOS, NIC, LifeCycleController, RAID, and EventFilters. This field cannot be updated.
 - `identity_pool_name` (String) Identity Pool name to be attached with template.
 - `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource.

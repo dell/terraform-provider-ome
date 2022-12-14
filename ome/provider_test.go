@@ -3,6 +3,8 @@ package ome
 import (
 	"context"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
@@ -57,4 +59,11 @@ func testAccPreCheck(t *testing.T) {
 
 func skipTest() bool {
 	return os.Getenv("TF_ACC") == "" || os.Getenv("ACC_DETAIL") == ""
+}
+
+func getTestData(fileName string) string {
+	wd, _ := os.Getwd()
+	parent := filepath.Dir(wd)
+	fileP := filepath.Join(parent, "testdata", fileName)
+	return strings.ReplaceAll(fileP, "\\", "/")
 }

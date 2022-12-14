@@ -225,20 +225,21 @@ func TestClient_GetBaselineDeviceComplianceReportByID(t *testing.T) {
 	tests := []struct {
 		name       string
 		baselineID int64
+		deviceID   int64
 	}{
-		{"Get Baseline Device Compliance Reports By ID Successfully", 14},
-		{"Get Baseline Device Compliance Reports By ID Failure", -1},
+		{"Get Baseline Device Compliance Reports By ID Successfully", 14, 11803},
+		{"Get Baseline Device Compliance Reports By ID Failure", -1, 0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			baselineDevComplianceReportStr, err := c.GetBaselineDevComplianceReportsByID(tt.baselineID)
+			baselineDevComplianceReport, err := c.GetBaselineDevComplianceReportsByID(tt.baselineID)
 			if tt.baselineID == 14 {
 				assert.Nil(t, err)
-				assert.NotEmpty(t, baselineDevComplianceReportStr)
-				assert.Contains(t, baselineDevComplianceReportStr, "\"Id\": 11803")
+				assert.NotEmpty(t, baselineDevComplianceReport)
+				assert.Equal(t, baselineDevComplianceReport[0].ID, tt.deviceID)
 			} else if tt.baselineID == -1 {
 				assert.NotNil(t, err)
-				assert.Empty(t, baselineDevComplianceReportStr)
+				assert.Empty(t, baselineDevComplianceReport)
 			}
 
 		})
