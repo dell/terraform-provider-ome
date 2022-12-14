@@ -338,3 +338,83 @@ func TestBaselineInvalidJson(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "", response.Name)
 }
+
+func TestClient_RemediateBaseLineDevices(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name    string
+		cr      models.ConfigurationRemediationPayload
+		want    int64
+		wantErr bool
+	}{
+		{"RemediateBaseline Success", models.ConfigurationRemediationPayload{
+			ID:        100,
+			DeviceIDS: []int64{12345},
+			Schedule: models.OMESchedule{
+				RunNow:   true,
+				RunLater: false,
+			},
+		}, 12345, false},
+		{"RemediateBaseline Failure", models.ConfigurationRemediationPayload{
+			ID:        101,
+			DeviceIDS: []int64{12345},
+			Schedule: models.OMESchedule{
+				RunNow:   true,
+				RunLater: false,
+			},
+		}, 0, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := c.RemediateBaseLineDevices(tt.cr)
+			if tt.wantErr {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestClient_ConfiBaselineDeviceReport(t *testing.T) {
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name       string
+		baseLineID int64
+		want       []models.OMEDeviceComplianceReport
+		wantErr    bool
+	}{
+		{"Get Config Device Comp Report", 185, []models.OMEDeviceComplianceReport{
+			{ID: 12328},
+			{ID: 12329},
+			{ID: 12330},
+		}, false},
+		{"Get Config Device Comp Report error", 186, []models.OMEDeviceComplianceReport{}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := c.GetAllConfiBaselineDeviceReport(tt.baseLineID)
+			if tt.wantErr {
+				assert.NotNil(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.NotNil(t, got)
+				assert.Equal(t, len(tt.want), len((got)))
+			}
+		})
+	}
+}

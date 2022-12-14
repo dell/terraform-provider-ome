@@ -92,3 +92,52 @@ type BaselineNotificationSchedule struct {
 type BaseLineIDsData struct {
 	BaselineIDs []int64 `json:"BaselineIds"`
 }
+
+// ConfigurationRemediation holds the plan data
+type ConfigurationRemediation struct {
+	ID            types.String    `tfsdk:"id"`
+	BaselineName  types.String    `tfsdk:"baseline_name"`
+	BaselineID    types.Int64     `tfsdk:"baseline_id"`
+	TargetDevices []TargetDevices `tfsdk:"target_devices"`
+	JobRetryCount types.Int64     `tfsdk:"job_retry_count"`
+	SleepInterval types.Int64     `tfsdk:"sleep_interval"`
+	RunLater      types.Bool      `tfsdk:"run_later"`
+	Cron          types.String    `tfsdk:"cron"`
+}
+
+// TargetDevices -  holds the plan data
+type TargetDevices struct {
+	DeviceServiceTag types.String `tfsdk:"device_service_tag"`
+	ComplianceStatus types.String `tfsdk:"compliance_status"`
+}
+
+// ConfigurationRemediationPayload - payload for remediation
+type ConfigurationRemediationPayload struct {
+	ID        int64       `json:"Id"`
+	DeviceIDS []int64     `json:"DeviceIds"`
+	Schedule  OMESchedule `json:"Schedule"`
+}
+
+// OMEDeviceComplianceReports compliance reports
+type OMEDeviceComplianceReports struct {
+	Value []OMEDeviceComplianceReport `json:"value"`
+}
+
+// OMEDeviceComplianceReport - reports fo devices
+type OMEDeviceComplianceReport struct {
+	ID                      int64                   `json:"Id"`
+	DeviceName              string                  `json:"DeviceName"`
+	IPAddress               string                  `json:"IpAddress"`
+	IPAddresses             []string                `json:"IpAddresses"`
+	Model                   string                  `json:"Model"`
+	ServiceTag              string                  `json:"ServiceTag"`
+	ComplianceStatus        int64                   `json:"ComplianceStatus"`
+	DeviceType              int64                   `json:"DeviceType"`
+	InventoryTime           string                  `json:"InventoryTime"`
+	DeviceComplianceDetails DeviceComplianceDetails `json:"DeviceComplianceDetails"`
+}
+
+// DeviceComplianceDetails - details deive reports
+type DeviceComplianceDetails struct {
+	OdataID string `json:"@odata.id"`
+}

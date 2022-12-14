@@ -26,7 +26,7 @@ type resourceConfigurationBaselineType struct{}
 // Template Deployment Resource schema
 func (r resourceConfigurationBaselineType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise.",
+		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for the following parameters: `baseline_name`, `description`, `device_ids`, `device_servicetags`, `schedule_notification`, `notification_on_schedule`, `email_addresses`, `output_format`, `cron`, `job_retry_count`, `sleep_interval`.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "ID of the resource.",
