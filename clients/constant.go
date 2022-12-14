@@ -214,7 +214,7 @@ const (
 	ValidOutputFormat string = "html,csv,pdf,xls"
 	// ValidTemplateViewTypes = Valid template view types supported in template creation
 	ValidTemplateViewTypes string = "Deployment,Compliance"
-	// ValidTemplateViewTypes = Valid template view types supported in template creation
+	// ValidComplainceStatus = Valid compliance status supported
 	ValidComplainceStatus string = "Compliant"
 )
 
