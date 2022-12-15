@@ -70,6 +70,8 @@ const (
 	BaseLineConfigRemediationAPI = "/api/TemplateService/Actions/TemplateService.Remediate"
 	//BaseLineConfigDeviceCompReport - api to get device compliance report of a baseline
 	BaseLineConfigDeviceCompReport = "/api/TemplateService/Baselines(%d)/DeviceConfigComplianceReports"
+	//VlanNetworksAPI - api to vlan networks
+	VlanNetworksAPI = "/api/NetworkConfigurationService/Networks"
 )
 
 // Messages constants
@@ -182,6 +184,24 @@ const (
 	ErrBaseLineComplianceStatus = "supported value is %s"
 	// ErrBaselineReportForDevice - message returned when device report is not avaiable for a servicetag
 	ErrBaselineReportForDevice = "device reports not found for baseline %d and device %s"
+	// ErrCreateTemplate - message returned when template creation fails
+	ErrCreateTemplate = "Unable to create template"
+	// ErrReadTemplate - message returned when template read fails
+	ErrReadTemplate = "Unable to read template"
+	// ErrUpdateTemplate - message returned when update template fails
+	ErrUpdateTemplate = "Unable to update template"
+	// ErrDeleteTemplate - message returned when template delete fails
+	ErrDeleteTemplate = "Unable to delete template"
+	// ErrImportTemplate - message returned when import template fails
+	ErrImportTemplate = "Unable to import template"
+	// ErrTemplateDeploymentCreate - message returned when template deployment fails
+	ErrTemplateDeploymentCreate = "unable to create template deployment resource"
+	// ErrTemplateDeploymentUpdate - message returned when template deployment fails
+	ErrTemplateDeploymentUpdate = "unable to update template deployment resource"
+	// ErrTemplateDeploymentRead - message returned when template deployment fails
+	ErrTemplateDeploymentRead = "unable to read template deployment resource"
+	// ErrTemplateDeploymentDelete - message returned when template deployment fails
+	ErrTemplateDeploymentDelete = "unable to delete template deployment resource"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job
@@ -189,7 +209,7 @@ var FailureStatusIDs = []any{2070, 2090, 2100, 2101, 2102, 2103}
 
 const (
 	// ValidFQDDS = Valid FQDDS supported in template creation
-	ValidFQDDS string = "iDRAC,System,BIOS,NIC,LifeCycleController,RAID,EventFilters"
+	ValidFQDDS string = "All,iDRAC,System,BIOS,NIC,LifeCycleController,RAID,EventFilters"
 	// ValidOutputFormat - valid output formats
 	ValidOutputFormat string = "html,csv,pdf,xls"
 	// ValidTemplateViewTypes = Valid template view types supported in template creation

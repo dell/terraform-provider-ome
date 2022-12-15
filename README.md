@@ -1,4 +1,4 @@
-# Terraform provider for OME
+# Terraform provider for OpenManage Enterprise
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](https://github.com/dell/terraform-provider-ome/blob/main/about/CODE_OF_CONDUCT.md)
 [![License](https://img.shields.io/github/license/dell/terraform-provider-ome)](https://github.com/dell/terraform-provider-ome/blob/main/LICENSE)
@@ -7,7 +7,7 @@
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/dell/terraform-provider-ome?include_prereleases&label=latest&style=flat-square)](https://github.com/dell/terraform-provider-ome/releases)
 
 
-The Terraform Provider for OME is a plugin for Terraform that allows the resource management of PowerEdge servers using OME (OpenManagement Enterprise). For more details on OME, please refer to OME Official webpage [here][ome-website].
+The Terraform Provider for OpenManage Enterprise is a provider for terraform that allows the resource management of PowerEdge servers using OpenManage Enterprise (OME). For more details on OME, please refer to OME official webpage [here][ome-website].
 
 For general information about Terraform, visit the [official website][tf-website] and the [GitHub project page][tf-github].
 
@@ -26,6 +26,7 @@ For general information about Terraform, visit the [official website][tf-website
   * [Support](https://github.com/dell/terraform-provider-ome/blob/main/about/SUPPORT.md)
   * [Security](https://github.com/dell/terraform-provider-ome/blob/main/about/SECURITY.md)
   * [Additional Information](https://github.com/dell/terraform-provider-ome/blob/main/about/ADDITIONAL_INFORMATION.md)
+  * [Attribution](https://github.com/dell/terraform-provider-ome/blob/main/about/ATTRIBUTION.md)
 
 ## Supported Platforms
   * Dell OpenManage Enterprise versions 3.9.0 (Build 55) and above.

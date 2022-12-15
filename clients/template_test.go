@@ -190,9 +190,13 @@ func TestClient_GetIdentityPoolByNameUnAuth(t *testing.T) {
 	response, err := c.GetIdentityPoolByName("1234")
 	assert.NotNil(t, err)
 	assert.Equal(t, "", response.Name)
+
+	response, err = c.GetIdentityPoolByID(1234)
+	assert.NotNil(t, err)
+	assert.Equal(t, "", response.Name)
 }
 
-func TestClient_GetIdentityPoolByNameInvalidJson(t *testing.T) {
+func TestClient_GetIdentityPoolInvalidJson(t *testing.T) {
 
 	ts := createNewTLSServerWithPort(t, 8236, mockPortInValidJSON)
 	defer ts.Close()
@@ -204,7 +208,12 @@ func TestClient_GetIdentityPoolByNameInvalidJson(t *testing.T) {
 	response, err := c.GetIdentityPoolByName("2234")
 	assert.NotNil(t, err)
 	assert.Equal(t, "", response.Name)
+
+	response, err = c.GetIdentityPoolByID(2234)
+	assert.NotNil(t, err)
+	assert.Equal(t, "", response.Name)
 }
+
 func TestClient_GetIdentityPoolByName(t *testing.T) {
 	ts := createNewTLSServer(t)
 	defer ts.Close()
@@ -239,6 +248,44 @@ func TestClient_GetIdentityPoolByName(t *testing.T) {
 			if tt.args.IdentityPoolName == "IdPool2" {
 				assert.NotNil(t, err)
 				assert.ErrorContains(t, err, tt.errorMessage)
+			}
+		})
+	}
+}
+
+func TestClient_GetIdentityPoolByID(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	type args struct {
+		IdentityPoolID int64
+	}
+	tests := []struct {
+		name         string
+		args         args
+		identityPool models.IdentityPool
+		errorMessage string
+	}{
+		{"Get IdentityPool By Name - Get IdentityPool for valid id", args{123}, models.IdentityPool{
+			Name: "IdPool1",
+			ID:   123,
+		}, ""},
+		{"Get IdentityPool By Name - Get IdentityPool for invalid id", args{124}, models.IdentityPool{}, "Unable to process the request because the Identity Pool ID 124 provided is invalid."},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			response, err := c.GetIdentityPoolByID(tt.args.IdentityPoolID)
+			if tt.errorMessage != "" {
+				assert.NotNil(t, err)
+				assert.ErrorContains(t, err, tt.errorMessage)
+			} else {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, int64(123), response.ID)
 			}
 		})
 	}

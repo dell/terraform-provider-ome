@@ -172,7 +172,6 @@ func (r resourceConfigurationBaseline) Create(ctx context.Context, req tfsdk.Cre
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
-		fmt.Println(clients.ErrPlanToTfsdkConversion)
 		return
 	}
 

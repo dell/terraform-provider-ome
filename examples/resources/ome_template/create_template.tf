@@ -33,50 +33,114 @@ resource "ome_template" "template_3" {
   fqdds           = "NIC"
 }
 
+# used to fetch vlan network data
+data "ome_vlannetworks_info" "vlans" {
+}
 
-# create a template and attach the identity pool and vlan.
+
+data "ome_template_info" "template_data" {
+  name = "template_4"
+}
+
+#use locals to fetch vlan network ID from vlan name for updating vlan template attributes.
+locals {
+  vlan_network_map = {for vlan_network in  data.ome_vlannetworks_info.vlans.vlan_networks : vlan_network.name => vlan_network.vlan_id}
+}
+
+#use locals to modify the attributes required for updating a template for assigning identity pool.
+locals {
+  attributes_value = tomap({
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Initiator Persistence Policy": "WarmReset, ColdReset, ACPowerLoss"
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Storage Target Persistence Policy": "WarmReset, ColdReset, ACPowerLoss"
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Auxiliary Powered": "WarmReset, ColdReset, ACPowerLoss"
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Non Auxiliary Powered": "WarmReset, ColdReset, ACPowerLoss"
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 IOIDOpt Enable" : "Enabled"
+
+  })
+  attributes_is_ignored = tomap({
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Initiator Persistence Policy": false
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Storage Target Persistence Policy": false
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Auxiliary Powered": false
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Non Auxiliary Powered": false
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 IOIDOpt Enable" : false
+
+  })
+  
+  template_attributes = data.ome_template_info.template_data.attributes != null ? [
+    for attr in data.ome_template_info.template_data.attributes : tomap({
+      attribute_id = attr.attribute_id
+      is_ignored   = lookup(local.attributes_is_ignored, attr.display_name, attr.is_ignored)
+      display_name = attr.display_name
+      value        = lookup(local.attributes_value, attr.display_name, attr.value)
+  })] : null
+}
+
+# create a template and uncomment the below in a resouce to update the template to attach the identity pool and vlan.
 # identity pool and vlan attributes are applicable as part of the update operation, please uncomment it to update after the create is finished.
 resource "ome_template" "template_4" {
   name                 = "template_4"
   refdevice_servicetag = "MXL1234"
-#   identity_pool_name   = "IO1"
-#   vlan = {
-#     propogate_vlan     = true
-#     bonding_technology = "NoTeaming"
-#     vlan_attributes = [
-#       {
-#         untagged_network = 12001
-#         tagged_networks  = [0]
-#         is_nic_bonded    = false
-#         port             = 1
-#         nic_identifier   = "NIC in Mezzanine 1A"
-#       },
-#       {
-#         untagged_network = 0
-#         tagged_networks  = [12002]
-#         is_nic_bonded    = false
-#         port             = 2
-#         nic_identifier   = "NIC in Mezzanine 1A"
-#       }
-#     ]
-#   }
+  # attributes = local.template_attributes
+  # identity_pool_name   = "IO1"
+  # vlan = {
+  #     propogate_vlan     = true
+  #     bonding_technology = "NoTeaming"
+  #     vlan_attributes = [
+  #       {
+  #         untagged_network = lookup(local.vlan_network_map, "VLAN1", 0)
+  #         tagged_networks  = [0]
+  #         is_nic_bonded    = false
+  #         port             = 1
+  #         nic_identifier   = "NIC in Mezzanine 1A"
+  #       },
+  #       {
+  #         untagged_network = 0
+  #         tagged_networks  = [lookup(local.vlan_network_map, "VLAN1", 0), lookup(local.vlan_network_map, "VLAN2", 0), lookup(local.vlan_network_map, "VLAN3", 0)]
+  #         is_nic_bonded    = false
+  #         port             = 1
+  #         nic_identifier   = "NIC in Mezzanine 1B"
+  #       },
+  #     ]
+  #   }
 }
 
 
 # get the template details 
-data "ome_template_info" "template_dat_5" {
+data "ome_template_info" "template_data1" {
   name = "template_5"
 }
 
 
-#use locals to modify the attributes required for updating a template.
+#use locals to modify the attributes required for updating a template using attribute ids.
 locals {
-  template_attributes = data.ome_template_info.data-template-1.attributes != null ? [
-    for attr in data.ome_template_info.data-template-1.attributes : tomap({
+  attributes_map = tomap({
+    2740260: "One Way"
+    2743100: "Disabled"
+  })
+  
+  template_attributes = data.ome_template_info.template_data1.attributes != null ? [
+    for attr in data.ome_template_info.template_data1.attributes : tomap({
       attribute_id = attr.attribute_id
       is_ignored   = attr.is_ignored
       display_name = attr.display_name
-      value        = attr.display_name == "iDRAC,Time Zone Configuration Information,Time 1 Time Zone String" ? "IST" : attr.value
+      value        = lookup(local.attributes_map, attr.attribute_id, attr.value)
+  })] : null
+}
+
+#use locals to modify the attributes required for updating a template using display name.
+locals {
+  attributes_map = tomap({
+    "iDRAC,Time Zone Configuration Information,Time 1 Time Zone String": "IST"
+    "System,Server Topology,ServerTopology 1 Aisle Name": "Aisle-123"
+    "iDRAC,User Domain,UserDomain 1 User Domain Name": "TestDomain1"
+  })
+  
+  template_attributes = data.ome_template_info.template_data1.attributes != null ? [
+    for attr in data.ome_template_info.template_data1.attributes : tomap({
+      attribute_id = attr.attribute_id
+      is_ignored   = attr.is_ignored
+      display_name = attr.display_name
+      value        = lookup(local.attributes_map, attr.display_name, attr.value)
   })] : null
 }
 

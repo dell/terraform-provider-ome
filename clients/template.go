@@ -146,7 +146,7 @@ func (c *Client) GetViewTypeID(viewType string) (int64, error) {
 	}
 
 	for _, vt2 := range vt.Value {
-		if vt2.Description == viewType {
+		if strings.EqualFold(vt2.Description, viewType) {
 			viewTypeID = vt2.ID
 			break
 		}
@@ -248,6 +248,23 @@ func (c *Client) GetIdentityPoolByName(name string) (models.IdentityPool, error)
 	}
 
 	return models.IdentityPool{}, fmt.Errorf(ErrInvalidIdentityPool, name)
+}
+
+// GetIdentityPoolByID returns the identityPool for the given identityPoolID
+func (c *Client) GetIdentityPoolByID(id int64) (models.IdentityPool, error) {
+	response, err := c.Get(fmt.Sprintf(IdentityPoolAPI+"(%d)", id), nil, nil)
+	if err != nil {
+		return models.IdentityPool{}, err
+	}
+	b, _ := c.GetBodyData(response.Body)
+
+	omeIdentityPool := models.IdentityPool{}
+	err = c.JSONUnMarshal(b, &omeIdentityPool)
+	if err != nil {
+		return models.IdentityPool{}, err
+	}
+
+	return omeIdentityPool, nil
 }
 
 // GetPayloadVlanAttribute returns the vlan attribute for a specific (nicIdentifier,port) combination

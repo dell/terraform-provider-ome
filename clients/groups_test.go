@@ -112,7 +112,7 @@ func TestClient_GetDevicesByGroupName(t *testing.T) {
 				assert.Equal(t, int64(10337), devices.Value[0].ID)
 				assert.Equal(t, 1, len(devices.Value))
 			} else {
-				assert.NotNil(t, err)
+				assert.Nil(t, err)
 				assert.Empty(t, devices.Value)
 			}
 		})
@@ -176,8 +176,11 @@ func TestClient_GetDevicesByGroups(t *testing.T) {
 				DeviceServiceTag: "SvcTag-2",
 			},
 		}, false},
-		{"GetDeviceByGroups -  get devices for valid/invalid groups", args{[]string{"valid_group1", "invalid_group1"}}, []models.Device{}, true},
-		{"GetDeviceByGroups -  get devices for only invalid groups", args{[]string{"invalid_group1"}}, []models.Device{}, true},
+		{"GetDeviceByGroups -  get devices for valid/invalid groups", args{[]string{"valid_group1", "invalid_group1"}}, []models.Device{{
+			ID:               10337,
+			DeviceServiceTag: "SvcTag-1",
+		}}, false},
+		{"GetDeviceByGroups -  get devices for only invalid groups", args{[]string{"invalid_group1"}}, []models.Device{}, false},
 	}
 	ts := createNewTLSServer(t)
 	defer ts.Close()

@@ -53,7 +53,7 @@ resource "ome_deployment" "deploy-template-5" {
 	device_ids = [10001, 10002]
 	device_attributes = [
 		{
-			device_ids = [10001, 10002]
+			device_servicetags = ["MXL12345", "MXL23456"]
 			attributes = [
 				{
 					attribute_id = 1197967

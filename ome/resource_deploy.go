@@ -20,7 +20,7 @@ type resourceDeploymentType struct{}
 // Template Deployment Resource schema
 func (r resourceDeploymentType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Resource for managing template deployment on OpenManage Enterprise.",
+		MarkdownDescription: "Resource for managing template deployment on OpenManage Enterprise. Updates are supported for the following parameters: `device_ids`, `device_servicetags`, `boot_to_network_iso`, `forced_shutdown`, `options_time_to_wait_before_shutdown`, `power_state_off`, `options_precheck_only`, `options_strict_checking_vlan`, `options_continue_on_warning`, `run_later`, `cron`, `device_attributes`, `job_retry_count`, `sleep_interval`.",
 		Version:             1,
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
@@ -52,7 +52,7 @@ func (r resourceDeploymentType) GetSchema(_ context.Context) (tfsdk.Schema, diag
 			"device_ids": {
 				MarkdownDescription: "List of the device id(s).",
 				Description:         "List of the device id(s).",
-				Type: types.ListType{
+				Type: types.SetType{
 					ElemType: types.Int64Type,
 				},
 				Optional: true,
@@ -60,7 +60,7 @@ func (r resourceDeploymentType) GetSchema(_ context.Context) (tfsdk.Schema, diag
 			"device_servicetags": {
 				MarkdownDescription: "List of the device servicetags.",
 				Description:         "List of the device servicetags.",
-				Type: types.ListType{
+				Type: types.SetType{
 					ElemType: types.StringType,
 				},
 				Optional: true,
@@ -133,8 +133,8 @@ func (r resourceDeploymentType) GetSchema(_ context.Context) (tfsdk.Schema, diag
 				Optional:            true,
 			},
 			"cron": {
-				MarkdownDescription: "Cron to schedule the deployment task.",
-				Description:         "Cron to schedule the deployment task.",
+				MarkdownDescription: "Cron to schedule the deployment task. Cron expression should be of future datetime.",
+				Description:         "Cron to schedule the deployment task. Cron expression should be of future datetime.",
 				Type:                types.StringType,
 				Optional:            true,
 			},
@@ -145,8 +145,8 @@ func (r resourceDeploymentType) GetSchema(_ context.Context) (tfsdk.Schema, diag
 				Type: types.ListType{
 					ElemType: types.ObjectType{
 						AttrTypes: map[string]attr.Type{
-							"device_ids": types.ListType{
-								ElemType: types.Int64Type,
+							"device_servicetags": types.SetType{
+								ElemType: types.StringType,
 							},
 							"attributes": types.ListType{
 								ElemType: types.ObjectType{
@@ -205,7 +205,6 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
-		fmt.Println(clients.ErrPlanToTfsdkConversion)
 		return
 	}
 	templateDeploymentState := models.TemplateDeployment{}
@@ -264,7 +263,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	usedDeviceInput, err := clients.DeviceMutuallyExclusive(serviceTags, devIDs)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentCreate, err.Error(),
 		)
 		return
 	}
@@ -272,7 +271,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	devices, err := omeClient.GetDevices(serviceTags, devIDs, []string{})
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentCreate, err.Error(),
 		)
 		return
 	}
@@ -307,7 +306,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	//Schedule ends
 	// Device Attrs
 	if len(plan.DeviceAttributes.Elems) > 0 {
-		deploymentRequest.Attributes = getDeviceAttributes(ctx, plan)
+		deploymentRequest.Attributes = getDeviceAttributes(ctx, devices, plan)
 	}
 
 	tflog.Trace(ctx, "resource_deploy create: started creating deployment job")
@@ -315,7 +314,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	deploymentJobID, err := omeClient.CreateDeployment(deploymentRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentCreate, err.Error(),
 		)
 		return
 	}
@@ -329,7 +328,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 		isSuccess, message := omeClient.TrackJob(deploymentJobID, plan.JobRetryCount.Value, plan.SleepInterval.Value)
 		if !isSuccess {
 			resp.Diagnostics.AddWarning(
-				clients.ErrTemplateDeploymentGeneral, message,
+				clients.ErrTemplateDeploymentCreate, message,
 			)
 		}
 	}
@@ -462,7 +461,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 
 	if (plan.TemplateID.Value != 0 && plan.TemplateID.Value != state.TemplateID.Value) || (plan.TemplateName.Value != "" && plan.TemplateName.Value != state.TemplateName.Value) {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral,
+			clients.ErrTemplateDeploymentUpdate,
 			clients.ErrTemplateChanges,
 		)
 		return
@@ -490,7 +489,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	usedDeviceInput, err := clients.DeviceMutuallyExclusive(serviceTags, devIDs)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentUpdate, err.Error(),
 		)
 		return
 	}
@@ -498,7 +497,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	planDevices, err := omeClient.GetDevices(serviceTags, devIDs, []string{})
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentUpdate, err.Error(),
 		)
 		return
 	}
@@ -524,7 +523,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(state.TemplateName.Value)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentUpdate, err.Error(),
 		)
 		return
 	}
@@ -573,7 +572,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	//Schedule ends
 	// Device Attrs
 	if len(plan.DeviceAttributes.Elems) > 0 {
-		deploymentRequest.Attributes = getDeviceAttributes(ctx, plan)
+		deploymentRequest.Attributes = getDeviceAttributes(ctx, planDevices, plan)
 	}
 
 	if len(newDeployDevIDs) > 0 {
@@ -581,7 +580,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 		deploymentJobID, err := omeClient.CreateDeployment(deploymentRequest)
 		if err != nil {
 			resp.Diagnostics.AddError(
-				clients.ErrTemplateDeploymentGeneral, err.Error(),
+				clients.ErrTemplateDeploymentUpdate, err.Error(),
 			)
 			return
 		}
@@ -612,7 +611,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 		err = deleteProfiles(ctx, omeClient, profileArr)
 		if err != nil {
 			resp.Diagnostics.AddError(
-				clients.ErrTemplateDeploymentGeneral,
+				clients.ErrTemplateDeploymentUpdate,
 				err.Error(),
 			)
 			return
@@ -672,7 +671,7 @@ func (r resourceDeployment) Delete(ctx context.Context, req tfsdk.DeleteResource
 	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(statetemplateDeployment.TemplateName.Value)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral, err.Error(),
+			clients.ErrTemplateDeploymentDelete, err.Error(),
 		)
 		return
 	}
@@ -690,7 +689,7 @@ func (r resourceDeployment) Delete(ctx context.Context, req tfsdk.DeleteResource
 	err = deleteProfiles(ctx, omeClient, profileArr)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrTemplateDeploymentGeneral,
+			clients.ErrTemplateDeploymentDelete,
 			err.Error(),
 		)
 		return
@@ -764,12 +763,12 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 	stateTemplateDeployment.ID.Value = strconv.FormatInt(templateID, 10)
 	stateTemplateDeployment.TemplateID.Value = templateID
 	stateTemplateDeployment.TemplateName.Value = templateName
-	devSTsTfsdk := types.List{
+	devSTsTfsdk := types.Set{
 		ElemType: types.StringType,
 	}
 	devSTsTfsdk.Elems = profileDevSTVals
 	stateTemplateDeployment.DeviceServicetags = devSTsTfsdk
-	devIDsTfsdk := types.List{
+	devIDsTfsdk := types.Set{
 		ElemType: types.Int64Type,
 	}
 	devIDsTfsdk.Elems = []attr.Value{}
@@ -808,8 +807,8 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 	deviceAttributeObjects := []attr.Value{}
 	deviceAttributeObject := types.Object{
 		AttrTypes: map[string]attr.Type{
-			"device_ids": types.ListType{
-				ElemType: types.Int64Type,
+			"device_servicetags": types.SetType{
+				ElemType: types.StringType,
 			},
 			"attributes": types.ListType{
 				ElemType: types.ObjectType{
@@ -823,8 +822,8 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 			},
 		},
 		Attrs: map[string]attr.Value{
-			"device_ids": devIDsTfsdk,
-			"attributes": attributesTfsdk,
+			"device_servicetags": devSTsTfsdk,
+			"attributes":         attributesTfsdk,
 		},
 	}
 
@@ -833,8 +832,8 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 	deviceAttributeTfsdk := types.List{
 		ElemType: types.ObjectType{
 			AttrTypes: map[string]attr.Type{
-				"device_ids": types.ListType{
-					ElemType: types.Int64Type,
+				"device_servicetags": types.SetType{
+					ElemType: types.StringType,
 				},
 				"attributes": types.ListType{
 					ElemType: types.ObjectType{
@@ -912,12 +911,12 @@ func updateDeploymentState(stateTemplateDeployment, planTemplateDeployment *mode
 	stateTemplateDeployment.JobRetryCount = planTemplateDeployment.JobRetryCount
 	stateTemplateDeployment.SleepInterval = planTemplateDeployment.SleepInterval
 
-	devIDsTfsdk := types.List{
+	devIDsTfsdk := types.Set{
 		ElemType: types.Int64Type,
 	}
 	devIDList := planTemplateDeployment.DeviceIDs.Elems
 
-	devSTsTfsdk := types.List{
+	devSTsTfsdk := types.Set{
 		ElemType: types.StringType,
 	}
 	devSTList := planTemplateDeployment.DeviceServicetags.Elems
@@ -1072,16 +1071,22 @@ func getBootToNetworkISO(ctx context.Context, plan models.TemplateDeployment) (m
 	return bootToNetworkISOModel, nil, nil
 }
 
-func getDeviceAttributes(ctx context.Context, plan models.TemplateDeployment) []models.OMEDeviceAttributes {
+func getDeviceAttributes(ctx context.Context, devices []models.Device, plan models.TemplateDeployment) []models.OMEDeviceAttributes {
 	omeDeviceAttributes := []models.OMEDeviceAttributes{}
 	deviceAttributes := []models.DeviceAttributes{}
+
+	deviceMap := map[string]int64{}
+	for _, d := range devices {
+		deviceMap[d.DeviceServiceTag] = d.ID
+	}
+
 	plan.DeviceAttributes.ElementsAs(ctx, &deviceAttributes, true)
 	for _, deviceAttribute := range deviceAttributes {
 		omeDeviceAttribute := models.OMEDeviceAttributes{}
 		attributeList := []models.Attribute{}
-		deviceIds := []int64{}
+		deviceServiceTags := []string{}
 		deviceAttribute.Attributes.ElementsAs(ctx, &attributeList, true)
-		deviceAttribute.DeviceIDs.ElementsAs(ctx, &deviceIds, true)
+		deviceAttribute.DeviceServiceTags.ElementsAs(ctx, &deviceServiceTags, true)
 		omeAttributes := []models.OMEAttribute{}
 		for _, attribute := range attributeList {
 			omeAttribute := models.OMEAttribute{
@@ -1091,12 +1096,13 @@ func getDeviceAttributes(ctx context.Context, plan models.TemplateDeployment) []
 			}
 			omeAttributes = append(omeAttributes, omeAttribute)
 		}
-		for _, devID := range deviceIds {
-			omeDeviceAttribute.DeviceID = devID
-			omeDeviceAttribute.Attributes = omeAttributes
-			omeDeviceAttributes = append(omeDeviceAttributes, omeDeviceAttribute)
+		for _, deviceServiceTag := range deviceServiceTags {
+			if val, ok := deviceMap[deviceServiceTag]; ok {
+				omeDeviceAttribute.DeviceID = val
+				omeDeviceAttribute.Attributes = omeAttributes
+				omeDeviceAttributes = append(omeDeviceAttributes, omeDeviceAttribute)
+			}
 		}
-
 	}
 	return omeDeviceAttributes
 }

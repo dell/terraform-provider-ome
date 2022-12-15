@@ -41,7 +41,7 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 			return
 		}
 
-		shouldReturn4 := mockGroupServiceAPIs(r, w) || mockDeployAPIs(r, w)
+		shouldReturn4 := mockGroupServiceAPIs(r, w) || mockDeployAPIs(r, w) || mockGetServerProfileInfoByTemplateNameAPIs(r, w) || mockNetworkVlanAPI(r, w)
 		if shouldReturn4 {
 			return
 		}
@@ -609,6 +609,37 @@ func mockGetIdentityPoolAPIs(r *http.Request, w http.ResponseWriter) bool {
 		}`))
 		return true
 	}
+	if r.URL.Path == fmt.Sprintf(IdentityPoolAPI+"(%d)", 123) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"Id": 123,
+			"Name": "IdPool1"		
+		}`))
+		return true
+	}
+	if r.URL.Path == fmt.Sprintf(IdentityPoolAPI+"(%d)", 124) && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{
+			"error": {
+				"code": "Base.1.0.GeneralError",
+				"message": "A general error has occurred. See ExtendedInfo for more information.",
+				"@Message.ExtendedInfo": [
+					{
+						"MessageId": "CTEM9046",
+						"RelatedProperties": [],
+						"Message": "Unable to process the request because the Identity Pool ID 124 provided is invalid.",
+						"MessageArgs": [
+							"5"
+						],
+						"Severity": "Warning",
+						"Resolution": "Enter a valid Identity Pool ID and retry the operation."
+					}
+				]
+			}
+		}`))
+		return true
+	}
+
 	return false
 }
 
@@ -1373,6 +1404,26 @@ func mockUnassignProfileAPI(r *http.Request, w http.ResponseWriter) bool {
 					]
 				}
 			}`))
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CGEN6002",
+							"RelatedProperties": [],
+							"Message": "Unable to complete the request because the input value for ProfileIds is missing or an invalid value is entered.",
+							"MessageArgs": [
+								"ProfileIds"
+							],
+							"Severity": "Critical",
+							"Resolution": "Enter a valid value and retry the operation."
+						}
+					]
+				}
+			}`))
 		}
 
 		return true
@@ -1846,6 +1897,40 @@ func mockCloneTemplateAPI(r *http.Request, w http.ResponseWriter) bool {
 			}`))
 		}
 		return true
+	}
+	return false
+}
+
+func mockNetworkVlanAPI(r *http.Request, w http.ResponseWriter) bool {
+	if r.URL.Path == VlanNetworksAPI && r.Method == "GET" {
+		if r.URL.RawQuery == "" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"@odata.context": "/api/$metadata#Collection(NetworkConfigurationService.Network)",
+				"@odata.count": 2,
+				"value": [
+					{
+						"Id": 1234,
+						"Name": "VLAN1"
+					}
+				],
+				"@odata.nextLink": "/api/NetworkConfigurationService/Networks?skip=1&top=1"
+			}`))
+			return true
+		} else if strings.Contains(r.URL.RawQuery, "skip=1&top=1") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"@odata.context": "/api/$metadata#Collection(NetworkConfigurationService.Network)",
+				"@odata.count": 2,
+				"value": [
+					{
+						"Id": 1235,
+						"Name": "VLAN2"
+					}
+				]
+			}`))
+			return true
+		}
 	}
 	return false
 }

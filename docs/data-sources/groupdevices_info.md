@@ -24,7 +24,7 @@ data "ome_groupdevices_info" "gd" {
 
 ### Required
 
-- `device_group_names` (List of String) List of the device group names.
+- `device_group_names` (Set of String) List of the device group names.
 
 ### Optional
 

@@ -157,10 +157,9 @@ func (t templateDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRe
 	stateAttributes := []models.Attribute{}
 
 	omeTemplateData, err := omeClient.GetTemplateByName(templateName)
-	if omeTemplateData.Name == "" {
+	if err == nil && omeTemplateData.Name == "" {
 		return
 	}
-
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"error reading the template", err.Error(),

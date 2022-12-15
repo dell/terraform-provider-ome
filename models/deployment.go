@@ -4,14 +4,13 @@ import "github.com/hashicorp/terraform-plugin-framework/types"
 
 // TemplateDeployment to hold planned and state data
 type TemplateDeployment struct {
-	ID                types.String `tfsdk:"id"`
-	TemplateID        types.Int64  `tfsdk:"template_id"`
-	TemplateName      types.String `tfsdk:"template_name"`
-	DeviceIDs         types.List   `tfsdk:"device_ids"`
-	DeviceServicetags types.List   `tfsdk:"device_servicetags"`
-	BootToNetworkISO  types.Object `tfsdk:"boot_to_network_iso"`
-	DeviceAttributes  types.List   `tfsdk:"device_attributes"`
-	// ServerProfile                   types.List   `tfsdk:"server_profile"`
+	ID                              types.String `tfsdk:"id"`
+	TemplateID                      types.Int64  `tfsdk:"template_id"`
+	TemplateName                    types.String `tfsdk:"template_name"`
+	DeviceIDs                       types.Set    `tfsdk:"device_ids"`
+	DeviceServicetags               types.Set    `tfsdk:"device_servicetags"`
+	BootToNetworkISO                types.Object `tfsdk:"boot_to_network_iso"`
+	DeviceAttributes                types.List   `tfsdk:"device_attributes"`
 	JobRetryCount                   types.Int64  `tfsdk:"job_retry_count"`
 	SleepInterval                   types.Int64  `tfsdk:"sleep_interval"`
 	ForcedShutdown                  types.Bool   `tfsdk:"forced_shutdown"`
@@ -63,20 +62,8 @@ type Schedule struct {
 
 // DeviceAttributes to hold planned and state data
 type DeviceAttributes struct {
-	DeviceIDs  types.List `tfsdk:"device_ids"`
-	Attributes types.List `tfsdk:"attributes"`
-}
-
-// ServerProfile to hold planned and state data
-type ServerProfile struct {
-	DeviceID       types.Int64  `tfsdk:"device_id"`
-	ProfileDetails types.Object `tfsdk:"profile_details"`
-}
-
-// ProfileDetails to hold planned and state data
-type ProfileDetails struct {
-	ID          types.Int64  `tfsdk:"id"`
-	ProfileName types.String `tfsdk:"profile_name"`
+	DeviceServiceTags types.Set  `tfsdk:"device_servicetags"`
+	Attributes        types.List `tfsdk:"attributes"`
 }
 
 // OMETemplateDeployRequest to form a request to deploy template

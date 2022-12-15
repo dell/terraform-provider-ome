@@ -46,7 +46,7 @@ func (t groupDevicesDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema
 			"device_group_names": {
 				MarkdownDescription: "List of the device group names.",
 				Description:         "List of the device group names.",
-				Type: types.ListType{
+				Type: types.SetType{
 					ElemType: types.StringType,
 				},
 				Required: true,

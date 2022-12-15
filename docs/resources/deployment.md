@@ -3,12 +3,12 @@
 page_title: "ome_deployment Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing template deployment on OpenManage Enterprise.
+  Resource for managing template deployment on OpenManage Enterprise. Updates are supported for the following parameters: device_ids, device_servicetags, boot_to_network_iso, forced_shutdown, options_time_to_wait_before_shutdown, power_state_off, options_precheck_only, options_strict_checking_vlan, options_continue_on_warning, run_later, cron, device_attributes, job_retry_count, sleep_interval.
 ---
 
 # ome_deployment (Resource)
 
-Resource for managing template deployment on OpenManage Enterprise.
+Resource for managing template deployment on OpenManage Enterprise. Updates are supported for the following parameters: `device_ids`, `device_servicetags`, `boot_to_network_iso`, `forced_shutdown`, `options_time_to_wait_before_shutdown`, `power_state_off`, `options_precheck_only`, `options_strict_checking_vlan`, `options_continue_on_warning`, `run_later`, `cron`, `device_attributes`, `job_retry_count`, `sleep_interval`.
 
 ## Example Usage
 
@@ -26,10 +26,10 @@ resource "ome_deployment" "deploy-template-1" {
 ### Optional
 
 - `boot_to_network_iso` (Object) Boot To Network ISO deployment details. (see [below for nested schema](#nestedatt--boot_to_network_iso))
-- `cron` (String) Cron to schedule the deployment task.
+- `cron` (String) Cron to schedule the deployment task. Cron expression should be of future datetime.
 - `device_attributes` (List of Object) List of template attributes associated with the target devices for deploymnent. (see [below for nested schema](#nestedatt--device_attributes))
-- `device_ids` (List of Number) List of the device id(s).
-- `device_servicetags` (List of String) List of the device servicetags.
+- `device_ids` (Set of Number) List of the device id(s).
+- `device_servicetags` (Set of String) List of the device servicetags.
 - `forced_shutdown` (Boolean) Force shutdown after deployment.
 - `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource.
 - `options_continue_on_warning` (Boolean) Continue to run the job on warnings.
@@ -76,7 +76,7 @@ Optional:
 Optional:
 
 - `attributes` (List of Object) (see [below for nested schema](#nestedobjatt--device_attributes--attributes))
-- `device_ids` (List of Number)
+- `device_servicetags` (Set of String)
 
 <a id="nestedobjatt--device_attributes--attributes"></a>
 ### Nested Schema for `device_attributes.attributes`
