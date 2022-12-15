@@ -2,6 +2,7 @@ package clients
 
 import (
 	"fmt"
+	"strconv"
 	"terraform-provider-ome/models"
 )
 
@@ -107,4 +108,46 @@ func (c *Client) getBaseline(url, name string) (models.OmeBaseline, error) {
 		return c.getBaseline(omeBaselines.NextLink, name)
 	}
 	return models.OmeBaseline{}, fmt.Errorf(ErrBaselineNameNotFound, name)
+}
+
+// RemediateBaseLineDevices remdiats the baseline devices
+func (c *Client) RemediateBaseLineDevices(cr models.ConfigurationRemediationPayload) (int64, error) {
+	data, _ := c.JSONMarshal(cr)
+	response, err := c.Post(BaseLineConfigRemediationAPI, nil, data)
+	if err != nil {
+		return 0, err
+	}
+	respData, _ := c.GetBodyData(response.Body)
+	val, _ := strconv.ParseInt(string(respData), 10, 64)
+	return val, nil
+}
+
+// GetAllConfiBaselineDeviceReport returns all the device report
+func (c *Client) GetAllConfiBaselineDeviceReport(baseLineID int64) ([]models.OMEDeviceComplianceReport, error) {
+	deviceCompReports := []models.OMEDeviceComplianceReport{}
+	err := c.GetPaginatedData(fmt.Sprintf(BaseLineConfigDeviceCompReport, baseLineID), &deviceCompReports)
+	if err != nil {
+		return []models.OMEDeviceComplianceReport{}, err
+	}
+	return deviceCompReports, nil
+}
+
+// GetConfiBaselineDeviceReport - returns baseline device report for a device
+func (c *Client) GetConfiBaselineDeviceReport(baseLineID int64, deviceSt string) (models.OMEDeviceComplianceReport, error) {
+	deviceCompReports := models.OMEDeviceComplianceReports{}
+	key := "ServiceTag"
+	resp, err := c.Get(fmt.Sprintf(BaseLineConfigDeviceCompReport, baseLineID), nil, map[string]string{"$filter": fmt.Sprintf("%s eq '%s'", key, deviceSt)})
+
+	if err != nil {
+		return models.OMEDeviceComplianceReport{}, err
+	}
+	respData, _ := c.GetBodyData(resp.Body)
+	err = c.JSONUnMarshal(respData, &deviceCompReports)
+	if err != nil {
+		return models.OMEDeviceComplianceReport{}, err
+	}
+	if len(deviceCompReports.Value) != 0 {
+		return deviceCompReports.Value[0], nil
+	}
+	return models.OMEDeviceComplianceReport{}, fmt.Errorf(ErrBaselineReportForDevice, baseLineID, deviceSt)
 }

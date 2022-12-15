@@ -167,7 +167,7 @@ func TestClientPreReqHook(t *testing.T) {
 	ClientPreReqHook(c, request)
 }
 
-func TestGetJob(t *testing.T) {
+func TestClient_GetPaginatedData(t *testing.T) {
 
 	ts := createNewTLSServer(t)
 	defer ts.Close()
@@ -203,16 +203,17 @@ func TestGetJob(t *testing.T) {
 				}
 
 			}
-		})}
+		})
 	}
-func TestClient_GetPaginatedData(t *testing.T) {
-		ts := createNewTLSServer(t)
-		defer ts.Close()
-	
-		opts := initOptions(ts)
-	
-		c, _ := NewClient(opts)
-		
+}
+func TestGetJob(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
 	tests := []struct {
 		name  string
 		id    int64

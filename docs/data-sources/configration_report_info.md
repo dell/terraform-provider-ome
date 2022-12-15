@@ -40,7 +40,7 @@ data "ome_configration_report_info" "cr" {
 
 Read-Only:
 
-- `compliance_status` (Number) Device compliance status.
+- `compliance_status` (String) Device compliance status.
 - `device_compliance_details` (String) Device compliance details.
 - `device_id` (Number) Device ID
 - `device_name` (String) Device Name.
