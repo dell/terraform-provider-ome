@@ -17,7 +17,10 @@ const (
 	ResourceName1                           = "ome_template.terraform-acceptance-test-6"
 	ReferenceDeploymentTemplateNameForClone = "test_acc_clone_deployment_template"
 	ReferenceComplianceTemplateNameForClone = "test_acc_clone_compliance_template"
+	// ContentFilePath                         = "../testdata/test_acc_template.xml"
 )
+
+var ContentFilePath = getTestData("test_acc_template.xml")
 
 func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 	if skipTest() {
@@ -138,6 +141,10 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
+				Config:      testAccCreateTemplateMutuallyExclusive4,
+				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
+			},
+			{
 				Config:      testAccCreateTemplateWithIOAndVlan,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
@@ -207,6 +214,33 @@ func TestTemplateImport_ImportTemplates(t *testing.T) {
 				ImportStateCheck: assertTFImportState,
 				ExpectError:      nil,
 				ImportStateId:    TemplateName1,
+			},
+		},
+	})
+}
+
+func TestTemplateCreation_CreateImportTemplate(t *testing.T) {
+	if skipTest() {
+		t.Skip(SkipTestMsg)
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testProviderFactory,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCreateImportTemplateSuccess,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_template.citdtest", "name", "test_acc_import_content_d"),
+					resource.TestCheckResourceAttr("ome_template.citdtest", "view_type", "Deployment"),
+					resource.TestCheckResourceAttr("ome_template.citdtest", "view_type_id", "2"),
+					resource.TestCheckResourceAttr("ome_template.citdtest", "device_type", "Server"),
+
+					resource.TestCheckResourceAttr("ome_template.citctest", "name", "test_acc_import_content_c"),
+					resource.TestCheckResourceAttr("ome_template.citctest", "view_type", "Compliance"),
+					resource.TestCheckResourceAttr("ome_template.citctest", "view_type_id", "1"),
+					resource.TestCheckResourceAttr("ome_template.citctest", "device_type", "Server"),
+				),
 			},
 		},
 	})
@@ -379,6 +413,22 @@ resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
 	refdevice_id = 12328
 	refdevice_servicetag = "MX1404"
+}
+`
+
+var testAccCreateTemplateMutuallyExclusive4 = `
+
+provider "ome" {
+	username = "` + omeUserName + `"
+	password = "` + omePassword + `"
+	host = "` + omeHost + `"
+	skipssl = true
+}
+
+resource "ome_template" "terraform-acceptance-test-3" {
+	name = "test_acc_template-3"
+	refdevice_id = 12328
+	content = "MX1404"
 }
 `
 
@@ -566,6 +616,25 @@ resource "ome_template" "terraform-acceptance-test-2" {
 	description = "This is sample description"
 	job_retry_count  = 10
 	sleep_interval = 60
+}
+`
+var testAccCreateImportTemplateSuccess = `
+provider "ome" {
+	username = "` + omeUserName + `"
+	password = "` + omePassword + `"
+	host = "` + omeHost + `"
+	skipssl = true
+}
+
+resource "ome_template" "citdtest" {
+	name = "test_acc_import_content_d"
+	content = file("` + ContentFilePath + `")
+}
+
+resource "ome_template" "citctest" {
+	name = "test_acc_import_content_c"
+	content = file("` + ContentFilePath + `")
+	view_type = "Compliance"
 }
 `
 

@@ -52,7 +52,8 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 		}
 
 		shouldReturn6 := mockBaselineAPIs(r, w) || mockGetBaselineByIDAPI(r, w) ||
-			mockGetBaselineDevComplianceReportByIDAPI(r, w) || mockGetBaselineDevAttrComplianceReportByIDAPI(r, w) || mockGetBaselineByNameAPI(r, w)
+			mockGetBaselineDevComplianceReportByIDAPI(r, w) || mockGetBaselineDevAttrComplianceReportByIDAPI(r, w) || mockGetBaselineByNameAPI(r, w) ||
+			mockImportTemplateAPI(r, w)
 		if shouldReturn6 {
 			return
 		}
@@ -2098,6 +2099,45 @@ func mockGetBaselineByNameAPI(r *http.Request, w http.ResponseWriter) bool {
 				}
 			]
 		}`))
+		return true
+	}
+	return false
+}
+
+func mockImportTemplateAPI(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == ImportTemplateAPI) && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "server-dep-template") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`` + fmt.Sprint(123) + ``))
+		} else if strings.Contains(string(body), "chassis-dep-template") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`` + fmt.Sprint(124) + ``))
+		} else if strings.Contains(string(body), "server-comp-template") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`` + fmt.Sprint(125) + ``))
+		} else if strings.Contains(string(body), "chassis-comp-template") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`` + fmt.Sprint(126) + ``))
+		} else if strings.Contains(string(body), "invalid-template-content") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM9073",
+							"RelatedProperties": [],
+							"Message": "Unable to import template because the XML content is invalid.",
+							"MessageArgs": [],
+							"Severity": "Warning",
+							"Resolution": "Recommended Action: Ensure the XML content is valid."
+						}
+					]
+				}
+			}`))
+		}
 		return true
 	}
 	return false
