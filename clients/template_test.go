@@ -1006,7 +1006,7 @@ func TestClient_ImportTemplate(t *testing.T) {
 	tests := []struct {
 		name          string
 		importRequest models.OMEImportTemplate
-		isError  bool
+		isError       bool
 		newTemplateID int64
 	}{
 		{"OME Import server deployment Template", models.OMEImportTemplate{
@@ -1045,7 +1045,7 @@ func TestClient_ImportTemplate(t *testing.T) {
 			newTemplateID, err := c.ImportTemplate(tt.importRequest)
 			if tt.isError {
 				assert.NotNil(t, err)
-				assert.Equal(t,  tt.newTemplateID, newTemplateID)
+				assert.Equal(t, tt.newTemplateID, newTemplateID)
 			} else {
 				assert.Equal(t, tt.newTemplateID, newTemplateID)
 				assert.Nil(t, err)

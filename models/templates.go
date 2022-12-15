@@ -21,7 +21,7 @@ type Template struct {
 	ID                  types.String `tfsdk:"id"`
 	Name                types.String `tfsdk:"name"`
 	FQDDS               types.String `tfsdk:"fqdds"`
-	DeviceType            types.String `tfsdk:"device_type"`
+	DeviceType          types.String `tfsdk:"device_type"`
 	ViewType            types.String `tfsdk:"view_type"`
 	ViewTypeID          types.Int64  `tfsdk:"view_type_id"`
 	RefdeviceServicetag types.String `tfsdk:"refdevice_servicetag"`
@@ -233,7 +233,7 @@ type OMECloneTemplate struct {
 // OMEImportTemplate - model used to clone template from a reference template id.
 type OMEImportTemplate struct {
 	ViewTypeID int64  `json:"ViewTypeId"`
-	Type       int64 `json:"Type"`
-	Name       string  `json:"Name"`
-	Content    string  `json:"Content"`
+	Type       int64  `json:"Type"`
+	Name       string `json:"Name"`
+	Content    string `json:"Content"`
 }

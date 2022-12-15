@@ -2,11 +2,12 @@ package ome
 
 import (
 	"context"
+	"terraform-provider-ome/clients"
+	"terraform-provider-ome/models"
+
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"terraform-provider-ome/clients"
-	"terraform-provider-ome/models"
 )
 
 type configurationReportDataSourceType struct{}
@@ -146,9 +147,9 @@ func (g configurationReportDataSource) Read(ctx context.Context, req tfsdk.ReadD
 	}
 	if baseline.ConfigComplianceSummary.ComplianceStatus != "NotInventored" {
 
-		baselineId := baseline.ID
+		baselineID := baseline.ID
 
-		complianceReports, err := omeClient.GetBaselineDevComplianceReportsByID(baselineId)
+		complianceReports, err := omeClient.GetBaselineDevComplianceReportsByID(baselineID)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				clients.ErrGnrConfigurationReport, err.Error(),
@@ -173,7 +174,7 @@ func (g configurationReportDataSource) Read(ctx context.Context, req tfsdk.ReadD
 				InventoryTime:    types.String{Value: cr.InventoryTime},
 			}
 			if config.FetchAttributes.Value {
-				attrResp, err := omeClient.GetBaselineDevAttrComplianceReportsByID(baselineId, cr.ID)
+				attrResp, err := omeClient.GetBaselineDevAttrComplianceReportsByID(baselineID, cr.ID)
 				if err != nil {
 					resp.Diagnostics.AddError(
 						clients.ErrGnrConfigurationReport, err.Error(),

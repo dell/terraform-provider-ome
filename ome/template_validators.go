@@ -104,7 +104,6 @@ func (v validTemplateViewTypeValidator) Validate(ctx context.Context, req tfsdk.
 	)
 }
 
-
 type validTemplateDeviceTypeValidator struct {
 }
 
