@@ -106,11 +106,11 @@ func (v complianceStateValidator) Validate(ctx context.Context, req tfsdk.Valida
 	if input.Unknown || input.Null {
 		return
 	}
-	if !strings.EqualFold(input.Value,"Compliant") {
+	if !strings.EqualFold(input.Value, "Compliant") {
 		resp.Diagnostics.AddAttributeError(
 			req.AttributePath,
 			v.Description(ctx),
-			fmt.Sprintf("current value : %d", input.Value),
+			fmt.Sprintf("current value : %s", input.Value),
 		)
 	}
 }

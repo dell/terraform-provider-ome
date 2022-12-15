@@ -108,7 +108,7 @@ type ConfigurationRemediation struct {
 // TargetDevices -  holds the plan data
 type TargetDevices struct {
 	DeviceServiceTag types.String `tfsdk:"device_service_tag"`
-	ComplianceStatus types.String  `tfsdk:"compliance_status"`
+	ComplianceStatus types.String `tfsdk:"compliance_status"`
 }
 
 // ConfigurationRemediationPayload - payload for remediation
