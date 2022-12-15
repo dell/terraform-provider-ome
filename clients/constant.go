@@ -223,7 +223,7 @@ const (
 	ValidTemplateViewTypes string = "Deployment,Compliance"
 	// ValidComplainceStatus = Valid compliance status supported
 	ValidComplainceStatus string = "Compliant"
-	// ValidTemplateViewTypes = Valid template view types supported in template creation
+	// ValidTemplateDeviceTypes = Valid template device types supported in template creation
 	ValidTemplateDeviceTypes string = "Server,Chassis"
 )
 
