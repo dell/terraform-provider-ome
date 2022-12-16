@@ -9,11 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-const (
-	//RefTemplateName
-	RefTemplateName = "test_acc_compliance_template_update"
-)
-
 func TestDataSource_ReadConfigurationReport(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
@@ -59,11 +54,21 @@ var testConfiguratiponReportDS = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = "` + RefTemplateName + `"
+		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
 	}
 
 	data "ome_configration_report_info" "cr" {

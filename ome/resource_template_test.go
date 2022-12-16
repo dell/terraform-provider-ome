@@ -1,8 +1,11 @@
 package ome
 
 import (
+	"fmt"
+	"log"
 	"regexp"
 	"terraform-provider-ome/clients"
+	"terraform-provider-ome/models"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -21,6 +24,47 @@ const (
 )
 
 var ContentFilePath = getTestData("test_acc_template.xml")
+
+func init() {
+	resource.AddTestSweepers("ome_template", &resource.Sweeper{
+		Name:         "ome_template",
+		Dependencies: []string{"ome_deployment"},
+		F: func(region string) error {
+			omeClient, err := getSweeperClient(region)
+			if err != nil {
+				log.Println("Error getting sweeper client: " + err.Error())
+				return nil
+			}
+
+			_, err = omeClient.CreateSession()
+			if err != nil {
+				log.Println("Error creating client session for sweeper " + err.Error())
+				return nil
+			}
+			defer omeClient.RemoveSession()
+
+			templateURL := fmt.Sprintf(clients.TemplateNameContainsAPI, SweepTestsTemplateIdentifier)
+			templateResp, templateErr := omeClient.Get(templateURL, nil, nil)
+			if templateErr != nil {
+				log.Println("failed to fetch templates containing " + SweepTestsTemplateIdentifier + "Error: " + templateErr.Error())
+				return nil
+			}
+
+			templateBody, _ := omeClient.GetBodyData(templateResp.Body)
+			omeTemplates := models.OMETemplates{}
+			omeClient.JSONUnMarshal(templateBody, &omeTemplates)
+
+			for _, omeTemplateValue := range omeTemplates.Value {
+				_, err = omeClient.Delete(fmt.Sprintf(clients.TemplateAPI+"(%d)", omeTemplateValue.ID), nil, nil)
+				if err != nil {
+					log.Println("failed to sweep dangling templates. Error: " + err.Error())
+					return nil
+				}
+			}
+			return nil
+		},
+	})
+}
 
 func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 	if skipTest() {
@@ -85,8 +129,11 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 		ProtoV6ProviderFactories: testProviderFactory,
 		Steps: []resource.TestStep{
 			{
+				Config: testAccCreateTemplateForClone,
+			},
+			{
 				Config: testAccCloneTemplateSuccess,
-				Check: resource.ComposeTestCheckFunc(resource.TestCheckResourceAttr("ome_template.clone-template-test", "name", "clone-template-test"),
+				Check: resource.ComposeTestCheckFunc(resource.TestCheckResourceAttr("ome_template.clone-template-test", "name", "test_acc_clone_template_test"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "view_type", "Deployment"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "view_type_id", "2"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "reftemplate_name", ReferenceDeploymentTemplateNameForClone),
@@ -94,7 +141,7 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "description", "This is a template for testing deployments in acceptance testcases. Please do not delete this template"),
 
-					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "name", "clone-template-deployment-compliance"),
+					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "name", "test_acc_clone_template_deployment_compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type", "compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "reftemplate_name", ReferenceDeploymentTemplateNameForClone),
@@ -102,11 +149,11 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "description", "This is a template for testing deployments in acceptance testcases. Please do not delete this template"),
 
-					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "name", "clone-template-compliance-compliance"),
+					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "name", "test_acc_clone_template_compliance_compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "view_type", "Compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "reftemplate_name", ReferenceComplianceTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "refdevice_id", DeviceID1),
+					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "refdevice_id", DeviceID2),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "description", ""),
 				),
@@ -245,6 +292,26 @@ func TestTemplateCreation_CreateImportTemplate(t *testing.T) {
 		},
 	})
 }
+
+var testAccCreateTemplateForClone = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + ReferenceDeploymentTemplateNameForClone + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+	}
+
+	resource "ome_template" "terraform-acceptance-test-2" {
+		name = "` + ReferenceComplianceTemplateNameForClone + `"
+		refdevice_servicetag = "` + DeviceSvcTag2 + `"
+		view_type = "Compliance"
+	}
+`
 
 var testAccCreateTemplateSuccess = `
 	provider "ome" {
@@ -646,19 +713,30 @@ provider "ome" {
 	skipssl = true
 }
 
+resource "ome_template" "terraform-acceptance-test-1" {
+	name = "` + ReferenceDeploymentTemplateNameForClone + `"
+	refdevice_servicetag = "` + DeviceSvcTag1 + `"
+}
+
+resource "ome_template" "terraform-acceptance-test-2" {
+	name = "` + ReferenceComplianceTemplateNameForClone + `"
+	refdevice_servicetag = "` + DeviceSvcTag2 + `"
+	view_type = "Compliance"
+}
+
 resource "ome_template" "clone-template-test" {
-	name = "clone-template-test"
+	name = "test_acc_clone_template_test"
 	reftemplate_name = "` + ReferenceDeploymentTemplateNameForClone + `"
 }
 
 resource "ome_template" "clone-template-deployment-compliance" {
-	name = "clone-template-deployment-compliance"
+	name = "test_acc_clone_template_deployment_compliance"
 	reftemplate_name = "` + ReferenceDeploymentTemplateNameForClone + `"
 	view_type = "compliance"
 }
 
 resource "ome_template" "clone-template-compliance-compliance" {
-	name = "clone-template-compliance-compliance"
+	name = "test_acc_clone_template_compliance_compliance"
 	reftemplate_name = "` + ReferenceComplianceTemplateNameForClone + `"
 	view_type = "Compliance"
 }
