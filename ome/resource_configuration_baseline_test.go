@@ -2,9 +2,12 @@ package ome
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"regexp"
+	"strings"
 	"terraform-provider-ome/clients"
+	"terraform-provider-ome/models"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -18,6 +21,48 @@ const (
 	TestRefTemplateName       = "test_acc_compliance_template"
 	TestRefTemplateNameUpdate = "test_acc_compliance_template_update"
 )
+
+func init() {
+	resource.AddTestSweepers("ome_configuration_baseline", &resource.Sweeper{
+		Name: "ome_configuration_baseline",
+		F: func(region string) error {
+			fmt.Println("Sweeprs for baseline invoked")
+			omeClient, err := getSweeperClient(region)
+			if err != nil {
+				log.Println("Error getting sweeper client: ", err)
+				return nil
+			}
+
+			_, err = omeClient.CreateSession()
+			if err != nil {
+				log.Println("Error creating client session for sweeper " + err.Error())
+				return nil
+			}
+			defer omeClient.RemoveSession()
+
+			omeBaselines := []models.OmeBaseline{}
+			err = omeClient.GetPaginatedData(clients.BaselineAPI, &omeBaselines)
+			if err != nil {
+				log.Println("failed to fetch baseline details for the name " + SweepTestsTemplateIdentifier + " Error: " + err.Error())
+				return nil
+			}
+
+			var baselineIDs []int64
+			for _, omeBaseline := range omeBaselines {
+				if strings.Contains(omeBaseline.Name, SweepTestsTemplateIdentifier) {
+					baselineIDs = append(baselineIDs, omeBaseline.ID)
+				}
+			}
+
+			err = omeClient.DeleteBaseline(baselineIDs)
+			if err != nil {
+				log.Println("failed to sweep dangling baselines. Error:" + err.Error())
+				return nil
+			}
+			return nil
+		},
+	})
+}
 
 func TestCreateBaseline_TestValidations(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
@@ -299,11 +344,21 @@ var testConfigureBaselinewithDeviceID = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
 		description = "baseline description"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
 	}
 `
 
@@ -315,11 +370,30 @@ var testConfigureBaselinewithDeviceIDUpdate = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
+	resource "ome_template" "terraform-acceptance-test-2" {
+		name = "` + TestRefTemplateNameUpdate + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineNameUpdate + `"
 		ref_template_name = "` + TestRefTemplateNameUpdate + `"
 		device_servicetags = ["` + DeviceSvcTag2 + `"]
 		description = "baseline description updated"
+		depends_on = ["ome_template.terraform-acceptance-test-2"]
 	}
 `
 
@@ -396,6 +470,15 @@ var testConfigureBaselineWithSchedule = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
@@ -406,6 +489,7 @@ var testConfigureBaselineWithSchedule = `
 		email_addresses = ["test@testmail.com"]
 		cron = "0 49 8 * * ? *"
 		output_format = "csv"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
 	}
 `
 var testConfigureBaselineWithScheduleUpdate = `
@@ -414,6 +498,15 @@ var testConfigureBaselineWithScheduleUpdate = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
+	}
+
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
 	}
 
 	resource "ome_configuration_baseline" "create_baseline" {
@@ -426,6 +519,7 @@ var testConfigureBaselineWithScheduleUpdate = `
 		email_addresses = ["test@mail.com"]
 		cron = "0 50 8 * * ? *"
 		output_format = "html"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
 	}
 `
 
@@ -477,6 +571,15 @@ var testConfigureBaselineScheduleNonCompliant = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
@@ -484,6 +587,7 @@ var testConfigureBaselineScheduleNonCompliant = `
 		description = "baseline description"
 		schedule_notification = true
 		email_addresses = ["test@testmail.com"]
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
 	}
 `
 
@@ -495,11 +599,21 @@ var testConfigureBaselineScheduleNonCompliantUpdate = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
 		description = "baseline description"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
 	}
 `
 

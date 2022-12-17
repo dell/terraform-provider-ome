@@ -14,7 +14,8 @@ import (
 
 const (
 	//SkipTestMsg
-	SkipTestMsg = "Skipping the test because eith TF_ACC or ACC_DETAIL is not set to 1"
+	SkipTestMsg                  = "Skipping the test because eith TF_ACC or ACC_DETAIL is not set to 1"
+	SweepTestsTemplateIdentifier = "test_acc"
 )
 
 var testProvider tfsdk.Provider

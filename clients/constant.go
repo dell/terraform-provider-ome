@@ -74,6 +74,8 @@ const (
 	VlanNetworksAPI = "/api/NetworkConfigurationService/Networks"
 	//ImportTemplateAPI - api to import a template
 	ImportTemplateAPI = "/api/TemplateService/Actions/TemplateService.Import"
+	// TemplateNameContainsAPI - api to fetch templates by name
+	TemplateNameContainsAPI = "/api/TemplateService/Templates?$filter=contains(Name, '%s')"
 )
 
 // Messages constants

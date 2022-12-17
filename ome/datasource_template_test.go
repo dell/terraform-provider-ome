@@ -46,9 +46,19 @@ var testReadTemplate = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
 	data "ome_template_info" "template" {
 		id = "0"
-		name = "` + TestAccTemplateName + `"
+		name = "` + TestRefTemplateName + `"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
 	}
 `
 

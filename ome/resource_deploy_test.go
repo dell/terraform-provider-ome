@@ -1,8 +1,11 @@
 package ome
 
 import (
+	"fmt"
+	"log"
 	"regexp"
 	"terraform-provider-ome/clients"
+	"terraform-provider-ome/models"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +17,58 @@ const (
 	TestAccTemplateName       = "test_acc_create_deployment"
 	TestAccUpdateTemplateName = "test_acc_update_deployment"
 )
+
+func init() {
+	resource.AddTestSweepers("ome_deployment", &resource.Sweeper{
+		Name: "ome_deployment",
+		F: func(region string) error {
+			fmt.Println("Sweeprs for Deploy invoked")
+			omeClient, err := getSweeperClient(region)
+			if err != nil {
+				log.Println("Error getting sweeper client: ", err)
+				return nil
+			}
+
+			_, err = omeClient.CreateSession()
+			if err != nil {
+				log.Println("Error creating client session for sweeper " + err.Error())
+				return nil
+			}
+			defer omeClient.RemoveSession()
+
+			profileURL := fmt.Sprintf(clients.ProfileAPI+"?$filter=contains(TemplateName, '%s')", SweepTestsTemplateIdentifier)
+			response, err := omeClient.Get(profileURL, nil, nil)
+
+			if err != nil {
+				log.Println("failed to fetch profile with template name " + SweepTestsTemplateIdentifier + " Error: " + err.Error())
+				return nil
+			}
+			b, _ := omeClient.GetBodyData(response.Body)
+			omeServerProfiles := models.OMEServerProfiles{}
+			err = omeClient.JSONUnMarshal(b, &omeServerProfiles)
+			if err != nil {
+				log.Println("failed to fetch profile with template name " + SweepTestsTemplateIdentifier + " Error: " + err.Error())
+				return nil
+			}
+
+			profileArr := make([]int64, len(omeServerProfiles.Value))
+
+			for i, serverProfile := range omeServerProfiles.Value {
+				profileArr[i] = serverProfile.ID
+			}
+
+			pdr := models.ProfileDeleteRequest{
+				ProfileIds: profileArr,
+			}
+			err = omeClient.DeleteDeployment(pdr)
+			if err != nil {
+				log.Println("failed to sweep dangling profiles. Error:" + err.Error())
+				return nil
+			}
+			return nil
+		},
+	})
+}
 
 func TestTemplateDeploy_InvalidTemplate(t *testing.T) {
 	if skipTest() {
@@ -264,9 +319,18 @@ var testTemplateDeploymentSuccess = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestAccTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "System"
+	}
+
 	resource "ome_deployment" "deploy-template-3" {
 		template_name = "` + TestAccTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
+		depends_on = [
+			"ome_template.terraform-acceptance-test-1"
+		]
 	}
 `
 
@@ -276,6 +340,12 @@ var testTemplateUpdateDeploymentSuccess = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
+	}
+
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestAccTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "System"
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
@@ -290,6 +360,12 @@ var testTemplateDeploymentbootToNetworkISOSuccess = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
+	}
+
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestAccTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "System"
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
@@ -338,6 +414,12 @@ var testTemplateDeploymentSuccessWithSchedule = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestAccTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "System"
+	}
+
 	resource "ome_deployment" "deploy-template-3" {
 		template_name = "` + TestAccTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
@@ -352,6 +434,12 @@ var testTemplateUpdateDeployWithParamsSuccess = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
+	}
+
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestAccTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "System"
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
@@ -393,6 +481,12 @@ var testTemplateUpdateDeploymentWithScheduleSuccess = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
+	}
+
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestAccTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "System"
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
