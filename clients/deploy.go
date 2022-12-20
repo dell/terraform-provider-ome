@@ -22,21 +22,21 @@ func (c *Client) CreateDeployment(deploymentRequest models.OMETemplateDeployRequ
 
 // GetServerProfileInfoByTemplateName returns the profile information for a templateName
 func (c *Client) GetServerProfileInfoByTemplateName(name string) (models.OMEServerProfiles, error) {
-	response, err := c.Get(ProfileAPI, nil, map[string]string{"$filter": fmt.Sprintf("%s eq '%s'", "TemplateName", name)})
+	omeServerProfileResp := []models.OMEServerProfile{}
+	err := c.GetPaginatedDataWithQueryParam(ProfileAPI, map[string]string{"$filter": fmt.Sprintf("%s eq '%s'", "TemplateName", name)}, &omeServerProfileResp)
 	if err != nil {
 		return models.OMEServerProfiles{}, err
 	}
-	b, _ := c.GetBodyData(response.Body)
-
-	omeServerProfiles := models.OMEServerProfiles{}
-	err = c.JSONUnMarshal(b, &omeServerProfiles)
-	if err != nil {
-		return models.OMEServerProfiles{}, err
-	}
-	if len(omeServerProfiles.Value) == 0 {
+	if len(omeServerProfileResp) == 0 {
 		return models.OMEServerProfiles{}, nil
 	}
-	return omeServerProfiles, nil
+	omeServerProfileFilteredResp := []models.OMEServerProfile{}
+	for _, filteredServerProfile := range omeServerProfileResp {
+		if filteredServerProfile.TemplateName == name {
+			omeServerProfileFilteredResp = append(omeServerProfileFilteredResp, filteredServerProfile)
+		}
+	}
+	return models.OMEServerProfiles{Value: omeServerProfileFilteredResp}, nil
 }
 
 // DeleteDeployment unassigns and deletes the profile corresponding to the deployment

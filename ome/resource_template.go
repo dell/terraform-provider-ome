@@ -24,6 +24,8 @@ const (
 	ComplianceViewTypeID = 1
 	//DeploymentViewTypeID - stores the id for the deployment view type.
 	DeploymentViewTypeID = 2
+	//ChassisDeviceTypeID - stores the id for the Chassis device type type.
+	ChassisDeviceTypeID = 4
 	// RetryCount - stores the default value of retry count
 	RetryCount = 5
 	// SleepInterval - stores the default value of sleep interval
@@ -305,7 +307,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 
 		if !plan.Description.Unknown {
 			resp.Diagnostics.AddError(
-				clients.ErrCreateTemplate, "description will be copied from the reference template.",
+				clients.ErrCreateTemplate, "description cannot be modified while cloning from a reference template.",
 			)
 			return
 		}
@@ -957,10 +959,17 @@ func (r resourceTemplate) ImportState(ctx context.Context, req tfsdk.ImportResou
 		viewType = "Compliance"
 	}
 
+	deviceType := "Server"
+	if omeTemplateData.TypeID == ChassisDeviceTypeID {
+		deviceType = "Chassis"
+	}
+
 	template.RefdeviceID = types.Int64{Value: omeTemplateData.SourceDeviceID}
 	template.RefdeviceServicetag = types.String{Value: "NA"}
 	template.ReftemplateName = types.String{Value: "NA"}
+	template.Content = types.String{Value: "NA"}
 	template.ViewType = types.String{Value: viewType}
+	template.DeviceType = types.String{Value: deviceType}
 	template.JobRetryCount = types.Int64{Value: RetryCount}
 	template.SleepInterval = types.Int64{Value: SleepInterval}
 	template.FQDDS = types.String{Value: "All"}

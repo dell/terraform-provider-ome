@@ -3,7 +3,6 @@ package ome
 import (
 	"context"
 	"fmt"
-	"strings"
 	"terraform-provider-ome/clients"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -48,7 +47,7 @@ func (v sizeAtLeastValidator) Validate(ctx context.Context, req tfsdk.ValidateAt
 }
 
 func validateList(ctx context.Context, request tfsdk.ValidateAttributeRequest, response *tfsdk.ValidateAttributeResponse) ([]attr.Value, bool) {
-	var l types.List
+	var l types.Set
 
 	diags := tfsdk.ValueAs(ctx, request.AttributeConfig, &l)
 
@@ -106,7 +105,7 @@ func (v complianceStateValidator) Validate(ctx context.Context, req tfsdk.Valida
 	if input.Unknown || input.Null {
 		return
 	}
-	if !strings.EqualFold(input.Value, "Compliant") {
+	if !(input.Value == clients.ValidComplainceStatus) {
 		resp.Diagnostics.AddAttributeError(
 			req.AttributePath,
 			v.Description(ctx),

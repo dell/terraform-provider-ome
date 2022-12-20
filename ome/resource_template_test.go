@@ -137,7 +137,6 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "view_type", "Deployment"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "view_type_id", "2"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "reftemplate_name", ReferenceDeploymentTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-test", "refdevice_id", DeviceID1),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "description", "This is a template for testing deployments in acceptance testcases. Please do not delete this template"),
 
@@ -145,7 +144,6 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type", "compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "reftemplate_name", ReferenceDeploymentTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "refdevice_id", DeviceID1),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "description", "This is a template for testing deployments in acceptance testcases. Please do not delete this template"),
 
@@ -153,7 +151,6 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "view_type", "Compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "reftemplate_name", ReferenceComplianceTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "refdevice_id", DeviceID2),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "description", ""),
 				),
@@ -304,6 +301,7 @@ var testAccCreateTemplateForClone = `
 	resource "ome_template" "terraform-acceptance-test-1" {
 		name = "` + ReferenceDeploymentTemplateNameForClone + `"
 		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		description = "This is a template for testing deployments in acceptance testcases. Please do not delete this template"
 	}
 
 	resource "ome_template" "terraform-acceptance-test-2" {

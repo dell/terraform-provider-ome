@@ -566,6 +566,7 @@ func TestClient_GetTemplateByName(t *testing.T) {
 		{"Empty Template response", "ValidEmptyTemplate"},
 		{"Sinle Template response", "ValidSingleTemplate"},
 		{"Multiple Template response", "ValidMultipleTemplate"},
+		{"Multiple Template response with pagination", "ValidTemplatePagination"},
 		{"Unauthorised Template response", "UnauthorisedTemplate"},
 		{"Unmarshal error Template response", "UnmarshalErrTemplate"},
 	}
@@ -578,11 +579,11 @@ func TestClient_GetTemplateByName(t *testing.T) {
 			}
 			if tt.templateName == "ValidSingleTemplate" {
 				assert.Nil(t, err)
-				assert.Equal(t, "ValidSingleTemplate", response.Name)
+				assert.Equal(t, tt.templateName, response.Name)
 			}
-			if tt.templateName == "ValidMultipleTemplate" {
+			if tt.templateName == "ValidMultipleTemplate" || tt.templateName == "ValidTemplatePagination" {
 				assert.Nil(t, err)
-				assert.Equal(t, "ValidMultipleTemplate1", response.Name)
+				assert.Equal(t, tt.templateName, response.Name)
 			}
 			if tt.templateName == "UnauthorisedTemplate" || tt.templateName == "UnmarshalErrTemplate" {
 				assert.NotNil(t, err)

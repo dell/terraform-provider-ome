@@ -208,3 +208,38 @@ func (c *Client) GetPaginatedData(url string, in interface{}) error {
 
 	return nil
 }
+
+// GetPaginatedDataWithQueryParam - returns all the paginated data with query params
+func (c *Client) GetPaginatedDataWithQueryParam(url string, queryParams map[string]string, in interface{}) error {
+
+	response, err := c.Get(url, nil, queryParams)
+	if err != nil {
+		return err
+	}
+	var allData []map[string]interface{}
+	pd := PaginationData{}
+	bodyData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshal(bodyData, &pd)
+	if err != nil {
+		return err
+	}
+	allData = append(allData, pd.Value...)
+	for pd.NextLink != "" {
+		response, err := c.Get(pd.NextLink, nil, nil)
+		if err != nil {
+			return err
+		}
+		pd = PaginationData{}
+		bodyData, _ := c.GetBodyData(response.Body)
+		err = c.JSONUnMarshal(bodyData, &pd)
+		if err != nil {
+			return err
+		}
+		allData = append(allData, pd.Value...)
+	}
+
+	jsonString, _ := json.Marshal(allData)
+	_ = json.Unmarshal(jsonString, &in)
+
+	return nil
+}

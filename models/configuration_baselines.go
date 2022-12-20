@@ -4,21 +4,21 @@ import "github.com/hashicorp/terraform-plugin-framework/types"
 
 // ConfigureBaselines to hold planned and state data
 type ConfigureBaselines struct {
-	ID                     types.Int64  `tfsdk:"id"`
-	RefTemplateID          types.Int64  `tfsdk:"ref_template_id"`
-	RefTemplateName        types.String `tfsdk:"ref_template_name"`
-	Description            types.String `tfsdk:"description"`
-	BaselineName           types.String `tfsdk:"baseline_name"`
-	DeviceIDs              types.List   `tfsdk:"device_ids"`
-	DeviceServicetags      types.List   `tfsdk:"device_servicetags"`
-	ScheduleNotification   types.Bool   `tfsdk:"schedule_notification"`
-	NotificationOnSchedule types.Bool   `tfsdk:"notification_on_schedule"`
-	EmailAddresses         types.List   `tfsdk:"email_addresses"`
-	OutputFormat           types.String `tfsdk:"output_format"`
-	Cron                   types.String `tfsdk:"cron"`
-	TaskID                 types.Int64  `tfsdk:"task_id"`
-	JobRetryCount          types.Int64  `tfsdk:"job_retry_count"`
-	SleepInterval          types.Int64  `tfsdk:"sleep_interval"`
+	ID                types.Int64  `tfsdk:"id"`
+	RefTemplateID     types.Int64  `tfsdk:"ref_template_id"`
+	RefTemplateName   types.String `tfsdk:"ref_template_name"`
+	Description       types.String `tfsdk:"description"`
+	BaselineName      types.String `tfsdk:"baseline_name"`
+	DeviceIDs         types.Set    `tfsdk:"device_ids"`
+	DeviceServicetags types.Set    `tfsdk:"device_servicetags"`
+	Schedule          types.Bool   `tfsdk:"schedule"`
+	NotifyOnSchedule  types.Bool   `tfsdk:"notify_on_schedule"`
+	EmailAddresses    types.Set    `tfsdk:"email_addresses"`
+	OutputFormat      types.String `tfsdk:"output_format"`
+	Cron              types.String `tfsdk:"cron"`
+	TaskID            types.Int64  `tfsdk:"task_id"`
+	JobRetryCount     types.Int64  `tfsdk:"job_retry_count"`
+	SleepInterval     types.Int64  `tfsdk:"sleep_interval"`
 }
 
 // ConfigurationBaselinePayload - payload to create a baseline

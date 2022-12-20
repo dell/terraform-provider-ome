@@ -26,7 +26,7 @@ func init() {
 	resource.AddTestSweepers("ome_configuration_baseline", &resource.Sweeper{
 		Name: "ome_configuration_baseline",
 		F: func(region string) error {
-			fmt.Println("Sweeprs for baseline invoked")
+			fmt.Println("Sweepers for baseline invoked")
 			omeClient, err := getSweeperClient(region)
 			if err != nil {
 				log.Println("Error getting sweeper client: ", err)
@@ -204,9 +204,9 @@ var testCreateBaselineValidationFailureNotificationOnScheduleEmptyCron = `
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
-		schedule_notification=true
+		schedule=true
 		email_addresses=["abc@gmail.com"]
-		notification_on_schedule=true
+		notify_on_schedule=true
 	}
 `
 var testCreateBaselineValidationFailureScheduleNotificationInvalidEmail = `
@@ -221,7 +221,7 @@ var testCreateBaselineValidationFailureScheduleNotificationInvalidEmail = `
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
-		schedule_notification=true
+		schedule=true
 		email_addresses= ["abc"]
 	}
 
@@ -239,7 +239,7 @@ var testCreateBaselineValidationFailureScheduleNotificationEmptyEmail = `
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
-		schedule_notification=true
+		schedule=true
 	}
 `
 
@@ -404,10 +404,10 @@ func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 	assertTFImportState := func(s []*terraform.InstanceState) error {
 		assert.Equal(t, BaselineName, s[0].Attributes["baseline_name"])
 		assert.Equal(t, DeviceSvcTag1, s[0].Attributes["device_servicetags.0"])
-		assert.Equal(t, "true", s[0].Attributes["schedule_notification"])
+		assert.Equal(t, "true", s[0].Attributes["schedule"])
 		assert.Equal(t, "test@mail.com", s[0].Attributes["email_addresses.0"])
 		assert.Equal(t, "0 50 8 * * ? *", s[0].Attributes["cron"])
-		assert.Equal(t, "true", s[0].Attributes["notification_on_schedule"])
+		assert.Equal(t, "true", s[0].Attributes["notify_on_schedule"])
 		assert.Equal(t, "html", s[0].Attributes["output_format"])
 		return nil
 	}
@@ -425,11 +425,11 @@ func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.0", DeviceSvcTag1),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "0"),
-					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "schedule_notification", "true"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "schedule", "true"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "email_addresses.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "email_addresses.0", "test@testmail.com"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "cron", "0 49 8 * * ? *"),
-					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "notification_on_schedule", "true"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "notify_on_schedule", "true"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "output_format", "csv"),
 				),
 			},
@@ -442,11 +442,11 @@ func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.0", DeviceSvcTag1),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "0"),
-					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "schedule_notification", "true"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "schedule", "true"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "email_addresses.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "email_addresses.0", "test@mail.com"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "cron", "0 50 8 * * ? *"),
-					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "notification_on_schedule", "true"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "notify_on_schedule", "true"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "output_format", "html"),
 				),
 			},
@@ -484,8 +484,8 @@ var testConfigureBaselineWithSchedule = `
 		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
 		description = "baseline description"
-		schedule_notification = true
-		notification_on_schedule = true
+		schedule = true
+		notify_on_schedule = true
 		email_addresses = ["test@testmail.com"]
 		cron = "0 49 8 * * ? *"
 		output_format = "csv"
@@ -514,8 +514,8 @@ var testConfigureBaselineWithScheduleUpdate = `
 		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
 		description = "baseline description"
-		schedule_notification = true
-		notification_on_schedule = true
+		schedule = true
+		notify_on_schedule = true
 		email_addresses = ["test@mail.com"]
 		cron = "0 50 8 * * ? *"
 		output_format = "html"
@@ -541,11 +541,11 @@ func TestCreateBaseline_CreateBaselineWithScheduleNonCompliant(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.0", DeviceSvcTag1),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "0"),
-					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "schedule_notification", "true"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "schedule", "true"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "email_addresses.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "email_addresses.0", "test@testmail.com"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "output_format", "html"),
-					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "notification_on_schedule", "false")),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "notify_on_schedule", "false")),
 			},
 			{
 				Config: testConfigureBaselineScheduleNonCompliantUpdate,
@@ -556,7 +556,7 @@ func TestCreateBaseline_CreateBaselineWithScheduleNonCompliant(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.0", DeviceSvcTag1),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "0"),
-					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "schedule_notification", "false"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "schedule", "false"),
 				),
 			},
 		},
@@ -585,7 +585,7 @@ var testConfigureBaselineScheduleNonCompliant = `
 		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
 		description = "baseline description"
-		schedule_notification = true
+		schedule = true
 		email_addresses = ["test@testmail.com"]
 		depends_on = ["ome_template.terraform-acceptance-test-1"]
 	}

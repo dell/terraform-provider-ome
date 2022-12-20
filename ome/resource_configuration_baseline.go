@@ -26,7 +26,7 @@ type resourceConfigurationBaselineType struct{}
 // Template Deployment Resource schema
 func (r resourceConfigurationBaselineType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for the following parameters: `baseline_name`, `description`, `device_ids`, `device_servicetags`, `schedule_notification`, `notification_on_schedule`, `email_addresses`, `output_format`, `cron`, `job_retry_count`, `sleep_interval`.",
+		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for all the parameters. When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "ID of the resource.",
@@ -64,7 +64,7 @@ func (r resourceConfigurationBaselineType) GetSchema(_ context.Context) (tfsdk.S
 			"device_ids": {
 				MarkdownDescription: "List of the device id on which the baseline compliance needs to be run.",
 				Description:         "List of the device id on which the baseline compliance needs to be run.",
-				Type: types.ListType{
+				Type: types.SetType{
 					ElemType: types.Int64Type,
 				},
 				Optional: true,
@@ -72,14 +72,14 @@ func (r resourceConfigurationBaselineType) GetSchema(_ context.Context) (tfsdk.S
 			"device_servicetags": {
 				MarkdownDescription: "List of the device servicetag on which the baseline compliance needs to be run.",
 				Description:         "List of the device servicetag on which the baseline compliance needs to be run.",
-				Type: types.ListType{
+				Type: types.SetType{
 					ElemType: types.StringType,
 				},
 				Optional: true,
 			},
-			"schedule_notification": {
-				MarkdownDescription: "Flag to schedule notification via email.",
-				Description:         "Flag to schedule notification via email.",
+			"schedule": {
+				MarkdownDescription: "Schedule notification via email.",
+				Description:         "Schedule notification via email.",
 				Type:                types.BoolType,
 				Optional:            true,
 				Computed:            true,
@@ -87,9 +87,9 @@ func (r resourceConfigurationBaselineType) GetSchema(_ context.Context) (tfsdk.S
 					DefaultAttribute(types.Bool{Value: false}),
 				},
 			},
-			"notification_on_schedule": {
-				MarkdownDescription: "Flag to set scheduled notification via cron.",
-				Description:         "Flag to set scheduled notification via cron.",
+			"notify_on_schedule": {
+				MarkdownDescription: "Schedule notification via cron or any time the baseline becomes non-compliant.",
+				Description:         "Schedule notification via cron or any time the baseline becomes non-compliant.",
 				Type:                types.BoolType,
 				Optional:            true,
 				Computed:            true,
@@ -100,7 +100,7 @@ func (r resourceConfigurationBaselineType) GetSchema(_ context.Context) (tfsdk.S
 			"email_addresses": {
 				MarkdownDescription: "Email addresses for notification.",
 				Description:         "Email addresses for notification.",
-				Type: types.ListType{
+				Type: types.SetType{
 					ElemType: types.StringType},
 				Optional: true,
 			},
@@ -177,6 +177,14 @@ func (r resourceConfigurationBaseline) Create(ctx context.Context, req tfsdk.Cre
 
 	state := models.ConfigureBaselines{}
 
+	err := validateNotification(plan)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrCreateClient,
+			err.Error(),
+		)
+		return
+	}
 	//Create Session and defer the remove session
 	omeClient, err := clients.NewClient(*r.p.clientOpt)
 	if err != nil {
@@ -360,6 +368,15 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req tfsdk.Upd
 	diags = req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	err := validateNotification(plan)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrCreateClient,
+			err.Error(),
+		)
 		return
 	}
 
@@ -583,7 +600,10 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req tfsd
 	updateBaselineState(ctx, &state, &state, baseline, clients.ServiceTags, omeClient)
 	//Save into State
 	state.EmailAddresses.ElemType = types.StringType
-	state.DeviceIDs.ElemType = types.Int64Type
+	state.EmailAddresses.Elems = []attr.Value{}
+	state.OutputFormat = types.String{Value: "html"}
+	state.JobRetryCount = types.Int64{Value: 30}
+	state.SleepInterval = types.Int64{Value: 20}
 
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -641,7 +661,7 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 	state.BaselineName = types.String{Value: omeBaseline.Name}
 
 	if usedDeviceInput == clients.ServiceTags {
-		devSTsTfsdk := types.List{
+		devSTsTfsdk := types.Set{
 			ElemType: types.StringType,
 		}
 		apiDeviceIDs := map[string]models.Device{}
@@ -672,7 +692,7 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 		state.DeviceServicetags = devSTsTfsdk
 		state.DeviceIDs = plan.DeviceIDs
 	} else {
-		devIDsTfsdk := types.List{
+		devIDsTfsdk := types.Set{
 			ElemType: types.Int64Type,
 		}
 		apiDeviceIDs := map[int64]models.Device{}
@@ -705,7 +725,7 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 
 	notificationSettings := omeBaseline.NotificationSettings
 	if notificationSettings != nil {
-		state.ScheduleNotification = types.Bool{Value: true}
+		state.Schedule = types.Bool{Value: true}
 		state.OutputFormat = types.String{Value: notificationSettings.OutputFormat}
 
 		emailAddress := []attr.Value{}
@@ -713,16 +733,16 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 			emailAddress = append(emailAddress, types.String{Value: v})
 		}
 
-		emailTfsdk := types.List{
+		emailTfsdk := types.Set{
 			ElemType: types.StringType,
 		}
 		emailTfsdk.Elems = emailAddress
 		state.EmailAddresses = emailTfsdk
 
 		if notificationSettings.NotificationType == "NOTIFY_ON_NON_COMPLIANCE" {
-			state.NotificationOnSchedule = types.Bool{Value: false}
+			state.NotifyOnSchedule = types.Bool{Value: false}
 		} else {
-			state.NotificationOnSchedule = types.Bool{Value: true}
+			state.NotifyOnSchedule = types.Bool{Value: true}
 		}
 
 		if notificationSettings.Schedule.Cron != "" {
@@ -731,8 +751,8 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 			state.Cron = plan.Cron
 		}
 	} else {
-		state.ScheduleNotification = plan.ScheduleNotification
-		state.NotificationOnSchedule = plan.NotificationOnSchedule
+		state.Schedule = plan.Schedule
+		state.NotifyOnSchedule = plan.NotifyOnSchedule
 		state.EmailAddresses = plan.EmailAddresses
 		state.OutputFormat = plan.OutputFormat
 		state.Cron = plan.Cron
@@ -762,7 +782,7 @@ func getPayload(ctx context.Context, plan *models.ConfigureBaselines, templateID
 	}
 	cbp.BaselineTargets = baselineTargets
 
-	if plan.ScheduleNotification.Value {
+	if plan.Schedule.Value {
 		if len(plan.EmailAddresses.Elems) == 0 {
 			return models.ConfigurationBaselinePayload{}, fmt.Errorf(clients.ErrScheduleNotification)
 		}
@@ -775,12 +795,12 @@ func getPayload(ctx context.Context, plan *models.ConfigureBaselines, templateID
 			}
 		}
 
-		if plan.NotificationOnSchedule.Value && plan.Cron.Value == "" {
+		if plan.NotifyOnSchedule.Value && plan.Cron.Value == "" {
 			return models.ConfigurationBaselinePayload{}, fmt.Errorf(clients.ErrInvalidCronExpression)
 		}
 
 		notificationType := "NOTIFY_ON_NON_COMPLIANCE"
-		if plan.NotificationOnSchedule.Value {
+		if plan.NotifyOnSchedule.Value {
 			notificationType = "NOTIFY_ON_SCHEDULE"
 		}
 
@@ -827,4 +847,17 @@ func getValidTargetDevices(omeClient *clients.Client, serviceTags []string, devI
 		return []models.Device{}, "", err
 	}
 	return targetDevices, usedDeviceInput, err
+}
+
+func validateNotification(plan models.ConfigureBaselines) error {
+	if !plan.Schedule.Value {
+		if !plan.Cron.Null || !plan.EmailAddresses.Null {
+			return fmt.Errorf(clients.ErrBaseLineScheduleValid)
+		}
+	} else {
+		if !plan.NotifyOnSchedule.Value && !plan.Cron.Null {
+			return fmt.Errorf(clients.ErrBaseLineNotifyValid)
+		}
+	}
+	return nil
 }

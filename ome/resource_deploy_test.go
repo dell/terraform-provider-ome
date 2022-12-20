@@ -22,7 +22,7 @@ func init() {
 	resource.AddTestSweepers("ome_deployment", &resource.Sweeper{
 		Name: "ome_deployment",
 		F: func(region string) error {
-			fmt.Println("Sweeprs for Deploy invoked")
+			fmt.Println("Sweepers for Deploy invoked")
 			omeClient, err := getSweeperClient(region)
 			if err != nil {
 				log.Println("Error getting sweeper client: ", err)

@@ -134,10 +134,11 @@ type OMEServerProfiles struct {
 
 // OMEServerProfile to form a profile type object.
 type OMEServerProfile struct {
-	ID          int64  `json:"Id,omitempty"`
-	ProfileName string `json:"ProfileName,omitempty"`
-	TemplateID  int64  `json:"TemplateId,omitempty"`
-	TargetID    int64  `json:"TargetId,omitempty"`
+	ID           int64  `json:"Id,omitempty"`
+	ProfileName  string `json:"ProfileName,omitempty"`
+	TemplateID   int64  `json:"TemplateId,omitempty"`
+	TemplateName string `json:"TemplateName,omitempty"`
+	TargetID     int64  `json:"TargetId,omitempty"`
 }
 
 // ProfileDeleteRequest to delete profiles type request.

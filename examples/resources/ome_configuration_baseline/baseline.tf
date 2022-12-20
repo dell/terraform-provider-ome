@@ -29,8 +29,8 @@ resource "ome_configuration_baseline" "baseline2" {
 	ref_template_id = 745
 	device_servicetags = ["MXL1234", "MXL1235"]
 	description = "baseline description"
-	schedule_notification = true
-	notification_on_schedule = true
+	schedule = true
+	notify_on_schedule = true
 	email_addresses = ["test@testmail.com"]
 	cron = "0 30 11 * * ? *"
 	output_format = "csv"
@@ -43,7 +43,7 @@ resource "ome_configuration_baseline" "baseline3" {
 	ref_template_id = 745
 	device_ids = [10001, 10002]
 	description = "baseline description"
-	schedule_notification = true
+	schedule = true
 	email_addresses = ["test@testmail.com"]
   output_format = "pdf"
 }
