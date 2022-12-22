@@ -600,7 +600,7 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req tfsd
 	updateBaselineState(ctx, &state, &state, baseline, clients.ServiceTags, omeClient)
 	//Save into State
 	state.EmailAddresses.ElemType = types.StringType
-	state.EmailAddresses.Elems = []attr.Value{}
+	state.DeviceIDs.ElemType = types.Int64Type
 	state.OutputFormat = types.String{Value: "html"}
 	state.JobRetryCount = types.Int64{Value: 30}
 	state.SleepInterval = types.Int64{Value: 20}

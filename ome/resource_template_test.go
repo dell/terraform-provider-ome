@@ -32,13 +32,13 @@ func init() {
 		F: func(region string) error {
 			omeClient, err := getSweeperClient(region)
 			if err != nil {
-				log.Println("Error getting sweeper client: " + err.Error())
+				log.Println("Error getting sweeper client")
 				return nil
 			}
 
 			_, err = omeClient.CreateSession()
 			if err != nil {
-				log.Println("Error creating client session for sweeper " + err.Error())
+				log.Println("Error creating client session for sweeper ")
 				return nil
 			}
 			defer omeClient.RemoveSession()
@@ -46,7 +46,7 @@ func init() {
 			templateURL := fmt.Sprintf(clients.TemplateNameContainsAPI, SweepTestsTemplateIdentifier)
 			templateResp, templateErr := omeClient.Get(templateURL, nil, nil)
 			if templateErr != nil {
-				log.Println("failed to fetch templates containing " + SweepTestsTemplateIdentifier + "Error: " + templateErr.Error())
+				log.Println("failed to fetch templates containing " + SweepTestsTemplateIdentifier)
 				return nil
 			}
 
@@ -57,7 +57,7 @@ func init() {
 			for _, omeTemplateValue := range omeTemplates.Value {
 				_, err = omeClient.Delete(fmt.Sprintf(clients.TemplateAPI+"(%d)", omeTemplateValue.ID), nil, nil)
 				if err != nil {
-					log.Println("failed to sweep dangling templates. Error: " + err.Error())
+					log.Println("failed to sweep dangling templates.")
 					return nil
 				}
 			}

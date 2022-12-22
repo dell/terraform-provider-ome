@@ -29,13 +29,13 @@ func init() {
 			fmt.Println("Sweepers for baseline invoked")
 			omeClient, err := getSweeperClient(region)
 			if err != nil {
-				log.Println("Error getting sweeper client: ", err)
+				log.Println("Error getting sweeper client")
 				return nil
 			}
 
 			_, err = omeClient.CreateSession()
 			if err != nil {
-				log.Println("Error creating client session for sweeper " + err.Error())
+				log.Println("Error creating client session for sweeper")
 				return nil
 			}
 			defer omeClient.RemoveSession()
@@ -43,7 +43,7 @@ func init() {
 			omeBaselines := []models.OmeBaseline{}
 			err = omeClient.GetPaginatedData(clients.BaselineAPI, &omeBaselines)
 			if err != nil {
-				log.Println("failed to fetch baseline details for the name " + SweepTestsTemplateIdentifier + " Error: " + err.Error())
+				log.Println("failed to fetch baseline details for the name " + SweepTestsTemplateIdentifier)
 				return nil
 			}
 
@@ -56,7 +56,7 @@ func init() {
 
 			err = omeClient.DeleteBaseline(baselineIDs)
 			if err != nil {
-				log.Println("failed to sweep dangling baselines. Error:" + err.Error())
+				log.Println("failed to sweep dangling baselines.")
 				return nil
 			}
 			return nil

@@ -25,13 +25,13 @@ func init() {
 			fmt.Println("Sweepers for Deploy invoked")
 			omeClient, err := getSweeperClient(region)
 			if err != nil {
-				log.Println("Error getting sweeper client: ", err)
+				log.Println("Error getting sweeper client")
 				return nil
 			}
 
 			_, err = omeClient.CreateSession()
 			if err != nil {
-				log.Println("Error creating client session for sweeper " + err.Error())
+				log.Println("Error creating client session for sweeper")
 				return nil
 			}
 			defer omeClient.RemoveSession()
@@ -40,14 +40,14 @@ func init() {
 			response, err := omeClient.Get(profileURL, nil, nil)
 
 			if err != nil {
-				log.Println("failed to fetch profile with template name " + SweepTestsTemplateIdentifier + " Error: " + err.Error())
+				log.Println("failed to fetch profile with template name " + SweepTestsTemplateIdentifier)
 				return nil
 			}
 			b, _ := omeClient.GetBodyData(response.Body)
 			omeServerProfiles := models.OMEServerProfiles{}
 			err = omeClient.JSONUnMarshal(b, &omeServerProfiles)
 			if err != nil {
-				log.Println("failed to fetch profile with template name " + SweepTestsTemplateIdentifier + " Error: " + err.Error())
+				log.Println("failed to fetch profile with template name " + SweepTestsTemplateIdentifier)
 				return nil
 			}
 
@@ -62,7 +62,7 @@ func init() {
 			}
 			err = omeClient.DeleteDeployment(pdr)
 			if err != nil {
-				log.Println("failed to sweep dangling profiles. Error:" + err.Error())
+				log.Println("failed to sweep dangling profiles")
 				return nil
 			}
 			return nil
