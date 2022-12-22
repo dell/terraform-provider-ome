@@ -517,6 +517,48 @@ func mockGetTemplateByNameAPIs(r *http.Request, w http.ResponseWriter) bool {
 					"Id": 27,
 					"Name": "ValidMultipleTemplate2",
 					"Description": "This is a test template update2"
+				},
+				{
+					"Id": 28,
+					"Name": "ValidMultipleTemplate",
+					"Description": "This is a test template update"
+				}
+			]
+		}`))
+		return true
+	}
+	if strings.Contains(r.URL.RawQuery, "ValidTemplatePagination") && !strings.Contains(r.URL.RawQuery, "skip=2&top=2") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"value": [
+				{
+					"Id": 26,
+					"Name": "ValidTemplatePagination1",
+					"Description": "This is a test template update1"
+				},
+				{
+					"Id": 27,
+					"Name": "ValidTemplatePagination2",
+					"Description": "This is a test template update2"
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Templates?$filter=Name eq 'ValidTemplatePagination'&skip=2&top=2"
+		}`))
+		return true
+	}
+	if strings.Contains(r.URL.RawQuery, "ValidTemplatePagination%27&skip=2&top=2") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"value": [
+				{
+					"Id": 26,
+					"Name": "ValidTemplatePagination3",
+					"Description": "This is a test template update1"
+				},
+				{
+					"Id": 27,
+					"Name": "ValidTemplatePagination",
+					"Description": "This is a test template update with pagination"
 				}
 			]
 		}`))
@@ -1285,7 +1327,8 @@ func mockGetServerProfileInfoByTemplateNameAPIs(r *http.Request, w http.Response
 				{
 					"Id": 10848,
             		"ProfileName": "Profile from template 'test_deployment' 00001",
-            		"TemplateId": 585
+            		"TemplateId": 585,
+					"TemplateName": "ValidSingleProfileTemplateName"
 				}
 			]
 		}`))
@@ -1298,12 +1341,55 @@ func mockGetServerProfileInfoByTemplateNameAPIs(r *http.Request, w http.Response
 				{
 					"Id": 10848,
             		"ProfileName": "Profile from template 'test_deployment' 00001",
-            		"TemplateId": 585
+            		"TemplateId": 586,
+					"TemplateName": "ValidMultipleProfileTemplateName1"
 				},
 				{
 					"Id": 10849,
             		"ProfileName": "Profile from template 'test_deployment' 00002",
-            		"TemplateId": 585
+            		"TemplateId": 585,
+					"TemplateName": "ValidMultipleProfileTemplateName"
+				}
+			]
+		}`))
+		return true
+	}
+	if strings.Contains(r.URL.RawQuery, "ValidPaginationProfileTemplateName") && !strings.Contains(r.URL.RawQuery, "skip=2&top=2") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"value": [
+				{
+					"Id": 10848,
+            		"ProfileName": "Profile from template 'test_deployment' 00001",
+            		"TemplateId": 586,
+					"TemplateName": "ValidPaginationProfileTemplateName1"
+				},
+				{
+					"Id": 10849,
+            		"ProfileName": "Profile from template 'test_deployment' 00002",
+            		"TemplateId": 585,
+					"TemplateName": "ValidPaginationProfileTemplateName2"
+				}
+			],
+			"@odata.nextLink": "/api/ProfileService/Profiles?$filter=TemplateName eq 'ValidPaginationProfileTemplateName'&skip=2&top=2"
+		}`))
+		return true
+	}
+	if strings.Contains(r.URL.RawQuery, "ValidPaginationProfileTemplateName%27&skip=2&top=2") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"value": [
+				{
+					"Id": 10850,
+            		"ProfileName": "Profile from template 'test_deployment' 00001",
+            		"TemplateId": 587,
+					"TemplateName": "ValidPaginationProfileTemplateName"
+				},
+				{
+					"Id": 10851,
+            		"ProfileName": "Profile from template 'test_deployment' 00002",
+            		"TemplateId": 588,
+					"TemplateName": "ValidPaginationProfileTemplateName"
 				}
 			]
 		}`))

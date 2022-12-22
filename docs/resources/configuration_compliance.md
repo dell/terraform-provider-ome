@@ -30,7 +30,7 @@ resource "ome_configuration_compliance" "remeditation" {
 
 ### Required
 
-- `target_devices` (Attributes List) Target devices to be remediated. (see [below for nested schema](#nestedatt--target_devices))
+- `target_devices` (Attributes Set) Target devices to be remediated. (see [below for nested schema](#nestedatt--target_devices))
 
 ### Optional
 
@@ -50,10 +50,7 @@ resource "ome_configuration_compliance" "remeditation" {
 
 Required:
 
-- `device_service_tag` (String) Target device servicetag to be remediated.
-
-Optional:
-
 - `compliance_status` (String) End compliance status of the target device, used to check the drifts in the compliance status.
+- `device_service_tag` (String) Target device servicetag to be remediated.
 
 

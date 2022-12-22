@@ -56,7 +56,7 @@ func (r resourceConfigurationComplianceType) GetSchema(_ context.Context) (tfsdk
 				MarkdownDescription: "Target devices to be remediated.",
 				Description:         "Target devices to be remediated.",
 				Required:            true,
-				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
+				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 					"device_service_tag": {
 						Type:                types.StringType,
 						MarkdownDescription: "Target device servicetag to be remediated.",
@@ -67,11 +67,7 @@ func (r resourceConfigurationComplianceType) GetSchema(_ context.Context) (tfsdk
 						Type:                types.StringType,
 						MarkdownDescription: "End compliance status of the target device, used to check the drifts in the compliance status.",
 						Description:         "End compliance status of the target device, used to check the drifts in the compliance status.",
-						Computed:            true,
-						Optional:            true,
-						PlanModifiers: tfsdk.AttributePlanModifiers{
-							DefaultAttribute(types.String{Value: "Compliant"}),
-						},
+						Required:            true,
 						Validators: []tfsdk.AttributeValidator{
 							complianceStateValidator{},
 						},
@@ -137,6 +133,13 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req tfsdk.C
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		fmt.Println(clients.ErrPlanToTfsdkConversion)
+		return
+	}
+	if plan.RunLater.Value && plan.Cron.Value == "" {
+		resp.Diagnostics.AddError(
+			clients.ErrGnrBaseLineCreateRemediation,
+			clients.ErrCronRequired,
+		)
 		return
 	}
 
@@ -328,6 +331,14 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.U
 		return
 	}
 
+	if plan.RunLater.Value && plan.Cron.Value == "" {
+		resp.Diagnostics.AddError(
+			clients.ErrBaseLineUpdateRemediation,
+			clients.ErrCronRequired,
+		)
+		return
+	}
+
 	//Create Session and differ the remove session
 	omeClient, err := clients.NewClient(*r.p.clientOpt)
 	if err != nil {
@@ -473,6 +484,7 @@ func checkValidDevices(omeClient *clients.Client, targetDevices []string, baseli
 
 	var baselineDevices []int64
 	var targetDeviceIDs []int64
+	deviceIDServiceTagsMap := map[int64]string{}
 
 	for _, bt := range baseline.BaselineTargets {
 		baselineDevices = append(baselineDevices, bt.ID)
@@ -484,11 +496,16 @@ func checkValidDevices(omeClient *clients.Client, targetDevices []string, baseli
 			return []int64{}, err
 		}
 		targetDeviceIDs = append(targetDeviceIDs, device.ID)
+		deviceIDServiceTagsMap[device.ID] = device.DeviceServiceTag
 	}
 
-	diff := clients.CompareInt64(targetDeviceIDs, baselineDevices)
-	if len(diff) != 0 {
-		return []int64{}, fmt.Errorf(clients.ErrBaseLineInvalidDevices, diff)
+	diffDeviceIDs := clients.CompareInt64(targetDeviceIDs, baselineDevices)
+	diffDeviceServiceTags := []string{}
+	for _, diffDeviceID := range diffDeviceIDs {
+		diffDeviceServiceTags = append(diffDeviceServiceTags, deviceIDServiceTagsMap[diffDeviceID])
+	}
+	if len(diffDeviceIDs) != 0 {
+		return []int64{}, fmt.Errorf(clients.ErrBaseLineInvalidDevices, diffDeviceServiceTags)
 	}
 
 	return targetDeviceIDs, nil

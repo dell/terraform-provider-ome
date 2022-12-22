@@ -211,6 +211,12 @@ const (
 	ErrImportTemplate = "Unable to import template"
 	// ErrGnrConfigurationReport - message returned when report could not be fetched
 	ErrGnrConfigurationReport = "unable to fetch the report"
+	// ErrCronRequired - message returned when run_later is true but cron is not provided
+	ErrCronRequired = "cron is required when run_later is true"
+	//ErrBaseLineScheduleValid
+	ErrBaseLineScheduleValid = "attributes `cron` and `email_addresses` are accepted only when `schedule` is true"
+	//ErrBaseLineNotifyValid
+	ErrBaseLineNotifyValid = "attributes `cron` is not accepted only when `schedule` is true and `notify_on_schedule` is false"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job

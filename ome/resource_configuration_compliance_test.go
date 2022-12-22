@@ -69,6 +69,15 @@ var testConfigureBaselineRemediationDevicePartOfBaseline = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
