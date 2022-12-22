@@ -46,6 +46,18 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 			return
 		}
 
+		shouldReturn5 := mockGetServerProfileInfoByTemplateNameAPIs(r, w) || mockConfigRemediationAPIs(r, w) || mockDeviceComplianceReportAPIs(r, w)
+		if shouldReturn5 {
+			return
+		}
+
+		shouldReturn6 := mockBaselineAPIs(r, w) || mockGetBaselineByIDAPI(r, w) ||
+			mockGetBaselineDevComplianceReportByIDAPI(r, w) || mockGetBaselineDevAttrComplianceReportByIDAPI(r, w) || mockGetBaselineByNameAPI(r, w) ||
+			mockImportTemplateAPI(r, w)
+		if shouldReturn6 {
+			return
+		}
+
 		mockGeneralAPIs(r, w)
 	}))
 
@@ -173,6 +185,23 @@ func mockSessionAPIs(r *http.Request, w http.ResponseWriter) bool {
 }
 
 func mockJobsAPI(r *http.Request, w http.ResponseWriter, jobRetries *int) bool {
+	if r.URL.Path == "/api/JobService/Jobs(1)" && r.Method == "GET" {
+		w.Write([]byte(buildJobResponse(2060, "success")))
+		return true
+	}
+	if r.URL.Path == "/api/JobService/Jobs(2)" && r.Method == "GET" {
+		w.Write([]byte(buildJobResponse(2070, "success")))
+		return true
+	}
+	if r.URL.Path == "/api/JobService/Jobs(3)" && r.Method == "GET" {
+		w.Write([]byte(buildJobResponse(2090, "success")))
+		return true
+	}
+	if r.URL.Path == "/api/JobService/Jobs(4)" && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(buildJobResponse(2060, "success")))
+		return true
+	}
 	if r.URL.Path == "/api/JobService/Jobs(12345)" && r.Method == "GET" {
 		w.Write([]byte(buildJobResponse(2060, "success")))
 		return true
@@ -488,6 +517,48 @@ func mockGetTemplateByNameAPIs(r *http.Request, w http.ResponseWriter) bool {
 					"Id": 27,
 					"Name": "ValidMultipleTemplate2",
 					"Description": "This is a test template update2"
+				},
+				{
+					"Id": 28,
+					"Name": "ValidMultipleTemplate",
+					"Description": "This is a test template update"
+				}
+			]
+		}`))
+		return true
+	}
+	if strings.Contains(r.URL.RawQuery, "ValidTemplatePagination") && !strings.Contains(r.URL.RawQuery, "skip=2&top=2") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"value": [
+				{
+					"Id": 26,
+					"Name": "ValidTemplatePagination1",
+					"Description": "This is a test template update1"
+				},
+				{
+					"Id": 27,
+					"Name": "ValidTemplatePagination2",
+					"Description": "This is a test template update2"
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Templates?$filter=Name eq 'ValidTemplatePagination'&skip=2&top=2"
+		}`))
+		return true
+	}
+	if strings.Contains(r.URL.RawQuery, "ValidTemplatePagination%27&skip=2&top=2") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"value": [
+				{
+					"Id": 26,
+					"Name": "ValidTemplatePagination3",
+					"Description": "This is a test template update1"
+				},
+				{
+					"Id": 27,
+					"Name": "ValidTemplatePagination",
+					"Description": "This is a test template update with pagination"
 				}
 			]
 		}`))
@@ -1256,7 +1327,8 @@ func mockGetServerProfileInfoByTemplateNameAPIs(r *http.Request, w http.Response
 				{
 					"Id": 10848,
             		"ProfileName": "Profile from template 'test_deployment' 00001",
-            		"TemplateId": 585
+            		"TemplateId": 585,
+					"TemplateName": "ValidSingleProfileTemplateName"
 				}
 			]
 		}`))
@@ -1269,12 +1341,55 @@ func mockGetServerProfileInfoByTemplateNameAPIs(r *http.Request, w http.Response
 				{
 					"Id": 10848,
             		"ProfileName": "Profile from template 'test_deployment' 00001",
-            		"TemplateId": 585
+            		"TemplateId": 586,
+					"TemplateName": "ValidMultipleProfileTemplateName1"
 				},
 				{
 					"Id": 10849,
             		"ProfileName": "Profile from template 'test_deployment' 00002",
-            		"TemplateId": 585
+            		"TemplateId": 585,
+					"TemplateName": "ValidMultipleProfileTemplateName"
+				}
+			]
+		}`))
+		return true
+	}
+	if strings.Contains(r.URL.RawQuery, "ValidPaginationProfileTemplateName") && !strings.Contains(r.URL.RawQuery, "skip=2&top=2") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"value": [
+				{
+					"Id": 10848,
+            		"ProfileName": "Profile from template 'test_deployment' 00001",
+            		"TemplateId": 586,
+					"TemplateName": "ValidPaginationProfileTemplateName1"
+				},
+				{
+					"Id": 10849,
+            		"ProfileName": "Profile from template 'test_deployment' 00002",
+            		"TemplateId": 585,
+					"TemplateName": "ValidPaginationProfileTemplateName2"
+				}
+			],
+			"@odata.nextLink": "/api/ProfileService/Profiles?$filter=TemplateName eq 'ValidPaginationProfileTemplateName'&skip=2&top=2"
+		}`))
+		return true
+	}
+	if strings.Contains(r.URL.RawQuery, "ValidPaginationProfileTemplateName%27&skip=2&top=2") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"value": [
+				{
+					"Id": 10850,
+            		"ProfileName": "Profile from template 'test_deployment' 00001",
+            		"TemplateId": 587,
+					"TemplateName": "ValidPaginationProfileTemplateName"
+				},
+				{
+					"Id": 10851,
+            		"ProfileName": "Profile from template 'test_deployment' 00002",
+            		"TemplateId": 588,
+					"TemplateName": "ValidPaginationProfileTemplateName"
 				}
 			]
 		}`))
@@ -1436,6 +1551,381 @@ func mockDeleteProfileAPI(r *http.Request, w http.ResponseWriter) bool {
 	return false
 }
 
+func mockBaselineAPIs(r *http.Request, w http.ResponseWriter) bool {
+
+	if (r.URL.Path == BaselineAPI) && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "TestAccCreateBaselineFailure") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM1026",
+							"RelatedProperties": [],
+							"Message": "Unable to process the request because the template ID -1 provided is invalid.",
+							"MessageArgs": [
+								"3226"
+							],
+							"Severity": "Informational",
+							"Resolution": "Enter a valid template ID and retry the operation. For information about valid template IDs. Refer to the API Guide or Product Guide available on the support site."
+						}
+					]
+				}
+			}`))
+		} else if strings.Contains(string(body), "TestAccCreateBaseline") {
+			w.WriteHeader(http.StatusCreated)
+			w.Write([]byte(`{
+			"Id": 21,
+			"Name": "TestAccCreateBaseline",
+			"Description": "Test Acc Description for create baseline",
+			"LastRun": null,
+			"TemplateId": 326,
+			"TemplateName": null,
+			"TemplateType": 0,
+			"TaskId": 0,
+			"PercentageComplete": null,
+			"TaskStatus": 0,
+			"ConfigComplianceSummary": null,
+			"BaselineTargets": [
+				{
+					"Id": 10093,
+					"Type": {
+						"Id": 1,
+						"Name": "DEVICE"
+					}
+				},
+				{
+					"Id": 10104,
+					"Type": {
+						"Id": 1,
+						"Name": "DEVICE"
+					}
+				}
+			],
+			"NotificationSettings": {
+				"NotificationType": "NOTIFY_ON_SCHEDULE",
+				"Schedule": {
+					"RunNow": false,
+					"RunLater": false,
+					"Cron": "0 00 00 * * ? *",
+					"StartTime": null,
+					"EndTime": null
+				},
+				"EmailAddresses": [
+					"test@testdell.com"
+				],
+				"OutputFormat": "HTML"
+			}
+		}`))
+		}
+		return true
+	}
+	if r.URL.Path == fmt.Sprintf(BaselineAPI+"(%d)", 101) && r.Method == "PUT" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM1026",
+							"RelatedProperties": [],
+							"Message": "Unable to process the request because the template ID -1 provided is invalid.",
+							"MessageArgs": [
+								"3226"
+							],
+							"Severity": "Informational",
+							"Resolution": "Enter a valid template ID and retry the operation. For information about valid template IDs. Refer to the API Guide or Product Guide available on the support site."
+						}
+					]
+				}
+			}`))
+	}
+	if r.URL.Path == fmt.Sprintf(BaselineAPI+"(%d)", 100) && r.Method == "PUT" {
+		w.WriteHeader(http.StatusCreated)
+		w.Write([]byte(`{
+		"Id": 100,
+		"Name": "TestAccCreateBaseline",
+		"Description": "Test Acc Description for create baseline",
+		"LastRun": null,
+		"TemplateId": 326,
+		"TemplateName": null,
+		"TemplateType": 0,
+		"TaskId": 0,
+		"PercentageComplete": null,
+		"TaskStatus": 0,
+		"ConfigComplianceSummary": null,
+		"BaselineTargets": [
+			{
+				"Id": 10093,
+				"Type": {
+					"Id": 1,
+					"Name": "DEVICE"
+				}
+			},
+			{
+				"Id": 10104,
+				"Type": {
+					"Id": 1,
+					"Name": "DEVICE"
+				}
+			}
+		],
+		"NotificationSettings": {
+			"NotificationType": "NOTIFY_ON_SCHEDULE",
+			"Schedule": {
+				"RunNow": false,
+				"RunLater": false,
+				"Cron": "0 00 00 * * ? *",
+				"StartTime": null,
+				"EndTime": null
+			},
+			"EmailAddresses": [
+				"test@testdell.com"
+			],
+			"OutputFormat": "HTML"
+		}
+	}`))
+		return true
+	}
+	if r.URL.Path == BaseLineRemoveAPI && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "10001") {
+			w.WriteHeader(http.StatusCreated)
+			w.Write([]byte(`10001`))
+		}
+		if strings.Contains(string(body), "10002") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CGEN1004",
+							"RelatedProperties": [],
+							"Message": "Unable to complete the operation because the value provided for {0} is invalid.",
+							"MessageArgs": [],
+							"Severity": "Critical",
+							"Resolution": "Enter a valid value and retry the operation."
+						}
+					]
+				}
+			}`))
+		}
+
+		return true
+	}
+	return false
+}
+
+func mockGetBaselineByIDAPI(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == BaselineAPI+"(1)") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"Id": 1,
+			"Name": "Baseline Name",
+			"Description": "Description 1.",
+			"TemplateId": 326,
+			"TemplateName": "test-compliance-template",
+			"TemplateType": 2,
+			"TaskId": 11988,
+			"PercentageComplete": null,
+			"TaskStatus": 0,
+			"LastRun": null,
+			"BaselineTargets": [
+				{
+					"Id": 10093,
+					"Type": {
+						"Id": 1000,
+						"Name": "DEVICE"
+					}
+				},
+				{
+					"Id": 10104,
+					"Type": {
+						"Id": 1000,
+						"Name": "DEVICE"
+					}
+				}
+			],
+			"ConfigComplianceSummary": {
+				"ComplianceStatus": "OK",
+				"NumberOfCritical": 0,
+				"NumberOfWarning": 0,
+				"NumberOfNormal": 0,
+				"NumberOfIncomplete": 0
+			},
+			"NotificationSettings": {
+				"NotificationType": "NOTIFY_ON_NON_COMPLIANCE",
+				"Schedule": {
+					"Cron": "0 00 00 * * ? *"
+				},
+				"EmailAddresses": [
+					"naveen.patil@dell.com"
+				],
+				"OutputFormat": "html"
+			},
+			"DeviceConfigComplianceReports@odata.navigationLink": "/api/TemplateService/Baselines(20)/DeviceConfigComplianceReports"
+		}`))
+		return true
+	}
+	if (r.URL.Path == BaselineAPI+"(-1)") && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{
+			"error": {
+				"code": "Base.1.0.GeneralError",
+				"message": "A general error has occurred. See ExtendedInfo for more information.",
+				"@Message.ExtendedInfo": [
+					{
+						"MessageId": "CGEN1008",
+						"RelatedProperties": [],
+						"Message": "Unable to process the request because an error occurred.",
+						"MessageArgs": [],
+						"Severity": "Critical",
+						"Resolution": "Retry the operation. If the issue persists, contact your system administrator."
+					}
+				]
+			}
+		}`))
+		return true
+	}
+	return false
+}
+
+func mockGetBaselineDevComplianceReportByIDAPI(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == fmt.Sprintf(BaselineDeviceComplianceReportsAPI, 14)) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.DeviceConfigComplianceReports)",
+			"@odata.count": 2,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.DeviceConfigComplianceReports",
+					"@odata.id": "/api/TemplateService/Baselines(14)/DeviceConfigComplianceReports(11803)",
+					"Id": 11803,
+					"DeviceName": "WIN-02GODDHDJTC",
+					"IpAddress": "100.68.168.50",
+					"IpAddresses": [
+						"100.68.168.50"
+					],
+					"Model": "PowerEdge MX840c",
+					"ServiceTag": "MX84002",
+					"ComplianceStatus": 2,
+					"DeviceType": 1000,
+					"InventoryTime": "2022-11-09 00:01:14.619974",
+					"DeviceComplianceDetails": {
+						"@odata.id": "/api/TemplateService/Baselines(14)/DeviceConfigComplianceReports(11803)/DeviceComplianceDetails"
+					}
+				},
+				{
+					"@odata.type": "#TemplateService.DeviceConfigComplianceReports",
+					"@odata.id": "/api/TemplateService/Baselines(14)/DeviceConfigComplianceReports(10337)",
+					"Id": 10337,
+					"DeviceName": "WIN-MX740.wacdev.com",
+					"IpAddress": null,
+					"IpAddresses": [],
+					"Model": "PowerEdge MX740c",
+					"ServiceTag": "6H6GNX2",
+					"ComplianceStatus": 3,
+					"DeviceType": 1000,
+					"InventoryTime": null,
+					"DeviceComplianceDetails": {
+						"@odata.id": "/api/TemplateService/Baselines(14)/DeviceConfigComplianceReports(10337)/DeviceComplianceDetails"
+					}
+				}
+			]
+		}`))
+		return true
+	} else if (r.URL.Path == fmt.Sprintf(BaselineDeviceComplianceReportsAPI, -1)) && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.DeviceConfigComplianceReports)",
+			"@odata.count": 0,
+			"value": []
+		}`))
+		return true
+	}
+	return false
+}
+
+func mockGetBaselineDevAttrComplianceReportByIDAPI(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == fmt.Sprintf(BaselineDeviceAttrComplianceReportsAPI, 14, 11803)) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#TemplateService.DeviceComplianceDetail",
+			"@odata.type": "#TemplateService.DeviceComplianceDetail",
+			"@odata.id": "/api/TemplateService/Baselines(14)/DeviceConfigComplianceReports(11803)/DeviceComplianceDetails",
+			"DeviceId": 11803,
+			"DeviceName": "WIN-02GODDHDJTC",
+			"BaselineId": 14,
+			"BaselineName": "Baseline Name 1-updated",
+			"TemplateId": 326,
+			"TemplateName": "test-compliance-template",
+			"ComplianceAttributeGroups": [
+				{
+					"GroupNameId": 2,
+					"DisplayName": "LifecycleController",
+					"ComplianceStatus": 2,
+					"ComplianceReason": "One or more attributes on the target device(s) does not match the compliance template.",
+					"ComplianceSubAttributeGroups": [
+						{
+							"GroupNameId": 33,
+							"DisplayName": "Lifecycle Controller Attributes",
+							"ComplianceStatus": 2,
+							"ComplianceReason": "One or more attributes on the target device(s) does not match the compliance template.",
+							"ComplianceSubAttributeGroups": [],
+							"Attributes": [
+								{
+									"AttributeId": 721728,
+									"CustomId": 0,
+									"DisplayName": "LCAttributes 1 Automatic Backup Feature",
+									"Description": null,
+									"Value": null,
+									"ExpectedValue": "Disabled",
+									"ComplianceStatus": 2,
+									"ComplianceReason": "Missing template attribute value."
+								},
+								{
+									"AttributeId": 721727,
+									"CustomId": 0,
+									"DisplayName": "LCAttributes 1 Automatic Update Feature",
+									"Description": null,
+									"Value": null,
+									"ExpectedValue": "Disabled",
+									"ComplianceStatus": 1,
+									"ComplianceReason": "All attributes on the target device(s) match the compliance template."
+								}
+							]
+						}
+					],
+					"Attributes": []
+				}
+			]
+		}`))
+		return true
+	} else if (r.URL.Path == fmt.Sprintf(BaselineDeviceAttrComplianceReportsAPI, -1, -1)) && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#TemplateService.DeviceComplianceDetail",
+			"@odata.type": "#TemplateService.DeviceComplianceDetail",
+			"@odata.id": "/api/TemplateService/Baselines(-1)/DeviceConfigComplianceReports(-1)/DeviceComplianceDetails",
+			"DeviceId": -1,
+			"DeviceName": null,
+			"BaselineId": -1,
+			"BaselineName": null,
+			"TemplateId": 0,
+			"TemplateName": null,
+			"ComplianceAttributeGroups": []
+		}`))
+		return true
+	}
+	return false
+}
+
 func mockCloneTemplateAPI(r *http.Request, w http.ResponseWriter) bool {
 	if (r.URL.Path == CloneTemplateAPI) && r.Method == "POST" {
 		body, _ := io.ReadAll(r.Body)
@@ -1528,6 +2018,357 @@ func mockNetworkVlanAPI(r *http.Request, w http.ResponseWriter) bool {
 			}`))
 			return true
 		}
+	}
+	return false
+}
+
+func mockGetBaselineByNameAPI(r *http.Request, w http.ResponseWriter) bool {
+	// first page
+	if (r.URL.Path == BaselineAPI && r.URL.RawQuery == "") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.Baseline)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.Baseline",
+					"@odata.id": "/api/TemplateService/Baselines(162)",
+					"Id": 162,
+					"Name": "TestAccBaseline1",
+					"Description": null,
+					"TemplateId": 745,
+					"TemplateName": "test_acc_compliance_template",
+					"TemplateType": 2,
+					"TaskId": 12399,
+					"PercentageComplete": "100",
+					"TaskStatus": 2060,
+					"LastRun": "2022-11-18 04:32:16.838",
+					"BaselineTargets": [
+						{
+							"Id": 12152,
+							"Type": {
+								"Id": 1000,
+								"Name": "DEVICE"
+							}
+						}
+					],
+					"ConfigComplianceSummary": {
+						"ComplianceStatus": "NOT_INVENTORIED",
+						"NumberOfCritical": 0,
+						"NumberOfWarning": 0,
+						"NumberOfNormal": 0,
+						"NumberOfIncomplete": 1
+					},
+					"NotificationSettings": {
+						"NotificationType": "NOTIFY_ON_SCHEDULE",
+						"Schedule": {
+							"Cron": "0 10 5 * * ? *",
+							"StartTime": "2022-11-18 05:10:59.780",
+							"EndTime": null
+						},
+						"EmailAddresses": [
+							"dell@dell.com"
+						],
+						"OutputFormat": "html"
+					},
+					"DeviceConfigComplianceReports@odata.navigationLink": "/api/TemplateService/Baselines(162)/DeviceConfigComplianceReports"
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Baselines?skip=1&top=1"
+		}`))
+		return true
+	}
+	// second page
+	if (r.URL.Path == BaselineAPI && strings.EqualFold(r.URL.RawQuery, "skip=1&top=1")) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.Baseline)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.Baseline",
+					"@odata.id": "/api/TemplateService/Baselines(163)",
+					"Id": 163,
+					"Name": "TestAccBaseline2",
+					"Description": null,
+					"TemplateId": 745,
+					"TemplateName": "test_acc_compliance_template",
+					"TemplateType": 2,
+					"TaskId": 12400,
+					"PercentageComplete": "100",
+					"TaskStatus": 2060,
+					"LastRun": "2022-11-18 04:32:16.838",
+					"BaselineTargets": [
+						{
+							"Id": 12152,
+							"Type": {
+								"Id": 1000,
+								"Name": "DEVICE"
+							}
+						}
+					],
+					"ConfigComplianceSummary": {
+						"ComplianceStatus": "NOT_INVENTORIED",
+						"NumberOfCritical": 0,
+						"NumberOfWarning": 0,
+						"NumberOfNormal": 0,
+						"NumberOfIncomplete": 1
+					},
+					"NotificationSettings": {
+						"NotificationType": "NOTIFY_ON_SCHEDULE",
+						"Schedule": {
+							"Cron": "0 10 5 * * ? *",
+							"StartTime": "2022-11-18 05:10:59.780",
+							"EndTime": null
+						},
+						"EmailAddresses": [
+							"dell@dell.com"
+						],
+						"OutputFormat": "html"
+					},
+					"DeviceConfigComplianceReports@odata.navigationLink": "/api/TemplateService/Baselines(163)/DeviceConfigComplianceReports"
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Baselines?skip=2&top=1"
+		}`))
+		return true
+	}
+	// third page
+	if (r.URL.Path == BaselineAPI && strings.EqualFold(r.URL.RawQuery, "skip=2&top=1")) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.Baseline)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.Baseline",
+					"@odata.id": "/api/TemplateService/Baselines(164)",
+					"Id": 164,
+					"Name": "TestAccBaseline3",
+					"Description": null,
+					"TemplateId": 745,
+					"TemplateName": "test_acc_compliance_template",
+					"TemplateType": 2,
+					"TaskId": 12401,
+					"PercentageComplete": "100",
+					"TaskStatus": 2050,
+					"LastRun": "2022-11-18 04:32:16.838",
+					"BaselineTargets": [
+						{
+							"Id": 12152,
+							"Type": {
+								"Id": 1000,
+								"Name": "DEVICE"
+							}
+						}
+					],
+					"ConfigComplianceSummary": {
+						"ComplianceStatus": "NOT_INVENTORIED",
+						"NumberOfCritical": 0,
+						"NumberOfWarning": 0,
+						"NumberOfNormal": 0,
+						"NumberOfIncomplete": 1
+					},
+					"NotificationSettings": {
+						"NotificationType": "NOTIFY_ON_SCHEDULE",
+						"Schedule": {
+							"Cron": "0 10 5 * * ? *",
+							"StartTime": "2022-11-18 05:10:59.780",
+							"EndTime": null
+						},
+						"EmailAddresses": [
+							"dell@dell.com"
+						],
+						"OutputFormat": "html"
+					},
+					"DeviceConfigComplianceReports@odata.navigationLink": "/api/TemplateService/Baselines(164)/DeviceConfigComplianceReports"
+				}
+			]
+		}`))
+		return true
+	}
+	return false
+}
+
+func mockConfigRemediationAPIs(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == BaseLineConfigRemediationAPI) && r.Method == "POST" {
+		requestStruct := models.ConfigurationRemediationPayload{}
+		err := json.NewDecoder(r.Body).Decode(&requestStruct)
+		if err != nil {
+			return false
+		}
+		if requestStruct.ID == 100 {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`12345`))
+		} else if requestStruct.ID == 101 {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM9021",
+							"RelatedProperties": [],
+							"Message": "Unable to deploy the template.",
+							"MessageArgs": [],
+							"Severity": "Warning",
+							"Resolution": "Review the reason and initiate necessary resolution."
+						}
+					]
+				}
+			}`))
+		}
+		return true
+	}
+	return false
+}
+
+func mockDeviceComplianceReportAPIs(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == fmt.Sprintf(BaseLineConfigDeviceCompReport, 185) && r.URL.RawQuery == "") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.DeviceConfigComplianceReports)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.DeviceConfigComplianceReports",
+					"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12328)",
+					"Id": 12328,
+					"DeviceName": "MINWINPC",
+					"IpAddress": "192.168.0.1",
+					"IpAddresses": [
+						"192.168.0.1"
+					],
+					"Model": "PowerEdge MX740c",
+					"ServiceTag": "MXL1234",
+					"ComplianceStatus": 2,
+					"DeviceType": 1000,
+					"InventoryTime": "2022-11-22 00:00:37.638264",
+					"DeviceComplianceDetails": {
+						"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12328)/DeviceComplianceDetails"
+					}
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports?skip=1&top=1"
+		}`))
+		return true
+	}
+	if (r.URL.Path == fmt.Sprintf(BaseLineConfigDeviceCompReport, 185) && strings.EqualFold(r.URL.RawQuery, "skip=1&top=1")) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.DeviceConfigComplianceReports)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.DeviceConfigComplianceReports",
+					"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12329)",
+					"Id": 12329,
+					"DeviceName": "MINWINPC1",
+					"IpAddress": "192.168.0.2",
+					"IpAddresses": [
+						"192.168.0.2"
+					],
+					"Model": "PowerEdge MX740c",
+					"ServiceTag": "MXL1235",
+					"ComplianceStatus": 2,
+					"DeviceType": 1000,
+					"InventoryTime": "2022-11-22 00:00:37.638264",
+					"DeviceComplianceDetails": {
+						"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12329)/DeviceComplianceDetails"
+					}
+				}
+			],
+			"@odata.nextLink": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports?skip=2&top=1"
+		}`))
+		return true
+	}
+	if (r.URL.Path == fmt.Sprintf(BaseLineConfigDeviceCompReport, 185) && strings.EqualFold(r.URL.RawQuery, "skip=2&top=1")) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(TemplateService.DeviceConfigComplianceReports)",
+			"@odata.count": 3,
+			"value": [
+				{
+					"@odata.type": "#TemplateService.DeviceConfigComplianceReports",
+					"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12330)",
+					"Id": 12330,
+					"DeviceName": "MINWINPC2",
+					"IpAddress": "192.168.0.3",
+					"IpAddresses": [
+						"192.168.0.3"
+					],
+					"Model": "PowerEdge MX740c",
+					"ServiceTag": "MXL1236",
+					"ComplianceStatus": 2,
+					"DeviceType": 1000,
+					"InventoryTime": "2022-11-22 00:00:37.638264",
+					"DeviceComplianceDetails": {
+						"@odata.id": "/api/TemplateService/Baselines(185)/DeviceConfigComplianceReports(12330)/DeviceComplianceDetails"
+					}
+				}
+			]
+		}`))
+		return true
+	}
+	if (r.URL.Path == fmt.Sprintf(BaseLineConfigDeviceCompReport, 186)) && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{
+			"error": {
+				"code": "Base.1.0.GeneralError",
+				"message": "A general error has occurred. See ExtendedInfo for more information.",
+				"@Message.ExtendedInfo": [
+					{
+						"MessageId": "CGEN1008",
+						"RelatedProperties": [],
+						"Message": "Unable to process the request because an error occurred.",
+						"MessageArgs": [],
+						"Severity": "Critical",
+						"Resolution": "Retry the operation. If the issue persists, contact your system administrator."
+					}
+				]
+			}
+		}`))
+		return true
+	}
+	return false
+}
+
+func mockImportTemplateAPI(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == ImportTemplateAPI) && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "server-dep-template") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`` + fmt.Sprint(123) + ``))
+		} else if strings.Contains(string(body), "chassis-dep-template") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`` + fmt.Sprint(124) + ``))
+		} else if strings.Contains(string(body), "server-comp-template") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`` + fmt.Sprint(125) + ``))
+		} else if strings.Contains(string(body), "chassis-comp-template") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`` + fmt.Sprint(126) + ``))
+		} else if strings.Contains(string(body), "invalid-template-content") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM9073",
+							"RelatedProperties": [],
+							"Message": "Unable to import template because the XML content is invalid.",
+							"MessageArgs": [],
+							"Severity": "Warning",
+							"Resolution": "Recommended Action: Ensure the XML content is valid."
+						}
+					]
+				}
+			}`))
+		}
+		return true
 	}
 	return false
 }

@@ -151,16 +151,19 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 
 func (p *provider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceType, diag.Diagnostics) {
 	return map[string]tfsdk.ResourceType{
-		"ome_template":   resourceTemplateType{},
-		"ome_deployment": resourceDeploymentType{},
+		"ome_template":                 resourceTemplateType{},
+		"ome_deployment":               resourceDeploymentType{},
+		"ome_configuration_baseline":   resourceConfigurationBaselineType{},
+		"ome_configuration_compliance": resourceConfigurationComplianceType{},
 	}, nil
 }
 
 func (p *provider) GetDataSources(ctx context.Context) (map[string]tfsdk.DataSourceType, diag.Diagnostics) {
 	return map[string]tfsdk.DataSourceType{
-		"ome_template_info":     templateDataSourceType{},
-		"ome_groupdevices_info": groupDevicesDataSourceType{},
-		"ome_vlannetworks_info": vlanNetowrksDataSourceType{},
+		"ome_template_info":             templateDataSourceType{},
+		"ome_groupdevices_info":         groupDevicesDataSourceType{},
+		"ome_vlannetworks_info":         vlanNetowrksDataSourceType{},
+		"ome_configuration_report_info": configurationReportDataSourceType{},
 	}, nil
 }
 

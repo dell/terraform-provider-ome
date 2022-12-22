@@ -174,7 +174,7 @@ func (c *Client) GetDeviceTypeID(deviceType string) (int64, error) {
 	}
 
 	for _, dt2 := range dt.Value {
-		if dt2.Name == deviceType {
+		if strings.EqualFold(dt2.Name, deviceType) {
 			deviceTypeID = dt2.ID
 			break
 		}
@@ -203,21 +203,20 @@ func (c *Client) GetTemplateByID(id int64) (models.OMETemplate, error) {
 
 // GetTemplateByName returns the template for the given template name
 func (c *Client) GetTemplateByName(name string) (models.OMETemplate, error) {
-	response, err := c.Get(TemplateAPI, nil, map[string]string{"$filter": fmt.Sprintf("%s eq '%s'", "Name", name)})
+	omeTemplateResponse := []models.OMETemplate{}
+	err := c.GetPaginatedDataWithQueryParam(TemplateAPI, map[string]string{"$filter": fmt.Sprintf("%s eq '%s'", "Name", name)}, &omeTemplateResponse)
 	if err != nil {
 		return models.OMETemplate{}, err
 	}
-	b, _ := c.GetBodyData(response.Body)
-
-	omeTemplate := models.OMETemplates{}
-	err = c.JSONUnMarshal(b, &omeTemplate)
-	if err != nil {
-		return models.OMETemplate{}, err
-	}
-	if len(omeTemplate.Value) == 0 {
+	if len(omeTemplateResponse) == 0 {
 		return models.OMETemplate{}, nil
 	}
-	return omeTemplate.Value[0], nil
+	for _, template := range omeTemplateResponse {
+		if template.Name == name {
+			return template, nil
+		}
+	}
+	return models.OMETemplate{}, nil
 }
 
 // UpdateTemplate updates a template from a reference template id.
@@ -378,6 +377,18 @@ func (c *Client) CloneTemplateByRefTemplateID(cloneTemplateRequest models.OMEClo
 		return -1, err
 	}
 
+	respData, _ := c.GetBodyData(response.Body)
+	newTemplateID, _ := strconv.ParseInt(string(respData), 10, 64)
+	return newTemplateID, nil
+}
+
+// ImportTemplate - method to clone template using reference template ID.
+func (c *Client) ImportTemplate(importTemplateRequest models.OMEImportTemplate) (int64, error) {
+	data, _ := c.JSONMarshal(importTemplateRequest)
+	response, err := c.Post(ImportTemplateAPI, nil, data)
+	if err != nil {
+		return -1, err
+	}
 	respData, _ := c.GetBodyData(response.Body)
 	newTemplateID, _ := strconv.ParseInt(string(respData), 10, 64)
 	return newTemplateID, nil

@@ -36,3 +36,6 @@ build: download
 	go build -v -o ./out
 
 all: download code-check test compile
+
+sweep :
+	go test -v ./ome -timeout 5h -sweep=all

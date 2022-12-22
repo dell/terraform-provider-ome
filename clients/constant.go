@@ -10,6 +10,8 @@ const (
 	AuthTokenHeader = "x-auth-token" // #nosec G101
 	// SuccessStatusID - job success status ID
 	SuccessStatusID = 2060
+	// RunningStatusID - job success status ID
+	RunningStatusID = 2050
 	// waitTime - sleep interval between retries
 	waitTime = 5 * time.Second
 	// Retries - Number of http retries
@@ -26,6 +28,14 @@ const (
 	SessionAPI = "/api/SessionService/Sessions"
 	// TemplateAPI - api used to manage templates
 	TemplateAPI = "/api/TemplateService/Templates"
+	// BaselineAPI - api used to manage baselines
+	BaselineAPI = "/api/TemplateService/Baselines"
+	// BaselineByIDAPI - api used to manage baseline by ID
+	BaselineByIDAPI = "/api/TemplateService/Baselines(%d)"
+	// BaselineDeviceComplianceReportsAPI - api used to fetch baseline device compliance report
+	BaselineDeviceComplianceReportsAPI = "/api/TemplateService/Baselines(%d)/DeviceConfigComplianceReports"
+	// BaselineDeviceAttrComplianceReportsAPI - api used to fetch baseline device attributes compliance report
+	BaselineDeviceAttrComplianceReportsAPI = "/api/TemplateService/Baselines(%d)/DeviceConfigComplianceReports(%d)/DeviceComplianceDetails"
 	// JobAPI - api used to manage jobs
 	JobAPI = "/api/JobService/Jobs"
 	// IdentityPoolAPI - api used to manage IdentityPools
@@ -54,8 +64,18 @@ const (
 	DeleteProfileAPI = "/api/ProfileService/Actions/ProfileService.Delete"
 	//CloneTemplateAPI - api to clone a template
 	CloneTemplateAPI = "/api/TemplateService/Actions/TemplateService.Clone"
+	//BaseLineRemoveAPI - api to remove a baseline
+	BaseLineRemoveAPI = "/api/TemplateService/Actions/TemplateService.RemoveBaseline"
+	//BaseLineConfigRemediationAPI - api to remediate a baseline
+	BaseLineConfigRemediationAPI = "/api/TemplateService/Actions/TemplateService.Remediate"
+	//BaseLineConfigDeviceCompReport - api to get device compliance report of a baseline
+	BaseLineConfigDeviceCompReport = "/api/TemplateService/Baselines(%d)/DeviceConfigComplianceReports"
 	//VlanNetworksAPI - api to vlan networks
 	VlanNetworksAPI = "/api/NetworkConfigurationService/Networks"
+	//ImportTemplateAPI - api to import a template
+	ImportTemplateAPI = "/api/TemplateService/Actions/TemplateService.Import"
+	// TemplateNameContainsAPI - api to fetch templates by name
+	TemplateNameContainsAPI = "/api/TemplateService/Templates?$filter=contains(Name, '%s')"
 )
 
 // Messages constants
@@ -68,6 +88,8 @@ const (
 	ErrEmptyBodyMsg = "body cannot be empty"
 	// ErrInvalidDeviceIdentifiers - error message for invalid device service tag
 	ErrInvalidDeviceIdentifiers = "invalid device servicetag or id"
+	// ErrComplianceTemplateIDOrName - error message when either compliance template ID or name is not given
+	ErrComplianceTemplateIDOrName = "either compliance template ID or template name is expected"
 	// ErrEmptyDeviceDetails - error message when both device service tag and device id not given
 	ErrEmptyDeviceDetails = "either Device ID or Servicetag is required"
 	// ErrInvalidFqdds = error message for invalid fqdds
@@ -100,18 +122,14 @@ const (
 	ErrDeviceMutuallyExclusive = "please provide one of the device IDs or service tags"
 	// ErrInvalidTemplate - message returned when invalid template id or name
 	ErrInvalidTemplate = "please provide a valid template ID or name"
+	// ErrPlanToTfsdkConversion - message returned when converting the plan to tfsdk
+	ErrPlanToTfsdkConversion = "Error occured converting the plan values to tfsdk struct"
 	// ErrStateToTfsdkConversion - message returned when converting the state to tfsdk
 	ErrStateToTfsdkConversion = "Error occured converting the state values to tfsdk struct"
 	// ErrStateToTfsdkConversion - message returned when template id or name changed
 	ErrTemplateChanges = "template id or name cannot be changed"
-	// ErrTemplateDeploymentCreate - message returned when template deployment fails
-	ErrTemplateDeploymentCreate = "unable to create template deployment resource"
-	// ErrTemplateDeploymentUpdate - message returned when template deployment fails
-	ErrTemplateDeploymentUpdate = "unable to update template deployment resource"
-	// ErrTemplateDeploymentRead - message returned when template deployment fails
-	ErrTemplateDeploymentRead = "unable to read template deployment resource"
-	// ErrTemplateDeploymentDelete - message returned when template deployment fails
-	ErrTemplateDeploymentDelete = "unable to delete template deployment resource"
+	// ErrTemplateDeploymentGeneral - message returned when template deployment fails
+	ErrTemplateDeploymentGeneral = "unable to create or update or delete the template deployment resource"
 	// ErrCreateClient - message returned when client creation fails
 	ErrCreateClient = "Unable to create client"
 	// ErrCreateSession - message returned when session creation fails
@@ -120,7 +138,67 @@ const (
 	ErrImportDeployment = "Unable to import deployment"
 	// ErrImportNoProfiles - message returned when import deployment fails for no existing profile
 	ErrImportNoProfiles = "no deployment profiles exist for the template - %s"
-
+	// ErrScheduleNotification - message returned when email address are not provided when schedule notification is true
+	ErrScheduleNotification = "please provide a valid email address, when schedule notification is set to true"
+	// ErrGnrCreateBaseline - summary returned when failed to create baseline
+	ErrGnrCreateBaseline = "error creating a baseline"
+	// ErrGnrUpdateBaseline - summary returned when failed to update baseline
+	ErrGnrUpdateBaseline = "error updating a baseline"
+	// ErrGnrDeleteBaseline - summary returned when failed to delete baseline
+	ErrGnrDeleteBaseline = "error deleting a baseline"
+	// ErrGnrReadBaseline - summary returned when failed to read baseline
+	ErrGnrReadBaseline = "error reading a baseline"
+	// ErrGnrImportBaseline - message returned when import baseline fails
+	ErrGnrImportBaseline = "Unable to import baseline"
+	// ErrInvalidEmailAddress - message returned when invalid email address is provided
+	ErrInvalidEmailAddress = "invalid email address %s"
+	// ErrInvalidCronExpression - message returned when invalid cron expression is not provided
+	ErrInvalidCronExpression = "cron value is required when notification is scheduled"
+	// ErrInvalidRefTemplateNameorID - refernce template name required
+	ErrInvalidRefTemplateNameorID = "either reference template Id or template name is required"
+	// ErrInvalidRefTemplateType - template type is not comliance
+	ErrInvalidRefTemplateType = "reference template id or name should be of type compliance"
+	// ErrBaselineCreationTask - baseline report generation task failed
+	ErrBaselineCreationTask = "baseline report generation task failed"
+	// ErrDeviceNotCapable - device capablity
+	ErrDeviceNotCapable = "device with %v are not capable for deployments"
+	// ErrBaseLineJobIsRunning - device capablity
+	ErrBaseLineJobIsRunning = "job with id %d is already running please wait for sometime and try again"
+	// WarningBaselineDeviceCapability - message returned when create baseline has incompatible devices
+	WarningBaselineDeviceCapability = "%v devices are not valid to create baseline"
+	// ErrBaselineNameNotFound - message returned when provided baseline name does not exist
+	ErrBaselineNameNotFound = "baseline not found: %s"
+	// ErrGnrBaseLineCreateRemediation - message returned when there is a error in baseline remediation for configuration
+	ErrGnrBaseLineCreateRemediation = "baseline configuration remediation create error"
+	// ErrGnrBaseLineRemediation - message returned when there is a error in baseline remediation for configuration
+	ErrGnrBaseLineReadRemediation = "baseline configuration remediation read error"
+	// ErrGnrBaseLineRemediation - message returned when there is a baseline report generation in progress
+	ErrBaseLineReportInProgress = "inventory update is in progress, retry after some time"
+	// ErrBaseLineInvalidDevices - message returned when baseline has invalid devices
+	ErrBaseLineInvalidDevices = "devices %v are not part of a baseline"
+	// ErrBaseLineInvalid - message returned when baseline name or id is invalid
+	ErrBaseLineInvalid = "either baseline name or id is required"
+	// ErrBaseLineUpdateRemediation - message returned when there is a error in baseline remediation for configuration
+	ErrBaseLineUpdateRemediation = "baseline configuration remediation update error"
+	// ErrBaseLineUpdateRemediation - message returned when baseline name or id is changed
+	ErrBaseLineModified = "baseline name or id cannot be modified"
+	// ErrBaseLineTargetsSize - message returned when min length is not satisfied
+	ErrBaseLineTargetsSize = "list must contain at least %d elements"
+	// ErrBaseLineTargetsSize - message returned when min length is not satisfied
+	ErrBaseLineComplianceStatus = "supported value is %s"
+	// ErrBaselineReportForDevice - message returned when device report is not avaiable for a servicetag
+	ErrBaselineReportForDevice = "device reports not found for baseline %d and device %s"
+	// ErrCreateTemplate - message returned when template creation fails
+	// ErrInvalidTemplateDeviceType - error message for invalid template device type
+	ErrInvalidTemplateDeviceType = "Invalid template device type for template creation"
+	// ErrTemplateDeploymentCreate - message returned when template deployment fails
+	ErrTemplateDeploymentCreate = "unable to create template deployment resource"
+	// ErrTemplateDeploymentUpdate - message returned when template deployment fails
+	ErrTemplateDeploymentUpdate = "unable to update template deployment resource"
+	// ErrTemplateDeploymentRead - message returned when template deployment fails
+	ErrTemplateDeploymentRead = "unable to read template deployment resource"
+	// ErrTemplateDeploymentDelete - message returned when template deployment fails
+	ErrTemplateDeploymentDelete = "unable to delete template deployment resource"
 	// ErrCreateTemplate - message returned when template creation fails
 	ErrCreateTemplate = "Unable to create template"
 	// ErrReadTemplate - message returned when template read fails
@@ -131,6 +209,14 @@ const (
 	ErrDeleteTemplate = "Unable to delete template"
 	// ErrImportTemplate - message returned when import template fails
 	ErrImportTemplate = "Unable to import template"
+	// ErrGnrConfigurationReport - message returned when report could not be fetched
+	ErrGnrConfigurationReport = "unable to fetch the report"
+	// ErrCronRequired - message returned when run_later is true but cron is not provided
+	ErrCronRequired = "cron is required when run_later is true"
+	//ErrBaseLineScheduleValid
+	ErrBaseLineScheduleValid = "attributes `cron` and `email_addresses` are accepted only when `schedule` is true"
+	//ErrBaseLineNotifyValid
+	ErrBaseLineNotifyValid = "attributes `cron` is not accepted only when `schedule` is true and `notify_on_schedule` is false"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job
@@ -139,8 +225,14 @@ var FailureStatusIDs = []any{2070, 2090, 2100, 2101, 2102, 2103}
 const (
 	// ValidFQDDS = Valid FQDDS supported in template creation
 	ValidFQDDS string = "All,iDRAC,System,BIOS,NIC,LifeCycleController,RAID,EventFilters"
+	// ValidOutputFormat - valid output formats
+	ValidOutputFormat string = "html,csv,pdf,xls"
 	// ValidTemplateViewTypes = Valid template view types supported in template creation
 	ValidTemplateViewTypes string = "Deployment,Compliance"
+	// ValidComplainceStatus = Valid compliance status supported
+	ValidComplainceStatus string = "Compliant"
+	// ValidTemplateDeviceTypes = Valid template device types supported in template creation
+	ValidTemplateDeviceTypes string = "Server,Chassis"
 )
 
 // constants for Vlan attributes

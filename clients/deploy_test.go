@@ -60,25 +60,34 @@ func TestClient_GetServerProfileInfoByTemplateName(t *testing.T) {
 		{"Empty Profile response", "ValidEmptyProfileTemplateName"},
 		{"Single Profile response", "ValidSingleProfileTemplateName"},
 		{"Multiple Profile response", "ValidMultipleProfileTemplateName"},
+		{"Multiple Profile response with pagination data", "ValidPaginationProfileTemplateName"},
 		{"Unauthorised Profile response", "UnauthorisedProfileTemplateName"},
 		{"Unmarshal error Profile response", "UnmarshalErrProfileTemplateName"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			response, err := c.GetServerProfileInfoByTemplateName(tt.templateName)
-			if tt.templateName == "ValidEmptyTemplate" {
+			if tt.templateName == "ValidEmptyProfileTemplateName" {
 				assert.Nil(t, err)
-				assert.Equal(t, response.Value[0].ID, "")
+				assert.Equal(t, 0, len(response.Value))
 			}
-			if tt.templateName == "ValidSingleTemplate" {
+			if tt.templateName == "ValidSingleProfileTemplateName" {
 				assert.Nil(t, err)
-				assert.Equal(t, 10848, response.Value[0].ID)
+				assert.Equal(t, int64(10848), response.Value[0].ID)
+				assert.Equal(t, tt.templateName, response.Value[0].TemplateName)
 			}
-			if tt.templateName == "ValidMultipleTemplate" {
+			if tt.templateName == "ValidMultipleProfileTemplateName" {
 				assert.Nil(t, err)
-				assert.Equal(t, 10849, response.Value[1].ID)
+				assert.Equal(t, int64(10849), response.Value[0].ID)
+				assert.Equal(t, tt.templateName, response.Value[0].TemplateName)
 			}
-			if tt.templateName == "UnauthorisedTemplate" || tt.templateName == "UnmarshalErrTemplate" {
+			if tt.templateName == "ValidPaginationProfileTemplateName" {
+				assert.Nil(t, err)
+				assert.Equal(t, 2, len(response.Value))
+				assert.Equal(t, tt.templateName, response.Value[0].TemplateName)
+				assert.Equal(t, tt.templateName, response.Value[1].TemplateName)
+			}
+			if tt.templateName == "UnauthorisedProfileTemplateName" || tt.templateName == "UnmarshalErrProfileTemplateName" {
 				assert.NotNil(t, err)
 			}
 		})

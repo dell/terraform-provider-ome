@@ -24,6 +24,8 @@ const (
 	ComplianceViewTypeID = 1
 	//DeploymentViewTypeID - stores the id for the deployment view type.
 	DeploymentViewTypeID = 2
+	//ChassisDeviceTypeID - stores the id for the Chassis device type type.
+	ChassisDeviceTypeID = 4
 	// RetryCount - stores the default value of retry count
 	RetryCount = 5
 	// SleepInterval - stores the default value of sleep interval
@@ -84,6 +86,26 @@ func (r resourceTemplateType) GetSchema(_ context.Context) (tfsdk.Schema, diag.D
 				MarkdownDescription: "OME template view type id.",
 				Description:         "OME template view type id.",
 				Type:                types.Int64Type,
+				Computed:            true,
+			},
+			"device_type": {
+				MarkdownDescription: "OME template device type, supported types are Server, Chassis. This field cannot be updated and is applicable only for importing xml.",
+				Description:         "OME template device type, supported types are Server, Chassis. This field cannot be updated and is applicable only for importing xml.",
+				Type:                types.StringType,
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					DefaultAttribute(types.String{Value: "Server"}),
+				},
+				Validators: []tfsdk.AttributeValidator{
+					validTemplateDeviceTypeValidator{},
+				},
+			},
+			"content": {
+				MarkdownDescription: "The XML content of template.. This field cannot be updated.",
+				Description:         "The XML content of template.. This field cannot be updated.",
+				Type:                types.StringType,
+				Optional:            true,
 				Computed:            true,
 			},
 			"refdevice_servicetag": {
@@ -269,6 +291,14 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 		return
 	}
 
+	deviceTypeID, err := omeClient.GetDeviceTypeID(plan.DeviceType.Value)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrCreateTemplate, err.Error(),
+		)
+		return
+	}
+
 	omeTemplateData := models.OMETemplate{}
 	var templateID int64
 
@@ -277,7 +307,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 
 		if !plan.Description.Unknown {
 			resp.Diagnostics.AddError(
-				clients.ErrCreateTemplate, "description will be copied from the reference template.",
+				clients.ErrCreateTemplate, "description cannot be modified while cloning from a reference template.",
 			)
 			return
 		}
@@ -318,6 +348,39 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 			)
 			return
 		}
+	} else if plan.Content.Value != "" { // template import
+		tflog.Info(ctx, "resource_template create: creating a template from a xml content")
+
+		if !plan.Description.Unknown {
+			resp.Diagnostics.AddError(
+				clients.ErrCreateTemplate, "description is not supported for template import operation.",
+			)
+			return
+		}
+
+		importTemplateRequest := models.OMEImportTemplate{
+			ViewTypeID: viewTypeID,
+			Type:       deviceTypeID,
+			Name:       plan.Name.Value,
+			Content:    plan.Content.Value,
+		}
+
+		templateID, err = omeClient.ImportTemplate(importTemplateRequest)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				clients.ErrCreateTemplate, err.Error(),
+			)
+			return
+		}
+
+		omeTemplateData, err = omeClient.GetTemplateByID(templateID)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				clients.ErrCreateTemplate, err.Error(),
+			)
+			return
+		}
+
 	} else {
 		tflog.Info(ctx, "resource_template create: creating a template from a reference device")
 		deviceID, err := omeClient.ValidateDevice(plan.RefdeviceServicetag.Value, plan.RefdeviceID.Value)
@@ -396,12 +459,14 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 	//PropogateVlan is default true and is not available in the response from OME,hence setting it to true here to persist in state
 	omeVlan.PropagateVLAN = true
 	template.RefdeviceServicetag.Value = plan.RefdeviceServicetag.Value
-
 	template.ReftemplateName.Value = plan.ReftemplateName.Value
+	template.RefdeviceID.Value = plan.RefdeviceID.Value
 	if plan.ReftemplateName.Value != "" {
 		template.RefdeviceID.Value = omeTemplateData.SourceDeviceID
 	}
+	template.Content.Value = plan.Content.Value
 	template.ViewType.Value = plan.ViewType.Value
+	template.DeviceType.Value = plan.DeviceType.Value
 	template.FQDDS.Value = plan.FQDDS.Value // The default value of fqdds is set to `All`. So if the config doesn't have any value specified, the default value in the plan is `All`.
 	template.JobRetryCount = plan.JobRetryCount
 	template.SleepInterval = plan.SleepInterval
@@ -557,7 +622,7 @@ func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 	if isConfigValuesChanged(planTemplate, stateTemplate) {
 		resp.Diagnostics.AddError(
 			clients.ErrUpdateTemplate,
-			"cannot update the following fields : `refdevice_servicetag`,`refdevice_id`,`view_type`, `reftemplate_name` and `fqdds` ",
+			"cannot update the following fields : `refdevice_servicetag`,`refdevice_id`,`view_type`, `reftemplate_name`, `content` and `fqdds`",
 		)
 		return
 	}
@@ -894,10 +959,17 @@ func (r resourceTemplate) ImportState(ctx context.Context, req tfsdk.ImportResou
 		viewType = "Compliance"
 	}
 
+	deviceType := "Server"
+	if omeTemplateData.TypeID == ChassisDeviceTypeID {
+		deviceType = "Chassis"
+	}
+
 	template.RefdeviceID = types.Int64{Value: omeTemplateData.SourceDeviceID}
 	template.RefdeviceServicetag = types.String{Value: "NA"}
 	template.ReftemplateName = types.String{Value: "NA"}
+	template.Content = types.String{Value: "NA"}
 	template.ViewType = types.String{Value: viewType}
+	template.DeviceType = types.String{Value: deviceType}
 	template.JobRetryCount = types.Int64{Value: RetryCount}
 	template.SleepInterval = types.Int64{Value: SleepInterval}
 	template.FQDDS = types.String{Value: "All"}
@@ -911,15 +983,16 @@ func (r resourceTemplate) ImportState(ctx context.Context, req tfsdk.ImportResou
 
 func validateCreate(plan models.Template) error {
 	// all references cannot be empty
-	if plan.ReftemplateName.Value == "" && plan.RefdeviceID.Value == 0 && plan.RefdeviceServicetag.Value == "" {
-		return fmt.Errorf("either reftemplate_name or refdevice_id or refdevice_servicetag is required")
+	if plan.ReftemplateName.Value == "" && plan.RefdeviceID.Value == 0 && plan.RefdeviceServicetag.Value == "" && plan.Content.Value == "" {
+		return fmt.Errorf("either reftemplate_name or refdevice_id or refdevice_servicetag or content is required")
 	}
 
 	// any two references given results in error
-	if (plan.ReftemplateName.Value != "" && (plan.RefdeviceID.Value != 0 || plan.RefdeviceServicetag.Value != "")) ||
-		(plan.RefdeviceID.Value != 0 && (plan.ReftemplateName.Value != "" || plan.RefdeviceServicetag.Value != "")) ||
-		(plan.RefdeviceServicetag.Value != "" && (plan.RefdeviceID.Value != 0 || plan.ReftemplateName.Value != "")) {
-		return fmt.Errorf("either reftemplate_name or refdevice_id or refdevice_servicetag is required")
+	if (plan.ReftemplateName.Value != "" && (plan.RefdeviceID.Value != 0 || plan.RefdeviceServicetag.Value != "" || plan.Content.Value != "")) ||
+		(plan.RefdeviceID.Value != 0 && (plan.ReftemplateName.Value != "" || plan.RefdeviceServicetag.Value != "" || plan.Content.Value != "")) ||
+		(plan.RefdeviceServicetag.Value != "" && (plan.RefdeviceID.Value != 0 || plan.ReftemplateName.Value != "" || plan.Content.Value != "")) ||
+		(plan.Content.Value != "" && (plan.RefdeviceID.Value != 0 || plan.ReftemplateName.Value != "" || plan.RefdeviceServicetag.Value != "")) {
+		return fmt.Errorf("either reftemplate_name or refdevice_id or refdevice_servicetag or content is required")
 	}
 
 	// Identity Pool name and Vlan is supported only during update
@@ -966,7 +1039,8 @@ func isConfigValuesChanged(planTemplate, stateTemplate models.Template) bool {
 		(!planTemplate.RefdeviceServicetag.Unknown && stateTemplate.RefdeviceServicetag.Value != planTemplate.RefdeviceServicetag.Value) ||
 		(!planTemplate.ViewType.Unknown && stateTemplate.ViewType.Value != planTemplate.ViewType.Value) ||
 		(!planTemplate.FQDDS.Unknown && stateTemplate.FQDDS.Value != planTemplate.FQDDS.Value) ||
-		(!planTemplate.ReftemplateName.Unknown && stateTemplate.ReftemplateName.Value != planTemplate.ReftemplateName.Value)
+		(!planTemplate.ReftemplateName.Unknown && stateTemplate.ReftemplateName.Value != planTemplate.ReftemplateName.Value) ||
+		(!planTemplate.Content.Unknown && stateTemplate.Content.Value != planTemplate.Content.Value)
 }
 
 func validateVlan(planVlan, remoteVlan models.OMEVlan, vlanNetworks []models.VLanNetworks) error {

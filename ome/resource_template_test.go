@@ -1,9 +1,11 @@
 package ome
 
 import (
-	"os"
+	"fmt"
+	"log"
 	"regexp"
 	"terraform-provider-ome/clients"
+	"terraform-provider-ome/models"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -18,12 +20,57 @@ const (
 	ResourceName1                           = "ome_template.terraform-acceptance-test-6"
 	ReferenceDeploymentTemplateNameForClone = "test_acc_clone_deployment_template"
 	ReferenceComplianceTemplateNameForClone = "test_acc_clone_compliance_template"
+	// ContentFilePath                         = "../testdata/test_acc_template.xml"
 )
 
+var ContentFilePath = getTestData("test_acc_template.xml")
+
+func init() {
+	resource.AddTestSweepers("ome_template", &resource.Sweeper{
+		Name:         "ome_template",
+		Dependencies: []string{"ome_deployment"},
+		F: func(region string) error {
+			omeClient, err := getSweeperClient(region)
+			if err != nil {
+				log.Println("Error getting sweeper client")
+				return nil
+			}
+
+			_, err = omeClient.CreateSession()
+			if err != nil {
+				log.Println("Error creating client session for sweeper ")
+				return nil
+			}
+			defer omeClient.RemoveSession()
+
+			templateURL := fmt.Sprintf(clients.TemplateNameContainsAPI, SweepTestsTemplateIdentifier)
+			templateResp, templateErr := omeClient.Get(templateURL, nil, nil)
+			if templateErr != nil {
+				log.Println("failed to fetch templates containing " + SweepTestsTemplateIdentifier)
+				return nil
+			}
+
+			templateBody, _ := omeClient.GetBodyData(templateResp.Body)
+			omeTemplates := models.OMETemplates{}
+			omeClient.JSONUnMarshal(templateBody, &omeTemplates)
+
+			for _, omeTemplateValue := range omeTemplates.Value {
+				_, err = omeClient.Delete(fmt.Sprintf(clients.TemplateAPI+"(%d)", omeTemplateValue.ID), nil, nil)
+				if err != nil {
+					log.Println("failed to sweep dangling templates.")
+					return nil
+				}
+			}
+			return nil
+		},
+	})
+}
+
 func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testProviderFactory,
@@ -73,8 +120,8 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 
 // The identity pool and Vlans does not get cloned into the new template in OME.
 func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -82,28 +129,28 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 		ProtoV6ProviderFactories: testProviderFactory,
 		Steps: []resource.TestStep{
 			{
+				Config: testAccCreateTemplateForClone,
+			},
+			{
 				Config: testAccCloneTemplateSuccess,
-				Check: resource.ComposeTestCheckFunc(resource.TestCheckResourceAttr("ome_template.clone-template-test", "name", "clone-template-test"),
+				Check: resource.ComposeTestCheckFunc(resource.TestCheckResourceAttr("ome_template.clone-template-test", "name", "test_acc_clone_template_test"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "view_type", "Deployment"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "view_type_id", "2"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "reftemplate_name", ReferenceDeploymentTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-test", "refdevice_id", DeviceID1),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "description", "This is a template for testing deployments in acceptance testcases. Please do not delete this template"),
 
-					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "name", "clone-template-deployment-compliance"),
+					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "name", "test_acc_clone_template_deployment_compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type", "compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "reftemplate_name", ReferenceDeploymentTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "refdevice_id", DeviceID1),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "description", "This is a template for testing deployments in acceptance testcases. Please do not delete this template"),
 
-					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "name", "clone-template-compliance-compliance"),
+					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "name", "test_acc_clone_template_compliance_compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "view_type", "Compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "reftemplate_name", ReferenceComplianceTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "refdevice_id", DeviceID1),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "description", ""),
 				),
@@ -113,8 +160,8 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -135,6 +182,10 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 			},
 			{
 				Config:      testAccCreateTemplateMutuallyExclusive3,
+				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
+			},
+			{
+				Config:      testAccCreateTemplateMutuallyExclusive4,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
@@ -174,10 +225,9 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 }
 
 func TestTemplateImport_ImportTemplates(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	if skipTest() {
+		t.Skip(SkipTestMsg)
 	}
-
 	assertTFImportState := func(s []*terraform.InstanceState) error {
 		assert.NotEmpty(t, s[0].Attributes["attributes.12.display_name"])
 		assert.NotEmpty(t, s[0].Attributes["vlan.bonding_technology"])
@@ -212,6 +262,54 @@ func TestTemplateImport_ImportTemplates(t *testing.T) {
 		},
 	})
 }
+
+func TestTemplateCreation_CreateImportTemplate(t *testing.T) {
+	if skipTest() {
+		t.Skip(SkipTestMsg)
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testProviderFactory,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCreateImportTemplateSuccess,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_template.citdtest", "name", "test_acc_import_content_d"),
+					resource.TestCheckResourceAttr("ome_template.citdtest", "view_type", "Deployment"),
+					resource.TestCheckResourceAttr("ome_template.citdtest", "view_type_id", "2"),
+					resource.TestCheckResourceAttr("ome_template.citdtest", "device_type", "Server"),
+
+					resource.TestCheckResourceAttr("ome_template.citctest", "name", "test_acc_import_content_c"),
+					resource.TestCheckResourceAttr("ome_template.citctest", "view_type", "Compliance"),
+					resource.TestCheckResourceAttr("ome_template.citctest", "view_type_id", "1"),
+					resource.TestCheckResourceAttr("ome_template.citctest", "device_type", "Server"),
+				),
+			},
+		},
+	})
+}
+
+var testAccCreateTemplateForClone = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + ReferenceDeploymentTemplateNameForClone + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		description = "This is a template for testing deployments in acceptance testcases. Please do not delete this template"
+	}
+
+	resource "ome_template" "terraform-acceptance-test-2" {
+		name = "` + ReferenceComplianceTemplateNameForClone + `"
+		refdevice_servicetag = "` + DeviceSvcTag2 + `"
+		view_type = "Compliance"
+	}
+`
 
 var testAccCreateTemplateSuccess = `
 	provider "ome" {
@@ -380,6 +478,22 @@ resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
 	refdevice_id = 12328
 	refdevice_servicetag = "MX1404"
+}
+`
+
+var testAccCreateTemplateMutuallyExclusive4 = `
+
+provider "ome" {
+	username = "` + omeUserName + `"
+	password = "` + omePassword + `"
+	host = "` + omeHost + `"
+	skipssl = true
+}
+
+resource "ome_template" "terraform-acceptance-test-3" {
+	name = "test_acc_template-3"
+	refdevice_id = 12328
+	content = "MX1404"
 }
 `
 
@@ -569,6 +683,25 @@ resource "ome_template" "terraform-acceptance-test-2" {
 	sleep_interval = 60
 }
 `
+var testAccCreateImportTemplateSuccess = `
+provider "ome" {
+	username = "` + omeUserName + `"
+	password = "` + omePassword + `"
+	host = "` + omeHost + `"
+	skipssl = true
+}
+
+resource "ome_template" "citdtest" {
+	name = "test_acc_import_content_d"
+	content = file("` + ContentFilePath + `")
+}
+
+resource "ome_template" "citctest" {
+	name = "test_acc_import_content_c"
+	content = file("` + ContentFilePath + `")
+	view_type = "Compliance"
+}
+`
 
 var testAccCloneTemplateSuccess = `
 provider "ome" {
@@ -578,19 +711,30 @@ provider "ome" {
 	skipssl = true
 }
 
+resource "ome_template" "terraform-acceptance-test-1" {
+	name = "` + ReferenceDeploymentTemplateNameForClone + `"
+	refdevice_servicetag = "` + DeviceSvcTag1 + `"
+}
+
+resource "ome_template" "terraform-acceptance-test-2" {
+	name = "` + ReferenceComplianceTemplateNameForClone + `"
+	refdevice_servicetag = "` + DeviceSvcTag2 + `"
+	view_type = "Compliance"
+}
+
 resource "ome_template" "clone-template-test" {
-	name = "clone-template-test"
+	name = "test_acc_clone_template_test"
 	reftemplate_name = "` + ReferenceDeploymentTemplateNameForClone + `"
 }
 
 resource "ome_template" "clone-template-deployment-compliance" {
-	name = "clone-template-deployment-compliance"
+	name = "test_acc_clone_template_deployment_compliance"
 	reftemplate_name = "` + ReferenceDeploymentTemplateNameForClone + `"
 	view_type = "compliance"
 }
 
 resource "ome_template" "clone-template-compliance-compliance" {
-	name = "clone-template-compliance-compliance"
+	name = "test_acc_clone_template_compliance_compliance"
 	reftemplate_name = "` + ReferenceComplianceTemplateNameForClone + `"
 	view_type = "Compliance"
 }

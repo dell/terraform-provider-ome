@@ -566,6 +566,7 @@ func TestClient_GetTemplateByName(t *testing.T) {
 		{"Empty Template response", "ValidEmptyTemplate"},
 		{"Sinle Template response", "ValidSingleTemplate"},
 		{"Multiple Template response", "ValidMultipleTemplate"},
+		{"Multiple Template response with pagination", "ValidTemplatePagination"},
 		{"Unauthorised Template response", "UnauthorisedTemplate"},
 		{"Unmarshal error Template response", "UnmarshalErrTemplate"},
 	}
@@ -578,11 +579,11 @@ func TestClient_GetTemplateByName(t *testing.T) {
 			}
 			if tt.templateName == "ValidSingleTemplate" {
 				assert.Nil(t, err)
-				assert.Equal(t, "ValidSingleTemplate", response.Name)
+				assert.Equal(t, tt.templateName, response.Name)
 			}
-			if tt.templateName == "ValidMultipleTemplate" {
+			if tt.templateName == "ValidMultipleTemplate" || tt.templateName == "ValidTemplatePagination" {
 				assert.Nil(t, err)
-				assert.Equal(t, "ValidMultipleTemplate1", response.Name)
+				assert.Equal(t, tt.templateName, response.Name)
 			}
 			if tt.templateName == "UnauthorisedTemplate" || tt.templateName == "UnmarshalErrTemplate" {
 				assert.NotNil(t, err)
@@ -987,6 +988,65 @@ func TestClient_CloneTemplateByRefTemplateID(t *testing.T) {
 				assert.NotNil(t, err)
 				assert.ErrorContains(t, err, tt.errorMessage)
 				assert.Equal(t, int64(-1), newTemplateID)
+			} else {
+				assert.Equal(t, tt.newTemplateID, newTemplateID)
+				assert.Nil(t, err)
+			}
+		})
+	}
+}
+
+func TestClient_ImportTemplate(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	tests := []struct {
+		name          string
+		importRequest models.OMEImportTemplate
+		isError       bool
+		newTemplateID int64
+	}{
+		{"OME Import server deployment Template", models.OMEImportTemplate{
+			Type:       1,
+			Name:       "server-dep-template",
+			Content:    "<a>server-dep-template</a>",
+			ViewTypeID: DeploymentViewTypeID,
+		}, false, 123},
+		{"OME Import chassis compliance Template", models.OMEImportTemplate{
+			Type:       2,
+			Name:       "chassis-dep-template",
+			Content:    "<a>chassis-dep-template</a>",
+			ViewTypeID: DeploymentViewTypeID,
+		}, false, 124},
+		{"OME Import server compliance Template", models.OMEImportTemplate{
+			Type:       1,
+			Name:       "server-comp-template",
+			Content:    "<a>server-comp-template</a>",
+			ViewTypeID: ComplainceViewTypeID,
+		}, false, 125},
+		{"OME Import chassis compliance Template", models.OMEImportTemplate{
+			Type:       2,
+			Name:       "chassis-comp-template",
+			Content:    "<a>chassis-comp-template</a>",
+			ViewTypeID: ComplainceViewTypeID,
+		}, false, 126},
+		{"OME Import invalid compliance Template", models.OMEImportTemplate{
+			Type:       2,
+			Name:       "invalid-template-content",
+			Content:    "<a>invalid-template-content<a>",
+			ViewTypeID: ComplainceViewTypeID,
+		}, true, -1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			newTemplateID, err := c.ImportTemplate(tt.importRequest)
+			if tt.isError {
+				assert.NotNil(t, err)
+				assert.Equal(t, tt.newTemplateID, newTemplateID)
 			} else {
 				assert.Equal(t, tt.newTemplateID, newTemplateID)
 				assert.Nil(t, err)
