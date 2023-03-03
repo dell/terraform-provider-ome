@@ -7,134 +7,136 @@ import (
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
-type templateDataSourceType struct{}
+var (
+	_ datasource.DataSource              = &templateDataSource{}
+	_ datasource.DataSourceWithConfigure = &templateDataSource{}
+)
 
-func (t templateDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+// NewTemplateDataSource is a new datasource for template
+func NewTemplateDataSource() datasource.DataSource {
+	return &templateDataSource{}
+}
+
+type templateDataSource struct {
+	p *omeProvider
+}
+
+// Configure implements datasource.DataSourceWithConfigure
+func (t *templateDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+	t.p = req.ProviderData.(*omeProvider)
+}
+
+// Metadata implements datasource.DataSource
+func (*templateDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "template_info"
+}
+
+func (t templateDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "Data Source to list the Template details from OpenManage Enterprise",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
 				MarkdownDescription: "Id of the template.",
 				Description:         "Id of the template.",
-				Type:                types.StringType,
 				Computed:            true,
 				Optional:            true,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Name of the template.",
 				Description:         "Name of the template.",
-				Type:                types.StringType,
 				Required:            true,
 			},
-			"view_type_id": {
+			"view_type_id": schema.Int64Attribute{
 				MarkdownDescription: "OME template view type id.",
 				Description:         "OME template view type id.",
-				Type:                types.Int64Type,
 				Computed:            true,
 			},
-			"device_type_id": {
+			"device_type_id": schema.Int64Attribute{
 				MarkdownDescription: "Template type ID, indicating the type of device for which configuration is supported, current supported device is server",
 				Description:         "Template type ID, indicating the type of device for which configuration is supported, current supported device is server",
-				Type:                types.Int64Type,
 				Computed:            true,
 			},
-			"refdevice_id": {
+			"refdevice_id": schema.Int64Attribute{
 				MarkdownDescription: "Target device id from which the template is created.",
 				Description:         "Target device id from which the template is created.",
-				Type:                types.Int64Type,
 				Optional:            true,
 				Computed:            true,
 			},
-			"content": {
+			"content": schema.StringAttribute{
 				MarkdownDescription: "The XML content of template from which the template will be created",
 				Description:         "The XML content of template from which the template will be created",
-				Type:                types.StringType,
 				Optional:            true,
 			},
-			"description": {
+			"description": schema.StringAttribute{
 				MarkdownDescription: "Description for the template.",
 				Description:         "Description for the template.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
 			},
-			"attributes": {
+			"attributes": schema.ListAttribute{
 				MarkdownDescription: "List of attributes associated with template.",
 				Description:         "List of attributes associated with template.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.ListType{
-					ElemType: types.ObjectType{
-						AttrTypes: map[string]attr.Type{
-							"attribute_id": types.Int64Type,
-							"display_name": types.StringType,
-							"value":        types.StringType,
-							"is_ignored":   types.BoolType,
-						},
+				ElementType: types.ObjectType{
+					AttrTypes: map[string]attr.Type{
+						"attribute_id": types.Int64Type,
+						"display_name": types.StringType,
+						"value":        types.StringType,
+						"is_ignored":   types.BoolType,
 					},
 				},
 			},
-			"identity_pool_id": {
+			"identity_pool_id": schema.Int64Attribute{
 				MarkdownDescription: "ID of the Identity Pool attached with template.",
 				Description:         "ID of the Identity Pool attached with template.",
-				Type:                types.Int64Type,
 				Computed:            true,
 			},
-			"vlan": {
+			"vlan": schema.ObjectAttribute{
 				MarkdownDescription: "VLAN details to be attached with template.",
 				Description:         "VLAN details to be attached with template.",
 				Computed:            true,
 				Optional:            true,
-				Type: types.ObjectType{
-					AttrTypes: map[string]attr.Type{
-						"propogate_vlan":     types.BoolType,
-						"bonding_technology": types.StringType,
-						"vlan_attributes": types.ListType{
-							ElemType: types.ObjectType{
-								AttrTypes: map[string]attr.Type{
-									"untagged_network": types.Int64Type,
-									"tagged_networks": types.ListType{
-										ElemType: types.Int64Type,
-									},
-									"is_nic_bonded":  types.BoolType,
-									"port":           types.Int64Type,
-									"nic_identifier": types.StringType,
+				AttributeTypes: map[string]attr.Type{
+					"propogate_vlan":     types.BoolType,
+					"bonding_technology": types.StringType,
+					"vlan_attributes": types.ListType{
+						ElemType: types.ObjectType{
+							AttrTypes: map[string]attr.Type{
+								"untagged_network": types.Int64Type,
+								"tagged_networks": types.ListType{
+									ElemType: types.Int64Type,
 								},
+								"is_nic_bonded":  types.BoolType,
+								"port":           types.Int64Type,
+								"nic_identifier": types.StringType,
 							},
 						},
 					},
 				},
 			},
 		},
-	}, nil
-}
-
-func (t templateDataSourceType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
-
-	return templateDataSource{
-		p: provider,
-	}, diags
-}
-
-type templateDataSource struct {
-	p provider
+	}
 }
 
 // Read resource information
-func (t templateDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (t templateDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var template models.TemplateDataSource
 	diags := req.Config.Get(ctx, &template)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	templateName := template.Name.Value
+	templateName := template.Name.ValueString()
 	omeClient, err := clients.NewClient(*t.p.clientOpt)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -176,7 +178,7 @@ func (t templateDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRe
 		return
 	}
 	stateVlan := models.Vlan{}
-	diags = template.Vlan.As(ctx, &stateVlan, types.ObjectAsOptions{UnhandledNullAsEmpty: true})
+	diags = template.Vlan.As(ctx, &stateVlan, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
 	if diags.HasError() {
 		resp.Diagnostics.AddError(
 			"Unable to fetch Vlan from state ",
@@ -196,7 +198,7 @@ func (t templateDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRe
 		}
 	}
 
-	omeVlan.PropagateVLAN = stateVlan.PropogateVlan.Value
+	omeVlan.PropagateVLAN = stateVlan.PropogateVlan.ValueBool()
 	updateDataSourceState(&template, &omeTemplateData, omeAttributes, omeVlan)
 
 	diags = resp.State.Set(ctx, &template)
@@ -208,17 +210,34 @@ func (t templateDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRe
 
 func updateDataSourceState(template *models.TemplateDataSource, omeTemplateData *models.OMETemplate, omeTemplateAttributes []models.OmeAttribute, omeVlan models.OMEVlan) {
 
-	template.ID = types.String{Value: fmt.Sprintf("%d", omeTemplateData.ID)}
-	template.Name = types.String{Value: omeTemplateData.Name}
-	template.Description = types.String{Value: omeTemplateData.Description}
-	template.ViewTypeID = types.Int64{Value: omeTemplateData.ViewTypeID}
-	template.DeviceTypeID = types.Int64{Value: omeTemplateData.TypeID}
-	template.RefdeviceID = types.Int64{Value: omeTemplateData.SourceDeviceID}
-	template.IdentityPoolID = types.Int64{Value: omeTemplateData.IdentityPoolID}
-	template.Content = types.String{Value: omeTemplateData.Content}
+	template.ID = types.StringValue(fmt.Sprintf("%d", omeTemplateData.ID))
+	template.Name = types.StringValue(omeTemplateData.Name)
+	template.Description = types.StringValue(omeTemplateData.Description)
+	template.ViewTypeID = types.Int64Value(omeTemplateData.ViewTypeID)
+	template.DeviceTypeID = types.Int64Value(omeTemplateData.TypeID)
+	template.RefdeviceID = types.Int64Value(omeTemplateData.SourceDeviceID)
+	template.IdentityPoolID = types.Int64Value(omeTemplateData.IdentityPoolID)
+	template.Content = types.StringValue(omeTemplateData.Content)
+	attributeObjects := []attr.Value{}
 
-	attributesTfsdk := types.List{
-		ElemType: types.ObjectType{
+	for _, attribute := range omeTemplateAttributes {
+		attributeDetails := map[string]attr.Value{}
+		attributeDetails["attribute_id"] = types.Int64Value(attribute.AttributeID)
+		attributeDetails["display_name"] = types.StringValue(attribute.DisplayName)
+		attributeDetails["value"] = types.StringValue(attribute.Value)
+		attributeDetails["is_ignored"] = types.BoolValue(attribute.IsIgnored)
+		attributeObject, _ := types.ObjectValue(
+			map[string]attr.Type{
+				"attribute_id": types.Int64Type,
+				"display_name": types.StringType,
+				"value":        types.StringType,
+				"is_ignored":   types.BoolType,
+			}, attributeDetails,
+		)
+		attributeObjects = append(attributeObjects, attributeObject)
+	}
+	attributesTfsdk, _ := types.ListValue(
+		types.ObjectType{
 			AttrTypes: map[string]attr.Type{
 				"attribute_id": types.Int64Type,
 				"display_name": types.StringType,
@@ -226,35 +245,34 @@ func updateDataSourceState(template *models.TemplateDataSource, omeTemplateData 
 				"is_ignored":   types.BoolType,
 			},
 		},
-	}
-	attributeObjects := []attr.Value{}
+		attributeObjects,
+	)
 
-	for _, attribute := range omeTemplateAttributes {
-		attributeDetails := map[string]attr.Value{}
-		attributeDetails["attribute_id"] = types.Int64{Value: attribute.AttributeID}
-		attributeDetails["display_name"] = types.String{Value: attribute.DisplayName}
-		attributeDetails["value"] = types.String{Value: attribute.Value}
-		attributeDetails["is_ignored"] = types.Bool{Value: attribute.IsIgnored}
-		attributeObject := types.Object{
-			Attrs: attributeDetails,
-			AttrTypes: map[string]attr.Type{
-				"attribute_id": types.Int64Type,
-				"display_name": types.StringType,
-				"value":        types.StringType,
-				"is_ignored":   types.BoolType,
-			},
-		}
-		attributeObjects = append(attributeObjects, attributeObject)
+	if attributesTfsdk.IsUnknown() {
+		template.Attributes = attributesTfsdk
 	}
-	attributesTfsdk.Elems = attributeObjects
-	template.Attributes = attributesTfsdk
 
 	var vlanTfsdk types.Object
 	vlanAttrsObjects := []attr.Value{}
 
 	for _, omeVlanAttr := range omeVlan.OMEVlanAttributes {
-		vlanAttrObject := types.Object{
-			AttrTypes: map[string]attr.Type{
+
+		vlanAttrMap := map[string]attr.Value{}
+		vlanAttrMap["untagged_network"] = types.Int64Value(omeVlanAttr.Untagged)
+		taggedNetworks := []attr.Value{}
+		for _, tn := range omeVlanAttr.Tagged {
+			taggedNetworks = append(taggedNetworks, types.Int64Value(tn))
+		}
+
+		vlanAttrMap["tagged_networks"], _ = types.ListValue(
+			types.Int64Type,
+			taggedNetworks,
+		)
+		vlanAttrMap["is_nic_bonded"] = types.BoolValue(omeVlanAttr.IsNICBonded)
+		vlanAttrMap["port"] = types.Int64Value(omeVlanAttr.Port)
+		vlanAttrMap["nic_identifier"] = types.StringValue(omeVlanAttr.NicIdentifier)
+		vlanAttrObject, _ := types.ObjectValue(
+			map[string]attr.Type{
 				"untagged_network": types.Int64Type,
 				"tagged_networks": types.ListType{
 					ElemType: types.Int64Type,
@@ -262,28 +280,13 @@ func updateDataSourceState(template *models.TemplateDataSource, omeTemplateData 
 				"is_nic_bonded":  types.BoolType,
 				"port":           types.Int64Type,
 				"nic_identifier": types.StringType,
-			},
-		}
-		vlanAttrMap := map[string]attr.Value{}
-		vlanAttrMap["untagged_network"] = types.Int64{Value: omeVlanAttr.Untagged}
-		taggedNetworks := []attr.Value{}
-		for _, tn := range omeVlanAttr.Tagged {
-			taggedNetworks = append(taggedNetworks, types.Int64{Value: tn})
-		}
-
-		vlanAttrMap["tagged_networks"] = types.List{
-			ElemType: types.Int64Type,
-			Elems:    taggedNetworks,
-		}
-		vlanAttrMap["is_nic_bonded"] = types.Bool{Value: omeVlanAttr.IsNICBonded}
-		vlanAttrMap["port"] = types.Int64{Value: omeVlanAttr.Port}
-		vlanAttrMap["nic_identifier"] = types.String{Value: omeVlanAttr.NicIdentifier}
-		vlanAttrObject.Attrs = vlanAttrMap
+			}, vlanAttrMap,
+		)
 		vlanAttrsObjects = append(vlanAttrsObjects, vlanAttrObject)
 	}
 
-	vlanAttrList := types.List{
-		ElemType: types.ObjectType{
+	vlanAttrList, _ := types.ListValue(
+		types.ObjectType{
 			AttrTypes: map[string]attr.Type{
 				"untagged_network": types.Int64Type,
 				"tagged_networks": types.ListType{
@@ -294,10 +297,10 @@ func updateDataSourceState(template *models.TemplateDataSource, omeTemplateData 
 				"nic_identifier": types.StringType,
 			},
 		},
-		Elems: vlanAttrsObjects,
-	}
-	vlanTfsdk = types.Object{
-		AttrTypes: map[string]attr.Type{
+		vlanAttrsObjects,
+	)
+	vlanTfsdk, _ = types.ObjectValue(
+		map[string]attr.Type{
 			"propogate_vlan":     types.BoolType,
 			"bonding_technology": types.StringType,
 			"vlan_attributes": types.ListType{
@@ -314,12 +317,14 @@ func updateDataSourceState(template *models.TemplateDataSource, omeTemplateData 
 				},
 			},
 		},
-		Attrs: map[string]attr.Value{
-			"propogate_vlan":     types.Bool{Value: omeVlan.PropagateVLAN},
-			"bonding_technology": types.String{Value: omeVlan.BondingTechnology},
+		map[string]attr.Value{
+			"propogate_vlan":     types.BoolValue(omeVlan.PropagateVLAN),
+			"bonding_technology": types.StringValue(omeVlan.BondingTechnology),
 			"vlan_attributes":    vlanAttrList,
 		},
-	}
+	)
 
-	template.Vlan = vlanTfsdk
+	if vlanTfsdk.IsUnknown() {
+		template.Vlan = vlanTfsdk
+	}
 }

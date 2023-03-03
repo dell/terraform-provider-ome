@@ -10,8 +10,10 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -21,151 +23,150 @@ const (
 	NoOFTries = 5
 )
 
-type resourceConfigurationBaselineType struct{}
+// Ensure the implementation satisfies the expected interfaces.
+var (
+	_ resource.Resource                = &resourceConfigurationBaseline{}
+	_ resource.ResourceWithConfigure   = &resourceConfigurationBaseline{}
+	_ resource.ResourceWithImportState = &resourceConfigurationBaseline{}
+)
 
-// Template Deployment Resource schema
-func (r resourceConfigurationBaselineType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
-		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for all the parameters. When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
-				MarkdownDescription: "ID of the resource.",
-				Description:         "ID of the resource.",
-				Type:                types.Int64Type,
-				Computed:            true,
-			},
-			"ref_template_id": {
-				MarkdownDescription: "Reference template ID.",
-				Description:         "Reference template ID.",
-				Type:                types.Int64Type,
-				Computed:            true,
-				Optional:            true,
-			},
-			"ref_template_name": {
-				MarkdownDescription: "Reference template name.",
-				Description:         "Reference template name.",
-				Type:                types.StringType,
-				Optional:            true,
-				Computed:            true,
-			},
-			"baseline_name": {
-				MarkdownDescription: "Name of the Baseline.",
-				Description:         "Name of the Baseline.",
-				Type:                types.StringType,
-				Required:            true,
-			},
-			"description": {
-				MarkdownDescription: "Description of the baseline.",
-				Description:         "Description of the baseline.",
-				Type:                types.StringType,
-				Optional:            true,
-				Computed:            true,
-			},
-			"device_ids": {
-				MarkdownDescription: "List of the device id on which the baseline compliance needs to be run.",
-				Description:         "List of the device id on which the baseline compliance needs to be run.",
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
-				Optional: true,
-			},
-			"device_servicetags": {
-				MarkdownDescription: "List of the device servicetag on which the baseline compliance needs to be run.",
-				Description:         "List of the device servicetag on which the baseline compliance needs to be run.",
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
-				Optional: true,
-			},
-			"schedule": {
-				MarkdownDescription: "Schedule notification via email.",
-				Description:         "Schedule notification via email.",
-				Type:                types.BoolType,
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Bool{Value: false}),
-				},
-			},
-			"notify_on_schedule": {
-				MarkdownDescription: "Schedule notification via cron or any time the baseline becomes non-compliant.",
-				Description:         "Schedule notification via cron or any time the baseline becomes non-compliant.",
-				Type:                types.BoolType,
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Bool{Value: false}),
-				},
-			},
-			"email_addresses": {
-				MarkdownDescription: "Email addresses for notification.",
-				Description:         "Email addresses for notification.",
-				Type: types.SetType{
-					ElemType: types.StringType},
-				Optional: true,
-			},
-			"output_format": {
-				MarkdownDescription: "Output format type, the input is case senitive.",
-				Description:         "Output format type, the input is case senitive.",
-				Type:                types.StringType,
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.String{Value: "html"}),
-				},
-				Validators: []tfsdk.AttributeValidator{
-					outputFormatValidator{},
-				},
-			},
-			"cron": {
-				MarkdownDescription: "Cron expression for notification schedule.",
-				Description:         "Cron expression for notification schedule.",
-				Type:                types.StringType,
-				Optional:            true,
-			},
-			"task_id": {
-				MarkdownDescription: "Task id associated with baseline.",
-				Description:         "Task id associated with baseline.",
-				Type:                types.Int64Type,
-				Computed:            true,
-			},
-			"job_retry_count": {
-				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
-				Description:         "Number of times the job has to be polled to get the final status of the resource.",
-				Type:                types.Int64Type,
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Int64{Value: 30}),
-				},
-			},
-			"sleep_interval": {
-				MarkdownDescription: "Sleep time interval for job polling in seconds.",
-				Description:         "Sleep time interval for job polling in seconds.",
-				Type:                types.Int64Type,
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Int64{Value: 20}),
-				},
-			},
-		},
-	}, nil
-}
-
-// New resource instance
-func (r resourceConfigurationBaselineType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
-	return resourceConfigurationBaseline{
-		p: *(p.(*provider)),
-	}, nil
+// NewConfigurationBaselineResource is new resource for configuration baseline
+func NewConfigurationBaselineResource() resource.Resource {
+	return &resourceConfigurationBaseline{}
 }
 
 type resourceConfigurationBaseline struct {
-	p provider
+	p *omeProvider
+}
+
+// Configure implements resource.ResourceWithConfigure
+func (r *resourceConfigurationBaseline) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+	r.p = req.ProviderData.(*omeProvider)
+}
+
+// Metadata implements resource.Resource
+func (r resourceConfigurationBaseline) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "configuration_baseline"
+}
+
+// Template Deployment Resource schema
+func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
+		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for all the parameters. When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`",
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
+				MarkdownDescription: "ID of the resource.",
+				Description:         "ID of the resource.",
+				Computed:            true,
+			},
+			"ref_template_id": schema.Int64Attribute{
+				MarkdownDescription: "Reference template ID.",
+				Description:         "Reference template ID.",
+				Computed:            true,
+				Optional:            true,
+			},
+			"ref_template_name": schema.StringAttribute{
+				MarkdownDescription: "Reference template name.",
+				Description:         "Reference template name.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"baseline_name": schema.StringAttribute{
+				MarkdownDescription: "Name of the Baseline.",
+				Description:         "Name of the Baseline.",
+				Required:            true,
+			},
+			"description": schema.StringAttribute{
+				MarkdownDescription: "Description of the baseline.",
+				Description:         "Description of the baseline.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"device_ids": schema.SetAttribute{
+				MarkdownDescription: "List of the device id on which the baseline compliance needs to be run.",
+				Description:         "List of the device id on which the baseline compliance needs to be run.",
+				ElementType:         types.Int64Type,
+				Optional:            true,
+			},
+			"device_servicetags": schema.SetAttribute{
+				MarkdownDescription: "List of the device servicetag on which the baseline compliance needs to be run.",
+				Description:         "List of the device servicetag on which the baseline compliance needs to be run.",
+				ElementType:         types.StringType,
+				Optional:            true,
+			},
+			"schedule": schema.BoolAttribute{
+				MarkdownDescription: "Schedule notification via email.",
+				Description:         "Schedule notification via email.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Bool{
+					BoolDefaultValue(types.BoolValue(false)),
+				},
+			},
+			"notify_on_schedule": schema.BoolAttribute{
+				MarkdownDescription: "Schedule notification via cron or any time the baseline becomes non-compliant.",
+				Description:         "Schedule notification via cron or any time the baseline becomes non-compliant.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Bool{
+					BoolDefaultValue(types.BoolValue(false)),
+				},
+			},
+			"email_addresses": schema.SetAttribute{
+				MarkdownDescription: "Email addresses for notification.",
+				Description:         "Email addresses for notification.",
+				ElementType:         types.StringType,
+				Optional:            true,
+			},
+			"output_format": schema.StringAttribute{
+				MarkdownDescription: "Output format type, the input is case senitive.",
+				Description:         "Output format type, the input is case senitive.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					StringDefaultValue(types.StringValue("html")),
+				},
+				Validators: []validator.String{
+					outputFormatValidator{},
+				},
+			},
+			"cron": schema.StringAttribute{
+				MarkdownDescription: "Cron expression for notification schedule.",
+				Description:         "Cron expression for notification schedule.",
+				Optional:            true,
+			},
+			"task_id": schema.Int64Attribute{
+				MarkdownDescription: "Task id associated with baseline.",
+				Description:         "Task id associated with baseline.",
+				Computed:            true,
+			},
+			"job_retry_count": schema.Int64Attribute{
+				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
+				Description:         "Number of times the job has to be polled to get the final status of the resource.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Int64{
+					Int64DefaultValue(types.Int64Value(30)),
+				},
+			},
+			"sleep_interval": schema.Int64Attribute{
+				MarkdownDescription: "Sleep time interval for job polling in seconds.",
+				Description:         "Sleep time interval for job polling in seconds.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Int64{
+					Int64DefaultValue(types.Int64Value(20)),
+				},
+			},
+		},
+	}
 }
 
 // Create a new resource
-func (r resourceConfigurationBaseline) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r resourceConfigurationBaseline) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	//Get Plan Data
 	tflog.Trace(ctx, "resource_configuration_baseline create: started")
 	var plan models.ConfigureBaselines
@@ -207,7 +208,7 @@ func (r resourceConfigurationBaseline) Create(ctx context.Context, req tfsdk.Cre
 	defer omeClient.RemoveSession()
 
 	tflog.Info(ctx, "resource_configuration_baseline create Validating Template Details")
-	omeTemplate, err := validateRefTemplateDetails(plan.RefTemplateID.Value, plan.RefTemplateName.Value, omeClient)
+	omeTemplate, err := validateRefTemplateDetails(plan.RefTemplateID.ValueInt64(), plan.RefTemplateName.ValueString(), omeClient)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrCreateBaseline,
@@ -278,7 +279,7 @@ func (r resourceConfigurationBaseline) Create(ctx context.Context, req tfsdk.Cre
 		"taskid":     baseline.TaskID,
 	})
 
-	isSuccess, message := omeClient.TrackJob(baseline.TaskID, plan.JobRetryCount.Value, plan.SleepInterval.Value)
+	isSuccess, message := omeClient.TrackJob(baseline.TaskID, plan.JobRetryCount.ValueInt64(), plan.SleepInterval.ValueInt64())
 	if !isSuccess {
 		resp.Diagnostics.AddWarning(
 			clients.ErrBaselineCreationTask, message,
@@ -300,7 +301,7 @@ func (r resourceConfigurationBaseline) Create(ctx context.Context, req tfsdk.Cre
 }
 
 // Read resource information
-func (r resourceConfigurationBaseline) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r resourceConfigurationBaseline) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	//Get State Data
 	var state models.ConfigureBaselines
 	diags := req.State.Get(ctx, &state)
@@ -331,12 +332,12 @@ func (r resourceConfigurationBaseline) Read(ctx context.Context, req tfsdk.ReadR
 
 	var usedDeviceInput string
 
-	if len(state.DeviceIDs.Elems) > 0 {
+	if len(state.DeviceIDs.Elements()) > 0 {
 		usedDeviceInput = clients.DeviceIDs
-	} else if len(state.DeviceServicetags.Elems) > 0 {
+	} else if len(state.DeviceServicetags.Elements()) > 0 {
 		usedDeviceInput = clients.ServiceTags
 	}
-	baseline, err := omeClient.GetBaselineByID(state.ID.Value)
+	baseline, err := omeClient.GetBaselineByID(state.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrReadBaseline, err.Error(),
@@ -354,7 +355,7 @@ func (r resourceConfigurationBaseline) Read(ctx context.Context, req tfsdk.ReadR
 }
 
 // Update resource
-func (r resourceConfigurationBaseline) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r resourceConfigurationBaseline) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	//Get state Data
 	var state models.ConfigureBaselines
 	diags := req.State.Get(ctx, &state)
@@ -402,11 +403,11 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req tfsdk.Upd
 
 	tflog.Trace(ctx, "resource_configuration_baseline update checking the job status")
 	tflog.Debug(ctx, "resource_configuration_baseline checking job status for", map[string]interface{}{
-		"jobid": state.TaskID.Value,
+		"jobid": state.TaskID.ValueInt64(),
 	})
 
-	if state.TaskID.Value != 0 {
-		jr, err := omeClient.GetJob(state.TaskID.Value)
+	if state.TaskID.ValueInt64() != 0 {
+		jr, err := omeClient.GetJob(state.TaskID.ValueInt64())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				clients.ErrGnrUpdateBaseline,
@@ -415,7 +416,7 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req tfsdk.Upd
 			return
 		}
 		tflog.Debug(ctx, "resource_configuration_baseline update job status is", map[string]interface{}{
-			"jobid":  state.TaskID.Value,
+			"jobid":  state.TaskID.ValueInt64(),
 			"status": jr.LastRunStatus.ID,
 		})
 
@@ -430,7 +431,7 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req tfsdk.Upd
 	}
 
 	tflog.Info(ctx, "resource_configuration_baseline update Validating Template Details")
-	omeTemplate, err := validateRefTemplateDetails(plan.RefTemplateID.Value, plan.RefTemplateName.Value, omeClient)
+	omeTemplate, err := validateRefTemplateDetails(plan.RefTemplateID.ValueInt64(), plan.RefTemplateName.ValueString(), omeClient)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrUpdateBaseline,
@@ -472,7 +473,7 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req tfsdk.Upd
 		)
 		return
 	}
-	cb.ID = state.ID.Value // For update case
+	cb.ID = state.ID.ValueInt64() // For update case
 
 	tflog.Trace(ctx, "resource_configuration_baseline update Creating Baseline")
 	tflog.Debug(ctx, "resource_configuration_baseline update Creating Baseline", map[string]interface{}{
@@ -503,7 +504,7 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req tfsdk.Upd
 		"taskid":     baseline.TaskID,
 	})
 
-	isSuccess, message := omeClient.TrackJob(baseline.TaskID, plan.JobRetryCount.Value, plan.SleepInterval.Value)
+	isSuccess, message := omeClient.TrackJob(baseline.TaskID, plan.JobRetryCount.ValueInt64(), plan.SleepInterval.ValueInt64())
 	if !isSuccess {
 		resp.Diagnostics.AddWarning(
 			clients.ErrBaselineCreationTask, message,
@@ -526,7 +527,7 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req tfsdk.Upd
 }
 
 // Delete resource
-func (r resourceConfigurationBaseline) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r resourceConfigurationBaseline) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// Get State Data
 	var state models.ConfigureBaselines
 	diags := req.State.Get(ctx, &state)
@@ -555,7 +556,7 @@ func (r resourceConfigurationBaseline) Delete(ctx context.Context, req tfsdk.Del
 	}
 	defer omeClient.RemoveSession()
 
-	err = omeClient.DeleteBaseline([]int64{state.ID.Value})
+	err = omeClient.DeleteBaseline([]int64{state.ID.ValueInt64()})
 
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -567,7 +568,7 @@ func (r resourceConfigurationBaseline) Delete(ctx context.Context, req tfsdk.Del
 }
 
 // Import resource
-func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
+func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Save the import identifier in the id attribute
 	var state models.ConfigureBaselines
 	baselineName := req.ID
@@ -599,11 +600,11 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req tfsd
 	}
 	updateBaselineState(ctx, &state, &state, baseline, clients.ServiceTags, omeClient)
 	//Save into State
-	state.EmailAddresses.ElemType = types.StringType
-	state.DeviceIDs.ElemType = types.Int64Type
-	state.OutputFormat = types.String{Value: "html"}
-	state.JobRetryCount = types.Int64{Value: 30}
-	state.SleepInterval = types.Int64{Value: 20}
+	// state.EmailAddresses.ElemType = types.StringType
+	// state.DeviceIDs.ElemType = types.Int64Type
+	state.OutputFormat = types.StringValue("html")
+	state.JobRetryCount = types.Int64Value(30)
+	state.SleepInterval = types.Int64Value(20)
 
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -654,16 +655,13 @@ func validateDevicesCapablity(deviceIds []int64, deviceServiceTags []string, ome
 }
 
 func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, plan *models.ConfigureBaselines, omeBaseline models.OmeBaseline, usedDeviceInput string, omeClient *clients.Client) {
-	state.ID = types.Int64{Value: omeBaseline.ID}
-	state.RefTemplateID = types.Int64{Value: omeBaseline.TemplateID}
-	state.RefTemplateName = types.String{Value: omeBaseline.TemplateName}
-	state.Description = types.String{Value: omeBaseline.Description}
-	state.BaselineName = types.String{Value: omeBaseline.Name}
+	state.ID = types.Int64Value(omeBaseline.ID)
+	state.RefTemplateID = types.Int64Value(omeBaseline.TemplateID)
+	state.RefTemplateName = types.StringValue(omeBaseline.TemplateName)
+	state.Description = types.StringValue(omeBaseline.Description)
+	state.BaselineName = types.StringValue(omeBaseline.Name)
 
 	if usedDeviceInput == clients.ServiceTags {
-		devSTsTfsdk := types.Set{
-			ElemType: types.StringType,
-		}
 		apiDeviceIDs := map[string]models.Device{}
 		devSts := []string{}
 		deviceStVals := []attr.Value{}
@@ -676,25 +674,28 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 
 		for _, devSt := range devSts {
 			if val, ok := apiDeviceIDs[devSt]; ok {
-				deviceStVals = append(deviceStVals, types.String{Value: val.DeviceServiceTag})
+				deviceStVals = append(deviceStVals, types.StringValue(val.DeviceServiceTag))
 				delete(apiDeviceIDs, devSt)
 			}
 		}
 
 		if len(apiDeviceIDs) != 0 {
 			for _, val := range apiDeviceIDs {
-				deviceStVals = append(deviceStVals, types.String{Value: val.DeviceServiceTag})
+				deviceStVals = append(deviceStVals, types.StringValue(val.DeviceServiceTag))
 			}
 		}
 
-		devSTsTfsdk.Elems = deviceStVals
-
-		state.DeviceServicetags = devSTsTfsdk
-		state.DeviceIDs = plan.DeviceIDs
-	} else {
-		devIDsTfsdk := types.Set{
-			ElemType: types.Int64Type,
+		devSTsTfsdk, _ := types.SetValue(
+			types.StringType,
+			deviceStVals,
+		)
+		if !devSTsTfsdk.IsUnknown() {
+			state.DeviceServicetags = devSTsTfsdk
 		}
+		if !plan.DeviceIDs.IsUnknown() {
+			state.DeviceIDs = plan.DeviceIDs
+		}
+	} else {
 		apiDeviceIDs := map[int64]models.Device{}
 		devIDs := []int64{}
 		deviceIDVals := []attr.Value{}
@@ -707,65 +708,81 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 
 		for _, devID := range devIDs {
 			if val, ok := apiDeviceIDs[devID]; ok {
-				deviceIDVals = append(deviceIDVals, types.Int64{Value: val.ID})
+				deviceIDVals = append(deviceIDVals, types.Int64Value(val.ID))
 				delete(apiDeviceIDs, devID)
 			}
 		}
 
 		if len(apiDeviceIDs) != 0 {
 			for _, val := range apiDeviceIDs {
-				deviceIDVals = append(deviceIDVals, types.Int64{Value: val.ID})
+				deviceIDVals = append(deviceIDVals, types.Int64Value(val.ID))
 			}
 		}
 
-		devIDsTfsdk.Elems = deviceIDVals
-		state.DeviceIDs = devIDsTfsdk
-		state.DeviceServicetags = plan.DeviceServicetags
+		devIDsTfsdk, _ := types.SetValue(types.Int64Type, deviceIDVals)
+		if devIDsTfsdk.IsUnknown() {
+			state.DeviceIDs = devIDsTfsdk
+		}
+		if plan.DeviceServicetags.IsUnknown() {
+			state.DeviceServicetags = plan.DeviceServicetags
+		}
 	}
 
 	notificationSettings := omeBaseline.NotificationSettings
 	if notificationSettings != nil {
-		state.Schedule = types.Bool{Value: true}
-		state.OutputFormat = types.String{Value: notificationSettings.OutputFormat}
+		state.Schedule = types.BoolValue(true)
+		state.OutputFormat = types.StringValue(notificationSettings.OutputFormat)
 
 		emailAddress := []attr.Value{}
 		for _, v := range notificationSettings.EmailAddresses {
-			emailAddress = append(emailAddress, types.String{Value: v})
+			emailAddress = append(emailAddress, types.StringValue(v))
 		}
 
-		emailTfsdk := types.Set{
-			ElemType: types.StringType,
-		}
-		emailTfsdk.Elems = emailAddress
+		emailTfsdk, _ := types.SetValue(types.StringType, emailAddress)
 		state.EmailAddresses = emailTfsdk
 
 		if notificationSettings.NotificationType == "NOTIFY_ON_NON_COMPLIANCE" {
-			state.NotifyOnSchedule = types.Bool{Value: false}
+			state.NotifyOnSchedule = types.BoolValue(false)
 		} else {
-			state.NotifyOnSchedule = types.Bool{Value: true}
+			state.NotifyOnSchedule = types.BoolValue(true)
 		}
 
 		if notificationSettings.Schedule.Cron != "" {
-			state.Cron = types.String{Value: notificationSettings.Schedule.Cron}
+			state.Cron = types.StringValue(notificationSettings.Schedule.Cron)
 		} else {
 			state.Cron = plan.Cron
 		}
 	} else {
-		state.Schedule = plan.Schedule
-		state.NotifyOnSchedule = plan.NotifyOnSchedule
-		state.EmailAddresses = plan.EmailAddresses
-		state.OutputFormat = plan.OutputFormat
-		state.Cron = plan.Cron
+		if !plan.Schedule.IsUnknown() {
+			state.Schedule = plan.Schedule
+		}
+		if !plan.NotifyOnSchedule.IsUnknown() {
+			state.NotifyOnSchedule = plan.NotifyOnSchedule
+		}
+		if !plan.EmailAddresses.IsUnknown() {
+			state.EmailAddresses = plan.EmailAddresses
+		}
+		if !plan.OutputFormat.IsUnknown() {
+			state.OutputFormat = plan.OutputFormat
+		}
+		if !plan.Cron.IsUnknown() {
+			state.Cron = plan.Cron
+		}
+
 	}
-	state.TaskID = types.Int64{Value: omeBaseline.TaskID}
-	state.JobRetryCount = plan.JobRetryCount
-	state.SleepInterval = plan.SleepInterval
+	state.TaskID = types.Int64Value(omeBaseline.TaskID)
+	if !plan.JobRetryCount.IsUnknown() {
+		state.JobRetryCount = plan.JobRetryCount
+	}
+	if !plan.SleepInterval.IsUnknown() {
+		state.SleepInterval = plan.SleepInterval
+	}
 }
 
 func getPayload(ctx context.Context, plan *models.ConfigureBaselines, templateID int64, targetDevices []models.Device) (models.ConfigurationBaselinePayload, error) {
 	cbp := models.ConfigurationBaselinePayload{
-		Name:        plan.BaselineName.Value,
-		Description: plan.Description.Value,
+		Name:        plan.BaselineName.ValueString(),
+		Description: plan.Description.ValueString(),
 		TemplateID:  templateID,
 	}
 
@@ -782,8 +799,8 @@ func getPayload(ctx context.Context, plan *models.ConfigureBaselines, templateID
 	}
 	cbp.BaselineTargets = baselineTargets
 
-	if plan.Schedule.Value {
-		if len(plan.EmailAddresses.Elems) == 0 {
+	if plan.Schedule.ValueBool() {
+		if len(plan.EmailAddresses.Elements()) == 0 {
 			return models.ConfigurationBaselinePayload{}, fmt.Errorf(clients.ErrScheduleNotification)
 		}
 		var emailaddressList []string
@@ -795,12 +812,12 @@ func getPayload(ctx context.Context, plan *models.ConfigureBaselines, templateID
 			}
 		}
 
-		if plan.NotifyOnSchedule.Value && plan.Cron.Value == "" {
+		if plan.NotifyOnSchedule.ValueBool() && plan.Cron.ValueString() == "" {
 			return models.ConfigurationBaselinePayload{}, fmt.Errorf(clients.ErrInvalidCronExpression)
 		}
 
 		notificationType := "NOTIFY_ON_NON_COMPLIANCE"
-		if plan.NotifyOnSchedule.Value {
+		if plan.NotifyOnSchedule.ValueBool() {
 			notificationType = "NOTIFY_ON_SCHEDULE"
 		}
 
@@ -808,9 +825,9 @@ func getPayload(ctx context.Context, plan *models.ConfigureBaselines, templateID
 			NotificationType: notificationType,
 			EmailAddresses:   emailaddressList,
 			Schedule: models.BaselineNotificationSchedule{
-				Cron: plan.Cron.Value,
+				Cron: plan.Cron.ValueString(),
 			},
-			OutputFormat: strings.ToUpper(plan.OutputFormat.Value),
+			OutputFormat: strings.ToUpper(plan.OutputFormat.ValueString()),
 		}
 		cbp.NotificationSettings = &notificationSettings
 	}
@@ -850,12 +867,12 @@ func getValidTargetDevices(omeClient *clients.Client, serviceTags []string, devI
 }
 
 func validateNotification(plan models.ConfigureBaselines) error {
-	if !plan.Schedule.Value {
-		if !plan.Cron.Null || !plan.EmailAddresses.Null {
+	if !plan.Schedule.ValueBool() {
+		if !plan.Cron.IsNull() || !plan.EmailAddresses.IsNull() {
 			return fmt.Errorf(clients.ErrBaseLineScheduleValid)
 		}
 	} else {
-		if !plan.NotifyOnSchedule.Value && !plan.Cron.Null {
+		if !plan.NotifyOnSchedule.ValueBool() && !plan.Cron.IsNull() {
 			return fmt.Errorf(clients.ErrBaseLineNotifyValid)
 		}
 	}

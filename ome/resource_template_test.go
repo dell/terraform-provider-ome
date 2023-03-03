@@ -67,13 +67,13 @@ func init() {
 }
 
 func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
-	if skipTest() {
-		t.Skip(SkipTestMsg)
-	}
+	// if skipTest() {
+	// 	t.Skip(SkipTestMsg)
+	// }
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCreateTemplateSuccess,
@@ -126,7 +126,7 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCreateTemplateForClone,
@@ -166,7 +166,7 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccCreateTemplateInvalidSvcTag,
@@ -239,7 +239,7 @@ func TestTemplateImport_ImportTemplates(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config:            testAccImportTemplateError,
@@ -270,7 +270,7 @@ func TestTemplateCreation_CreateImportTemplate(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCreateImportTemplateSuccess,

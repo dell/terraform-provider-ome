@@ -6,8 +6,7 @@ import (
 	"strings"
 	"terraform-provider-ome/clients"
 
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 type outputFormatValidator struct {
@@ -24,26 +23,21 @@ func (o outputFormatValidator) MarkdownDescription(ctx context.Context) string {
 }
 
 // Validate runs the main validation logic of the validator, reading configuration data out of `req` and updating `resp` with diagnostics.
-func (o outputFormatValidator) Validate(ctx context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
-	var outputFormat types.String
-	diags := tfsdk.ValueAs(ctx, req.AttributeConfig, &outputFormat)
-	resp.Diagnostics.Append(diags...)
-	if diags.HasError() {
-		return
-	}
+func (o outputFormatValidator) ValidateString(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	outputFormat := req.ConfigValue
 
-	if outputFormat.Unknown || outputFormat.Null {
+	if outputFormat.IsUnknown() || outputFormat.IsNull() {
 		return
 	}
 
 	validOutputFormatTypes := strings.Split(clients.ValidOutputFormat, ",")
 	for _, validOutputFormat := range validOutputFormatTypes {
-		if outputFormat.Value == validOutputFormat {
+		if outputFormat.ValueString() == validOutputFormat {
 			return
 		}
 	}
 	resp.Diagnostics.AddAttributeError(
-		req.AttributePath,
+		req.Path,
 		clients.ErrInvalidTemplateViewType,
 		fmt.Sprintf("Allowed values are one of  :  %s", clients.ValidOutputFormat),
 	)

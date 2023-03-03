@@ -71,7 +71,7 @@ func TestCreateBaseline_TestValidations(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{ // Step 1
 				Config:      testCreateBaselineFailureWithBothTemplateIDName,
@@ -302,7 +302,7 @@ func TestCreateBaseline_BaselineWithDeviceID(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testConfigureBaselinewithDeviceID,
@@ -414,7 +414,7 @@ func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testConfigureBaselineWithSchedule,
@@ -530,7 +530,7 @@ func TestCreateBaseline_CreateBaselineWithScheduleNonCompliant(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testConfigureBaselineScheduleNonCompliant,

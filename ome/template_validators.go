@@ -6,13 +6,12 @@ import (
 	"strings"
 	"terraform-provider-ome/clients"
 
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
-var _ tfsdk.AttributeValidator = &validFqddsValidator{}
-var _ tfsdk.AttributeValidator = &validTemplateViewTypeValidator{}
-var _ tfsdk.AttributeValidator = &validTemplateDeviceTypeValidator{}
+var _ validator.String = &validFqddsValidator{}
+var _ validator.String = &validTemplateViewTypeValidator{}
+var _ validator.String = &validTemplateDeviceTypeValidator{}
 
 type validFqddsValidator struct {
 }
@@ -28,18 +27,12 @@ func (v validFqddsValidator) MarkdownDescription(ctx context.Context) string {
 }
 
 // Validate runs the main validation logic of the validator, reading configuration data out of `req` and updating `resp` with diagnostics.
-func (v validFqddsValidator) Validate(ctx context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
-	var fqdds types.String
-	diags := tfsdk.ValueAs(ctx, req.AttributeConfig, &fqdds)
-	resp.Diagnostics.Append(diags...)
-	if diags.HasError() {
+func (v validFqddsValidator) ValidateString(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	fqdds := req.ConfigValue
+	if fqdds.IsUnknown() || fqdds.IsNull() {
 		return
 	}
-
-	if fqdds.Unknown || fqdds.Null {
-		return
-	}
-	inputFqdds := fqdds.Value
+	inputFqdds := fqdds.ValueString()
 	multipleInputFqdds := strings.Split(inputFqdds, ",")
 	multipleValidFqdds := strings.Split(clients.ValidFQDDS, ",")
 	isValid := false
@@ -55,7 +48,7 @@ func (v validFqddsValidator) Validate(ctx context.Context, req tfsdk.ValidateAtt
 		}
 		if !isValid {
 			resp.Diagnostics.AddAttributeError(
-				req.AttributePath,
+				req.Path,
 				clients.ErrInvalidFqdds,
 				v.Description(ctx),
 			)
@@ -79,26 +72,20 @@ func (v validTemplateViewTypeValidator) MarkdownDescription(ctx context.Context)
 }
 
 // Validate runs the main validation logic of the validator, reading configuration data out of `req` and updating `resp` with diagnostics.
-func (v validTemplateViewTypeValidator) Validate(ctx context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
-	var templateViewType types.String
-	diags := tfsdk.ValueAs(ctx, req.AttributeConfig, &templateViewType)
-	resp.Diagnostics.Append(diags...)
-	if diags.HasError() {
-		return
-	}
-
-	if templateViewType.Unknown || templateViewType.Null {
+func (v validTemplateViewTypeValidator) ValidateString(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	templateViewType := req.ConfigValue
+	if templateViewType.IsUnknown() || templateViewType.IsNull() {
 		return
 	}
 
 	validTemplateViewTypes := strings.Split(clients.ValidTemplateViewTypes, ",")
 	for _, validTemplateViewType := range validTemplateViewTypes {
-		if strings.EqualFold(strings.TrimSpace(templateViewType.Value), validTemplateViewType) {
+		if strings.EqualFold(strings.TrimSpace(templateViewType.ValueString()), validTemplateViewType) {
 			return
 		}
 	}
 	resp.Diagnostics.AddAttributeError(
-		req.AttributePath,
+		req.Path,
 		clients.ErrInvalidTemplateViewType,
 		v.Description(ctx),
 	)
@@ -118,26 +105,20 @@ func (v validTemplateDeviceTypeValidator) MarkdownDescription(ctx context.Contex
 }
 
 // Validate runs the main validation logic of the validator, reading configuration data out of `req` and updating `resp` with diagnostics.
-func (v validTemplateDeviceTypeValidator) Validate(ctx context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
-	var templateDeviceType types.String
-	diags := tfsdk.ValueAs(ctx, req.AttributeConfig, &templateDeviceType)
-	resp.Diagnostics.Append(diags...)
-	if diags.HasError() {
-		return
-	}
-
-	if templateDeviceType.Unknown || templateDeviceType.Null {
+func (v validTemplateDeviceTypeValidator) ValidateString(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	templateDeviceType := req.ConfigValue
+	if templateDeviceType.IsUnknown() || templateDeviceType.IsNull() {
 		return
 	}
 
 	validTemplateDeviceTypes := strings.Split(clients.ValidTemplateDeviceTypes, ",")
 	for _, validTemplateDeviceType := range validTemplateDeviceTypes {
-		if strings.EqualFold(strings.TrimSpace(templateDeviceType.Value), validTemplateDeviceType) {
+		if strings.EqualFold(strings.TrimSpace(templateDeviceType.ValueString()), validTemplateDeviceType) {
 			return
 		}
 	}
 	resp.Diagnostics.AddAttributeError(
-		req.AttributePath,
+		req.Path,
 		clients.ErrInvalidTemplateViewType,
 		v.Description(ctx),
 	)
