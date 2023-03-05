@@ -46,7 +46,15 @@ uninstall:
 	find examples -type f -name "*.hcl" -delete
 	find examples -type f -name "*.backup" -delete
 	rm -rf trace.*
+unit_test:
+	echo "Running unit tests"
+	go test -v ./clients -cover -timeout 60m
 
+integration_test:
+	echo "Running integration test"
+	TF_ACC=1 go test -v ./ome -timeout 5h -cover
+
+combine_test: unit_test integration_test
 
 test: check
 	go test -i $(TEST) || exit 1                                                   
@@ -70,3 +78,6 @@ cover:
 	rm -f coverage.*
 	go test -coverprofile=coverage.out ./...
 	go tool cover -html coverage.out -o coverage.html
+
+sweep :
+	go test -v ./ome -timeout 5h -sweep=all

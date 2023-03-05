@@ -48,7 +48,7 @@ var testgroupDeviceDS = `
 
 	data "ome_groupdevices_info" "gd" {
 		id = "0"
-		device_group_names = ["TERRAFORM_ACC_GROUP"]
+		device_group_names = ["test_device_group"]
 	}
 `
 var testgroupDeviceDSInvalidGroup = `

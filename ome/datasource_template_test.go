@@ -19,9 +19,9 @@ func TestDataSource_ReadTemplate(t *testing.T) {
 			{
 				Config: testReadTemplate,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.ome_template_info.template", "name", TestAccTemplateName),
-					resource.TestCheckResourceAttr("data.ome_template_info.template", "view_type_id", "2"),
-					resource.TestCheckResourceAttr("data.ome_template_info.template", "refdevice_id", "12152"),
+					resource.TestCheckResourceAttr("data.ome_template_info.template", "name", TestRefTemplateName),
+					resource.TestCheckResourceAttr("data.ome_template_info.template", "view_type_id", "1"),
+					resource.TestCheckResourceAttr("data.ome_template_info.template", "refdevice_id", "10112"),
 					resource.TestCheckResourceAttr("data.ome_template_info.template", "description", ""),
 				),
 			},

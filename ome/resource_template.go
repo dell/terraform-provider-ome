@@ -480,12 +480,24 @@ func (r *resourceTemplate) Create(ctx context.Context, req resource.CreateReques
 	if !plan.Content.IsUnknown() {
 		template.Content = plan.Content
 	}
-	template.ViewType = plan.ViewType
-	template.DeviceType = plan.DeviceType
-	template.FQDDS = plan.FQDDS // The default value of fqdds is set to `All`. So if the config doesn't have any value specified, the default value in the plan is `All`.
-	template.JobRetryCount = plan.JobRetryCount
-	template.SleepInterval = plan.SleepInterval
-	template.IdentityPoolName = plan.IdentityPoolName
+	if !plan.ViewType.IsUnknown() {
+		template.ViewType = plan.ViewType
+	}
+	if !plan.DeviceType.IsUnknown() {
+		template.DeviceType = plan.DeviceType
+	}
+	if !plan.FQDDS.IsUnknown() {
+		template.FQDDS = plan.FQDDS
+	} // The default value of fqdds is set to `All`. So if the config doesn't have any value specified, the default value in the plan is `All`.
+	if !plan.JobRetryCount.IsUnknown() {
+		template.JobRetryCount = plan.JobRetryCount
+	}
+	if !plan.SleepInterval.IsUnknown() {
+		template.SleepInterval = plan.SleepInterval
+	}
+	if !plan.IdentityPoolName.IsUnknown() {
+		template.IdentityPoolName = plan.IdentityPoolName
+	}
 
 	tflog.Trace(ctx, "resource_template create: started updating state")
 
