@@ -600,6 +600,12 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req reso
 	}
 	updateBaselineState(ctx, &state, &state, baseline, clients.ServiceTags, omeClient)
 	//Save into State
+	if len(state.EmailAddresses.Elements()) == 0 {
+		state.EmailAddresses, _ = types.SetValue(types.StringType, nil)
+	}
+	if len(state.DeviceIDs.Elements()) == 0 {
+		state.DeviceIDs, _ = types.SetValue(types.Int64Type, nil)
+	}
 	// state.EmailAddresses.ElemType = types.StringType
 	// state.DeviceIDs.ElemType = types.Int64Type
 	state.OutputFormat = types.StringValue("html")
@@ -670,7 +676,9 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 			apiDeviceIDs[device.DeviceServiceTag] = device
 		}
 
-		plan.DeviceServicetags.ElementsAs(ctx, &devSts, true)
+		if len(plan.DeviceServicetags.Elements()) > 0 {
+			plan.DeviceServicetags.ElementsAs(ctx, &devSts, true)
+		}
 
 		for _, devSt := range devSts {
 			if val, ok := apiDeviceIDs[devSt]; ok {
