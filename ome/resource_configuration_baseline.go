@@ -9,6 +9,7 @@ import (
 	"terraform-provider-ome/models"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -130,7 +131,7 @@ func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.Sche
 					StringDefaultValue(types.StringValue("html")),
 				},
 				Validators: []validator.String{
-					outputFormatValidator{},
+					stringvalidator.OneOf(strings.Split(clients.ValidOutputFormat, ",")...),
 				},
 			},
 			"cron": schema.StringAttribute{

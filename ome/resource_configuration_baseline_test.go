@@ -107,11 +107,11 @@ func TestCreateBaseline_TestValidations(t *testing.T) {
 			},
 			{ // Step 9
 				Config:      testCreateBaselineValidationInvalidOutputFormatCase,
-				ExpectError: regexp.MustCompile(fmt.Sprintf("Allowed values are one of  :  %s", clients.ValidOutputFormat)),
+				ExpectError: regexp.MustCompile("Invalid Attribute Value Match"),
 			},
 			{ // Step 10
 				Config:      testCreateBaselineValidationInvalidOutputFormat,
-				ExpectError: regexp.MustCompile(fmt.Sprintf("Allowed values are one of  :  %s", clients.ValidOutputFormat)),
+				ExpectError: regexp.MustCompile("Invalid Attribute Value Match"),
 			},
 			{ // Step 11
 				Config:      testCreateBaselineValidationDeviceCapable,
