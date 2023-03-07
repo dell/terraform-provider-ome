@@ -43,6 +43,7 @@ type resourceConfigurationBaseline struct {
 // Configure implements resource.ResourceWithConfigure
 func (r *resourceConfigurationBaseline) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
+		resp.Diagnostics.AddError("Missing Provider Data","Provide all the required provider config.")
 		return
 	}
 	r.p = req.ProviderData.(*omeProvider)

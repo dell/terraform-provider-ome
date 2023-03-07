@@ -27,6 +27,7 @@ type vlanNetowrksDataSource struct {
 // Configure implements datasource.DataSourceWithConfigure
 func (g *vlanNetowrksDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
+		resp.Diagnostics.AddError("Missing Provider Data","Provide all the required provider config.")
 		return
 	}
 	g.p = req.ProviderData.(*omeProvider)
