@@ -10,9 +10,9 @@ import (
 )
 
 //go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --rendered-website-dir docs
-var (
-	version string = "dev"
-)
+// var (
+// 	version string = "dev"
+// )
 
 func main() {
 	var debug bool
