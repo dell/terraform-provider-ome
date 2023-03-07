@@ -62,7 +62,6 @@ type resourceTemplate struct {
 func (r *resourceTemplate) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// panic("unimplemented")
 	if req.ProviderData == nil {
-		resp.Diagnostics.AddError("Missing Provider Data","Provide all the required provider config.")
 		return
 	}
 	r.p = req.ProviderData.(*omeProvider)

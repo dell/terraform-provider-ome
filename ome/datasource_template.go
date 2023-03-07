@@ -30,7 +30,6 @@ type templateDataSource struct {
 // Configure implements datasource.DataSourceWithConfigure
 func (t *templateDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
-		resp.Diagnostics.AddError("Missing Provider Data","Provide all the required provider config.")
 		return
 	}
 	t.p = req.ProviderData.(*omeProvider)
