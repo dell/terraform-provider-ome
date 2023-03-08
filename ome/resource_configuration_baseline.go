@@ -11,6 +11,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -599,7 +600,11 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req reso
 		resp.Diagnostics.AddError(clients.ErrImportDeployment, err.Error())
 		return
 	}
-	updateBaselineState(ctx, &state, &state, baseline, clients.ServiceTags, omeClient)
+	dia := updateBaselineState(ctx, &state, &state, baseline, clients.ServiceTags, omeClient)
+	resp.Diagnostics.Append(dia...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 	//Save into State
 	if len(state.EmailAddresses.Elements()) == 0 {
 		state.EmailAddresses, _ = types.SetValue(types.StringType, nil)
@@ -607,8 +612,6 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req reso
 	if len(state.DeviceIDs.Elements()) == 0 {
 		state.DeviceIDs, _ = types.SetValue(types.Int64Type, nil)
 	}
-	// state.EmailAddresses.ElemType = types.StringType
-	// state.DeviceIDs.ElemType = types.Int64Type
 	state.OutputFormat = types.StringValue("html")
 	state.JobRetryCount = types.Int64Value(30)
 	state.SleepInterval = types.Int64Value(20)
@@ -661,7 +664,7 @@ func validateDevicesCapablity(deviceIds []int64, deviceServiceTags []string, ome
 	return devices, nil
 }
 
-func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, plan *models.ConfigureBaselines, omeBaseline models.OmeBaseline, usedDeviceInput string, omeClient *clients.Client) {
+func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, plan *models.ConfigureBaselines, omeBaseline models.OmeBaseline, usedDeviceInput string, omeClient *clients.Client) (dia diag.Diagnostics) {
 	state.ID = types.Int64Value(omeBaseline.ID)
 	state.RefTemplateID = types.Int64Value(omeBaseline.TemplateID)
 	state.RefTemplateName = types.StringValue(omeBaseline.TemplateName)
@@ -698,12 +701,8 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 			types.StringType,
 			deviceStVals,
 		)
-		if !devSTsTfsdk.IsUnknown() {
-			state.DeviceServicetags = devSTsTfsdk
-		}
-		if !plan.DeviceIDs.IsUnknown() {
-			state.DeviceIDs = plan.DeviceIDs
-		}
+		state.DeviceServicetags = devSTsTfsdk
+		state.DeviceIDs = plan.DeviceIDs
 	} else {
 		apiDeviceIDs := map[int64]models.Device{}
 		devIDs := []int64{}
@@ -729,12 +728,8 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 		}
 
 		devIDsTfsdk, _ := types.SetValue(types.Int64Type, deviceIDVals)
-		if devIDsTfsdk.IsUnknown() {
-			state.DeviceIDs = devIDsTfsdk
-		}
-		if plan.DeviceServicetags.IsUnknown() {
-			state.DeviceServicetags = plan.DeviceServicetags
-		}
+		state.DeviceIDs = devIDsTfsdk
+		state.DeviceServicetags = plan.DeviceServicetags
 	}
 
 	notificationSettings := omeBaseline.NotificationSettings
@@ -747,7 +742,8 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 			emailAddress = append(emailAddress, types.StringValue(v))
 		}
 
-		emailTfsdk, _ := types.SetValue(types.StringType, emailAddress)
+		emailTfsdk, emailerror := types.SetValue(types.StringType, emailAddress)
+		dia.Append(emailerror...)
 		state.EmailAddresses = emailTfsdk
 
 		if notificationSettings.NotificationType == "NOTIFY_ON_NON_COMPLIANCE" {
@@ -762,30 +758,17 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 			state.Cron = plan.Cron
 		}
 	} else {
-		if !plan.Schedule.IsUnknown() {
-			state.Schedule = plan.Schedule
-		}
-		if !plan.NotifyOnSchedule.IsUnknown() {
-			state.NotifyOnSchedule = plan.NotifyOnSchedule
-		}
-		if !plan.EmailAddresses.IsUnknown() {
-			state.EmailAddresses = plan.EmailAddresses
-		}
-		if !plan.OutputFormat.IsUnknown() {
-			state.OutputFormat = plan.OutputFormat
-		}
-		if !plan.Cron.IsUnknown() {
-			state.Cron = plan.Cron
-		}
+		state.Schedule = plan.Schedule
+		state.NotifyOnSchedule = plan.NotifyOnSchedule
+		state.EmailAddresses = plan.EmailAddresses
+		state.OutputFormat = plan.OutputFormat
+		state.Cron = plan.Cron
 
 	}
 	state.TaskID = types.Int64Value(omeBaseline.TaskID)
-	if !plan.JobRetryCount.IsUnknown() {
-		state.JobRetryCount = plan.JobRetryCount
-	}
-	if !plan.SleepInterval.IsUnknown() {
-		state.SleepInterval = plan.SleepInterval
-	}
+	state.JobRetryCount = plan.JobRetryCount
+	state.SleepInterval = plan.SleepInterval
+	return
 }
 
 func getPayload(ctx context.Context, plan *models.ConfigureBaselines, templateID int64, targetDevices []models.Device) (models.ConfigurationBaselinePayload, error) {

@@ -135,18 +135,15 @@ func (g *groupDevicesDatasource) Read(ctx context.Context, req datasource.ReadRe
 		devIDs,
 	)
 
-	if !devIDsTfsdk.IsUnknown() {
-		groupDevices.DeviceIDs = devIDsTfsdk
-	}
+	groupDevices.DeviceIDs = devIDsTfsdk
 
 	devSTsTfsdk, _ := types.ListValue(
 		types.StringType,
 		devSvcTags,
 	)
 
-	if !devSTsTfsdk.IsUnknown() {
-		groupDevices.DeviceServicetags = devSTsTfsdk
-	}
+	groupDevices.DeviceServicetags = devSTsTfsdk
+
 	diags = resp.State.Set(ctx, &groupDevices)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {

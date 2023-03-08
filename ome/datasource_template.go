@@ -248,9 +248,7 @@ func updateDataSourceState(template *models.TemplateDataSource, omeTemplateData 
 		attributeObjects,
 	)
 
-	if attributesTfsdk.IsUnknown() {
-		template.Attributes = attributesTfsdk
-	}
+	template.Attributes = attributesTfsdk
 
 	var vlanTfsdk types.Object
 	vlanAttrsObjects := []attr.Value{}
@@ -324,7 +322,5 @@ func updateDataSourceState(template *models.TemplateDataSource, omeTemplateData 
 		},
 	)
 
-	if vlanTfsdk.IsUnknown() {
-		template.Vlan = vlanTfsdk
-	}
+	template.Vlan = vlanTfsdk
 }

@@ -11,21 +11,21 @@ import (
 )
 
 var (
-	_ datasource.DataSource              = &vlanNetowrksDataSource{}
-	_ datasource.DataSourceWithConfigure = &vlanNetowrksDataSource{}
+	_ datasource.DataSource              = &vlanNetworksDataSource{}
+	_ datasource.DataSourceWithConfigure = &vlanNetworksDataSource{}
 )
 
 // NewVlanNetworkDataSource is a new datasource for VlanNetwork
 func NewVlanNetworkDataSource() datasource.DataSource {
-	return &vlanNetowrksDataSource{}
+	return &vlanNetworksDataSource{}
 }
 
-type vlanNetowrksDataSource struct {
+type vlanNetworksDataSource struct {
 	p *omeProvider
 }
 
 // Configure implements datasource.DataSourceWithConfigure
-func (g *vlanNetowrksDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (g *vlanNetworksDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -33,11 +33,11 @@ func (g *vlanNetowrksDataSource) Configure(ctx context.Context, req datasource.C
 }
 
 // Metadata implements datasource.DataSource
-func (*vlanNetowrksDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (*vlanNetworksDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "vlannetworks_info"
 }
 
-func (g vlanNetowrksDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (g vlanNetworksDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Data source to list the vlan networks from OpenManage Enterprise.",
 		Attributes: map[string]schema.Attribute{
@@ -45,7 +45,7 @@ func (g vlanNetowrksDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 				MarkdownDescription: "ID for data source.",
 				Description:         "ID for data source.",
 				Computed:            true,
-				Optional:            true,
+				// Optional:            true,
 			},
 			"vlan_networks": schema.ListNestedAttribute{
 				MarkdownDescription: "List of vlan networks",
@@ -96,8 +96,9 @@ func (g vlanNetowrksDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 }
 
 // Read resource information
-func (g vlanNetowrksDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (g vlanNetworksDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var state models.VLanNetworksTypeTfsdk
+	state.ID = types.StringValue("0")
 
 	omeClient, err := clients.NewClient(*g.p.clientOpt)
 	if err != nil {

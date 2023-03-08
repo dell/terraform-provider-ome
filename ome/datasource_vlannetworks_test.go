@@ -34,6 +34,5 @@ var testVlanNetworks = `
 	}
 
 	data "ome_vlannetworks_info" "vlans" {
-		id = "0"
 	}
 `

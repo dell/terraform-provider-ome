@@ -160,12 +160,8 @@ func (g *configurationReportDataSource) Read(ctx context.Context, req datasource
 			)
 			return
 		}
-		if !config.BaseLineName.IsUnknown() {
-			state.BaseLineName = config.BaseLineName
-		}
-		if !config.ID.IsUnknown() {
-			state.ID = config.BaseLineName
-		}
+		state.BaseLineName = config.BaseLineName
+		state.ID = config.BaseLineName
 
 		for _, cr := range complianceReports {
 			compStatus := "Compliant"
