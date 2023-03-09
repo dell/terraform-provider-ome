@@ -79,13 +79,13 @@ func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, r
 		Version:             1,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Id of the template.",
-				Description:         "Template ID",
+				MarkdownDescription: "ID of the template resource.",
+				Description:         "ID of the template resource.",
 				Computed:            true,
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Name of the template.",
-				Description:         "Name of the template.",
+				MarkdownDescription: "Name of the template resource.",
+				Description:         "Name of the template resource.",
 				Required:            true,
 			},
 			"fqdds": schema.StringAttribute{

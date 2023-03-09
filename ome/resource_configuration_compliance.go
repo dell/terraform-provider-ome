@@ -62,8 +62,8 @@ func (r resourceConfigurationCompliance) Schema(_ context.Context, _ resource.Sc
 		MarkdownDescription: "Resource for managing configuration baselines remediation. Updates are supported for the following parameters: `target_devices`, `job_retry_count`, `sleep_interval`, `run_later`, `cron`.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "ID of the resource.",
-				Description:         "ID of the resource.",
+				MarkdownDescription: "ID of the configuration compliance resource.",
+				Description:         "ID of the configuration compliance resource.",
 				Computed:            true,
 			},
 			"baseline_name": schema.StringAttribute{

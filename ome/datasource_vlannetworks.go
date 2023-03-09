@@ -42,8 +42,8 @@ func (g vlanNetworksDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 		MarkdownDescription: "Data source to list the vlan networks from OpenManage Enterprise.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "ID for data source.",
-				Description:         "ID for data source.",
+				MarkdownDescription: "ID for vlan networks data source.",
+				Description:         "ID for vlan networks data source.",
 				Computed:            true,
 				// Optional:            true,
 			},

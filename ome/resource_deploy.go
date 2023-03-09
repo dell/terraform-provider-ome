@@ -56,8 +56,8 @@ func (r resourceDeployment) Schema(_ context.Context, _ resource.SchemaRequest, 
 		Version:             1,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "ID of the resource.",
-				Description:         "ID of the resource.",
+				MarkdownDescription: "ID of the deploy resource.",
+				Description:         "ID of the deploy resource.",
 				Computed:            true,
 			},
 			"template_id": schema.Int64Attribute{

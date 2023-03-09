@@ -43,8 +43,8 @@ func (*configurationReportDataSource) Schema(ctx context.Context, req datasource
 		Attributes: map[string]schema.Attribute{
 
 			"id": schema.StringAttribute{
-				MarkdownDescription: "ID for data source.",
-				Description:         "ID for data source.",
+				MarkdownDescription: "ID for baseline compliance data source.",
+				Description:         "ID for baseline compliance data source.",
 				Computed:            true,
 				Optional:            true,
 			},
@@ -60,8 +60,8 @@ func (*configurationReportDataSource) Schema(ctx context.Context, req datasource
 				Optional:            true,
 			},
 			"compliance_report_device": schema.ListNestedAttribute{
-				MarkdownDescription: "Device complaince report.",
-				Description:         "Device complaince report.",
+				MarkdownDescription: "Device compliance report.",
+				Description:         "Device compliance report.",
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{

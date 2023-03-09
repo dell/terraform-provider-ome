@@ -31,7 +31,7 @@ data "ome_template_info" "data-template-1" {
 - `attributes` (List of Object) List of attributes associated with template. (see [below for nested schema](#nestedatt--attributes))
 - `content` (String) The XML content of template from which the template will be created
 - `description` (String) Description for the template.
-- `id` (String) Id of the template.
+- `id` (String) ID of the template data source.
 - `refdevice_id` (Number) Target device id from which the template is created.
 - `vlan` (Object) VLAN details to be attached with template. (see [below for nested schema](#nestedatt--vlan))
 

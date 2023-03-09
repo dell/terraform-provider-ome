@@ -60,8 +60,8 @@ func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.Sche
 		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for all the parameters. When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				MarkdownDescription: "ID of the resource.",
-				Description:         "ID of the resource.",
+				MarkdownDescription: "ID of the configuration baseline resource.",
+				Description:         "ID of the configuration baseline resource.",
 				Computed:            true,
 			},
 			"ref_template_id": schema.Int64Attribute{

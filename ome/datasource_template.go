@@ -45,8 +45,8 @@ func (t templateDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 		MarkdownDescription: "Data Source to list the Template details from OpenManage Enterprise",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Id of the template.",
-				Description:         "Id of the template.",
+				MarkdownDescription: "ID of the template data source.",
+				Description:         "ID of the template data source.",
 				Computed:            true,
 				Optional:            true,
 			},

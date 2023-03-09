@@ -23,7 +23,7 @@ data "ome_vlannetworks_info" "data-vlans" {
 
 ### Read-Only
 
-- `id` (String) ID for data source.
+- `id` (String) ID for vlan networks data source.
 - `vlan_networks` (Attributes List) List of vlan networks (see [below for nested schema](#nestedatt--vlan_networks))
 
 <a id="nestedatt--vlan_networks"></a>

@@ -45,8 +45,8 @@ func (*groupDevicesDatasource) Schema(ctx context.Context, req datasource.Schema
 		Attributes: map[string]schema.Attribute{
 
 			"id": schema.StringAttribute{
-				MarkdownDescription: "ID for data source.",
-				Description:         "ID for data source.",
+				MarkdownDescription: "ID for group devices data source.",
+				Description:         "ID for group devices data source.",
 				Computed:            true,
 				Optional:            true,
 			},
