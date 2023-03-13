@@ -67,9 +67,6 @@ func init() {
 }
 
 func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
-	// if skipTest() {
-	// 	t.Skip(SkipTestMsg)
-	// }
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -120,9 +117,6 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 
 // The identity pool and Vlans does not get cloned into the new template in OME.
 func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
-	// if skipTest() {
-	// 	t.Skip(SkipTestMsg)
-	// }
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -160,9 +154,6 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
-	// if skipTest() {
-	// 	t.Skip(SkipTestMsg)
-	// }
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -225,9 +216,6 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 }
 
 func TestTemplateImport_ImportTemplates(t *testing.T) {
-	// if skipTest() {
-	// 	t.Skip(SkipTestMsg)
-	// }
 	assertTFImportState := func(s []*terraform.InstanceState) error {
 		assert.NotEmpty(t, s[0].Attributes["attributes.12.display_name"])
 		assert.NotEmpty(t, s[0].Attributes["vlan.bonding_technology"])
@@ -264,10 +252,6 @@ func TestTemplateImport_ImportTemplates(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateImportTemplate(t *testing.T) {
-	// if skipTest() {
-	// 	t.Skip(SkipTestMsg)
-	// }
-
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
