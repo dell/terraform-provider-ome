@@ -965,23 +965,16 @@ func updateDeploymentState(stateTemplateDeployment, planTemplateDeployment *mode
 			types.StringType,
 			filteredDevSTList,
 		)
-		if !devSTsTfsdk.IsUnknown() {
-			stateTemplateDeployment.DeviceServicetags = devSTsTfsdk
-		}
-		if planTemplateDeployment.DeviceIDs.IsUnknown() {
-			stateTemplateDeployment.DeviceIDs = planTemplateDeployment.DeviceIDs
-		}
+		stateTemplateDeployment.DeviceServicetags = devSTsTfsdk
+		stateTemplateDeployment.DeviceIDs = types.SetNull(types.Int64Type)
+		//planTemplateDeployment.DeviceIDs
 	case clients.DeviceIDs:
 		devIDsTfsdk, _ := types.SetValue(
 			types.Int64Type,
 			filteredDevIDList,
 		)
-		if !devIDsTfsdk.IsUnknown() {
-			stateTemplateDeployment.DeviceIDs = devIDsTfsdk
-		}
-		if !planTemplateDeployment.DeviceServicetags.IsUnknown() {
-			stateTemplateDeployment.DeviceServicetags = planTemplateDeployment.DeviceServicetags
-		}
+		stateTemplateDeployment.DeviceIDs = devIDsTfsdk
+		stateTemplateDeployment.DeviceServicetags = types.SetNull(types.StringType)
 	}
 	if !planTemplateDeployment.BootToNetworkISO.IsUnknown() {
 		stateTemplateDeployment.BootToNetworkISO = planTemplateDeployment.BootToNetworkISO

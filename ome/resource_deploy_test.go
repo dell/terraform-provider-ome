@@ -305,6 +305,12 @@ var testUpdateTemplateDeployWithInvalidTemplate = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestAccTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "System"
+	}
+
 	resource "ome_deployment" "deploy-template-3" {
 		template_name = "invalid_template_name"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
@@ -326,7 +332,7 @@ var testTemplateDeploymentSuccess = `
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
-		template_name = "` + TestAccTemplateName + `"
+		template_name = resource.ome_template.terraform-acceptance-test-1.name
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
 		depends_on = [
 			"ome_template.terraform-acceptance-test-1"
@@ -349,7 +355,7 @@ var testTemplateUpdateDeploymentSuccess = `
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
-		template_name = "` + TestAccTemplateName + `"
+		template_name = resource.ome_template.terraform-acceptance-test-1.name
 		device_servicetags = ["` + DeviceSvcTag2 + `"]
 	}
 `
@@ -369,7 +375,7 @@ var testTemplateDeploymentbootToNetworkISOSuccess = `
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
-		template_name = "` + TestAccTemplateName + `"
+		template_name = resource.ome_template.terraform-acceptance-test-1.name
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
 		power_state_off = true 
 		forced_shutdown = true
@@ -421,7 +427,7 @@ var testTemplateDeploymentSuccessWithSchedule = `
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
-		template_name = "` + TestAccTemplateName + `"
+		template_name = resource.ome_template.terraform-acceptance-test-1.name
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
 		run_later = true
 		cron = "0 00 11 14 02 ? 2032"
@@ -490,7 +496,7 @@ var testTemplateUpdateDeploymentWithScheduleSuccess = `
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
-		template_name = "` + TestAccTemplateName + `"
+		template_name = resource.ome_template.terraform-acceptance-test-1.name
 		device_servicetags = ["` + DeviceSvcTag2 + `"]
 		run_later = true
 		cron = "0 00 11 14 02 ? 2032"
