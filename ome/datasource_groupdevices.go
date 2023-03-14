@@ -6,69 +6,76 @@ import (
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-type groupDevicesDataSourceType struct{}
+var (
+	_ datasource.DataSource              = &groupDevicesDatasource{}
+	_ datasource.DataSourceWithConfigure = &groupDevicesDatasource{}
+)
 
-func (t groupDevicesDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+// NewGroupDevicesDatasource is new datasource for group devices
+func NewGroupDevicesDatasource() datasource.DataSource {
+	return &groupDevicesDatasource{}
+}
+
+type groupDevicesDatasource struct {
+	p *omeProvider
+}
+
+// Configure implements datasource.DataSourceWithConfigure
+func (g *groupDevicesDatasource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+	g.p = req.ProviderData.(*omeProvider)
+}
+
+// Metadata implements datasource.DataSource
+func (*groupDevicesDatasource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "groupdevices_info"
+}
+
+// Schema implements datasource.DataSource
+func (*groupDevicesDatasource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "Data source to list the devices in the group from OpenManage Enterprise.",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 
-			"id": {
-				MarkdownDescription: "ID for data source.",
-				Description:         "ID for data source.",
-				Type:                types.StringType,
+			"id": schema.StringAttribute{
+				MarkdownDescription: "ID for group devices data source.",
+				Description:         "ID for group devices data source.",
 				Computed:            true,
 				Optional:            true,
 			},
 
-			"device_ids": {
+			"device_ids": schema.ListAttribute{
 				MarkdownDescription: "List of the device id(s) associated with a group",
 				Description:         "List of the device id(s) associated with a group",
-				Type: types.ListType{
-					ElemType: types.Int64Type,
-				},
-				Computed: true,
+				ElementType:         types.Int64Type,
+				Computed:            true,
 			},
 
-			"device_servicetags": {
+			"device_servicetags": schema.ListAttribute{
 				MarkdownDescription: "List of the device servicetags associated with a group",
 				Description:         "List of the device servicetags associated with a group",
-				Type: types.ListType{
-					ElemType: types.StringType,
-				},
-				Computed: true,
+				ElementType:         types.StringType,
+				Computed:            true,
 			},
-			"device_group_names": {
+			"device_group_names": schema.SetAttribute{
 				MarkdownDescription: "List of the device group names.",
 				Description:         "List of the device group names.",
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
-				Required: true,
+				ElementType:         types.StringType,
+				Required:            true,
 			},
 		},
-	}, nil
+	}
 }
 
-func (t groupDevicesDataSourceType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
-
-	return groupDevicesDataSource{
-		p: provider,
-	}, diags
-}
-
-type groupDevicesDataSource struct {
-	p provider
-}
-
-// Read resource information
-func (g groupDevicesDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+// Read implements datasource.DataSource
+func (g *groupDevicesDatasource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var groupDevices models.GroupDevicesData
 	diags := req.Config.Get(ctx, &groupDevices)
 	resp.Diagnostics.Append(diags...)
@@ -119,20 +126,22 @@ func (g groupDevicesDataSource) Read(ctx context.Context, req tfsdk.ReadDataSour
 	devices = omeClient.GetUniqueDevices(devices)
 
 	for _, device := range devices {
-		devIDs = append(devIDs, types.Int64{Value: device.ID})
-		devSvcTags = append(devSvcTags, types.String{Value: device.DeviceServiceTag})
+		devIDs = append(devIDs, types.Int64Value(device.ID))
+		devSvcTags = append(devSvcTags, types.StringValue(device.DeviceServiceTag))
 	}
 
-	devIDsTfsdk := types.List{
-		ElemType: types.Int64Type,
-	}
-	devIDsTfsdk.Elems = devIDs
+	devIDsTfsdk, _ := types.ListValue(
+		types.Int64Type,
+		devIDs,
+	)
+
 	groupDevices.DeviceIDs = devIDsTfsdk
 
-	devSTsTfsdk := types.List{
-		ElemType: types.StringType,
-	}
-	devSTsTfsdk.Elems = devSvcTags
+	devSTsTfsdk, _ := types.ListValue(
+		types.StringType,
+		devSvcTags,
+	)
+
 	groupDevices.DeviceServicetags = devSTsTfsdk
 
 	diags = resp.State.Set(ctx, &groupDevices)

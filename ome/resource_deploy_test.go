@@ -77,7 +77,7 @@ func TestTemplateDeploy_InvalidTemplate(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config:      testTemplateDeploymentIDOrNameRequired,
@@ -101,7 +101,7 @@ func TestTemplateDeploy_CreateAndUpdateDeploySuccess(t *testing.T) {
 	}
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testTemplateDeploymentSuccess,
@@ -132,7 +132,7 @@ func TestTemplateDeploy_CreateUpdateDeployWithScheduleSuccess(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testTemplateDeploymentSuccessWithSchedule,
@@ -168,7 +168,7 @@ func TestTemplateDeploy_ImportDeploymentError(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config:            testAccImportDeploymentError,
@@ -208,7 +208,7 @@ func TestTemplateDeploy_CreateDeployBootNetworkISOSuccess(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testTemplateDeploymentbootToNetworkISOSuccess,

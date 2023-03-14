@@ -14,7 +14,7 @@ func TestDataSource_ReadGroupDevices(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testgroupDeviceDS,
@@ -48,7 +48,7 @@ var testgroupDeviceDS = `
 
 	data "ome_groupdevices_info" "gd" {
 		id = "0"
-		device_group_names = ["TERRAFORM_ACC_GROUP"]
+		device_group_names = ["test_device_group"]
 	}
 `
 var testgroupDeviceDSInvalidGroup = `

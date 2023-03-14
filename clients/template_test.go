@@ -39,16 +39,16 @@ func TestGetTemplateAttributes(t *testing.T) {
 	}{
 		{"Get Template Attribute - Attribute Found", args{31, []models.Attribute{
 			{
-				AttributeID: types.Int64{Value: 110},
-				DisplayName: types.String{Value: "BIOS,BIOS Boot Settings,Boot Sequence"},
-				Value:       types.String{Value: "HardDisk.List.1-1"},
-				IsIgnored:   types.Bool{Value: false},
+				AttributeID: types.Int64Value(110),
+				DisplayName: types.StringValue("BIOS,BIOS Boot Settings,Boot Sequence"),
+				Value:       types.StringValue("HardDisk.List.1-1"),
+				IsIgnored:   types.BoolValue(false),
 			},
 			{
-				AttributeID: types.Int64{Value: 120},
-				DisplayName: types.String{Value: "NIC,NIC.Integrated.1-1-1,iSCSI General Parameters,Boot to Target"},
-				Value:       types.String{Value: "Enabled"},
-				IsIgnored:   types.Bool{Value: false},
+				AttributeID: types.Int64Value(120),
+				DisplayName: types.StringValue("NIC,NIC.Integrated.1-1-1,iSCSI General Parameters,Boot to Target"),
+				Value:       types.StringValue("Enabled"),
+				IsIgnored:   types.BoolValue(false),
 			},
 		}}, []models.OmeAttribute{
 			{
@@ -66,26 +66,26 @@ func TestGetTemplateAttributes(t *testing.T) {
 		}},
 		{"Get Template Attribute - Attribute Not found", args{32, []models.Attribute{
 			{
-				AttributeID: types.Int64{Value: 110},
-				DisplayName: types.String{Value: "BIOS,BIOS Boot Settings,Boot Test Sequence"},
-				Value:       types.String{Value: "HardDisk.List.1-1"},
-				IsIgnored:   types.Bool{Value: false},
+				AttributeID: types.Int64Value(110),
+				DisplayName: types.StringValue("BIOS,BIOS Boot Settings,Boot Test Sequence"),
+				Value:       types.StringValue("HardDisk.List.1-1"),
+				IsIgnored:   types.BoolValue(false),
 			},
 		}}, nil},
 		{"Get Template Attribute - Attribute Group Not found", args{33, []models.Attribute{
 			{
-				AttributeID: types.Int64{Value: 110},
-				DisplayName: types.String{Value: "BIOS TEST,BIOS Boot Settings,Boot Test Sequence"},
-				Value:       types.String{Value: "HardDisk.List.1-1"},
-				IsIgnored:   types.Bool{Value: false},
+				AttributeID: types.Int64Value(110),
+				DisplayName: types.StringValue("BIOS TEST,BIOS Boot Settings,Boot Test Sequence"),
+				Value:       types.StringValue("HardDisk.List.1-1"),
+				IsIgnored:   types.BoolValue(false),
 			},
 		}}, nil},
 		{"Get Template Attribute - SubAttribute Group Not found", args{34, []models.Attribute{
 			{
-				AttributeID: types.Int64{Value: 110},
-				DisplayName: types.String{Value: "BIOS,BIOS TEST Boot Settings,Boot Test Sequence"},
-				Value:       types.String{Value: "HardDisk.List.1-1"},
-				IsIgnored:   types.Bool{Value: false},
+				AttributeID: types.Int64Value(110),
+				DisplayName: types.StringValue("BIOS,BIOS TEST Boot Settings,Boot Test Sequence"),
+				Value:       types.StringValue("HardDisk.List.1-1"),
+				IsIgnored:   types.BoolValue(false),
 			},
 		}}, nil},
 	}

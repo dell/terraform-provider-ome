@@ -10,195 +10,195 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-type resourceDeploymentType struct{}
+// Ensure the implementation satisfies the expected interfaces.
+var (
+	_ resource.Resource                = &resourceDeployment{}
+	_ resource.ResourceWithConfigure   = &resourceDeployment{}
+	_ resource.ResourceWithImportState = &resourceDeployment{}
+)
+
+// NewDeploymentResource is a new resource for deployment
+func NewDeploymentResource() resource.Resource {
+	return &resourceDeployment{}
+}
+
+type resourceDeployment struct {
+	p *omeProvider
+}
+
+// Configure implements resource.ResourceWithConfigure
+func (r *resourceDeployment) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+	r.p = req.ProviderData.(*omeProvider)
+}
+
+// Metadata implements resource.Resource
+func (resourceDeployment) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "deployment"
+}
 
 // Template Deployment Resource schema
-func (r resourceDeploymentType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r resourceDeployment) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "Resource for managing template deployment on OpenManage Enterprise. Updates are supported for the following parameters: `device_ids`, `device_servicetags`, `boot_to_network_iso`, `forced_shutdown`, `options_time_to_wait_before_shutdown`, `power_state_off`, `options_precheck_only`, `options_strict_checking_vlan`, `options_continue_on_warning`, `run_later`, `cron`, `device_attributes`, `job_retry_count`, `sleep_interval`.",
 		Version:             1,
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
-				MarkdownDescription: "ID of the resource.",
-				Description:         "ID of the resource.",
-				Type:                types.StringType,
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				MarkdownDescription: "ID of the deploy resource.",
+				Description:         "ID of the deploy resource.",
 				Computed:            true,
 			},
-			"template_id": {
+			"template_id": schema.Int64Attribute{
 				MarkdownDescription: "ID of the existing template.",
 				Description:         "ID of the existing template.",
-				Type:                types.Int64Type,
 				Computed:            true,
 				Optional:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"template_name": {
+			"template_name": schema.StringAttribute{
 				MarkdownDescription: "Name of the existing template.",
 				Description:         "Name of the existing template.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"device_ids": {
+			"device_ids": schema.SetAttribute{
 				MarkdownDescription: "List of the device id(s).",
 				Description:         "List of the device id(s).",
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
-				Optional: true,
+				ElementType:         types.Int64Type,
+				Optional:            true,
 			},
-			"device_servicetags": {
+			"device_servicetags": schema.SetAttribute{
 				MarkdownDescription: "List of the device servicetags.",
 				Description:         "List of the device servicetags.",
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
-				Optional: true,
+				ElementType:         types.StringType,
+				Optional:            true,
 			},
-			"boot_to_network_iso": {
+			"boot_to_network_iso": schema.ObjectAttribute{
 				MarkdownDescription: "Boot To Network ISO deployment details.",
 				Description:         "Boot To Network ISO deployment details.",
 				Optional:            true,
-				Type: types.ObjectType{
-					AttrTypes: map[string]attr.Type{
-						"boot_to_network": types.BoolType,
-						"share_type":      types.StringType,
-						"iso_timeout":     types.Int64Type,
-						"iso_path":        types.StringType,
-						"share_detail": types.ObjectType{
-							AttrTypes: map[string]attr.Type{
-								"ip_address": types.StringType,
-								"share_name": types.StringType,
-								"work_group": types.StringType,
-								"user":       types.StringType,
-								"password":   types.StringType,
-							}},
-					},
+				AttributeTypes: map[string]attr.Type{
+					"boot_to_network": types.BoolType,
+					"share_type":      types.StringType,
+					"iso_timeout":     types.Int64Type,
+					"iso_path":        types.StringType,
+					"share_detail": types.ObjectType{
+						AttrTypes: map[string]attr.Type{
+							"ip_address": types.StringType,
+							"share_name": types.StringType,
+							"work_group": types.StringType,
+							"user":       types.StringType,
+							"password":   types.StringType,
+						}},
 				},
 			},
-			"forced_shutdown": {
+			"forced_shutdown": schema.BoolAttribute{
 				MarkdownDescription: "Force shutdown after deployment.",
 				Description:         "Force shutdown after deployment.",
-				Type:                types.BoolType,
 				Optional:            true,
 			},
-			"options_time_to_wait_before_shutdown": {
+			"options_time_to_wait_before_shutdown": schema.Int64Attribute{
 				MarkdownDescription: "Option to specify the time to wait before shutdown in seconds. Default and minimum value is 300 and maximum is 3600 seconds respectively.",
 				Description:         "Option to specify the time to wait before shutdown in seconds. Default and minimum value is 300 and maximum is 3600 seconds respectively.",
-				Type:                types.Int64Type,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Int64{Value: 300}),
+				PlanModifiers: []planmodifier.Int64{
+					Int64DefaultValue(types.Int64Value(300)),
 				},
 			},
-			"power_state_off": {
+			"power_state_off": schema.BoolAttribute{
 				MarkdownDescription: "End power state of a target devices. Default power state is ON. Make it true to switch it to OFF state.",
 				Description:         "End power state of a target devices. Default power state is ON. Make it true to switch it to OFF state.",
-				Type:                types.BoolType,
 				Optional:            true,
 			},
-			"options_precheck_only": {
+			"options_precheck_only": schema.BoolAttribute{
 				MarkdownDescription: "Option to precheck",
 				Description:         "Option to precheck",
-				Type:                types.BoolType,
 				Optional:            true,
 			},
-			"options_strict_checking_vlan": {
+			"options_strict_checking_vlan": schema.BoolAttribute{
 				MarkdownDescription: "Checks the strict association of vlan.",
 				Description:         "Checks the strict association of vlan.",
-				Type:                types.BoolType,
 				Optional:            true,
 			},
-			"options_continue_on_warning": {
+			"options_continue_on_warning": schema.BoolAttribute{
 				MarkdownDescription: "Continue to run the job on warnings.",
 				Description:         "Continue to run the job on warnings.",
-				Type:                types.BoolType,
 				Optional:            true,
 			},
-			"run_later": {
+			"run_later": schema.BoolAttribute{
 				MarkdownDescription: "Provides options to schedule the deployment task immediately, or at a specified time.",
 				Description:         "Provides options to schedule the deployment task immediately, or at a specified time.",
-				Type:                types.BoolType,
 				Optional:            true,
 			},
-			"cron": {
+			"cron": schema.StringAttribute{
 				MarkdownDescription: "Cron to schedule the deployment task. Cron expression should be of future datetime.",
 				Description:         "Cron to schedule the deployment task. Cron expression should be of future datetime.",
-				Type:                types.StringType,
 				Optional:            true,
 			},
-			"device_attributes": {
+			"device_attributes": schema.ListAttribute{
 				MarkdownDescription: "List of template attributes associated with the target devices for deploymnent.",
 				Description:         "List of template attributes associated with the target devices for deploymnent.",
 				Optional:            true,
-				Type: types.ListType{
-					ElemType: types.ObjectType{
-						AttrTypes: map[string]attr.Type{
-							"device_servicetags": types.SetType{
-								ElemType: types.StringType,
-							},
-							"attributes": types.ListType{
-								ElemType: types.ObjectType{
-									AttrTypes: map[string]attr.Type{
-										"attribute_id": types.Int64Type,
-										"display_name": types.StringType,
-										"value":        types.StringType,
-										"is_ignored":   types.BoolType,
-									},
+				ElementType: types.ObjectType{
+					AttrTypes: map[string]attr.Type{
+						"device_servicetags": types.SetType{
+							ElemType: types.StringType,
+						},
+						"attributes": types.ListType{
+							ElemType: types.ObjectType{
+								AttrTypes: map[string]attr.Type{
+									"attribute_id": types.Int64Type,
+									"display_name": types.StringType,
+									"value":        types.StringType,
+									"is_ignored":   types.BoolType,
 								},
 							},
 						},
 					},
 				},
 			},
-			"job_retry_count": {
+			"job_retry_count": schema.Int64Attribute{
 				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
 				Description:         "Number of times the job has to be polled to get the final status of the resource.",
-				Type:                types.Int64Type,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Int64{Value: 20}),
+				PlanModifiers: []planmodifier.Int64{
+					Int64DefaultValue(types.Int64Value(20)),
 				},
 			},
-			"sleep_interval": {
+			"sleep_interval": schema.Int64Attribute{
 				MarkdownDescription: "Sleep time interval for job polling in seconds.",
 				Description:         "Sleep time interval for job polling in seconds.",
-				Type:                types.Int64Type,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Int64{Value: 60}),
+				PlanModifiers: []planmodifier.Int64{
+					Int64DefaultValue(types.Int64Value(60)),
 				},
 			},
 		},
-	}, nil
-}
-
-// New resource instance
-func (r resourceDeploymentType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
-	return resourceDeployment{
-		p: *(p.(*provider)),
-	}, nil
-}
-
-type resourceDeployment struct {
-	p provider
+	}
 }
 
 // Create a new resource
-func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r resourceDeployment) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	tflog.Trace(ctx, "resource_deploy create : Started")
 	//Get Plan Data
 	var plan models.TemplateDeployment
@@ -231,7 +231,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 
 	tflog.Trace(ctx, "resource_deploy create: session created")
 
-	omeTemplate, err := omeClient.GetTemplateByIDOrName(plan.TemplateID.Value, plan.TemplateName.Value)
+	omeTemplate, err := omeClient.GetTemplateByIDOrName(plan.TemplateID.ValueInt64(), plan.TemplateName.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrInvalidTemplate,
@@ -287,7 +287,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	}
 
 	//Boot to Network ISO starts
-	if !plan.BootToNetworkISO.Null {
+	if !plan.BootToNetworkISO.IsNull() {
 		bootToNetworkISOModel, diags, err := getBootToNetworkISO(ctx, plan)
 		if err != nil {
 			resp.Diagnostics.Append(diags...)
@@ -300,12 +300,12 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 	}
 	//Boot to Network ISO Ends
 	// Schedule Starts
-	if plan.RunLater.Value {
+	if plan.RunLater.ValueBool() {
 		deploymentRequest.Schedule = getSchedule(plan)
 	}
 	//Schedule ends
 	// Device Attrs
-	if len(plan.DeviceAttributes.Elems) > 0 {
+	if len(plan.DeviceAttributes.Elements()) > 0 {
 		deploymentRequest.Attributes = getDeviceAttributes(ctx, devices, plan)
 	}
 
@@ -323,9 +323,9 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 		"deploymentJobID": deploymentJobID,
 	})
 
-	if !plan.RunLater.Value {
+	if !plan.RunLater.ValueBool() {
 		tflog.Trace(ctx, "resource_deploy create: started job tracking")
-		isSuccess, message := omeClient.TrackJob(deploymentJobID, plan.JobRetryCount.Value, plan.SleepInterval.Value)
+		isSuccess, message := omeClient.TrackJob(deploymentJobID, plan.JobRetryCount.ValueInt64(), plan.SleepInterval.ValueInt64())
 		if !isSuccess {
 			resp.Diagnostics.AddWarning(
 				clients.ErrTemplateDeploymentCreate, message,
@@ -348,7 +348,7 @@ func (r resourceDeployment) Create(ctx context.Context, req tfsdk.CreateResource
 }
 
 // Read resource information
-func (r resourceDeployment) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r resourceDeployment) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	//Get State Data
 	tflog.Trace(ctx, "resource_deploy read: started")
 	var stateTemplateDeployment models.TemplateDeployment
@@ -358,8 +358,8 @@ func (r resourceDeployment) Read(ctx context.Context, req tfsdk.ReadResourceRequ
 		return
 	}
 
-	templateID := stateTemplateDeployment.TemplateID.Value
-	templateName := stateTemplateDeployment.TemplateName.Value
+	templateID := stateTemplateDeployment.TemplateID.ValueInt64()
+	templateName := stateTemplateDeployment.TemplateName.ValueString()
 
 	tflog.Debug(ctx, "resource_deploy read: reading a template", map[string]interface{}{
 		"id":   templateID,
@@ -421,7 +421,7 @@ func (r resourceDeployment) Read(ctx context.Context, req tfsdk.ReadResourceRequ
 }
 
 // Update resource
-func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r resourceDeployment) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	//Get state Data
 	tflog.Trace(ctx, "resource_deploy update: started")
 	var state models.TemplateDeployment
@@ -459,7 +459,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	}
 	defer omeClient.RemoveSession()
 
-	if (plan.TemplateID.Value != 0 && plan.TemplateID.Value != state.TemplateID.Value) || (plan.TemplateName.Value != "" && plan.TemplateName.Value != state.TemplateName.Value) {
+	if (plan.TemplateID.ValueInt64() != 0 && plan.TemplateID.ValueInt64() != state.TemplateID.ValueInt64()) || (plan.TemplateName.ValueString() != "" && plan.TemplateName.ValueString() != state.TemplateName.ValueString()) {
 		resp.Diagnostics.AddError(
 			clients.ErrTemplateDeploymentUpdate,
 			clients.ErrTemplateChanges,
@@ -467,8 +467,8 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 		return
 	}
 	tflog.Debug(ctx, "resource_deploy update: started with template", map[string]interface{}{
-		"id":   plan.TemplateID.Value,
-		"name": plan.TemplateName.Value,
+		"id":   plan.TemplateID.ValueInt64(),
+		"name": plan.TemplateName.ValueString(),
 	})
 
 	var serviceTags []string
@@ -520,7 +520,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 		return
 	}
 
-	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(state.TemplateName.Value)
+	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(state.TemplateName.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrTemplateDeploymentUpdate, err.Error(),
@@ -547,13 +547,13 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	options := getOptions(plan)
 
 	deploymentRequest := models.OMETemplateDeployRequest{
-		ID:        state.TemplateID.Value,
+		ID:        state.TemplateID.ValueInt64(),
 		TargetIDS: newDeployDevIDs,
 		Options:   options,
 	}
 
 	//Boot to Network ISO starts
-	if !plan.BootToNetworkISO.Null {
+	if !plan.BootToNetworkISO.IsNull() {
 		bootToNetworkISOModel, diags, err := getBootToNetworkISO(ctx, plan)
 		if err != nil {
 			resp.Diagnostics.Append(diags...)
@@ -566,12 +566,12 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 	}
 	//Boot to Network ISO Ends
 	// Schedule Starts
-	if plan.RunLater.Value {
+	if plan.RunLater.ValueBool() {
 		deploymentRequest.Schedule = getSchedule(plan)
 	}
 	//Schedule ends
 	// Device Attrs
-	if len(plan.DeviceAttributes.Elems) > 0 {
+	if len(plan.DeviceAttributes.Elements()) > 0 {
 		deploymentRequest.Attributes = getDeviceAttributes(ctx, planDevices, plan)
 	}
 
@@ -585,9 +585,9 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 			return
 		}
 
-		if !plan.RunLater.Value {
+		if !plan.RunLater.ValueBool() {
 			tflog.Trace(ctx, "resource_deploy update: started job tracking")
-			isSuccess, message := omeClient.TrackJob(deploymentJobID, plan.JobRetryCount.Value, plan.SleepInterval.Value)
+			isSuccess, message := omeClient.TrackJob(deploymentJobID, plan.JobRetryCount.ValueInt64(), plan.SleepInterval.ValueInt64())
 			if !isSuccess {
 				resp.Diagnostics.AddWarning(
 					"unable to complete the deployment for the template: ", message,
@@ -620,7 +620,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 
 	tflog.Trace(ctx, "resource_deploy update: started state update")
 
-	_ = updateDeploymentState(&state, &plan, state.TemplateID.Value, state.TemplateName.Value, omeClient, usedDeviceInput)
+	_ = updateDeploymentState(&state, &plan, state.TemplateID.ValueInt64(), state.TemplateName.ValueString(), omeClient, usedDeviceInput)
 
 	tflog.Trace(ctx, "resource_deploy update: finished state update")
 	//Save into State
@@ -633,7 +633,7 @@ func (r resourceDeployment) Update(ctx context.Context, req tfsdk.UpdateResource
 }
 
 // Delete resource
-func (r resourceDeployment) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r resourceDeployment) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "resource_deploy delete: started")
 	// Get State Data
 	var statetemplateDeployment models.TemplateDeployment
@@ -664,11 +664,11 @@ func (r resourceDeployment) Delete(ctx context.Context, req tfsdk.DeleteResource
 	defer omeClient.RemoveSession()
 
 	tflog.Debug(ctx, "resource_deploy delete: started with template", map[string]interface{}{
-		"id":   statetemplateDeployment.TemplateID.Value,
-		"name": statetemplateDeployment.TemplateName.Value,
+		"id":   statetemplateDeployment.TemplateID.ValueInt64(),
+		"name": statetemplateDeployment.TemplateName.ValueString(),
 	})
 
-	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(statetemplateDeployment.TemplateName.Value)
+	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(statetemplateDeployment.TemplateName.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrTemplateDeploymentDelete, err.Error(),
@@ -710,7 +710,7 @@ func deleteProfiles(ctx context.Context, omeClient *clients.Client, profileArr [
 }
 
 // Import resource
-func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
+func (r resourceDeployment) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	tflog.Trace(ctx, "resource_deploy import: started")
 	// Save the import identifier in the id attribute
 	var stateTemplateDeployment models.TemplateDeployment
@@ -757,43 +757,43 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 
 	for _, serverProfile := range serverProfiles.Value {
 		device, _ := omeClient.GetDevice("", serverProfile.TargetID)
-		deviceSTVal := types.String{Value: device.DeviceServiceTag}
+		deviceSTVal := types.StringValue(device.DeviceServiceTag)
 		profileDevSTVals = append(profileDevSTVals, deviceSTVal)
 	}
-	stateTemplateDeployment.ID.Value = strconv.FormatInt(templateID, 10)
-	stateTemplateDeployment.TemplateID.Value = templateID
-	stateTemplateDeployment.TemplateName.Value = templateName
-	devSTsTfsdk := types.Set{
-		ElemType: types.StringType,
+	stateTemplateDeployment.ID = types.StringValue(strconv.FormatInt(templateID, 10))
+	stateTemplateDeployment.TemplateID = types.Int64Value(templateID)
+	stateTemplateDeployment.TemplateName = types.StringValue(templateName)
+	devSTsTfsdk, _ := types.SetValue(
+		types.StringType,
+		profileDevSTVals,
+	)
+	if !devSTsTfsdk.IsUnknown() {
+		stateTemplateDeployment.DeviceServicetags = devSTsTfsdk
 	}
-	devSTsTfsdk.Elems = profileDevSTVals
-	stateTemplateDeployment.DeviceServicetags = devSTsTfsdk
-	devIDsTfsdk := types.Set{
-		ElemType: types.Int64Type,
+	devIDsTfsdk, _ := types.SetValue(types.Int64Type, []attr.Value{})
+	if !devIDsTfsdk.IsUnknown() {
+		stateTemplateDeployment.DeviceIDs = devIDsTfsdk
 	}
-	devIDsTfsdk.Elems = []attr.Value{}
-	stateTemplateDeployment.DeviceIDs = devIDsTfsdk
-
 	// set empty device attributes
 	attributesObjects := []attr.Value{}
-	attributesObject := types.Object{
-		AttrTypes: map[string]attr.Type{
+	attributesObject, _ := types.ObjectValue(
+		map[string]attr.Type{
 			"attribute_id": types.Int64Type,
 			"display_name": types.StringType,
 			"value":        types.StringType,
 			"is_ignored":   types.BoolType,
 		},
-		Attrs: map[string]attr.Value{
-			"attribute_id": types.Int64{Value: 0},
-			"display_name": types.String{Value: ""},
-			"value":        types.String{Value: ""},
-			"is_ignored":   types.Bool{Value: false},
+		map[string]attr.Value{
+			"attribute_id": types.Int64Value(0),
+			"display_name": types.StringValue(""),
+			"value":        types.StringValue(""),
+			"is_ignored":   types.BoolValue(false),
 		},
-	}
+	)
 	attributesObjects = append(attributesObjects, attributesObject)
 
-	attributesTfsdk := types.List{
-		ElemType: types.ObjectType{
+	attributesTfsdk, _ := types.ListValue(
+		types.ObjectType{
 			AttrTypes: map[string]attr.Type{
 				"attribute_id": types.Int64Type,
 				"display_name": types.StringType,
@@ -801,12 +801,12 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 				"is_ignored":   types.BoolType,
 			},
 		},
-		Elems: attributesObjects,
-	}
+		attributesObjects,
+	)
 
 	deviceAttributeObjects := []attr.Value{}
-	deviceAttributeObject := types.Object{
-		AttrTypes: map[string]attr.Type{
+	deviceAttributeObject, _ := types.ObjectValue(
+		map[string]attr.Type{
 			"device_servicetags": types.SetType{
 				ElemType: types.StringType,
 			},
@@ -821,16 +821,16 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 				},
 			},
 		},
-		Attrs: map[string]attr.Value{
+		map[string]attr.Value{
 			"device_servicetags": devSTsTfsdk,
 			"attributes":         attributesTfsdk,
 		},
-	}
+	)
 
 	deviceAttributeObjects = append(deviceAttributeObjects, deviceAttributeObject)
 
-	deviceAttributeTfsdk := types.List{
-		ElemType: types.ObjectType{
+	deviceAttributeTfsdk, _ := types.ListValue(
+		types.ObjectType{
 			AttrTypes: map[string]attr.Type{
 				"device_servicetags": types.SetType{
 					ElemType: types.StringType,
@@ -847,29 +847,31 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 				},
 			},
 		},
-		Elems: deviceAttributeObjects,
-	}
-	stateTemplateDeployment.DeviceAttributes = deviceAttributeTfsdk
+		deviceAttributeObjects,
+	)
 
-	shareDetailsTfsdk := types.Object{
-		AttrTypes: map[string]attr.Type{
+	if !deviceAttributeTfsdk.IsUnknown() {
+		stateTemplateDeployment.DeviceAttributes = deviceAttributeTfsdk
+	}
+	shareDetailsTfsdk, _ := types.ObjectValue(
+		map[string]attr.Type{
 			"ip_address": types.StringType,
 			"share_name": types.StringType,
 			"work_group": types.StringType,
 			"user":       types.StringType,
 			"password":   types.StringType,
 		},
-		Attrs: map[string]attr.Value{
-			"ip_address": types.String{Value: ""},
-			"share_name": types.String{Value: ""},
-			"work_group": types.String{Value: ""},
-			"user":       types.String{Value: ""},
-			"password":   types.String{Value: ""},
+		map[string]attr.Value{
+			"ip_address": types.StringValue(""),
+			"share_name": types.StringValue(""),
+			"work_group": types.StringValue(""),
+			"user":       types.StringValue(""),
+			"password":   types.StringValue(""),
 		},
-	}
+	)
 
-	bootToNetworkISOTfsdk := types.Object{
-		AttrTypes: map[string]attr.Type{
+	bootToNetworkISOTfsdk, _ := types.ObjectValue(
+		map[string]attr.Type{
 			"boot_to_network": types.BoolType,
 			"share_type":      types.StringType,
 			"iso_timeout":     types.Int64Type,
@@ -884,17 +886,18 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 				},
 			},
 		},
-		Attrs: map[string]attr.Value{
-			"boot_to_network": types.Bool{Value: false},
-			"share_type":      types.String{Value: ""},
-			"iso_timeout":     types.Int64{Value: 0},
-			"iso_path":        types.String{Value: ""},
+		map[string]attr.Value{
+			"boot_to_network": types.BoolValue(false),
+			"share_type":      types.StringValue(""),
+			"iso_timeout":     types.Int64Value(0),
+			"iso_path":        types.StringValue(""),
 			"share_detail":    shareDetailsTfsdk,
 		},
+	)
+
+	if !bootToNetworkISOTfsdk.IsUnknown() {
+		stateTemplateDeployment.BootToNetworkISO = bootToNetworkISOTfsdk
 	}
-
-	stateTemplateDeployment.BootToNetworkISO = bootToNetworkISOTfsdk
-
 	//Save into State
 	diags := resp.State.Set(ctx, &stateTemplateDeployment)
 	resp.Diagnostics.Append(diags...)
@@ -905,21 +908,17 @@ func (r resourceDeployment) ImportState(ctx context.Context, req tfsdk.ImportRes
 }
 
 func updateDeploymentState(stateTemplateDeployment, planTemplateDeployment *models.TemplateDeployment, templateID int64, templateName string, omeClient *clients.Client, usedDeviceInput string) error {
-	stateTemplateDeployment.ID.Value = strconv.FormatInt(templateID, 10)
-	stateTemplateDeployment.TemplateID.Value = templateID
-	stateTemplateDeployment.TemplateName.Value = templateName
-	stateTemplateDeployment.JobRetryCount = planTemplateDeployment.JobRetryCount
-	stateTemplateDeployment.SleepInterval = planTemplateDeployment.SleepInterval
-
-	devIDsTfsdk := types.Set{
-		ElemType: types.Int64Type,
+	stateTemplateDeployment.ID = types.StringValue(strconv.FormatInt(templateID, 10))
+	stateTemplateDeployment.TemplateID = types.Int64Value(templateID)
+	stateTemplateDeployment.TemplateName = types.StringValue(templateName)
+	if !planTemplateDeployment.JobRetryCount.IsUnknown() {
+		stateTemplateDeployment.JobRetryCount = planTemplateDeployment.JobRetryCount
 	}
-	devIDList := planTemplateDeployment.DeviceIDs.Elems
-
-	devSTsTfsdk := types.Set{
-		ElemType: types.StringType,
+	if !planTemplateDeployment.SleepInterval.IsUnknown() {
+		stateTemplateDeployment.SleepInterval = planTemplateDeployment.SleepInterval
 	}
-	devSTList := planTemplateDeployment.DeviceServicetags.Elems
+	devIDList := planTemplateDeployment.DeviceIDs.Elements()
+	devSTList := planTemplateDeployment.DeviceServicetags.Elements()
 	profileDevSTVals := []attr.Value{}
 	profileDevIDVals := []attr.Value{}
 	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(templateName)
@@ -928,9 +927,9 @@ func updateDeploymentState(stateTemplateDeployment, planTemplateDeployment *mode
 	}
 	for _, serverProfile := range serverProfiles.Value {
 		device, _ := omeClient.GetDevice("", serverProfile.TargetID)
-		deviceSTVal := types.String{Value: device.DeviceServiceTag}
+		deviceSTVal := types.StringValue(device.DeviceServiceTag)
 		profileDevSTVals = append(profileDevSTVals, deviceSTVal)
-		deviceIDVal := types.Int64{Value: serverProfile.TargetID}
+		deviceIDVal := types.Int64Value(serverProfile.TargetID)
 		profileDevIDVals = append(profileDevIDVals, deviceIDVal)
 	}
 
@@ -962,25 +961,58 @@ func updateDeploymentState(stateTemplateDeployment, planTemplateDeployment *mode
 
 	switch usedDeviceInput {
 	case clients.ServiceTags:
-		devSTsTfsdk.Elems = filteredDevSTList
-		stateTemplateDeployment.DeviceServicetags = devSTsTfsdk
-		stateTemplateDeployment.DeviceIDs = planTemplateDeployment.DeviceIDs
+		devSTsTfsdk, _ := types.SetValue(
+			types.StringType,
+			filteredDevSTList,
+		)
+		if !devSTsTfsdk.IsUnknown() {
+			stateTemplateDeployment.DeviceServicetags = devSTsTfsdk
+		}
+		if planTemplateDeployment.DeviceIDs.IsUnknown() {
+			stateTemplateDeployment.DeviceIDs = planTemplateDeployment.DeviceIDs
+		}
 	case clients.DeviceIDs:
-		devIDsTfsdk.Elems = filteredDevIDList
-		stateTemplateDeployment.DeviceIDs = devIDsTfsdk
-		stateTemplateDeployment.DeviceServicetags = planTemplateDeployment.DeviceServicetags
+		devIDsTfsdk, _ := types.SetValue(
+			types.Int64Type,
+			filteredDevIDList,
+		)
+		if !devIDsTfsdk.IsUnknown() {
+			stateTemplateDeployment.DeviceIDs = devIDsTfsdk
+		}
+		if !planTemplateDeployment.DeviceServicetags.IsUnknown() {
+			stateTemplateDeployment.DeviceServicetags = planTemplateDeployment.DeviceServicetags
+		}
 	}
-
-	stateTemplateDeployment.BootToNetworkISO = planTemplateDeployment.BootToNetworkISO
-	stateTemplateDeployment.DeviceAttributes = planTemplateDeployment.DeviceAttributes
-	stateTemplateDeployment.OptionsContinueOnWarning = planTemplateDeployment.OptionsContinueOnWarning
-	stateTemplateDeployment.PowerStateOff = planTemplateDeployment.PowerStateOff
-	stateTemplateDeployment.OptionsPrecheckOnly = planTemplateDeployment.OptionsPrecheckOnly
-	stateTemplateDeployment.ForcedShutdown = planTemplateDeployment.ForcedShutdown
-	stateTemplateDeployment.OptionsStrictCheckingVlan = planTemplateDeployment.OptionsStrictCheckingVlan
-	stateTemplateDeployment.OptionsTimeToWaitBeforeShutdown = planTemplateDeployment.OptionsTimeToWaitBeforeShutdown
-	stateTemplateDeployment.RunLater = planTemplateDeployment.RunLater
-	stateTemplateDeployment.Cron = planTemplateDeployment.Cron
+	if !planTemplateDeployment.BootToNetworkISO.IsUnknown() {
+		stateTemplateDeployment.BootToNetworkISO = planTemplateDeployment.BootToNetworkISO
+	}
+	if !planTemplateDeployment.DeviceAttributes.IsUnknown() {
+		stateTemplateDeployment.DeviceAttributes = planTemplateDeployment.DeviceAttributes
+	}
+	if !planTemplateDeployment.OptionsContinueOnWarning.IsUnknown() {
+		stateTemplateDeployment.OptionsContinueOnWarning = planTemplateDeployment.OptionsContinueOnWarning
+	}
+	if !planTemplateDeployment.PowerStateOff.IsUnknown() {
+		stateTemplateDeployment.PowerStateOff = planTemplateDeployment.PowerStateOff
+	}
+	if !planTemplateDeployment.OptionsPrecheckOnly.IsUnknown() {
+		stateTemplateDeployment.OptionsPrecheckOnly = planTemplateDeployment.OptionsPrecheckOnly
+	}
+	if !planTemplateDeployment.ForcedShutdown.IsUnknown() {
+		stateTemplateDeployment.ForcedShutdown = planTemplateDeployment.ForcedShutdown
+	}
+	if !planTemplateDeployment.OptionsStrictCheckingVlan.IsUnknown() {
+		stateTemplateDeployment.OptionsStrictCheckingVlan = planTemplateDeployment.OptionsStrictCheckingVlan
+	}
+	if !planTemplateDeployment.OptionsTimeToWaitBeforeShutdown.IsUnknown() {
+		stateTemplateDeployment.OptionsTimeToWaitBeforeShutdown = planTemplateDeployment.OptionsTimeToWaitBeforeShutdown
+	}
+	if !planTemplateDeployment.RunLater.IsUnknown() {
+		stateTemplateDeployment.RunLater = planTemplateDeployment.RunLater
+	}
+	if !planTemplateDeployment.Cron.IsUnknown() {
+		stateTemplateDeployment.Cron = planTemplateDeployment.Cron
+	}
 	return nil
 }
 
@@ -1014,7 +1046,7 @@ func getSchedule(plan models.TemplateDeployment) models.OMESchedule {
 	schedule := models.OMESchedule{
 		RunNow:    false,
 		RunLater:  true,
-		Cron:      plan.Cron.Value,
+		Cron:      plan.Cron.ValueString(),
 		StartTime: "",
 		EndTime:   "",
 	}
@@ -1024,18 +1056,18 @@ func getSchedule(plan models.TemplateDeployment) models.OMESchedule {
 func getOptions(plan models.TemplateDeployment) models.OMEOptions {
 	options := models.OMEOptions{
 		ShutdownType:             0,
-		TimeToWaitBeforeShutdown: plan.OptionsTimeToWaitBeforeShutdown.Value,
+		TimeToWaitBeforeShutdown: plan.OptionsTimeToWaitBeforeShutdown.ValueInt64(),
 		EndHostPowerState:        1,
-		PrecheckOnly:             plan.OptionsPrecheckOnly.Value,
-		ContinueOnWarning:        plan.OptionsContinueOnWarning.Value,
-		StrictCheckingVLAN:       plan.OptionsStrictCheckingVlan.Value,
+		PrecheckOnly:             plan.OptionsPrecheckOnly.ValueBool(),
+		ContinueOnWarning:        plan.OptionsContinueOnWarning.ValueBool(),
+		StrictCheckingVLAN:       plan.OptionsStrictCheckingVlan.ValueBool(),
 	}
 
-	if plan.ForcedShutdown.Value {
+	if plan.ForcedShutdown.ValueBool() {
 		options.ShutdownType = 1
 	}
 
-	if plan.PowerStateOff.Value {
+	if plan.PowerStateOff.ValueBool() {
 		options.EndHostPowerState = 0
 	}
 	return options
@@ -1043,29 +1075,29 @@ func getOptions(plan models.TemplateDeployment) models.OMEOptions {
 
 func getBootToNetworkISO(ctx context.Context, plan models.TemplateDeployment) (models.OMENetworkBootISOModel, []diag.Diagnostic, error) {
 	bootToNetworkISO := models.BootToNetworkISO{}
-	diags := plan.BootToNetworkISO.As(ctx, &bootToNetworkISO, types.ObjectAsOptions{UnhandledNullAsEmpty: true})
+	diags := plan.BootToNetworkISO.As(ctx, &bootToNetworkISO, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
 	if diags.HasError() {
 		return models.OMENetworkBootISOModel{}, diags, fmt.Errorf(clients.ErrUnableToParseBootToNetISO)
 	}
 
 	shareDetail := models.ShareDetail{}
-	diags = bootToNetworkISO.ShareDetail.As(ctx, &shareDetail, types.ObjectAsOptions{UnhandledNullAsEmpty: true})
+	diags = bootToNetworkISO.ShareDetail.As(ctx, &shareDetail, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
 	if diags.HasError() {
 		return models.OMENetworkBootISOModel{}, diags, fmt.Errorf(clients.ErrUnableToParseBootToNetISO)
 	}
 
 	bootToNetworkISOModel := models.OMENetworkBootISOModel{
-		BootToNetwork:  bootToNetworkISO.BootToNetwork.Value,
-		ISOPath:        bootToNetworkISO.IsoPath.Value,
-		ISOTimeout:     bootToNetworkISO.IsoTimeout.Value,
+		BootToNetwork:  bootToNetworkISO.BootToNetwork.ValueBool(),
+		ISOPath:        bootToNetworkISO.IsoPath.ValueString(),
+		ISOTimeout:     bootToNetworkISO.IsoTimeout.ValueInt64(),
 		ISOTimeoutUnit: 2,
-		ShareType:      bootToNetworkISO.ShareType.Value,
+		ShareType:      bootToNetworkISO.ShareType.ValueString(),
 		ShareDetail: models.OMEShareDetail{
-			IPAddress: shareDetail.IPAddress.Value,
-			ShareName: shareDetail.ShareName.Value,
-			WorkGroup: shareDetail.WorkGroup.Value,
-			User:      shareDetail.User.Value,
-			Password:  shareDetail.Password.Value,
+			IPAddress: shareDetail.IPAddress.ValueString(),
+			ShareName: shareDetail.ShareName.ValueString(),
+			WorkGroup: shareDetail.WorkGroup.ValueString(),
+			User:      shareDetail.User.ValueString(),
+			Password:  shareDetail.Password.ValueString(),
 		},
 	}
 	return bootToNetworkISOModel, nil, nil
@@ -1090,9 +1122,9 @@ func getDeviceAttributes(ctx context.Context, devices []models.Device, plan mode
 		omeAttributes := []models.OMEAttribute{}
 		for _, attribute := range attributeList {
 			omeAttribute := models.OMEAttribute{
-				ID:        attribute.AttributeID.Value,
-				Value:     attribute.Value.Value,
-				IsIgnored: attribute.IsIgnored.Value,
+				ID:        attribute.AttributeID.ValueInt64(),
+				Value:     attribute.Value.ValueString(),
+				IsIgnored: attribute.IsIgnored.ValueBool(),
 			}
 			omeAttributes = append(omeAttributes, omeAttribute)
 		}
