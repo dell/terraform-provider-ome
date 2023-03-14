@@ -449,7 +449,7 @@ var testTemplateUpdateDeployWithParamsSuccess = `
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
-		template_name = "` + TestAccTemplateName + `"
+		template_name = resource.ome_template.terraform-acceptance-test-1.name
 		device_servicetags = ["` + DeviceSvcTag2 + `"]
 		boot_to_network_iso = {
 			boot_to_network = true
