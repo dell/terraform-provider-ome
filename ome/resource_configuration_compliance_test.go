@@ -90,6 +90,7 @@ var testConfigureBaselineRemediationDevicePartOfBaseline = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag2 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -115,6 +116,7 @@ var testConfigureBaselineRemediationInvalidBaselineName = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -139,6 +141,7 @@ var testConfigureBaselineRemediationInvalidBaselineID = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -164,6 +167,7 @@ var testConfigureBaselineRemediationBaselineMutaully = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -188,6 +192,7 @@ var testConfigureBaselineRemediationBaselineInfo = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -230,7 +235,7 @@ var testConfigureBaselineRemediationCompianceStatus = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag2 + `"
-				compliance_status = 2
+				compliance_status = "NonCompliant"
 			},
 		  ]
 	}
@@ -275,9 +280,16 @@ var testConfigureBaselineRemediation = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-2" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag2 + `"
+		view_type = "Compliance"
+	}
+
+
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = "` + TestRefTemplateName + `"
+		ref_template_name = ome_template.terraform-acceptance-test-2.name
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
@@ -287,6 +299,7 @@ var testConfigureBaselineRemediation = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -300,9 +313,15 @@ var testConfigureBaselineRemediationUpdate = `
 		skipssl = true
 	}
 
+	resource "ome_template" "terraform-acceptance-test-2" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag2 + `"
+		view_type = "Compliance"
+	}
+
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = "` + TestRefTemplateName + `"
+		ref_template_name = ome_template.terraform-acceptance-test-2.name 
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
@@ -312,11 +331,11 @@ var testConfigureBaselineRemediationUpdate = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
-				compliance_status = "1"
+				compliance_status = "Compliant"
 			},
 			{
 				device_service_tag = "` + DeviceSvcTag2 + `"
-				compliance_status = "1"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
