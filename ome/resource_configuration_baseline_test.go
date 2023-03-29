@@ -295,7 +295,7 @@ func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	assertTFImportState := func(s []*terraform.InstanceState) error {
-		assert.Equal(t, BaselineNameUpdate + "-1", s[0].Attributes["baseline_name"])
+		assert.Equal(t, BaselineNameUpdate+"-1", s[0].Attributes["baseline_name"])
 		assert.Equal(t, DeviceSvcTag2, s[0].Attributes["device_servicetags.0"])
 		return nil
 	}

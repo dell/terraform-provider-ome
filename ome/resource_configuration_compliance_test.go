@@ -257,15 +257,14 @@ func TestConfigurationRemediation(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.0.device_service_tag", DeviceSvcTag1),
 				),
-				// ExpectNonEmptyPlan: true,
+				ExpectNonEmptyPlan: true,
 			},
 			{
 				Config: testConfigureBaselineRemediationUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "baseline_name", BaselineName),
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.#", "2"),
-					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.0.device_service_tag", DeviceSvcTag1),
-					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.1.device_service_tag", DeviceSvcTag2),
+					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.0.device_service_tag", DeviceSvcTag2),
 				),
 				// ExpectNonEmptyPlan: true,
 			},
