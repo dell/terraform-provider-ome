@@ -11,13 +11,17 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
-
-type resourceTemplateType struct{}
 
 const (
 	//ComplianceViewTypeID - stores the id for the compliance view type.
@@ -38,207 +42,207 @@ const (
 	NicIdentifierAndPort = "%s" + NicPortDivider + "%d"
 )
 
+// Ensure the implementation satisfies the expected interfaces.
+var (
+	_ resource.Resource                = &resourceTemplate{}
+	_ resource.ResourceWithConfigure   = &resourceTemplate{}
+	_ resource.ResourceWithImportState = &resourceTemplate{}
+)
+
+// NewTemplateResource is new resource for template
+func NewTemplateResource() resource.Resource {
+	return &resourceTemplate{}
+}
+
+type resourceTemplate struct {
+	p *omeProvider
+}
+
+// Configure implements resource.ResourceWithConfigure
+func (r *resourceTemplate) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// panic("unimplemented")
+	if req.ProviderData == nil {
+		return
+	}
+	r.p = req.ProviderData.(*omeProvider)
+}
+
+// Metadata implements resource.Resource
+func (*resourceTemplate) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "template"
+}
+
 // Order Resource schema
-func (r resourceTemplateType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "Resource for managing template on OpenManage Enterprise.Updates are supported for the following parameters: `name`, `description`, `attributes`, `job_retry_count`, `sleep_interval`, `identity_pool_name`, `vlan`.",
 		Version:             1,
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
-				MarkdownDescription: "Id of the template.",
-				Description:         "Template ID",
-				Type:                types.StringType,
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				MarkdownDescription: "ID of the template resource.",
+				Description:         "ID of the template resource.",
 				Computed:            true,
 			},
-			"name": {
-				MarkdownDescription: "Name of the template.",
-				Description:         "Name of the template.",
-				Type:                types.StringType,
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Name of the template resource.",
+				Description:         "Name of the template resource.",
 				Required:            true,
 			},
-			"fqdds": {
+			"fqdds": schema.StringAttribute{
 				MarkdownDescription: "Comma seperated values of components from a specified server, should be one of these iDRAC, System, BIOS, NIC, LifeCycleController, RAID, and EventFilters. This field cannot be updated.",
 				Description:         "Comma seperated values of components from a specified server, should be one of these iDRAC, System, BIOS, NIC, LifeCycleController, RAID, and EventFilters. This field cannot be updated.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.String{Value: "All"}),
+				PlanModifiers: []planmodifier.String{
+					StringDefaultValue(types.StringValue("All")),
 				},
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validFqddsValidator{},
 				},
 			},
-			"view_type": {
+			"view_type": schema.StringAttribute{
 				MarkdownDescription: "OME template view type, supported types are Deployment, Compliance. This field cannot be updated.",
 				Description:         "OME template view type, supported types are Deployment, Compliance. This field cannot be updated.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.String{Value: "Deployment"}),
+				PlanModifiers: []planmodifier.String{
+					StringDefaultValue(types.StringValue("Deployment")),
 				},
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validTemplateViewTypeValidator{},
 				},
 			},
-			"view_type_id": {
+			"view_type_id": schema.Int64Attribute{
 				MarkdownDescription: "OME template view type id.",
 				Description:         "OME template view type id.",
-				Type:                types.Int64Type,
 				Computed:            true,
 			},
-			"device_type": {
+			"device_type": schema.StringAttribute{
 				MarkdownDescription: "OME template device type, supported types are Server, Chassis. This field cannot be updated and is applicable only for importing xml.",
 				Description:         "OME template device type, supported types are Server, Chassis. This field cannot be updated and is applicable only for importing xml.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.String{Value: "Server"}),
+				PlanModifiers: []planmodifier.String{
+					StringDefaultValue(types.StringValue("Server")),
 				},
-				Validators: []tfsdk.AttributeValidator{
+				Validators: []validator.String{
 					validTemplateDeviceTypeValidator{},
 				},
 			},
-			"content": {
+			"content": schema.StringAttribute{
 				MarkdownDescription: "The XML content of template.. This field cannot be updated.",
 				Description:         "The XML content of template.. This field cannot be updated.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
 			},
-			"refdevice_servicetag": {
+			"refdevice_servicetag": schema.StringAttribute{
 				MarkdownDescription: "Target device servicetag from which the template needs to be created. This field cannot be updated.",
 				Description:         "Target device servicetag from which the template needs to be created. This field cannot be updated.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
 			},
-			"refdevice_id": {
+			"refdevice_id": schema.Int64Attribute{
 				MarkdownDescription: "Target device id from which the template needs to be created. This field cannot be updated.",
 				Description:         "Target device id from which the template needs to be created. This field cannot be updated.",
-				Type:                types.Int64Type,
 				Optional:            true,
 				Computed:            true,
 			},
-			"reftemplate_name": {
+			"reftemplate_name": schema.StringAttribute{
 				MarkdownDescription: "Reference Template name from which the template needs to be cloned. This field cannot be updated.",
 				Description:         "Reference Template name from which the template needs to be cloned. This field cannot be updated.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
 			},
-			"description": {
+			"description": schema.StringAttribute{
 				MarkdownDescription: "Description of the template",
 				Description:         "Description of the template",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"attributes": {
+			"attributes": schema.ListAttribute{
 				MarkdownDescription: "List of attributes associated with a template. This field is ignored while creating a template.",
 				Description:         "List of attributes associated with a template. This field is ignored while creating a template.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
 				},
-				Type: types.ListType{
-					ElemType: types.ObjectType{
-						AttrTypes: map[string]attr.Type{
-							"attribute_id": types.Int64Type,
-							"display_name": types.StringType,
-							"value":        types.StringType,
-							"is_ignored":   types.BoolType,
-						},
+				ElementType: types.ObjectType{
+					AttrTypes: map[string]attr.Type{
+						"attribute_id": types.Int64Type,
+						"display_name": types.StringType,
+						"value":        types.StringType,
+						"is_ignored":   types.BoolType,
 					},
 				},
 			},
-			"job_retry_count": {
+			"job_retry_count": schema.Int64Attribute{
 				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
 				Description:         "Number of times the job has to be polled to get the final status of the resource.",
-				Type:                types.Int64Type,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Int64{Value: RetryCount}),
+				PlanModifiers: []planmodifier.Int64{
+					Int64DefaultValue(types.Int64Value(RetryCount)),
 				},
 			},
-			"sleep_interval": {
+			"sleep_interval": schema.Int64Attribute{
 				MarkdownDescription: "Sleep time interval for job polling in seconds.",
 				Description:         "Sleep time interval for job polling in seconds.",
-				Type:                types.Int64Type,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Int64{Value: SleepInterval}),
+				PlanModifiers: []planmodifier.Int64{
+					Int64DefaultValue(types.Int64Value(SleepInterval)),
 				},
 			},
-			"identity_pool_name": {
+			"identity_pool_name": schema.StringAttribute{
 				MarkdownDescription: "Identity Pool name to be attached with template.",
 				Description:         "Identity Pool name to be attached with template.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"identity_pool_id": {
+			"identity_pool_id": schema.Int64Attribute{
 				MarkdownDescription: "ID of the Identity Pool attached with template.",
 				Description:         "ID of the Identity Pool attached with template.",
-				Type:                types.Int64Type,
 				Computed:            true,
 			},
-			"vlan": {
+			"vlan": schema.ObjectAttribute{
 				MarkdownDescription: "VLAN details to be attached with template.",
 				Description:         "VLAN details to be attached with template.",
 				Computed:            true,
 				Optional:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.UseStateForUnknown(),
 				},
-				Type: types.ObjectType{
-					AttrTypes: map[string]attr.Type{
-						"propogate_vlan":     types.BoolType,
-						"bonding_technology": types.StringType,
-						"vlan_attributes": types.ListType{
-							ElemType: types.ObjectType{
-								AttrTypes: map[string]attr.Type{
-									"untagged_network": types.Int64Type,
-									"tagged_networks": types.SetType{
-										ElemType: types.Int64Type,
-									},
-									"is_nic_bonded":  types.BoolType,
-									"port":           types.Int64Type,
-									"nic_identifier": types.StringType,
+				AttributeTypes: map[string]attr.Type{
+					"propogate_vlan":     types.BoolType,
+					"bonding_technology": types.StringType,
+					"vlan_attributes": types.ListType{
+						ElemType: types.ObjectType{
+							AttrTypes: map[string]attr.Type{
+								"untagged_network": types.Int64Type,
+								"tagged_networks": types.SetType{
+									ElemType: types.Int64Type,
 								},
+								"is_nic_bonded":  types.BoolType,
+								"port":           types.Int64Type,
+								"nic_identifier": types.StringType,
 							},
 						},
 					},
 				},
 			},
 		},
-	}, nil
-}
-
-// New resource instance
-func (r resourceTemplateType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
-	return resourceTemplate{
-		p: *(p.(*provider)),
-	}, nil
-}
-
-type resourceTemplate struct {
-	p provider
+	}
 }
 
 // Create a new resource
-func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r *resourceTemplate) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	//Read the data from Plan
 	tflog.Trace(ctx, "resource_template create: started")
 	var plan models.Template
@@ -249,7 +253,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 	}
 
 	tflog.Debug(ctx, "resource_template create: reference data", map[string]interface{}{
-		"refdeviceid":         plan.RefdeviceID.Value,
+		"refdeviceid":         plan.RefdeviceID.ValueInt64(),
 		"refdeviceservicetag": plan.RefdeviceServicetag,
 		"refTemplate":         plan.ReftemplateName,
 	})
@@ -263,7 +267,6 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 		)
 		return
 	}
-
 	omeClient, err := clients.NewClient(*r.p.clientOpt)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -283,7 +286,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 	}
 	defer omeClient.RemoveSession()
 
-	viewTypeID, err := omeClient.GetViewTypeID(plan.ViewType.Value)
+	viewTypeID, err := omeClient.GetViewTypeID(plan.ViewType.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrCreateTemplate, err.Error(),
@@ -291,7 +294,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 		return
 	}
 
-	deviceTypeID, err := omeClient.GetDeviceTypeID(plan.DeviceType.Value)
+	deviceTypeID, err := omeClient.GetDeviceTypeID(plan.DeviceType.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrCreateTemplate, err.Error(),
@@ -302,10 +305,10 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 	omeTemplateData := models.OMETemplate{}
 	var templateID int64
 
-	if plan.ReftemplateName.Value != "" {
+	if plan.ReftemplateName.ValueString() != "" {
 		tflog.Info(ctx, "resource_template create: creating a template from a reference template")
 
-		if !plan.Description.Unknown {
+		if !plan.Description.IsUnknown() {
 			resp.Diagnostics.AddError(
 				clients.ErrCreateTemplate, "description cannot be modified while cloning from a reference template.",
 			)
@@ -313,7 +316,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 		}
 
 		// The identity pool and Vlans does not get cloned into the new template in OME.
-		sourceTemplate, err := omeClient.GetTemplateByName(plan.ReftemplateName.Value)
+		sourceTemplate, err := omeClient.GetTemplateByName(plan.ReftemplateName.ValueString())
 		if err != nil || sourceTemplate.Name == "" {
 			resp.Diagnostics.AddError(
 				clients.ErrCreateTemplate, "Unable to clone the template because Source template does not exist.",
@@ -330,7 +333,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 
 		cloneTemplateRequest := models.OMECloneTemplate{
 			SourceTemplateID: sourceTemplate.ID,
-			NewTemplateName:  plan.Name.Value,
+			NewTemplateName:  plan.Name.ValueString(),
 			ViewTypeID:       viewTypeID,
 		}
 		templateID, err = omeClient.CloneTemplateByRefTemplateID(cloneTemplateRequest)
@@ -348,10 +351,10 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 			)
 			return
 		}
-	} else if plan.Content.Value != "" { // template import
+	} else if plan.Content.ValueString() != "" { // template import
 		tflog.Info(ctx, "resource_template create: creating a template from a xml content")
 
-		if !plan.Description.Unknown {
+		if !plan.Description.IsUnknown() {
 			resp.Diagnostics.AddError(
 				clients.ErrCreateTemplate, "description is not supported for template import operation.",
 			)
@@ -361,8 +364,8 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 		importTemplateRequest := models.OMEImportTemplate{
 			ViewTypeID: viewTypeID,
 			Type:       deviceTypeID,
-			Name:       plan.Name.Value,
-			Content:    plan.Content.Value,
+			Name:       plan.Name.ValueString(),
+			Content:    plan.Content.ValueString(),
 		}
 
 		templateID, err = omeClient.ImportTemplate(importTemplateRequest)
@@ -383,7 +386,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 
 	} else {
 		tflog.Info(ctx, "resource_template create: creating a template from a reference device")
-		deviceID, err := omeClient.ValidateDevice(plan.RefdeviceServicetag.Value, plan.RefdeviceID.Value)
+		deviceID, err := omeClient.ValidateDevice(plan.RefdeviceServicetag.ValueString(), plan.RefdeviceID.ValueInt64())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				clients.ErrCreateTemplate, err.Error(),
@@ -392,11 +395,11 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 		}
 
 		ct := models.CreateTemplate{
-			Fqdds:          strings.ReplaceAll(plan.FQDDS.Value, " ", ""),
+			Fqdds:          strings.ReplaceAll(plan.FQDDS.ValueString(), " ", ""),
 			ViewTypeID:     viewTypeID,
 			SourceDeviceID: deviceID,
-			Name:           plan.Name.Value,
-			Description:    plan.Description.Value,
+			Name:           plan.Name.ValueString(),
+			Description:    plan.Description.ValueString(),
 		}
 
 		templateID, err = omeClient.CreateTemplate(ct)
@@ -417,7 +420,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 			return
 		}
 
-		isSuccess, message := omeClient.TrackJob(omeTemplateData.TaskID, plan.JobRetryCount.Value, plan.SleepInterval.Value)
+		isSuccess, message := omeClient.TrackJob(omeTemplateData.TaskID, plan.JobRetryCount.ValueInt64(), plan.SleepInterval.ValueInt64())
 		if !isSuccess {
 			resp.Diagnostics.AddError(
 				clients.ErrCreateTemplate, message,
@@ -458,19 +461,43 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 	}
 	//PropogateVlan is default true and is not available in the response from OME,hence setting it to true here to persist in state
 	omeVlan.PropagateVLAN = true
-	template.RefdeviceServicetag.Value = plan.RefdeviceServicetag.Value
-	template.ReftemplateName.Value = plan.ReftemplateName.Value
-	template.RefdeviceID.Value = plan.RefdeviceID.Value
-	if plan.ReftemplateName.Value != "" {
-		template.RefdeviceID.Value = omeTemplateData.SourceDeviceID
+	if !plan.RefdeviceServicetag.IsUnknown() {
+		template.RefdeviceServicetag = plan.RefdeviceServicetag
 	}
-	template.Content.Value = plan.Content.Value
-	template.ViewType.Value = plan.ViewType.Value
-	template.DeviceType.Value = plan.DeviceType.Value
-	template.FQDDS.Value = plan.FQDDS.Value // The default value of fqdds is set to `All`. So if the config doesn't have any value specified, the default value in the plan is `All`.
-	template.JobRetryCount = plan.JobRetryCount
-	template.SleepInterval = plan.SleepInterval
-	template.IdentityPoolName.Value = plan.IdentityPoolName.Value
+
+	if !plan.ReftemplateName.IsUnknown() {
+		template.ReftemplateName = plan.ReftemplateName
+	}
+
+	if !plan.RefdeviceID.IsUnknown() {
+		template.RefdeviceID = plan.RefdeviceID
+	}
+
+	if plan.ReftemplateName.ValueString() != "" {
+		template.RefdeviceID = types.Int64Value(omeTemplateData.SourceDeviceID)
+	}
+
+	if !plan.Content.IsUnknown() {
+		template.Content = plan.Content
+	}
+	if !plan.ViewType.IsUnknown() {
+		template.ViewType = plan.ViewType
+	}
+	if !plan.DeviceType.IsUnknown() {
+		template.DeviceType = plan.DeviceType
+	}
+	if !plan.FQDDS.IsUnknown() {
+		template.FQDDS = plan.FQDDS
+	} // The default value of fqdds is set to `All`. So if the config doesn't have any value specified, the default value in the plan is `All`.
+	if !plan.JobRetryCount.IsUnknown() {
+		template.JobRetryCount = plan.JobRetryCount
+	}
+	if !plan.SleepInterval.IsUnknown() {
+		template.SleepInterval = plan.SleepInterval
+	}
+	if !plan.IdentityPoolName.IsUnknown() {
+		template.IdentityPoolName = plan.IdentityPoolName
+	}
 
 	tflog.Trace(ctx, "resource_template create: started updating state")
 
@@ -489,7 +516,7 @@ func (r resourceTemplate) Create(ctx context.Context, req tfsdk.CreateResourceRe
 }
 
 // Read resource information
-func (r resourceTemplate) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r *resourceTemplate) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	tflog.Trace(ctx, "resource_template read: started")
 	var template models.Template
 	diags := req.State.Get(ctx, &template)
@@ -497,7 +524,7 @@ func (r resourceTemplate) Read(ctx context.Context, req tfsdk.ReadResourceReques
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	templateID, _ := strconv.ParseInt(template.ID.Value, 10, 64)
+	templateID, _ := strconv.ParseInt(template.ID.ValueString(), 10, 64)
 	omeClient, err := clients.NewClient(*r.p.clientOpt)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -523,7 +550,7 @@ func (r resourceTemplate) Read(ctx context.Context, req tfsdk.ReadResourceReques
 
 	for _, stateAttrObject := range stateAttributeObjects {
 		stateAttribute := models.Attribute{}
-		stateAttrObject.As(ctx, &stateAttribute, types.ObjectAsOptions{UnhandledNullAsEmpty: true})
+		stateAttrObject.As(ctx, &stateAttribute, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
 		stateAttributes = append(stateAttributes, stateAttribute)
 	}
 
@@ -551,7 +578,7 @@ func (r resourceTemplate) Read(ctx context.Context, req tfsdk.ReadResourceReques
 	}
 
 	stateVlan := models.Vlan{}
-	diags = template.Vlan.As(ctx, &stateVlan, types.ObjectAsOptions{UnhandledNullAsEmpty: true})
+	diags = template.Vlan.As(ctx, &stateVlan, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
 	if diags.HasError() {
 		resp.Diagnostics.AddError(
 			clients.ErrReadTemplate,
@@ -570,7 +597,7 @@ func (r resourceTemplate) Read(ctx context.Context, req tfsdk.ReadResourceReques
 		return
 	}
 
-	omeVlan.PropagateVLAN = stateVlan.PropogateVlan.Value
+	omeVlan.PropagateVLAN = stateVlan.PropogateVlan.ValueBool()
 
 	if omeTemplateData.IdentityPoolID != 0 {
 		identityPool, err := omeClient.GetIdentityPoolByID(omeTemplateData.IdentityPoolID)
@@ -581,7 +608,7 @@ func (r resourceTemplate) Read(ctx context.Context, req tfsdk.ReadResourceReques
 			)
 			return
 		}
-		template.IdentityPoolName = types.String{Value: identityPool.Name}
+		template.IdentityPoolName = types.StringValue(identityPool.Name)
 	}
 
 	tflog.Trace(ctx, "resource_template read: updating state started")
@@ -602,7 +629,7 @@ func (r resourceTemplate) Read(ctx context.Context, req tfsdk.ReadResourceReques
 }
 
 // Update resource
-func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	tflog.Trace(ctx, "resource_template update: started")
 	var planTemplate models.Template
 	planDiags := req.Plan.Get(ctx, &planTemplate)
@@ -617,7 +644,7 @@ func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	templateID, _ := strconv.ParseInt(stateTemplate.ID.Value, 10, 64)
+	templateID, _ := strconv.ParseInt(stateTemplate.ID.ValueString(), 10, 64)
 
 	if isConfigValuesChanged(planTemplate, stateTemplate) {
 		resp.Diagnostics.AddError(
@@ -650,8 +677,8 @@ func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 		"templateid": templateID,
 	})
 	var identityPool models.IdentityPool
-	if planTemplate.IdentityPoolName.Value != "" {
-		identityPool, err = validateIOPoolName(omeClient, planTemplate.IdentityPoolName.Value)
+	if planTemplate.IdentityPoolName.ValueString() != "" {
+		identityPool, err = validateIOPoolName(omeClient, planTemplate.IdentityPoolName.ValueString())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				clients.ErrUpdateTemplate,
@@ -662,7 +689,7 @@ func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 	}
 	planVlan := getVlanForTemplate(ctx, resp, planTemplate)
 
-	if !planTemplate.Vlan.Unknown {
+	if !planTemplate.Vlan.IsUnknown() {
 		err := validateVlanNetworkData(omeClient, templateID, planVlan)
 		if err != nil {
 			resp.Diagnostics.AddError(
@@ -675,13 +702,13 @@ func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 	}
 
 	updatePayload := models.UpdateTemplate{
-		Name:        planTemplate.Name.Value,
+		Name:        planTemplate.Name.ValueString(),
 		ID:          templateID,
-		Description: stateTemplate.Description.Value,
+		Description: stateTemplate.Description.ValueString(),
 	}
 
-	if planTemplate.Description.Value != stateTemplate.Description.Value {
-		updatePayload.Description = planTemplate.Description.Value
+	if planTemplate.Description != stateTemplate.Description {
+		updatePayload.Description = planTemplate.Description.ValueString()
 	}
 
 	stateAttributes := getTfsdkStateAttributes(ctx, stateTemplate)
@@ -707,8 +734,8 @@ func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 	}
 
 	// Updating networkConfig now
-	var updateIdentityPool = planTemplate.IdentityPoolName.Value != stateTemplate.IdentityPoolName.Value
-	updateVlan := !reflect.DeepEqual(planTemplate.Vlan.Attrs, stateTemplate.Vlan.Attrs)
+	var updateIdentityPool = planTemplate.IdentityPoolName != stateTemplate.IdentityPoolName
+	updateVlan := !reflect.DeepEqual(planTemplate.Vlan.Attributes(), stateTemplate.Vlan.Attributes())
 	updateNetworkConfig := updateIdentityPool || updateVlan
 
 	if updateNetworkConfig {
@@ -724,16 +751,16 @@ func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 			// 'OIDOpt 1 Virtual Address Persistence Policy Auxiliary Powered',
 			// 'IOIDOpt 1 Virtual Address Persistence Policy Non Auxiliary Powered']. This will cause an inconsistency between plan and state.
 			// Hence, before IO pool is assigned, these attributes will have to be modified.
-			if planTemplate.IdentityPoolName.Value != "" {
+			if planTemplate.IdentityPoolName.ValueString() != "" {
 				nwConfig.IdentityPoolID = identityPool.ID
 			} else {
 				nwConfig.IdentityPoolID = 0
 			}
 		} else {
-			nwConfig.IdentityPoolID = stateTemplate.IdentityPoolID.Value
+			nwConfig.IdentityPoolID = stateTemplate.IdentityPoolID.ValueInt64()
 		}
-		if planTemplate.IdentityPoolName.Value != "" {
-			identityPool, err := omeClient.GetIdentityPoolByName(planTemplate.IdentityPoolName.Value)
+		if planTemplate.IdentityPoolName.ValueString() != "" {
+			identityPool, err := omeClient.GetIdentityPoolByName(planTemplate.IdentityPoolName.ValueString())
 			if err != nil {
 				resp.Diagnostics.AddWarning(
 					fmt.Sprintf("Unable to update IdentityPool parameters to the template: %d", templateID),
@@ -819,18 +846,33 @@ func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 			return
 		}
 	}
+
 	updatedVlan.PropagateVLAN = planVlan.PropagateVLAN
 
-	stateTemplate.IdentityPoolName.Value = planTemplate.IdentityPoolName.Value
-	stateTemplate.SleepInterval.Value = planTemplate.SleepInterval.Value
-	stateTemplate.ViewType.Value = planTemplate.ViewType.Value
-	stateTemplate.FQDDS.Value = planTemplate.FQDDS.Value
-	stateTemplate.JobRetryCount.Value = planTemplate.JobRetryCount.Value
+	if !planTemplate.IdentityPoolName.IsUnknown() {
+		stateTemplate.IdentityPoolName = planTemplate.IdentityPoolName
+	}
+
+	if !planTemplate.SleepInterval.IsUnknown() {
+		stateTemplate.SleepInterval = planTemplate.SleepInterval
+	}
+
+	if !planTemplate.ViewType.IsUnknown() {
+		stateTemplate.ViewType = planTemplate.ViewType
+	}
+
+	if !planTemplate.FQDDS.IsUnknown() {
+		stateTemplate.FQDDS = planTemplate.FQDDS
+	}
+
+	if !planTemplate.JobRetryCount.IsUnknown() {
+		stateTemplate.JobRetryCount = planTemplate.JobRetryCount
+	}
 
 	tflog.Trace(ctx, "resource_template update: updating state data started")
 
 	tfsdkVlan := models.Vlan{}
-	planTemplate.Vlan.As(ctx, &tfsdkVlan, types.ObjectAsOptions{UnhandledNullAsEmpty: true})
+	planTemplate.Vlan.As(ctx, &tfsdkVlan, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
 
 	vlanAttrs := []models.VlanAttributes{}
 	tfsdkVlan.VlanAttributes.ElementsAs(ctx, &vlanAttrs, true)
@@ -849,7 +891,7 @@ func (r resourceTemplate) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 }
 
 // Delete resource
-func (r resourceTemplate) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r resourceTemplate) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "resource_template delete: started")
 	var template models.Template
 	diags := resp.State.Get(ctx, &template)
@@ -877,10 +919,10 @@ func (r resourceTemplate) Delete(ctx context.Context, req tfsdk.DeleteResourceRe
 	defer omeClient.RemoveSession()
 	tflog.Trace(ctx, "resource_template delete: started delete")
 	tflog.Debug(ctx, "resource_template delete: started delete for template", map[string]interface{}{
-		"templateid": template.ID.Value,
+		"templateid": template.ID.ValueString(),
 	})
 
-	_, err = omeClient.Delete(fmt.Sprintf(clients.TemplateAPI+"(%s)", template.ID.Value), nil, nil)
+	_, err = omeClient.Delete(fmt.Sprintf(clients.TemplateAPI+"(%s)", template.ID.ValueString()), nil, nil)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrDeleteTemplate,
@@ -892,10 +934,10 @@ func (r resourceTemplate) Delete(ctx context.Context, req tfsdk.DeleteResourceRe
 }
 
 // Import resource
-func (r resourceTemplate) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
+func (r resourceTemplate) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	tflog.Trace(ctx, "resource_template import: started")
 	var template models.Template
-	template.Name.Value = req.ID
+	template.Name = types.StringValue(req.ID)
 	omeClient, err := clients.NewClient(*r.p.clientOpt)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -964,15 +1006,15 @@ func (r resourceTemplate) ImportState(ctx context.Context, req tfsdk.ImportResou
 		deviceType = "Chassis"
 	}
 
-	template.RefdeviceID = types.Int64{Value: omeTemplateData.SourceDeviceID}
-	template.RefdeviceServicetag = types.String{Value: "NA"}
-	template.ReftemplateName = types.String{Value: "NA"}
-	template.Content = types.String{Value: "NA"}
-	template.ViewType = types.String{Value: viewType}
-	template.DeviceType = types.String{Value: deviceType}
-	template.JobRetryCount = types.Int64{Value: RetryCount}
-	template.SleepInterval = types.Int64{Value: SleepInterval}
-	template.FQDDS = types.String{Value: "All"}
+	template.RefdeviceID = types.Int64Value(omeTemplateData.SourceDeviceID)
+	template.RefdeviceServicetag = types.StringValue("NA")
+	template.ReftemplateName = types.StringValue("NA")
+	template.Content = types.StringValue("NA")
+	template.ViewType = types.StringValue(viewType)
+	template.DeviceType = types.StringValue(deviceType)
+	template.JobRetryCount = types.Int64Value(RetryCount)
+	template.SleepInterval = types.Int64Value(SleepInterval)
+	template.FQDDS = types.StringValue("All")
 	diags := resp.State.Set(ctx, &template)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -983,25 +1025,25 @@ func (r resourceTemplate) ImportState(ctx context.Context, req tfsdk.ImportResou
 
 func validateCreate(plan models.Template) error {
 	// all references cannot be empty
-	if plan.ReftemplateName.Value == "" && plan.RefdeviceID.Value == 0 && plan.RefdeviceServicetag.Value == "" && plan.Content.Value == "" {
+	if plan.ReftemplateName.ValueString() == "" && plan.RefdeviceID.ValueInt64() == 0 && plan.RefdeviceServicetag.ValueString() == "" && plan.Content.ValueString() == "" {
 		return fmt.Errorf("either reftemplate_name or refdevice_id or refdevice_servicetag or content is required")
 	}
 
 	// any two references given results in error
-	if (plan.ReftemplateName.Value != "" && (plan.RefdeviceID.Value != 0 || plan.RefdeviceServicetag.Value != "" || plan.Content.Value != "")) ||
-		(plan.RefdeviceID.Value != 0 && (plan.ReftemplateName.Value != "" || plan.RefdeviceServicetag.Value != "" || plan.Content.Value != "")) ||
-		(plan.RefdeviceServicetag.Value != "" && (plan.RefdeviceID.Value != 0 || plan.ReftemplateName.Value != "" || plan.Content.Value != "")) ||
-		(plan.Content.Value != "" && (plan.RefdeviceID.Value != 0 || plan.ReftemplateName.Value != "" || plan.RefdeviceServicetag.Value != "")) {
+	if (plan.ReftemplateName.ValueString() != "" && (plan.RefdeviceID.ValueInt64() != 0 || plan.RefdeviceServicetag.ValueString() != "" || plan.Content.ValueString() != "")) ||
+		(plan.RefdeviceID.ValueInt64() != 0 && (plan.ReftemplateName.ValueString() != "" || plan.RefdeviceServicetag.ValueString() != "" || plan.Content.ValueString() != "")) ||
+		(plan.RefdeviceServicetag.ValueString() != "" && (plan.RefdeviceID.ValueInt64() != 0 || plan.ReftemplateName.ValueString() != "" || plan.Content.ValueString() != "")) ||
+		(plan.Content.ValueString() != "" && (plan.RefdeviceID.ValueInt64() != 0 || plan.ReftemplateName.ValueString() != "" || plan.RefdeviceServicetag.ValueString() != "")) {
 		return fmt.Errorf("either reftemplate_name or refdevice_id or refdevice_servicetag or content is required")
 	}
 
 	// Identity Pool name and Vlan is supported only during update
-	if !plan.IdentityPoolName.Unknown || !plan.Vlan.Unknown {
+	if !plan.IdentityPoolName.IsUnknown() || !plan.Vlan.IsUnknown() {
 		return fmt.Errorf("attributes identity_pool_name and vlan cannot be associated during create")
 	}
 
 	// Attributes is part of plan during create
-	if !plan.Attributes.Unknown {
+	if !plan.Attributes.IsUnknown() {
 		return fmt.Errorf("attributes cannot be modified during create")
 	}
 	return nil
@@ -1035,12 +1077,12 @@ func validateIOPoolName(omeClient *clients.Client, name string) (models.Identity
 }
 
 func isConfigValuesChanged(planTemplate, stateTemplate models.Template) bool {
-	return (!planTemplate.RefdeviceID.Unknown && stateTemplate.RefdeviceID.Value != planTemplate.RefdeviceID.Value) ||
-		(!planTemplate.RefdeviceServicetag.Unknown && stateTemplate.RefdeviceServicetag.Value != planTemplate.RefdeviceServicetag.Value) ||
-		(!planTemplate.ViewType.Unknown && stateTemplate.ViewType.Value != planTemplate.ViewType.Value) ||
-		(!planTemplate.FQDDS.Unknown && stateTemplate.FQDDS.Value != planTemplate.FQDDS.Value) ||
-		(!planTemplate.ReftemplateName.Unknown && stateTemplate.ReftemplateName.Value != planTemplate.ReftemplateName.Value) ||
-		(!planTemplate.Content.Unknown && stateTemplate.Content.Value != planTemplate.Content.Value)
+	return (!planTemplate.RefdeviceID.IsUnknown() && stateTemplate.RefdeviceID.ValueInt64() != planTemplate.RefdeviceID.ValueInt64()) ||
+		(!planTemplate.RefdeviceServicetag.IsUnknown() && stateTemplate.RefdeviceServicetag.ValueString() != planTemplate.RefdeviceServicetag.ValueString()) ||
+		(!planTemplate.ViewType.IsUnknown() && stateTemplate.ViewType.ValueString() != planTemplate.ViewType.ValueString()) ||
+		(!planTemplate.FQDDS.IsUnknown() && stateTemplate.FQDDS.ValueString() != planTemplate.FQDDS.ValueString()) ||
+		(!planTemplate.ReftemplateName.IsUnknown() && stateTemplate.ReftemplateName.ValueString() != planTemplate.ReftemplateName.ValueString()) ||
+		(!planTemplate.Content.IsUnknown() && stateTemplate.Content.ValueString() != planTemplate.Content.ValueString())
 }
 
 func validateVlan(planVlan, remoteVlan models.OMEVlan, vlanNetworks []models.VLanNetworks) error {
@@ -1138,13 +1180,13 @@ func isValidNetworkID(remoteVlanIds map[int64]bool, vlanID int64) bool {
 	return true
 }
 
-func getVlanForTemplate(ctx context.Context, resp *tfsdk.UpdateResourceResponse, Template models.Template) models.OMEVlan {
+func getVlanForTemplate(ctx context.Context, resp *resource.UpdateResponse, Template models.Template) models.OMEVlan {
 	omeVlan := models.OMEVlan{}
 	vlan := models.Vlan{}
 
-	Template.Vlan.As(ctx, &vlan, types.ObjectAsOptions{UnhandledNullAsEmpty: true})
-	omeVlan.BondingTechnology = vlan.BondingTechnology.Value
-	omeVlan.PropagateVLAN = vlan.PropogateVlan.Value
+	Template.Vlan.As(ctx, &vlan, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
+	omeVlan.BondingTechnology = vlan.BondingTechnology.ValueString()
+	omeVlan.PropagateVLAN = vlan.PropogateVlan.ValueBool()
 	omeVlanAttrs := []models.OMEVlanAttribute{}
 	vlanAttrs := []models.VlanAttributes{}
 	vlan.VlanAttributes.ElementsAs(ctx, &vlanAttrs, true)
@@ -1152,11 +1194,11 @@ func getVlanForTemplate(ctx context.Context, resp *tfsdk.UpdateResourceResponse,
 		taggedNetworks := []int64{}
 		vlanAttr.TaggedNetworks.ElementsAs(ctx, &taggedNetworks, true)
 		omeVlanAttr := models.OMEVlanAttribute{
-			Untagged:      vlanAttr.UntaggedNetwork.Value,
+			Untagged:      vlanAttr.UntaggedNetwork.ValueInt64(),
 			Tagged:        taggedNetworks,
-			IsNICBonded:   vlanAttr.IsNicBonded.Value,
-			Port:          vlanAttr.Port.Value,
-			NicIdentifier: vlanAttr.NicIdentifier.Value,
+			IsNICBonded:   vlanAttr.IsNicBonded.ValueBool(),
+			Port:          vlanAttr.Port.ValueInt64(),
+			NicIdentifier: vlanAttr.NicIdentifier.ValueString(),
 		}
 		omeVlanAttrs = append(omeVlanAttrs, omeVlanAttr)
 	}
@@ -1171,7 +1213,7 @@ func getTfsdkStateAttributes(ctx context.Context, stateTemplate models.Template)
 
 	for _, stateAttrObject := range stateAttributeObjects {
 		stateAttribute := models.Attribute{}
-		stateAttrObject.As(ctx, &stateAttribute, types.ObjectAsOptions{UnhandledNullAsEmpty: true})
+		stateAttrObject.As(ctx, &stateAttribute, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
 		stateAttributes = append(stateAttributes, stateAttribute)
 	}
 	return stateAttributes
@@ -1204,16 +1246,16 @@ func getDeltaAttributes(ctx context.Context, planTemplate models.Template, state
 
 	for _, planUpdateAttrObject := range planUpdateAttributeObjects {
 		planUpdateAttribute := models.Attribute{}
-		planUpdateAttrObject.As(ctx, &planUpdateAttribute, types.ObjectAsOptions{UnhandledNullAsEmpty: true})
+		planUpdateAttrObject.As(ctx, &planUpdateAttribute, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
 		planUpdateAttributes = append(planUpdateAttributes, planUpdateAttribute)
 	}
 	if !reflect.DeepEqual(planUpdateAttributes, stateAttributes) {
 		for index, attribute := range planUpdateAttributes {
 			if attribute.Value != stateAttributes[index].Value {
 				updateAttribute := models.UpdateAttribute{
-					ID:        attribute.AttributeID.Value,
-					IsIgnored: attribute.IsIgnored.Value,
-					Value:     attribute.Value.Value,
+					ID:        attribute.AttributeID.ValueInt64(),
+					IsIgnored: attribute.IsIgnored.ValueBool(),
+					Value:     attribute.Value.ValueString(),
 				}
 				updatedAttributes = append(updatedAttributes, updateAttribute)
 			}
@@ -1225,42 +1267,38 @@ func getDeltaAttributes(ctx context.Context, planTemplate models.Template, state
 
 func updateState(stateTemplate *models.Template, planVlanAttributes []models.VlanAttributes, omeTemplateData *models.OMETemplate, omeTemplateAttributes []models.OmeAttribute, omeVlan models.OMEVlan) {
 
-	stateTemplate.ID.Value = fmt.Sprintf("%d", omeTemplateData.ID)
-	stateTemplate.Name.Value = omeTemplateData.Name
-	stateTemplate.Description.Value = omeTemplateData.Description
-	stateTemplate.ViewTypeID.Value = omeTemplateData.ViewTypeID
-	stateTemplate.IdentityPoolID.Value = omeTemplateData.IdentityPoolID
+	stateTemplate.ID = types.StringValue(fmt.Sprintf("%d", omeTemplateData.ID))
+	stateTemplate.Name = types.StringValue(omeTemplateData.Name)
+	stateTemplate.Description = types.StringValue(omeTemplateData.Description)
+	stateTemplate.ViewTypeID = types.Int64Value(omeTemplateData.ViewTypeID)
+	stateTemplate.IdentityPoolID = types.Int64Value(omeTemplateData.IdentityPoolID)
 
-	attributesTfsdk := types.List{
-		ElemType: types.ObjectType{
-			AttrTypes: map[string]attr.Type{
-				"attribute_id": types.Int64Type,
-				"display_name": types.StringType,
-				"value":        types.StringType,
-				"is_ignored":   types.BoolType,
-			},
-		},
-	}
 	attributeObjects := []attr.Value{}
 
 	for _, attribute := range omeTemplateAttributes {
 		attributeDetails := map[string]attr.Value{}
-		attributeDetails["attribute_id"] = types.Int64{Value: attribute.AttributeID}
-		attributeDetails["display_name"] = types.String{Value: attribute.DisplayName}
-		attributeDetails["value"] = types.String{Value: attribute.Value}
-		attributeDetails["is_ignored"] = types.Bool{Value: attribute.IsIgnored}
-		attributeObject := types.Object{
-			Attrs: attributeDetails,
+		attributeDetails["attribute_id"] = types.Int64Value(attribute.AttributeID)
+		attributeDetails["display_name"] = types.StringValue(attribute.DisplayName)
+		attributeDetails["value"] = types.StringValue(attribute.Value)
+		attributeDetails["is_ignored"] = types.BoolValue(attribute.IsIgnored)
+		attributeObject, _ := types.ObjectValue(
+			map[string]attr.Type{
+				"attribute_id": types.Int64Type,
+				"display_name": types.StringType,
+				"value":        types.StringType,
+				"is_ignored":   types.BoolType,
+			}, attributeDetails)
+		attributeObjects = append(attributeObjects, attributeObject)
+	}
+	attributesTfsdk, _ := types.ListValue(
+		types.ObjectType{
 			AttrTypes: map[string]attr.Type{
 				"attribute_id": types.Int64Type,
 				"display_name": types.StringType,
 				"value":        types.StringType,
 				"is_ignored":   types.BoolType,
 			},
-		}
-		attributeObjects = append(attributeObjects, attributeObject)
-	}
-	attributesTfsdk.Elems = attributeObjects
+		}, attributeObjects)
 	stateTemplate.Attributes = attributesTfsdk
 
 	omeVlanMap := map[string]models.OMEVlanAttribute{}
@@ -1273,7 +1311,7 @@ func updateState(stateTemplate *models.Template, planVlanAttributes []models.Vla
 	vlanAttrsObjects := []attr.Value{}
 
 	for _, planVlanAttr := range planVlanAttributes {
-		key := fmt.Sprintf(NicIdentifierAndPort, planVlanAttr.NicIdentifier.Value, planVlanAttr.Port.Value)
+		key := fmt.Sprintf(NicIdentifierAndPort, planVlanAttr.NicIdentifier.ValueString(), planVlanAttr.Port.ValueInt64())
 		if omeVlanAttr, ok := omeVlanMap[key]; ok {
 			vlanAttrObject := getVlanAtrrObject(omeVlanAttr)
 			vlanAttrsObjects = append(vlanAttrsObjects, vlanAttrObject)
@@ -1289,8 +1327,8 @@ func updateState(stateTemplate *models.Template, planVlanAttributes []models.Vla
 		}
 	}
 
-	vlanAttrList := types.List{
-		ElemType: types.ObjectType{
+	vlanAttrList, _ := types.ListValue(
+		types.ObjectType{
 			AttrTypes: map[string]attr.Type{
 				"untagged_network": types.Int64Type,
 				"tagged_networks": types.SetType{
@@ -1300,12 +1338,10 @@ func updateState(stateTemplate *models.Template, planVlanAttributes []models.Vla
 				"port":           types.Int64Type,
 				"nic_identifier": types.StringType,
 			},
-		},
-		Elems: vlanAttrsObjects,
-	}
+		}, vlanAttrsObjects)
 
-	vlanTfsdk := types.Object{
-		AttrTypes: map[string]attr.Type{
+	vlanTfsdk, _ := types.ObjectValue(
+		map[string]attr.Type{
 			"propogate_vlan":     types.BoolType,
 			"bonding_technology": types.StringType,
 			"vlan_attributes": types.ListType{
@@ -1322,19 +1358,33 @@ func updateState(stateTemplate *models.Template, planVlanAttributes []models.Vla
 				},
 			},
 		},
-		Attrs: map[string]attr.Value{
-			"propogate_vlan":     types.Bool{Value: omeVlan.PropagateVLAN},
-			"bonding_technology": types.String{Value: omeVlan.BondingTechnology},
+		map[string]attr.Value{
+			"propogate_vlan":     types.BoolValue(omeVlan.PropagateVLAN),
+			"bonding_technology": types.StringValue(omeVlan.BondingTechnology),
 			"vlan_attributes":    vlanAttrList,
 		},
-	}
+	)
 
 	stateTemplate.Vlan = vlanTfsdk
 }
 
 func getVlanAtrrObject(omeVlanAttr models.OMEVlanAttribute) types.Object {
-	vlanAttrObject := types.Object{
-		AttrTypes: map[string]attr.Type{
+	vlanAttrMap := map[string]attr.Value{}
+	vlanAttrMap["untagged_network"] = types.Int64Value(omeVlanAttr.Untagged)
+	taggedNetworks := []attr.Value{}
+	for _, tn := range omeVlanAttr.Tagged {
+		taggedNetworks = append(taggedNetworks, types.Int64Value(tn))
+	}
+
+	vlanAttrMap["tagged_networks"], _ = types.SetValue(
+		types.Int64Type,
+		taggedNetworks,
+	)
+	vlanAttrMap["is_nic_bonded"] = types.BoolValue(omeVlanAttr.IsNICBonded)
+	vlanAttrMap["port"] = types.Int64Value(omeVlanAttr.Port)
+	vlanAttrMap["nic_identifier"] = types.StringValue(omeVlanAttr.NicIdentifier)
+	vlanAttrObject, _ := types.ObjectValue(
+		map[string]attr.Type{
 			"untagged_network": types.Int64Type,
 			"tagged_networks": types.SetType{
 				ElemType: types.Int64Type,
@@ -1342,22 +1392,6 @@ func getVlanAtrrObject(omeVlanAttr models.OMEVlanAttribute) types.Object {
 			"is_nic_bonded":  types.BoolType,
 			"port":           types.Int64Type,
 			"nic_identifier": types.StringType,
-		},
-	}
-	vlanAttrMap := map[string]attr.Value{}
-	vlanAttrMap["untagged_network"] = types.Int64{Value: omeVlanAttr.Untagged}
-	taggedNetworks := []attr.Value{}
-	for _, tn := range omeVlanAttr.Tagged {
-		taggedNetworks = append(taggedNetworks, types.Int64{Value: tn})
-	}
-
-	vlanAttrMap["tagged_networks"] = types.Set{
-		ElemType: types.Int64Type,
-		Elems:    taggedNetworks,
-	}
-	vlanAttrMap["is_nic_bonded"] = types.Bool{Value: omeVlanAttr.IsNICBonded}
-	vlanAttrMap["port"] = types.Int64{Value: omeVlanAttr.Port}
-	vlanAttrMap["nic_identifier"] = types.String{Value: omeVlanAttr.NicIdentifier}
-	vlanAttrObject.Attrs = vlanAttrMap
+		}, vlanAttrMap)
 	return vlanAttrObject
 }

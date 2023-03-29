@@ -10,9 +10,9 @@ import (
 )
 
 //go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate --rendered-website-dir docs
-var (
-	version string = "dev"
-)
+// var (
+// 	version string = "dev"
+// )
 
 func main() {
 	var debug bool
@@ -20,7 +20,7 @@ func main() {
 	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
 	flag.Parse()
 
-	err := providerserver.Serve(context.Background(), ome.New(version), providerserver.ServeOpts{
+	err := providerserver.Serve(context.Background(), ome.New, providerserver.ServeOpts{
 		Address: "registry.terraform.io/dell/ome",
 		Debug:   debug,
 	})

@@ -29,11 +29,11 @@ data "ome_configuration_report_info" "cr" {
 ### Optional
 
 - `fetch_attributes` (Boolean) Fetch  device compliance attribute report.
-- `id` (String) ID for data source.
+- `id` (String) ID for baseline compliance data source.
 
 ### Read-Only
 
-- `compliance_report_device` (Attributes List) Device complaince report. (see [below for nested schema](#nestedatt--compliance_report_device))
+- `compliance_report_device` (Attributes List) Device compliance report. (see [below for nested schema](#nestedatt--compliance_report_device))
 
 <a id="nestedatt--compliance_report_device"></a>
 ### Nested Schema for `compliance_report_device`

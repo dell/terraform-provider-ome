@@ -1,15 +1,14 @@
 package ome
 
 import (
-	"context"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
+	"github.com/joho/godotenv"
 )
 
 const (
@@ -18,8 +17,7 @@ const (
 	SweepTestsTemplateIdentifier = "test_acc"
 )
 
-var testProvider tfsdk.Provider
-var testProviderFactory map[string]func() (tfprotov6.ProviderServer, error)
+var testAccProtoV6ProviderFactories map[string]func() (tfprotov6.ProviderServer, error)
 var omeUserName = os.Getenv("OME_USERNAME")
 var omeHost = os.Getenv("OME_HOST")
 var omePassword = os.Getenv("OME_PASSWORD")
@@ -33,10 +31,14 @@ var SharePassword = os.Getenv("SHAREPASSWORD")
 var ShareIP = os.Getenv("SHAREIP")
 
 func init() {
-	testProvider = New("test")()
-	testProviderFactory = map[string]func() (tfprotov6.ProviderServer, error){
+	// testAccProtoV6ProviderFactories are used to instantiate a provider during
+	// acceptance testing. The factory function will be invoked for every Terraform
+	// CLI command executed to create a provider server to which the CLI can
+	// reattach.
+	godotenv.Load("ome_test.env")
+	testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
 		// newProvider is an example function that returns a tfsdk.Provider
-		"ome": providerserver.NewProtocol6WithError(testProvider),
+		"ome": providerserver.NewProtocol6WithError(New()),
 	}
 
 }
@@ -54,7 +56,7 @@ func testAccPreCheck(t *testing.T) {
 		t.Fatal("OME_HOST must be set for acceptance tests")
 	}
 
-	testProvider.Configure(context.Background(), tfsdk.ConfigureProviderRequest{}, &tfsdk.ConfigureProviderResponse{})
+	// testProvider.Configure(context.Background(), tfsdk.ConfigureProviderRequest{}, &tfsdk.ConfigureProviderResponse{})
 
 }
 

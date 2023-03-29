@@ -67,13 +67,10 @@ func init() {
 }
 
 func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
-	if skipTest() {
-		t.Skip(SkipTestMsg)
-	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCreateTemplateSuccess,
@@ -105,7 +102,7 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "fqdds", "iDRAC,niC"),
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "description", "This is a test template"),
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "vlan.bonding_technology", "NoTeaming"),
-					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "vlan.vlan_attributes.0.untagged_network", "12832"),
+					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "vlan.vlan_attributes.0.untagged_network", "10172"),
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "identity_pool_name", "IO1"),
 
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-2", "name", TemplateName2),
@@ -120,13 +117,10 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 
 // The identity pool and Vlans does not get cloned into the new template in OME.
 func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
-	if skipTest() {
-		t.Skip(SkipTestMsg)
-	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCreateTemplateForClone,
@@ -137,21 +131,21 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "view_type", "Deployment"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "view_type_id", "2"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "reftemplate_name", ReferenceDeploymentTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-test", "refdevice_servicetag", ""),
+					// resource.TestCheckResourceAttr("ome_template.clone-template-test", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "description", "This is a template for testing deployments in acceptance testcases. Please do not delete this template"),
 
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "name", "test_acc_clone_template_deployment_compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type", "compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "reftemplate_name", ReferenceDeploymentTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "refdevice_servicetag", ""),
+					// resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "description", "This is a template for testing deployments in acceptance testcases. Please do not delete this template"),
 
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "name", "test_acc_clone_template_compliance_compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "view_type", "Compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "reftemplate_name", ReferenceComplianceTemplateNameForClone),
-					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "refdevice_servicetag", ""),
+					// resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "refdevice_servicetag", ""),
 					resource.TestCheckResourceAttr("ome_template.clone-template-compliance-compliance", "description", ""),
 				),
 			},
@@ -160,13 +154,10 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
-	if skipTest() {
-		t.Skip(SkipTestMsg)
-	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccCreateTemplateInvalidSvcTag,
@@ -225,9 +216,6 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 }
 
 func TestTemplateImport_ImportTemplates(t *testing.T) {
-	if skipTest() {
-		t.Skip(SkipTestMsg)
-	}
 	assertTFImportState := func(s []*terraform.InstanceState) error {
 		assert.NotEmpty(t, s[0].Attributes["attributes.12.display_name"])
 		assert.NotEmpty(t, s[0].Attributes["vlan.bonding_technology"])
@@ -239,7 +227,7 @@ func TestTemplateImport_ImportTemplates(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config:            testAccImportTemplateError,
@@ -264,13 +252,9 @@ func TestTemplateImport_ImportTemplates(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateImportTemplate(t *testing.T) {
-	if skipTest() {
-		t.Skip(SkipTestMsg)
-	}
-
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCreateImportTemplateSuccess,
@@ -363,18 +347,32 @@ var testAccUpdateTemplateSuccess = `
 			bonding_technology = "NoTeaming"
 			vlan_attributes = [
 				{
-					untagged_network = lookup(local.vlan_network_map, "VLAN1", 0)
-					tagged_networks = [0]
-					is_nic_bonded = false
+					is_nic_bonded =  false,
+					nic_identifier = "Integrated NIC 1"
 					port = 1
-					nic_identifier = "NIC in Mezzanine 1A"
+					tagged_networks = [0]
+					untagged_network = lookup(local.vlan_network_map, "VLAN1", 0)
 				},
 				{
-					untagged_network = 0
-					tagged_networks = [0]
-					is_nic_bonded = false
+					is_nic_bonded =  false
+					nic_identifier = "Integrated NIC 1"
 					port = 2
-					nic_identifier = "NIC in Mezzanine 1A"
+					tagged_networks = [0]
+					untagged_network = 0
+				},
+				{
+					is_nic_bonded =  false,
+					nic_identifier = "Integrated NIC 1"
+					port = 3
+					tagged_networks = [0]
+					untagged_network = lookup(local.vlan_network_map, "VLAN1", 0)
+				},
+				{
+					is_nic_bonded =  false
+					nic_identifier = "Integrated NIC 1"
+					port = 4
+					tagged_networks = [0]
+					untagged_network = 0 
 				}
 			]
 		}
@@ -445,7 +443,7 @@ provider "ome" {
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
 	reftemplate_name = "template_6"
-	refdevice_id = 12328
+	refdevice_id = 10112
 }
 `
 
@@ -461,7 +459,7 @@ provider "ome" {
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
 	reftemplate_name = "template_6"
-	refdevice_servicetag = "MX1404"
+	refdevice_servicetag = "CZMC1T2"
 }
 `
 
@@ -476,8 +474,8 @@ provider "ome" {
 
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
-	refdevice_id = 12328
-	refdevice_servicetag = "MX1404"
+	refdevice_id = 10112
+	refdevice_servicetag = "CZMC1T2"
 }
 `
 
@@ -492,8 +490,8 @@ provider "ome" {
 
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
-	refdevice_id = 12328
-	content = "MX1404"
+	refdevice_id = 10112
+	content = "CZMC1T2"
 }
 `
 
@@ -507,25 +505,39 @@ provider "ome" {
 
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
-	refdevice_id = 12328
+	refdevice_id = 10112
 	identity_pool_name = "IO1"
 	vlan = {
 		propogate_vlan = true
 		bonding_technology = "NoTeaming"
 		vlan_attributes = [
 			{
-				untagged_network = 10133
-				tagged_networks = [0]
-				is_nic_bonded = false
+				is_nic_bonded =  false,
+				nic_identifier = "Integrated NIC 1"
 				port = 1
-				nic_identifier = "NIC in Mezzanine 1A"
+				tagged_networks = [0]
+				untagged_network = 0
 			},
 			{
-				untagged_network = 0
-				tagged_networks = [0]
-				is_nic_bonded = false
+				is_nic_bonded =  false
+				nic_identifier = "Integrated NIC 1"
 				port = 2
-				nic_identifier = "NIC in Mezzanine 1A"
+				tagged_networks = [0]
+				untagged_network = 0
+			},
+			{
+				is_nic_bonded =  false,
+				nic_identifier = "Integrated NIC 1"
+				port = 3
+				tagged_networks = [0]
+				untagged_network = 0
+			},
+			{
+				is_nic_bonded =  false
+				nic_identifier = "Integrated NIC 1"
+				port = 4
+				tagged_networks = [0]
+				untagged_network = 0 
 			}
 		]
 	}

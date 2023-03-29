@@ -32,13 +32,13 @@ func (c *Client) GetTemplateAttributes(templateID int64, stateAttributes []model
 	} else {
 
 		for _, stateAttribute := range stateAttributes {
-			attribute, err := getUpdatedAttribute(stateAttribute.DisplayName.Value, stateAttribute.AttributeID.Value, attrGroups.AttributeGroups)
+			attribute, err := getUpdatedAttribute(stateAttribute.DisplayName.ValueString(), stateAttribute.AttributeID.ValueInt64(), attrGroups.AttributeGroups)
 			if err != nil {
 				return nil, err
 			}
 			updatedOMEAttribute := models.OmeAttribute{
 				AttributeID: attribute.AttributeID,
-				DisplayName: stateAttribute.DisplayName.Value,
+				DisplayName: stateAttribute.DisplayName.ValueString(),
 				Value:       attribute.Value,
 				IsIgnored:   attribute.IsIgnored,
 			}
