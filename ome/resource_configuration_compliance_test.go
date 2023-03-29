@@ -24,7 +24,7 @@ func TestConfigurationRemediationErrors(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testConfigureBaselinewithDeviceID,
+				Config: testConfigureBaselinewithDeviceTag,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName)),
 			},
@@ -257,6 +257,7 @@ func TestConfigurationRemediation(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.0.device_service_tag", DeviceSvcTag1),
 				),
+				// ExpectNonEmptyPlan: true,
 			},
 			{
 				Config: testConfigureBaselineRemediationUpdate,
@@ -266,6 +267,7 @@ func TestConfigurationRemediation(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.0.device_service_tag", DeviceSvcTag1),
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.1.device_service_tag", DeviceSvcTag2),
 				),
+				// ExpectNonEmptyPlan: true,
 			},
 		},
 	})
@@ -280,16 +282,9 @@ var testConfigureBaselineRemediation = `
 		skipssl = true
 	}
 
-	resource "ome_template" "terraform-acceptance-test-2" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag2 + `"
-		view_type = "Compliance"
-	}
-
-
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = ome_template.terraform-acceptance-test-2.name
+		ref_template_name = "avenger-temp"
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
@@ -313,15 +308,9 @@ var testConfigureBaselineRemediationUpdate = `
 		skipssl = true
 	}
 
-	resource "ome_template" "terraform-acceptance-test-2" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag2 + `"
-		view_type = "Compliance"
-	}
-
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = ome_template.terraform-acceptance-test-2.name 
+		ref_template_name = "avenger-temp"
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
