@@ -16,7 +16,7 @@ func TestDataSource_ReadConfigurationReport(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config:      testConfiguratiponReportDSInvalid,
@@ -25,7 +25,7 @@ func TestDataSource_ReadConfigurationReport(t *testing.T) {
 			{
 				Config: testConfiguratiponReportDS,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.ome_configration_report_info.cr", "compliance_report_device.#", "2")),
+					resource.TestCheckResourceAttr("data.ome_configuration_report_info.cr", "compliance_report_device.#", "2")),
 			},
 		},
 	})
@@ -39,7 +39,7 @@ var testConfiguratiponReportDSInvalid = `
 		skipssl = true
 	}
 
-	data "ome_configration_report_info" "cr" {
+	data "ome_configuration_report_info" "cr" {
 		id = "0"
 		baseline_name = "` + "InvalidBaseline" + `"
 		fetch_attributes = true
@@ -71,7 +71,7 @@ var testConfiguratiponReportDS = `
 		depends_on = ["ome_template.terraform-acceptance-test-1"]
 	}
 
-	data "ome_configration_report_info" "cr" {
+	data "ome_configuration_report_info" "cr" {
 		id = "0"
 		baseline_name = "` + BaselineName + `"
 		fetch_attributes = true

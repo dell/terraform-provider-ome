@@ -6,13 +6,12 @@ import (
 	"terraform-provider-ome/clients"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 // To be removed in the upcoming release and use framework
 
-var _ tfsdk.AttributeValidator = sizeAtLeastValidator{}
+var _ validator.Set = sizeAtLeastValidator{}
 
 // sizeAtLeastValidator validates that list contains at least min elements.
 type sizeAtLeastValidator struct {
@@ -30,7 +29,7 @@ func (v sizeAtLeastValidator) MarkdownDescription(ctx context.Context) string {
 }
 
 // Validate performs the validation.
-func (v sizeAtLeastValidator) Validate(ctx context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
+func (v sizeAtLeastValidator) ValidateSet(ctx context.Context, req validator.SetRequest, resp *validator.SetResponse) {
 	elems, ok := validateList(ctx, req, resp)
 	if !ok {
 		return
@@ -38,7 +37,7 @@ func (v sizeAtLeastValidator) Validate(ctx context.Context, req tfsdk.ValidateAt
 
 	if len(elems) < v.min {
 		resp.Diagnostics.AddAttributeError(
-			req.AttributePath,
+			req.Path,
 			v.Description(ctx),
 			fmt.Sprintf("current size : %d", len(elems)),
 		)
@@ -46,22 +45,12 @@ func (v sizeAtLeastValidator) Validate(ctx context.Context, req tfsdk.ValidateAt
 
 }
 
-func validateList(ctx context.Context, request tfsdk.ValidateAttributeRequest, response *tfsdk.ValidateAttributeResponse) ([]attr.Value, bool) {
-	var l types.Set
-
-	diags := tfsdk.ValueAs(ctx, request.AttributeConfig, &l)
-
-	if diags.HasError() {
-		response.Diagnostics.Append(diags...)
-
-		return nil, false
-	}
-
+func validateList(ctx context.Context, request validator.SetRequest, response *validator.SetResponse) ([]attr.Value, bool) {
+	l := request.ConfigValue
 	if l.IsUnknown() || l.IsNull() {
 		return nil, false
 	}
-
-	return l.Elems, true
+	return l.Elements(), true
 }
 
 // SizeAtLeast returns an AttributeValidator which ensures that any configured
@@ -71,13 +60,13 @@ func validateList(ctx context.Context, request tfsdk.ValidateAttributeRequest, r
 //   - Contains at least min elements.
 //
 // Null (unconfigured) and unknown (known after apply) values are skipped.
-func SizeAtLeast(min int) tfsdk.AttributeValidator {
+func SizeAtLeast(min int) validator.Set {
 	return sizeAtLeastValidator{
 		min: min,
 	}
 }
 
-var _ tfsdk.AttributeValidator = complianceStateValidator{}
+var _ validator.String = complianceStateValidator{}
 
 // sizeAtLeastValidator validates that list contains at least min elements.
 type complianceStateValidator struct {
@@ -94,22 +83,16 @@ func (v complianceStateValidator) MarkdownDescription(ctx context.Context) strin
 }
 
 // Validate performs the validation.
-func (v complianceStateValidator) Validate(ctx context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
-	var input types.String
-	diags := tfsdk.ValueAs(ctx, req.AttributeConfig, &input)
-	resp.Diagnostics.Append(diags...)
-	if diags.HasError() {
+func (v complianceStateValidator) ValidateString(ctx context.Context, req validator.StringRequest, resp *validator.StringResponse) {
+	input := req.ConfigValue
+	if input.IsUnknown() || input.IsNull() {
 		return
 	}
-
-	if input.Unknown || input.Null {
-		return
-	}
-	if !(input.Value == clients.ValidComplainceStatus) {
+	if !(input.ValueString() == clients.ValidComplainceStatus) {
 		resp.Diagnostics.AddAttributeError(
-			req.AttributePath,
+			req.Path,
 			v.Description(ctx),
-			fmt.Sprintf("current value : %s", input.Value),
+			fmt.Sprintf("current value : %s", input.ValueString()),
 		)
 	}
 }

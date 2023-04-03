@@ -71,7 +71,7 @@ func TestCreateBaseline_TestValidations(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{ // Step 1
 				Config:      testCreateBaselineFailureWithBothTemplateIDName,
@@ -107,11 +107,11 @@ func TestCreateBaseline_TestValidations(t *testing.T) {
 			},
 			{ // Step 9
 				Config:      testCreateBaselineValidationInvalidOutputFormatCase,
-				ExpectError: regexp.MustCompile(fmt.Sprintf("Allowed values are one of  :  %s", clients.ValidOutputFormat)),
+				ExpectError: regexp.MustCompile("Invalid Attribute Value Match"),
 			},
 			{ // Step 10
 				Config:      testCreateBaselineValidationInvalidOutputFormat,
-				ExpectError: regexp.MustCompile(fmt.Sprintf("Allowed values are one of  :  %s", clients.ValidOutputFormat)),
+				ExpectError: regexp.MustCompile("Invalid Attribute Value Match"),
 			},
 			{ // Step 11
 				Config:      testCreateBaselineValidationDeviceCapable,
@@ -290,22 +290,22 @@ var testCreateBaselineValidationDeviceCapable = `
 	}
 `
 
-func TestCreateBaseline_BaselineWithDeviceID(t *testing.T) {
+func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	assertTFImportState := func(s []*terraform.InstanceState) error {
-		assert.Equal(t, BaselineNameUpdate, s[0].Attributes["baseline_name"])
+		assert.Equal(t, BaselineNameUpdate+"-1", s[0].Attributes["baseline_name"])
 		assert.Equal(t, DeviceSvcTag2, s[0].Attributes["device_servicetags.0"])
 		return nil
 	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testConfigureBaselinewithDeviceID,
+				Config: testConfigureBaselinewithDeviceTag,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description"),
@@ -315,7 +315,7 @@ func TestCreateBaseline_BaselineWithDeviceID(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "0")),
 			},
 			{
-				Config: testConfigureBaselinewithDeviceIDUpdate,
+				Config: testConfigureBaselinewithDeviceTagUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineNameUpdate),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description updated"),
@@ -325,18 +325,36 @@ func TestCreateBaseline_BaselineWithDeviceID(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "0")),
 			},
 			{
+				Config: testConfigureBaselinewithDeviceID,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName+"-1"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "ref_template_name", TestRefTemplateName),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "1"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.0", DeviceID1)),
+			},
+			{
+				Config: testConfigureBaselinewithDeviceIDUpdate,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineNameUpdate+"-1"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description updated"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "ref_template_name", TestRefTemplateNameUpdate),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "1"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.0", DeviceID2)),
+			},
+			{
 				Config:           testImportConfigurationBaseline,
 				ResourceName:     "ome_configuration_baseline.import_baseline",
 				ImportState:      true,
 				ImportStateCheck: assertTFImportState,
 				ExpectError:      nil,
-				ImportStateId:    BaselineNameUpdate,
+				ImportStateId:    BaselineNameUpdate + "-1",
 			},
 		},
 	})
 }
 
-var testConfigureBaselinewithDeviceID = `
+var testConfigureBaselinewithDeviceTag = `
 	provider "ome" {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
@@ -362,7 +380,7 @@ var testConfigureBaselinewithDeviceID = `
 	}
 `
 
-var testConfigureBaselinewithDeviceIDUpdate = `
+var testConfigureBaselinewithDeviceTagUpdate = `
 	provider "ome" {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
@@ -397,6 +415,67 @@ var testConfigureBaselinewithDeviceIDUpdate = `
 	}
 `
 
+var testConfigureBaselinewithDeviceID = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
+	resource "ome_configuration_baseline" "create_baseline" {
+		baseline_name = "` + BaselineName + `-1"
+		ref_template_name = "` + TestRefTemplateName + `"
+		device_ids = ["` + DeviceID1 + `"]
+		description = "baseline description"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
+	}
+`
+
+var testConfigureBaselinewithDeviceIDUpdate = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_template" "terraform-acceptance-test-1" {
+		name = "` + TestRefTemplateName + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
+	resource "ome_template" "terraform-acceptance-test-2" {
+		name = "` + TestRefTemplateNameUpdate + `"
+		refdevice_servicetag = "` + DeviceSvcTag1 + `"
+		fqdds = "EventFilters"
+		view_type = "Compliance"
+		job_retry_count = 20
+		sleep_interval = 30
+	}
+
+	resource "ome_configuration_baseline" "create_baseline" {
+		baseline_name = "` + BaselineNameUpdate + `-1"
+		ref_template_name = "` + TestRefTemplateNameUpdate + `"
+		device_ids = ["` + DeviceID2 + `"]
+		description = "baseline description updated"
+		depends_on = ["ome_template.terraform-acceptance-test-2"]
+	}
+`
+
 func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
@@ -414,7 +493,7 @@ func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testConfigureBaselineWithSchedule,
@@ -530,7 +609,7 @@ func TestCreateBaseline_CreateBaselineWithScheduleNonCompliant(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testConfigureBaselineScheduleNonCompliant,

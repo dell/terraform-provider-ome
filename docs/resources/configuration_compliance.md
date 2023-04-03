@@ -59,7 +59,7 @@ resource "ome_configuration_compliance" "remeditation" {
 
 ### Read-Only
 
-- `id` (String) ID of the resource.
+- `id` (String) ID of the configuration compliance resource.
 
 <a id="nestedatt--target_devices"></a>
 ### Nested Schema for `target_devices`

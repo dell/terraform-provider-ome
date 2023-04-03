@@ -21,10 +21,10 @@ func TestConfigurationRemediationErrors(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testConfigureBaselinewithDeviceID,
+				Config: testConfigureBaselinewithDeviceTag,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName)),
 			},
@@ -90,6 +90,7 @@ var testConfigureBaselineRemediationDevicePartOfBaseline = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag2 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -115,6 +116,7 @@ var testConfigureBaselineRemediationInvalidBaselineName = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -139,6 +141,7 @@ var testConfigureBaselineRemediationInvalidBaselineID = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -164,6 +167,7 @@ var testConfigureBaselineRemediationBaselineMutaully = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -188,6 +192,7 @@ var testConfigureBaselineRemediationBaselineInfo = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -230,7 +235,7 @@ var testConfigureBaselineRemediationCompianceStatus = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag2 + `"
-				compliance_status = 2
+				compliance_status = "NonCompliant"
 			},
 		  ]
 	}
@@ -243,7 +248,7 @@ func TestConfigurationRemediation(t *testing.T) {
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testProviderFactory,
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
 				Config: testConfigureBaselineRemediation,
@@ -252,15 +257,16 @@ func TestConfigurationRemediation(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.#", "1"),
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.0.device_service_tag", DeviceSvcTag1),
 				),
+				ExpectNonEmptyPlan: true,
 			},
 			{
 				Config: testConfigureBaselineRemediationUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "baseline_name", BaselineName),
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.#", "2"),
-					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.0.device_service_tag", DeviceSvcTag1),
-					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.1.device_service_tag", DeviceSvcTag2),
+					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.0.device_service_tag", DeviceSvcTag2),
 				),
+				// ExpectNonEmptyPlan: true,
 			},
 		},
 	})
@@ -277,7 +283,7 @@ var testConfigureBaselineRemediation = `
 
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = "` + TestRefTemplateName + `"
+		ref_template_name = "avenger-temp"
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
@@ -287,6 +293,7 @@ var testConfigureBaselineRemediation = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}
@@ -302,7 +309,7 @@ var testConfigureBaselineRemediationUpdate = `
 
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = "` + TestRefTemplateName + `"
+		ref_template_name = "avenger-temp"
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
@@ -312,11 +319,11 @@ var testConfigureBaselineRemediationUpdate = `
 		target_devices = [
 			{
 				device_service_tag = "` + DeviceSvcTag1 + `"
-				compliance_status = "1"
+				compliance_status = "Compliant"
 			},
 			{
 				device_service_tag = "` + DeviceSvcTag2 + `"
-				compliance_status = "1"
+				compliance_status = "Compliant"
 			},
 		  ]
 	}

@@ -41,7 +41,7 @@ resource "ome_template" "template_2" {
 
 ### Required
 
-- `name` (String) Name of the template.
+- `name` (String) Name of the template resource.
 
 ### Optional
 
@@ -61,7 +61,7 @@ resource "ome_template" "template_2" {
 
 ### Read-Only
 
-- `id` (String) Id of the template.
+- `id` (String) ID of the template resource.
 - `identity_pool_id` (Number) ID of the Identity Pool attached with template.
 - `view_type_id` (Number) OME template view type id.
 

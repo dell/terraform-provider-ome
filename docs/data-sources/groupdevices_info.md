@@ -44,7 +44,7 @@ data "ome_groupdevices_info" "gd" {
 
 ### Optional
 
-- `id` (String) ID for data source.
+- `id` (String) ID for group devices data source.
 
 ### Read-Only
 

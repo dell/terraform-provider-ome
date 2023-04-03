@@ -60,7 +60,7 @@ resource "ome_deployment" "deploy-template-1" {
 
 ### Read-Only
 
-- `id` (String) ID of the resource.
+- `id` (String) ID of the deploy resource.
 
 <a id="nestedatt--boot_to_network_iso"></a>
 ### Nested Schema for `boot_to_network_iso`

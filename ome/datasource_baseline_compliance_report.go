@@ -5,111 +5,115 @@ import (
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-type configurationReportDataSourceType struct{}
+var (
+	_ datasource.DataSource              = &configurationReportDataSource{}
+	_ datasource.DataSourceWithConfigure = &configurationReportDataSource{}
+)
 
-func (t configurationReportDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
-		MarkdownDescription: "Data source to list the compliance configuration report of a baseline from OpenManage Enterprise.",
-		Attributes: map[string]tfsdk.Attribute{
-
-			"id": {
-				MarkdownDescription: "ID for data source.",
-				Description:         "ID for data source.",
-				Type:                types.StringType,
-				Computed:            true,
-				Optional:            true,
-			},
-			"baseline_name": {
-				MarkdownDescription: "Name of the Baseline.",
-				Description:         "Name of the Baseline.",
-				Type:                types.StringType,
-				Required:            true,
-			},
-			"fetch_attributes": {
-				MarkdownDescription: "Fetch  device compliance attribute report.",
-				Description:         "Fetch  device compliance attribute report.",
-				Type:                types.BoolType,
-				Computed:            true,
-				Optional:            true,
-			},
-			"compliance_report_device": {
-				MarkdownDescription: "Device complaince report.",
-				Description:         "Device complaince report.",
-				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
-					"device_id": {
-						MarkdownDescription: "Device ID",
-						Description:         "Device ID",
-						Type:                types.Int64Type,
-						Computed:            true,
-					},
-					"device_servicetag": {
-						MarkdownDescription: "Device servicetag.",
-						Description:         "Device servicetag.",
-						Type:                types.StringType,
-						Computed:            true,
-					},
-					"device_name": {
-						MarkdownDescription: "Device Name.",
-						Description:         "Device Name.",
-						Type:                types.StringType,
-						Computed:            true,
-					},
-					"model": {
-						MarkdownDescription: "Device model.",
-						Description:         "Device model.",
-						Type:                types.StringType,
-						Computed:            true,
-					},
-					"compliance_status": {
-						MarkdownDescription: "Device compliance status.",
-						Description:         "Device compliance status.",
-						Type:                types.StringType,
-						Computed:            true,
-					},
-					"device_type": {
-						MarkdownDescription: "Device type",
-						Description:         "Device type",
-						Type:                types.Int64Type,
-						Computed:            true,
-					},
-					"inventory_time": {
-						MarkdownDescription: "Inventory Time.",
-						Description:         "Inventory Time.",
-						Type:                types.StringType,
-						Computed:            true,
-					},
-					"device_compliance_details": {
-						MarkdownDescription: "Device compliance details.",
-						Description:         "Device compliance details.",
-						Type:                types.StringType,
-						Computed:            true,
-					},
-				}),
-				Computed: true,
-			},
-		},
-	}, nil
-}
-
-func (t configurationReportDataSourceType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
-
-	return configurationReportDataSource{
-		p: provider,
-	}, diags
+// NewConfigurationReportDataSource is a new datasource for configuration report
+func NewConfigurationReportDataSource() datasource.DataSource {
+	return &configurationReportDataSource{}
 }
 
 type configurationReportDataSource struct {
-	p provider
+	p *omeProvider
+}
+
+// Configure implements datasource.DataSourceWithConfigure
+func (g *configurationReportDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+	g.p = req.ProviderData.(*omeProvider)
+}
+
+// Metadata implements datasource.DataSource
+func (*configurationReportDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "configuration_report_info"
+}
+
+func (*configurationReportDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
+		MarkdownDescription: "Data source to list the compliance configuration report of a baseline from OpenManage Enterprise.",
+		Attributes: map[string]schema.Attribute{
+
+			"id": schema.StringAttribute{
+				MarkdownDescription: "ID for baseline compliance data source.",
+				Description:         "ID for baseline compliance data source.",
+				Computed:            true,
+				Optional:            true,
+			},
+			"baseline_name": schema.StringAttribute{
+				MarkdownDescription: "Name of the Baseline.",
+				Description:         "Name of the Baseline.",
+				Required:            true,
+			},
+			"fetch_attributes": schema.BoolAttribute{
+				MarkdownDescription: "Fetch  device compliance attribute report.",
+				Description:         "Fetch  device compliance attribute report.",
+				Computed:            true,
+				Optional:            true,
+			},
+			"compliance_report_device": schema.ListNestedAttribute{
+				MarkdownDescription: "Device compliance report.",
+				Description:         "Device compliance report.",
+				Computed:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"device_id": schema.Int64Attribute{
+							MarkdownDescription: "Device ID",
+							Description:         "Device ID",
+							Computed:            true,
+						},
+						"device_servicetag": schema.StringAttribute{
+							MarkdownDescription: "Device servicetag.",
+							Description:         "Device servicetag.",
+							Computed:            true,
+						},
+						"device_name": schema.StringAttribute{
+							MarkdownDescription: "Device Name.",
+							Description:         "Device Name.",
+							Computed:            true,
+						},
+						"model": schema.StringAttribute{
+							MarkdownDescription: "Device model.",
+							Description:         "Device model.",
+							Computed:            true,
+						},
+						"compliance_status": schema.StringAttribute{
+							MarkdownDescription: "Device compliance status.",
+							Description:         "Device compliance status.",
+							Computed:            true,
+						},
+						"device_type": schema.Int64Attribute{
+							MarkdownDescription: "Device type",
+							Description:         "Device type",
+							Computed:            true,
+						},
+						"inventory_time": schema.StringAttribute{
+							MarkdownDescription: "Inventory Time.",
+							Description:         "Inventory Time.",
+							Computed:            true,
+						},
+						"device_compliance_details": schema.StringAttribute{
+							MarkdownDescription: "Device compliance details.",
+							Description:         "Device compliance details.",
+							Computed:            true,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 // Read resource information
-func (g configurationReportDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (g *configurationReportDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var config models.ConfigurationReports
 	diags := req.Config.Get(ctx, &config)
 	resp.Diagnostics.Append(diags...)
@@ -138,7 +142,7 @@ func (g configurationReportDataSource) Read(ctx context.Context, req tfsdk.ReadD
 
 	var state models.ConfigurationReports
 
-	baseline, err := omeClient.GetBaselineByName(config.BaseLineName.Value)
+	baseline, err := omeClient.GetBaselineByName(config.BaseLineName.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrConfigurationReport, err.Error(),
@@ -156,8 +160,8 @@ func (g configurationReportDataSource) Read(ctx context.Context, req tfsdk.ReadD
 			)
 			return
 		}
-		state.BaseLineName.Value = config.BaseLineName.Value
-		state.ID.Value = config.BaseLineName.Value
+		state.BaseLineName = config.BaseLineName
+		state.ID = config.BaseLineName
 
 		for _, cr := range complianceReports {
 			compStatus := "Compliant"
@@ -165,15 +169,15 @@ func (g configurationReportDataSource) Read(ctx context.Context, req tfsdk.ReadD
 				compStatus = "Non Compliant"
 			}
 			crd := models.ComplianceReportDevice{
-				DeviceID:         types.Int64{Value: cr.ID},
-				DeviceServiceTag: types.String{Value: cr.ServiceTag},
-				DeviceName:       types.String{Value: cr.DeviceName},
-				Model:            types.String{Value: cr.Model},
-				ComplianceStatus: types.String{Value: compStatus},
-				DeviceType:       types.Int64{Value: cr.DeviceType},
-				InventoryTime:    types.String{Value: cr.InventoryTime},
+				DeviceID:         types.Int64Value(cr.ID),
+				DeviceServiceTag: types.StringValue(cr.ServiceTag),
+				DeviceName:       types.StringValue(cr.DeviceName),
+				Model:            types.StringValue(cr.Model),
+				ComplianceStatus: types.StringValue(compStatus),
+				DeviceType:       types.Int64Value(cr.DeviceType),
+				InventoryTime:    types.StringValue(cr.InventoryTime),
 			}
-			if config.FetchAttributes.Value {
+			if config.FetchAttributes.ValueBool() {
 				attrResp, err := omeClient.GetBaselineDevAttrComplianceReportsByID(baselineID, cr.ID)
 				if err != nil {
 					resp.Diagnostics.AddError(
@@ -181,7 +185,7 @@ func (g configurationReportDataSource) Read(ctx context.Context, req tfsdk.ReadD
 					)
 					return
 				}
-				crd.DeviceComplianceDetails = types.String{Value: attrResp}
+				crd.DeviceComplianceDetails = types.StringValue(attrResp)
 			}
 			state.ComplianceReportDevice = append(state.ComplianceReportDevice, crd)
 		}

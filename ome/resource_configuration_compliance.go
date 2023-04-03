@@ -8,8 +8,10 @@ import (
 	"terraform-provider-ome/models"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -25,107 +27,116 @@ const (
 	NonCompliant = "Non Compliant"
 )
 
-type resourceConfigurationComplianceType struct{}
+// Ensure the implementation satisfies the expected interfaces.
+var (
+	_ resource.Resource                = &resourceConfigurationCompliance{}
+	_ resource.ResourceWithConfigure   = &resourceConfigurationCompliance{}
+	_ resource.ResourceWithImportState = &resourceConfigurationCompliance{}
+)
 
-func (r resourceConfigurationComplianceType) GetSchema(_ context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
-		Version:             1,
-		MarkdownDescription: "Resource for managing configuration baselines remediation. Updates are supported for the following parameters: `target_devices`, `job_retry_count`, `sleep_interval`, `run_later`, `cron`.",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
-				MarkdownDescription: "ID of the resource.",
-				Description:         "ID of the resource.",
-				Type:                types.StringType,
-				Computed:            true,
-			},
-			"baseline_name": {
-				MarkdownDescription: "Name of the Baseline.",
-				Description:         "Name of the Baseline.",
-				Type:                types.StringType,
-				Optional:            true,
-				Computed:            true,
-			},
-			"baseline_id": {
-				MarkdownDescription: "Id of the Baseline.",
-				Description:         "Id of the Baseline.",
-				Type:                types.Int64Type,
-				Optional:            true,
-				Computed:            true,
-			},
-			"target_devices": {
-				MarkdownDescription: "Target devices to be remediated.",
-				Description:         "Target devices to be remediated.",
-				Required:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"device_service_tag": {
-						Type:                types.StringType,
-						MarkdownDescription: "Target device servicetag to be remediated.",
-						Description:         "Target device servicetag to be remediated.",
-						Required:            true,
-					},
-					"compliance_status": {
-						Type:                types.StringType,
-						MarkdownDescription: "End compliance status of the target device, used to check the drifts in the compliance status.",
-						Description:         "End compliance status of the target device, used to check the drifts in the compliance status.",
-						Required:            true,
-						Validators: []tfsdk.AttributeValidator{
-							complianceStateValidator{},
-						},
-					},
-				}),
-				Validators: []tfsdk.AttributeValidator{
-					sizeAtLeastValidator{min: 1},
-				},
-			},
-			"job_retry_count": {
-				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
-				Description:         "Number of times the job has to be polled to get the final status of the resource.",
-				Type:                types.Int64Type,
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Int64{Value: 30}),
-				},
-			},
-			"sleep_interval": {
-				MarkdownDescription: "Sleep time interval for job polling in seconds.",
-				Description:         "Sleep time interval for job polling in seconds.",
-				Type:                types.Int64Type,
-				Optional:            true,
-				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					DefaultAttribute(types.Int64{Value: 20}),
-				},
-			},
-			"run_later": {
-				MarkdownDescription: "Provides options to schedule the remediation task immediately, or at a specified time.",
-				Description:         "Provides options to schedule the remediation task immediately, or at a specified time.",
-				Type:                types.BoolType,
-				Optional:            true,
-			},
-			"cron": {
-				MarkdownDescription: "Cron to schedule the remediation task.",
-				Description:         "Cron to schedule the remediation task.",
-				Type:                types.StringType,
-				Optional:            true,
-			},
-		},
-	}, nil
-}
-
-// New resource instance
-func (r resourceConfigurationComplianceType) NewResource(_ context.Context, p tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
-	return resourceConfigurationCompliance{
-		p: *(p.(*provider)),
-	}, nil
+// NewConfigurationComplianceResource is a new resource for configuration compliance
+func NewConfigurationComplianceResource() resource.Resource {
+	return &resourceConfigurationCompliance{}
 }
 
 type resourceConfigurationCompliance struct {
-	p provider
+	p *omeProvider
+}
+
+// Configure implements resource.ResourceWithConfigure
+func (r *resourceConfigurationCompliance) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	if req.ProviderData == nil {
+		return
+	}
+	r.p = req.ProviderData.(*omeProvider)
+}
+
+// Metadata implements resource.Resource
+func (*resourceConfigurationCompliance) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "configuration_compliance"
+}
+
+func (r resourceConfigurationCompliance) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
+		Version:             1,
+		MarkdownDescription: "Resource for managing configuration baselines remediation. Updates are supported for the following parameters: `target_devices`, `job_retry_count`, `sleep_interval`, `run_later`, `cron`.",
+		Attributes: map[string]schema.Attribute{
+			"id": schema.StringAttribute{
+				MarkdownDescription: "ID of the configuration compliance resource.",
+				Description:         "ID of the configuration compliance resource.",
+				Computed:            true,
+			},
+			"baseline_name": schema.StringAttribute{
+				MarkdownDescription: "Name of the Baseline.",
+				Description:         "Name of the Baseline.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"baseline_id": schema.Int64Attribute{
+				MarkdownDescription: "Id of the Baseline.",
+				Description:         "Id of the Baseline.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"target_devices": schema.SetNestedAttribute{
+				MarkdownDescription: "Target devices to be remediated.",
+				Description:         "Target devices to be remediated.",
+				Required:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"device_service_tag": schema.StringAttribute{
+							MarkdownDescription: "Target device servicetag to be remediated.",
+							Description:         "Target device servicetag to be remediated.",
+							Required:            true,
+						},
+						"compliance_status": schema.StringAttribute{
+							MarkdownDescription: "End compliance status of the target device, used to check the drifts in the compliance status.",
+							Description:         "End compliance status of the target device, used to check the drifts in the compliance status.",
+							Required:            true,
+							Validators: []validator.String{
+								complianceStateValidator{},
+							},
+						},
+					},
+				},
+				Validators: []validator.Set{
+					sizeAtLeastValidator{min: 1},
+				},
+			},
+			"job_retry_count": schema.Int64Attribute{
+				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
+				Description:         "Number of times the job has to be polled to get the final status of the resource.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Int64{
+					Int64DefaultValue(types.Int64Value(30)),
+				},
+			},
+			"sleep_interval": schema.Int64Attribute{
+				MarkdownDescription: "Sleep time interval for job polling in seconds.",
+				Description:         "Sleep time interval for job polling in seconds.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Int64{
+					Int64DefaultValue(types.Int64Value(20)),
+				},
+			},
+			"run_later": schema.BoolAttribute{
+				MarkdownDescription: "Provides options to schedule the remediation task immediately, or at a specified time.",
+				Description:         "Provides options to schedule the remediation task immediately, or at a specified time.",
+				Optional:            true,
+			},
+			"cron": schema.StringAttribute{
+				MarkdownDescription: "Cron to schedule the remediation task.",
+				Description:         "Cron to schedule the remediation task.",
+				Optional:            true,
+			},
+		},
+	}
 }
 
 // Create a new resource
-func (r resourceConfigurationCompliance) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r resourceConfigurationCompliance) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	//Get Plan Data
 	tflog.Trace(ctx, "resource_configuration_compliance: create started")
 	var plan models.ConfigurationRemediation
@@ -135,7 +146,7 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req tfsdk.C
 		fmt.Println(clients.ErrPlanToTfsdkConversion)
 		return
 	}
-	if plan.RunLater.Value && plan.Cron.Value == "" {
+	if plan.RunLater.ValueBool() && plan.Cron.ValueString() == "" {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrBaseLineCreateRemediation,
 			clients.ErrCronRequired,
@@ -166,7 +177,7 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req tfsdk.C
 	}
 	defer omeClient.RemoveSession()
 
-	baseline, err := checkValidBaseline(omeClient, plan.BaselineName.Value, plan.BaselineID.Value, false)
+	baseline, err := checkValidBaseline(omeClient, plan.BaselineName.ValueString(), plan.BaselineID.ValueInt64(), false)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrBaseLineCreateRemediation,
@@ -178,7 +189,7 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req tfsdk.C
 	tflog.Trace(ctx, "resource_configuration_compliance create: all baselines data is valid")
 	var targetDevices []string
 	for _, td := range plan.TargetDevices {
-		targetDevices = append(targetDevices, td.DeviceServiceTag.Value)
+		targetDevices = append(targetDevices, td.DeviceServiceTag.ValueString())
 	}
 
 	targetDeviceIDs, err := checkValidDevices(omeClient, targetDevices, baseline)
@@ -191,7 +202,7 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req tfsdk.C
 	}
 	tflog.Trace(ctx, "resource_configuration_compliance create: all target devices are valid")
 
-	crp := getRemediationPayload(baseline.ID, targetDeviceIDs, plan.RunLater.Value, plan.Cron.Value)
+	crp := getRemediationPayload(baseline.ID, targetDeviceIDs, plan.RunLater.ValueBool(), plan.Cron.ValueString())
 
 	tflog.Trace(ctx, "resource_configuration_compliance create: triggered remediation", map[string]interface{}{
 		"payload": crp,
@@ -209,9 +220,9 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req tfsdk.C
 	tflog.Trace(ctx, "resource_configuration_compliance create: Job created", map[string]interface{}{
 		"jobID": jobID,
 	})
-	if jobID != 0 && !plan.RunLater.Value {
+	if jobID != 0 && !plan.RunLater.ValueBool() {
 		tflog.Trace(ctx, "resource_configuration_compliance create: Job track started")
-		isSuccess, err := omeClient.TrackJob(jobID, plan.JobRetryCount.Value, plan.SleepInterval.Value)
+		isSuccess, err := omeClient.TrackJob(jobID, plan.JobRetryCount.ValueInt64(), plan.SleepInterval.ValueInt64())
 		if !isSuccess {
 			tflog.Trace(ctx, "resource_configuration_compliance create: Job track errored", map[string]interface{}{
 				"err": err,
@@ -225,9 +236,9 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req tfsdk.C
 
 	tflog.Trace(ctx, "resource_configuration_compliance create: saving state")
 	state = plan
-	state.BaselineID = types.Int64{Value: baseline.ID}
-	state.BaselineName = types.String{Value: baseline.Name}
-	state.ID = types.String{Value: fmt.Sprintf("%d", baseline.ID)}
+	state.BaselineID = types.Int64Value(baseline.ID)
+	state.BaselineName = types.StringValue(baseline.Name)
+	state.ID = types.StringValue(fmt.Sprintf("%d", baseline.ID))
 
 	//save the data into state
 	diags = resp.State.Set(ctx, &state)
@@ -239,7 +250,7 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req tfsdk.C
 }
 
 // Read resource information
-func (r resourceConfigurationCompliance) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r resourceConfigurationCompliance) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	//Get State Data
 	tflog.Trace(ctx, "resource_configuration_compliance: read started")
 	var state models.ConfigurationRemediation
@@ -271,7 +282,7 @@ func (r resourceConfigurationCompliance) Read(ctx context.Context, req tfsdk.Rea
 
 	tflog.Trace(ctx, "resource_configuration_compliance: read checking status report")
 	//check the compliance status to check if the reports are generated
-	err = checkReportsStatus(omeClient, state.BaselineID.Value)
+	err = checkReportsStatus(omeClient, state.BaselineID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrBaseLineReadRemediation,
@@ -283,7 +294,7 @@ func (r resourceConfigurationCompliance) Read(ctx context.Context, req tfsdk.Rea
 	tflog.Trace(ctx, "resource_configuration_compliance: read checking status finshed")
 
 	for i, td := range state.TargetDevices {
-		deviceReport, err := omeClient.GetConfiBaselineDeviceReport(state.BaselineID.Value, td.DeviceServiceTag.Value)
+		deviceReport, err := omeClient.GetConfiBaselineDeviceReport(state.BaselineID.ValueInt64(), td.DeviceServiceTag.ValueString())
 		if err != nil {
 			if err != nil {
 				resp.Diagnostics.AddError(
@@ -299,7 +310,7 @@ func (r resourceConfigurationCompliance) Read(ctx context.Context, req tfsdk.Rea
 		}
 		state.TargetDevices[i] = models.TargetDevices{
 			DeviceServiceTag: td.DeviceServiceTag,
-			ComplianceStatus: types.String{Value: compliantStatus},
+			ComplianceStatus: types.StringValue(compliantStatus),
 		}
 	}
 
@@ -313,7 +324,7 @@ func (r resourceConfigurationCompliance) Read(ctx context.Context, req tfsdk.Rea
 }
 
 // Update resource
-func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r resourceConfigurationCompliance) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	//Get state Data
 	tflog.Trace(ctx, "resource_configuration_compliance: update started")
 	var state models.ConfigurationRemediation
@@ -331,7 +342,7 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.U
 		return
 	}
 
-	if plan.RunLater.Value && plan.Cron.Value == "" {
+	if plan.RunLater.ValueBool() && plan.Cron.ValueString() == "" {
 		resp.Diagnostics.AddError(
 			clients.ErrBaseLineUpdateRemediation,
 			clients.ErrCronRequired,
@@ -360,7 +371,7 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.U
 	defer omeClient.RemoveSession()
 
 	tflog.Trace(ctx, "resource_configuration_compliance: update checking if baseline name or id is changed")
-	if (plan.BaselineID.Value != 0 && plan.BaselineID.Value != state.BaselineID.Value) || (plan.BaselineName.Value != "" && plan.BaselineName.Value != state.BaselineName.Value) {
+	if (plan.BaselineID.ValueInt64() != 0 && plan.BaselineID.ValueInt64() != state.BaselineID.ValueInt64()) || (plan.BaselineName.ValueString() != "" && plan.BaselineName.ValueString() != state.BaselineName.ValueString()) {
 		resp.Diagnostics.AddError(
 			clients.ErrBaseLineUpdateRemediation,
 			clients.ErrBaseLineModified,
@@ -369,7 +380,7 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.U
 	}
 
 	tflog.Trace(ctx, "resource_configuration_compliance: update checking for valid baseline")
-	baseline, err := checkValidBaseline(omeClient, plan.BaselineName.Value, plan.BaselineID.Value, true)
+	baseline, err := checkValidBaseline(omeClient, plan.BaselineName.ValueString(), plan.BaselineID.ValueInt64(), true)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrBaseLineCreateRemediation,
@@ -382,7 +393,7 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.U
 
 	var targetDevices []string
 	for _, td := range plan.TargetDevices {
-		targetDevices = append(targetDevices, td.DeviceServiceTag.Value)
+		targetDevices = append(targetDevices, td.DeviceServiceTag.ValueString())
 	}
 
 	targetDeviceIDs, err := checkValidDevices(omeClient, targetDevices, baseline)
@@ -395,7 +406,7 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.U
 	}
 
 	tflog.Trace(ctx, "resource_configuration_compliance: target devices are valid")
-	crp := getRemediationPayload(baseline.ID, targetDeviceIDs, plan.RunLater.Value, plan.Cron.Value)
+	crp := getRemediationPayload(baseline.ID, targetDeviceIDs, plan.RunLater.ValueBool(), plan.Cron.ValueString())
 
 	tflog.Trace(ctx, "resource_configuration_compliance: update remidiation started", map[string]interface{}{
 		"payload": crp,
@@ -411,8 +422,8 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.U
 	tflog.Trace(ctx, "resource_configuration_compliance: update remidiation job created", map[string]interface{}{
 		"jobID": jobID,
 	})
-	if jobID != 0 && !plan.RunLater.Value {
-		isSuccess, err := omeClient.TrackJob(jobID, plan.JobRetryCount.Value, plan.SleepInterval.Value)
+	if jobID != 0 && !plan.RunLater.ValueBool() {
+		isSuccess, err := omeClient.TrackJob(jobID, plan.JobRetryCount.ValueInt64(), plan.SleepInterval.ValueInt64())
 		if !isSuccess {
 			tflog.Trace(ctx, "resource_configuration_compliance: update remidiation job failed", map[string]interface{}{
 				"err": err,
@@ -426,9 +437,9 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.U
 
 	tflog.Trace(ctx, "resource_configuration_compliance: update remidiation state updating")
 	state = plan
-	state.BaselineID = types.Int64{Value: baseline.ID}
-	state.BaselineName = types.String{Value: baseline.Name}
-	state.ID = types.String{Value: fmt.Sprintf("%d", baseline.ID)}
+	state.BaselineID = types.Int64Value(baseline.ID)
+	state.BaselineName = types.StringValue(baseline.Name)
+	state.ID = types.StringValue(fmt.Sprintf("%d", baseline.ID))
 
 	//Save into State
 	diags = resp.State.Set(ctx, &state)
@@ -440,12 +451,12 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req tfsdk.U
 }
 
 // Delete resource
-func (r resourceConfigurationCompliance) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r resourceConfigurationCompliance) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	resp.State.RemoveResource(ctx)
 }
 
 // Import resource
-func (r resourceConfigurationCompliance) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
+func (r resourceConfigurationCompliance) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Save the import identifier in the id attribute
 	var state models.ConfigurationRemediation
 	_ = req.ID
