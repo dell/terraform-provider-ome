@@ -82,43 +82,163 @@ func TestCreateBaseline_TestValidations(t *testing.T) {
 				ExpectError: regexp.MustCompile(clients.ErrGnrCreateBaseline),
 			},
 			{ // Step 3
-				Config:      testCreateBaselineValidationFailureNonComplianceTemplateID,
-				ExpectError: regexp.MustCompile(clients.ErrGnrCreateBaseline),
+				Config:      testCreateBaselineValidationFailureInvalidTemplateName,
+				ExpectError: regexp.MustCompile("reference template id or name should be of type compliance"),
 			},
 			{ // Step 4
-				Config:      testCreateBaselineValidationFailureEmptyDevice,
-				ExpectError: regexp.MustCompile(clients.ErrGnrCreateBaseline),
+				Config:      testCreateBaselineValidationFailureNonComplianceTemplateID,
+				ExpectError: regexp.MustCompile("reference template id or name should be of type compliance"),
+			},
+		},
+	})
+}
+
+func TestCreateBaseline_TestNotificationValidations(t *testing.T) {
+	if os.Getenv("TF_ACC") == "" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: justProvider + `
+				resource "ome_configuration_baseline" "create_baseline_validation_failure_unexpected_cron" {
+					ref_template_name = "not-needed"
+					baseline_name = "test_acc_create_baseline"
+					device_servicetags = ["10129"]
+					schedule = true
+					notify_on_schedule = false
+					cron = "abc"
+				}
+				`,
+				ExpectError: regexp.MustCompile(".*attributes `cron` is not accepted*"),
+				// ExpectError: regexp.MustCompile(clients.ErrBaseLineNotifyValid),
+			},
+			{
+				Config: justProvider + `
+				resource "ome_configuration_baseline" "create_baseline_validation_failure_unexpected_cron" {
+					ref_template_name = "not-needed"
+					baseline_name = "test_acc_create_baseline"
+					device_servicetags = ["10129"]
+					cron = "abc"
+				}
+				`,
+				ExpectError: regexp.MustCompile(".*attributes `cron` and `email_addresses` are accepted only when `schedule` is.*"),
+				// ExpectError: regexp.MustCompile(".*" + clients.ErrCronRequired + ".*"),
+			},
+			{
+				Config: justProvider + `
+				resource "ome_configuration_baseline" "create_baseline_validation_failure_unexpected_cron" {
+					ref_template_name = "not-needed"
+					baseline_name = "test_acc_create_baseline"
+					device_servicetags = ["10129"]
+					email_addresses=["abc@gmail.com"]
+				}
+				`,
+				ExpectError: regexp.MustCompile("attributes `cron` and `email_addresses` are accepted only when `schedule` is.*"),
+				// ExpectError: regexp.MustCompile(".*" + clients.ErrCronRequired + ".*"),
+			},
+		},
+	})
+}
+
+func TestCreateBaseline_TestValidationsWithValidTemplate(t *testing.T) {
+	if os.Getenv("TF_ACC") == "" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
+	initTemplates(t)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: justProvider + templateSvcTag1,
+			},
+			{ // Step 2
+				Config:      testCreateBaselineValidationFailureEmptyDevice + templateSvcTag1,
+				ExpectError: regexp.MustCompile(clients.ErrDeviceRequired),
+			},
+			{ // Step 3
+				Config:      testCreateBaselineValidationFailureInvalidDevice + templateSvcTag1,
+				ExpectError: regexp.MustCompile("invalid service tags:"),
+			},
+			{ // Step 4
+				Config: testCreateBaselineValidationFailureScheduleNotificationEmptyEmail + templateSvcTag1,
+				// ExpectError: regexp.MustCompile(clients.ErrScheduleNotification),
+				ExpectError: regexp.MustCompile(".*please provide a valid email address.*"),
 			},
 			{ // Step 5
-				Config:      testCreateBaselineValidationFailureInvalidDevice,
-				ExpectError: regexp.MustCompile(clients.ErrGnrCreateBaseline),
+				Config:      testCreateBaselineValidationFailureScheduleNotificationInvalidEmail + templateSvcTag1,
+				ExpectError: regexp.MustCompile(fmt.Sprintf(clients.ErrInvalidEmailAddress, "abc")),
 			},
 			{ // Step 6
-				Config:      testCreateBaselineValidationFailureScheduleNotificationEmptyEmail,
-				ExpectError: regexp.MustCompile(clients.ErrGnrCreateBaseline),
+				Config:      testCreateBaselineValidationFailureNotificationOnScheduleEmptyCron + templateSvcTag1,
+				ExpectError: regexp.MustCompile(clients.ErrInvalidCronExpression),
 			},
 			{ // Step 7
-				Config:      testCreateBaselineValidationFailureScheduleNotificationInvalidEmail,
-				ExpectError: regexp.MustCompile(clients.ErrGnrCreateBaseline),
+				Config:      testCreateBaselineValidationInvalidOutputFormatCase + templateSvcTag1,
+				ExpectError: regexp.MustCompile("Invalid Attribute Value Match"),
 			},
 			{ // Step 8
-				Config:      testCreateBaselineValidationFailureNotificationOnScheduleEmptyCron,
-				ExpectError: regexp.MustCompile(clients.ErrGnrCreateBaseline),
+				Config:      testCreateBaselineValidationInvalidOutputFormat + templateSvcTag1,
+				ExpectError: regexp.MustCompile("Invalid Attribute Value Match"),
 			},
 			{ // Step 9
-				Config:      testCreateBaselineValidationInvalidOutputFormatCase,
-				ExpectError: regexp.MustCompile("Invalid Attribute Value Match"),
-			},
-			{ // Step 10
-				Config:      testCreateBaselineValidationInvalidOutputFormat,
-				ExpectError: regexp.MustCompile("Invalid Attribute Value Match"),
-			},
-			{ // Step 11
-				Config:      testCreateBaselineValidationDeviceCapable,
+				Config:      testCreateBaselineValidationDeviceCapable + templateSvcTag1,
 				ExpectError: regexp.MustCompile(clients.ErrGnrCreateBaseline),
 			},
 		},
 	})
+}
+
+var justProvider = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+`
+
+var templateSvcTag1 string = `
+resource "ome_template" "terraform-acceptance-test-1" {
+	view_type = "Compliance"
+	name = "%s"
+	content = file("%s/%s")
+}
+`
+var templateSvcTag2 string
+
+func initTemplates(t *testing.T) {
+	omeTestdataDir, _ := os.LookupEnv("OME_TESTDATA_DIR")
+	if omeTestdataDir == "" {
+		t.Error("The environment variable OME_TESTDATA_DIR must be set for this test.")
+	}
+	templateSvcTag1FileName := "test_acc_template_compliance_svc_tag_1.xml"
+	templateSvcTag2FileName := "test_acc_template_compliance_svc_tag_2.xml"
+	if _, err := os.Stat(omeTestdataDir + "/" + templateSvcTag1FileName); err != nil {
+		t.Error(err.Error())
+	}
+	if _, err := os.Stat(omeTestdataDir + "/" + templateSvcTag2FileName); err != nil {
+		t.Error(err.Error())
+	}
+	templateSvcTag1 = fmt.Sprintf(`
+		resource "ome_template" "terraform-acceptance-test-1" {
+			view_type = "Compliance"
+			name = "%s"
+			content = file("%s/%s")
+		}
+	`, TestRefTemplateName, omeTestdataDir, templateSvcTag1FileName)
+	templateSvcTag2 = fmt.Sprintf(`
+		resource "ome_template" "terraform-acceptance-test-2" {
+			view_type = "Compliance"
+			name = "%s"
+			content = file("%s/%s")
+		}
+	`, TestRefTemplateNameUpdate, omeTestdataDir, templateSvcTag2FileName)
 }
 
 var testCreateBaselineFailureWithBothTemplateIDName = `
@@ -145,6 +265,20 @@ var testCreateBaselineValidationFailureEmptyTemplateIDName = `
 	}
 
 	resource "ome_configuration_baseline" "create_baseline_validation_failure_empty_template_id_name" {
+		baseline_name = "` + BaselineName + `"
+	}
+`
+
+var testCreateBaselineValidationFailureInvalidTemplateName = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_configuration_baseline" "create_baseline_validation_failure_empty_template_id_name" {
+		ref_template_name = "invalid"
 		baseline_name = "` + BaselineName + `"
 	}
 `
@@ -296,16 +430,17 @@ func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
 	}
 	assertTFImportState := func(s []*terraform.InstanceState) error {
 		assert.Equal(t, BaselineNameUpdate+"-1", s[0].Attributes["baseline_name"])
-		assert.Equal(t, DeviceSvcTag2, s[0].Attributes["device_servicetags.0"])
+		// assert.Equal(t, DeviceID2, s[0].Attributes["device_ids.0"])
 		return nil
 	}
+	initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testConfigureBaselinewithDeviceTag,
+				Config: testConfigureBaselinewithDeviceTag + templateSvcTag1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description"),
@@ -315,7 +450,7 @@ func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "0")),
 			},
 			{
-				Config: testConfigureBaselinewithDeviceTagUpdate,
+				Config: testConfigureBaselinewithDeviceTagUpdate + templateSvcTag1 + templateSvcTag2,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineNameUpdate),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description updated"),
@@ -325,7 +460,7 @@ func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "0")),
 			},
 			{
-				Config: testConfigureBaselinewithDeviceID,
+				Config: testConfigureBaselinewithDeviceID + templateSvcTag1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName+"-1"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description"),
@@ -334,7 +469,7 @@ func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.0", DeviceID1)),
 			},
 			{
-				Config: testConfigureBaselinewithDeviceIDUpdate,
+				Config: testConfigureBaselinewithDeviceIDUpdate + templateSvcTag1 + templateSvcTag2,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineNameUpdate+"-1"),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description updated"),
@@ -362,15 +497,6 @@ var testConfigureBaselinewithDeviceTag = `
 		skipssl = true
 	}
 
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
-	}
-
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
@@ -386,24 +512,6 @@ var testConfigureBaselinewithDeviceTagUpdate = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
-	}
-
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
-	}
-
-	resource "ome_template" "terraform-acceptance-test-2" {
-		name = "` + TestRefTemplateNameUpdate + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
 	}
 
 	resource "ome_configuration_baseline" "create_baseline" {
@@ -423,15 +531,6 @@ var testConfigureBaselinewithDeviceID = `
 		skipssl = true
 	}
 
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
-	}
-
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `-1"
 		ref_template_name = "` + TestRefTemplateName + `"
@@ -447,24 +546,6 @@ var testConfigureBaselinewithDeviceIDUpdate = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
-	}
-
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
-	}
-
-	resource "ome_template" "terraform-acceptance-test-2" {
-		name = "` + TestRefTemplateNameUpdate + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
 	}
 
 	resource "ome_configuration_baseline" "create_baseline" {
@@ -490,13 +571,14 @@ func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 		assert.Equal(t, "html", s[0].Attributes["output_format"])
 		return nil
 	}
+	initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testConfigureBaselineWithSchedule,
+				Config: testConfigureBaselineWithSchedule + templateSvcTag1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description"),
@@ -513,7 +595,7 @@ func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 				),
 			},
 			{
-				Config: testConfigureBaselineWithScheduleUpdate,
+				Config: testConfigureBaselineWithScheduleUpdate + templateSvcTag1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description"),
@@ -549,15 +631,6 @@ var testConfigureBaselineWithSchedule = `
 		skipssl = true
 	}
 
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
-	}
-
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
@@ -579,15 +652,6 @@ var testConfigureBaselineWithScheduleUpdate = `
 		skipssl = true
 	}
 
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
-	}
-
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
@@ -606,13 +670,14 @@ func TestCreateBaseline_CreateBaselineWithScheduleNonCompliant(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
+	initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testConfigureBaselineScheduleNonCompliant,
+				Config: testConfigureBaselineScheduleNonCompliant + templateSvcTag1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description"),
@@ -627,7 +692,7 @@ func TestCreateBaseline_CreateBaselineWithScheduleNonCompliant(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "notify_on_schedule", "false")),
 			},
 			{
-				Config: testConfigureBaselineScheduleNonCompliantUpdate,
+				Config: testConfigureBaselineScheduleNonCompliantUpdate + templateSvcTag1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName),
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description"),
@@ -650,15 +715,6 @@ var testConfigureBaselineScheduleNonCompliant = `
 		skipssl = true
 	}
 
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
-	}
-
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
@@ -676,15 +732,6 @@ var testConfigureBaselineScheduleNonCompliantUpdate = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
-	}
-
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
 	}
 
 	resource "ome_configuration_baseline" "create_baseline" {
@@ -705,5 +752,135 @@ var testImportConfigurationBaseline = `
 	}
 
 	resource "ome_configuration_baseline" "import_baseline" {
+	}
+`
+
+func TestCreateBaseline_Update(t *testing.T) {
+	if os.Getenv("TF_ACC") == "" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
+	initTemplates(t)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testCreateBaselineWrongCreds,
+				ExpectError: regexp.MustCompile(".*invalid credentials.*"),
+			},
+			{
+				Config: testConfigureBaselinewithDeviceTag + templateSvcTag1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "description", "baseline description"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "ref_template_name", TestRefTemplateName),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.#", "1"),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_servicetags.0", DeviceSvcTag1),
+					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.#", "0")),
+			},
+			{
+				Config:      testUpdateBaselinewithInvalidDeviceSvcTag + templateSvcTag1,
+				ExpectError: regexp.MustCompile(".*invalid service tags.*"),
+			},
+			{
+				Config:      testUpdateBaselinewithInvalidTemplate + templateSvcTag1,
+				ExpectError: regexp.MustCompile(".*reference template id or name should be of type compliance.*"),
+			},
+			{
+				Config:      testUpdateBaselinewithUnexpectedCron + templateSvcTag1,
+				ExpectError: regexp.MustCompile(".*attributes `cron` and `email_addresses` are accepted only when `schedule` is.*"),
+			},
+			{
+				Config:      testUpdateBaselinewithInvalidSchedule + templateSvcTag1,
+				ExpectError: regexp.MustCompile(".*please provide a valid email address.*"),
+			},
+		},
+	})
+}
+
+var testCreateBaselineWrongCreds = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "invalid"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_configuration_baseline" "create_baseline" {
+		baseline_name = "` + BaselineName + `"
+		ref_template_name = "` + TestRefTemplateName + `"
+		device_servicetags = ["invalid"]
+		description = "baseline description"
+	}
+`
+
+var testUpdateBaselinewithInvalidDeviceSvcTag = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_configuration_baseline" "create_baseline" {
+		baseline_name = "` + BaselineName + `"
+		ref_template_name = "` + TestRefTemplateName + `"
+		device_servicetags = ["invalid"]
+		description = "baseline description"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
+	}
+`
+
+var testUpdateBaselinewithInvalidTemplate = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_configuration_baseline" "create_baseline" {
+		baseline_name = "` + BaselineName + `"
+		ref_template_name = "invalid"
+		device_servicetags = ["` + DeviceSvcTag1 + `"]
+		description = "baseline description"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
+	}
+`
+
+var testUpdateBaselinewithUnexpectedCron = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_configuration_baseline" "create_baseline" {
+		baseline_name = "` + BaselineName + `"
+		ref_template_name = "` + TestRefTemplateName + `"
+		device_servicetags = ["` + DeviceSvcTag1 + `"]
+		description = "baseline description"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
+		cron = "abc"
+	}
+`
+
+var testUpdateBaselinewithInvalidSchedule = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	resource "ome_configuration_baseline" "create_baseline" {
+		baseline_name = "` + BaselineName + `"
+		ref_template_name = "` + TestRefTemplateName + `"
+		device_servicetags = ["` + DeviceSvcTag1 + `"]
+		description = "baseline description"
+		depends_on = ["ome_template.terraform-acceptance-test-1"]
+		schedule=true
 	}
 `

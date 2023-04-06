@@ -167,6 +167,30 @@ func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.Sche
 	}
 }
 
+func (p *omeProvider) createOMESession(ctx context.Context, caller string) (*clients.Client, diag.Diagnostics) {
+	//Create Session and defer the remove session
+	var d diag.Diagnostics
+	omeClient, err := clients.NewClient(*p.clientOpt)
+	if err != nil {
+		d.AddError(
+			clients.ErrCreateClient,
+			err.Error(),
+		)
+		return nil, d
+	}
+
+	tflog.Trace(ctx, fmt.Sprintf("resource_configuration_baseline %s Creating Session", caller))
+	_, err = omeClient.CreateSession()
+	if err != nil {
+		d.AddError(
+			clients.ErrCreateSession,
+			err.Error(),
+		)
+		return nil, d
+	}
+	return omeClient, d
+}
+
 // Create a new resource
 func (r resourceConfigurationBaseline) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	//Get Plan Data
@@ -189,22 +213,9 @@ func (r resourceConfigurationBaseline) Create(ctx context.Context, req resource.
 		return
 	}
 	//Create Session and defer the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	tflog.Trace(ctx, "resource_configuration_baseline create Creating Session")
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	omeClient, d := r.p.createOMESession(ctx, "resource_configuration_baseline Create")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -223,14 +234,12 @@ func (r resourceConfigurationBaseline) Create(ctx context.Context, req resource.
 	var devIDs []int64
 
 	diags = plan.DeviceServicetags.ElementsAs(ctx, &serviceTags, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
-		return
-	}
+	resp.Diagnostics.Append(diags...)
 
 	diags = plan.DeviceIDs.ElementsAs(ctx, &devIDs, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -297,9 +306,6 @@ func (r resourceConfigurationBaseline) Create(ctx context.Context, req resource.
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 }
 
 // Read resource information
@@ -313,21 +319,9 @@ func (r resourceConfigurationBaseline) Read(ctx context.Context, req resource.Re
 	}
 
 	//Create Session and differ the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	omeClient, d := r.p.createOMESession(ctx, "resource_configuration_baseline Read")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -351,9 +345,6 @@ func (r resourceConfigurationBaseline) Read(ctx context.Context, req resource.Re
 	//Save into State
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 }
 
 // Update resource
@@ -384,21 +375,9 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req resource.
 	}
 
 	//Create Session and differ the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	omeClient, d := r.p.createOMESession(ctx, "resource_configuration_baseline Update")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -446,14 +425,12 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req resource.
 	var devIDs []int64
 
 	diags = plan.DeviceServicetags.ElementsAs(ctx, &serviceTags, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
-		return
-	}
+	resp.Diagnostics.Append(diags...)
 
 	diags = plan.DeviceIDs.ElementsAs(ctx, &devIDs, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -523,9 +500,6 @@ func (r resourceConfigurationBaseline) Update(ctx context.Context, req resource.
 	//Save into State
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 }
 
 // Delete resource
@@ -539,26 +513,14 @@ func (r resourceConfigurationBaseline) Delete(ctx context.Context, req resource.
 	}
 
 	//Create Session and differ the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	omeClient, d := r.p.createOMESession(ctx, "resource_configuration_baseline Delete")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
 
-	err = omeClient.DeleteBaseline([]int64{state.ID.ValueInt64()})
+	err := omeClient.DeleteBaseline([]int64{state.ID.ValueInt64()})
 
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -575,24 +537,11 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req reso
 	var state models.ConfigureBaselines
 	baselineName := req.ID
 
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
+	omeClient, d := r.p.createOMESession(ctx, "resource_configuration_baseline ImportState")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
-		return
-	}
-
 	defer omeClient.RemoveSession()
 
 	baseline, err := omeClient.GetBaselineByName(baselineName)
@@ -618,9 +567,6 @@ func (r resourceConfigurationBaseline) ImportState(ctx context.Context, req reso
 
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 }
 
 func validateRefTemplateDetails(refTemplateID int64, refTemplateName string, omeClient *clients.Client) (models.OMETemplate, error) {
@@ -864,7 +810,7 @@ func validateNotification(plan models.ConfigureBaselines) error {
 			return fmt.Errorf(clients.ErrBaseLineScheduleValid)
 		}
 	} else {
-		if !plan.NotifyOnSchedule.ValueBool() && !plan.Cron.IsNull() {
+		if !(plan.NotifyOnSchedule.ValueBool() || plan.Cron.IsNull()) {
 			return fmt.Errorf(clients.ErrBaseLineNotifyValid)
 		}
 	}
