@@ -121,21 +121,9 @@ func (g *configurationReportDataSource) Read(ctx context.Context, req datasource
 		return
 	}
 
-	omeClient, err := clients.NewClient(*g.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	omeClient, d := g.p.createOMESession(ctx, "datasource_vlannetworks_info Read")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -192,7 +180,4 @@ func (g *configurationReportDataSource) Read(ctx context.Context, req datasource
 	}
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 }
