@@ -85,11 +85,15 @@ func TestTemplateDeploy_InvalidTemplate(t *testing.T) {
 			},
 			{
 				Config:      testTemplateDeploymentIDSTGNMutuallyExclusive1,
-				ExpectError: regexp.MustCompile(clients.ErrTemplateDeploymentCreate),
+				ExpectError: regexp.MustCompile(".*please provide one of the device IDs or service tags.*"),
 			},
 			{
 				Config:      testTemplateDeploymentDeviceInfoRequired,
-				ExpectError: regexp.MustCompile(clients.ErrTemplateDeploymentCreate),
+				ExpectError: regexp.MustCompile(".*please provide device IDs or service tags.*"),
+			},
+			{
+				Config:      testCreateTemplateDeployWithInvalidTemplate,
+				ExpectError: regexp.MustCompile(".*template ID 0 provided.*"),
 			},
 		},
 	})
@@ -99,23 +103,24 @@ func TestTemplateDeploy_CreateAndUpdateDeploySuccess(t *testing.T) {
 	if skipTest() {
 		t.Skip(SkipTestMsg)
 	}
+	temp := initTemplates(t)
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testTemplateDeploymentSuccess,
+				Config: testTemplateDeploymentSuccess + temp.templateDeploySvcTag1,
 				Check: resource.ComposeTestCheckFunc(resource.TestCheckResourceAttr("ome_deployment.deploy-template-3", "template_name", TestAccTemplateName),
 					resource.TestCheckResourceAttr("ome_deployment.deploy-template-3", "device_servicetags.#", "1"),
 					resource.TestCheckResourceAttr("ome_deployment.deploy-template-3", "device_servicetags.0", DeviceSvcTag1),
 				),
 			},
 			{
-				Config:      testUpdateTemplateDeployWithInvalidTemplate,
-				ExpectError: regexp.MustCompile(clients.ErrTemplateDeploymentUpdate),
+				Config:      testUpdateTemplateNameInDeployNegative + temp.templateDeploySvcTag1,
+				ExpectError: regexp.MustCompile(clients.ErrTemplateChanges),
 			},
 			{
-				Config: testTemplateUpdateDeploymentSuccess,
+				Config: testTemplateUpdateDeploymentSuccess + temp.templateDeploySvcTag1,
 				Check: resource.ComposeTestCheckFunc(resource.TestCheckResourceAttr("ome_deployment.deploy-template-3", "template_name", TestAccTemplateName),
 					resource.TestCheckResourceAttr("ome_deployment.deploy-template-3", "device_servicetags.#", "1"),
 					resource.TestCheckResourceAttr("ome_deployment.deploy-template-3", "device_servicetags.0", DeviceSvcTag2),
@@ -165,6 +170,7 @@ func TestTemplateDeploy_ImportDeploymentError(t *testing.T) {
 		assert.Equal(t, DeviceSvcTag1, s[0].Attributes["device_servicetags.0"])
 		return nil
 	}
+	temp := initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -187,7 +193,7 @@ func TestTemplateDeploy_ImportDeploymentError(t *testing.T) {
 				ExpectError:       regexp.MustCompile(clients.ErrImportDeployment),
 			},
 			{
-				Config: testTemplateDeploymentSuccess,
+				Config: testTemplateDeploymentSuccess + temp.templateDeploySvcTag1,
 			},
 			{
 				Config:           testAccImportDeploymentSuccess,
@@ -297,7 +303,8 @@ var testTemplateDeploymentDeviceInfoRequired = `
 		template_name = "demo_template_1"
 	}
 `
-var testUpdateTemplateDeployWithInvalidTemplate = `
+
+var testCreateTemplateDeployWithInvalidTemplate = `
 	provider "ome" {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
@@ -305,14 +312,22 @@ var testUpdateTemplateDeployWithInvalidTemplate = `
 		skipssl = true
 	}
 
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestAccTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "System"
+	resource "ome_deployment" "deploy-template-3" {
+		template_name = "invalid_template_name"
+		device_servicetags = ["` + DeviceSvcTag1 + `"]
+	}
+`
+
+var testUpdateTemplateNameInDeployNegative = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
 	}
 
 	resource "ome_deployment" "deploy-template-3" {
-		template_name = "invalid_template_name"
+		template_name = "anything"
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
 	}
 `
@@ -325,18 +340,9 @@ var testTemplateDeploymentSuccess = `
 		skipssl = true
 	}
 
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestAccTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "System"
-	}
-
 	resource "ome_deployment" "deploy-template-3" {
 		template_name = resource.ome_template.terraform-acceptance-test-1.name
 		device_servicetags = ["` + DeviceSvcTag1 + `"]
-		depends_on = [
-			"ome_template.terraform-acceptance-test-1"
-		]
 	}
 `
 
@@ -346,12 +352,6 @@ var testTemplateUpdateDeploymentSuccess = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
-	}
-
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestAccTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "System"
 	}
 
 	resource "ome_deployment" "deploy-template-3" {

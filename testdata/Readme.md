@@ -48,6 +48,14 @@ resource "ome_template" "terraform-acceptance-test-2" {
     sleep_interval = 30
 }
 
+resource "ome_template" "terraform-acceptance-test-deploy-1" {
+    name = "BuildDeploySvcTag1"
+    refdevice_servicetag = var.DEVICESVCTAG1
+    fqdds = "System"
+    job_retry_count = 20
+    sleep_interval = 30
+}
+
 ```
 Run as
 
@@ -62,6 +70,7 @@ Then export the templates to files in one folder:
 | BuildComplianceSvcTag1     | test_acc_template_compliance_svc_tag_1.xml | DEVICESVCTAG1          | `EventFilters` |
 | BuildComplianceSvcTag2     | test_acc_template_compliance_svc_tag_2.xml | DEVICESVCTAG2          | `EventFilters` |
 | BuildComplianceSvcTag1Full | test_acc_template_full_svc_tag_1.xml       | DEVICESVCTAG1          | `All`          |
+| BuildDeployeSvcTag1        | test_acc_template_deploy_svc_tag_1.xml     | DEVICESVCTAG1          | `System`       |
 
 After exporting these files, destroy the templates as:
 

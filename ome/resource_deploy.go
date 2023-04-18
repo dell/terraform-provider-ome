@@ -207,24 +207,27 @@ func (r resourceDeployment) Create(ctx context.Context, req resource.CreateReque
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	templateDeploymentState := models.TemplateDeployment{}
 
-	//Create Session and differ the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
+	// get plan devices
+	var serviceTags []string
+	var devIDs []int64
+
+	diags = plan.DeviceServicetags.ElementsAs(ctx, &serviceTags, true)
+	resp.Diagnostics.Append(diags...)
+
+	diags = plan.DeviceIDs.ElementsAs(ctx, &devIDs, true)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	templateDeploymentState := models.TemplateDeployment{}
+
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_deploy Create")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -244,21 +247,6 @@ func (r resourceDeployment) Create(ctx context.Context, req resource.CreateReque
 		"id":   omeTemplate.ID,
 		"name": omeTemplate.Name,
 	})
-
-	var serviceTags []string
-	var devIDs []int64
-
-	diags = plan.DeviceServicetags.ElementsAs(ctx, &serviceTags, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
-		return
-	}
-
-	diags = plan.DeviceIDs.ElementsAs(ctx, &devIDs, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
-		return
-	}
 
 	usedDeviceInput, err := clients.DeviceMutuallyExclusive(serviceTags, devIDs)
 	if err != nil {
@@ -341,9 +329,6 @@ func (r resourceDeployment) Create(ctx context.Context, req resource.CreateReque
 	// Save into State
 	diags = resp.State.Set(ctx, &templateDeploymentState)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	tflog.Trace(ctx, "resource_deploy create: finish")
 }
 
@@ -369,14 +354,12 @@ func (r resourceDeployment) Read(ctx context.Context, req resource.ReadRequest, 
 	var devIDs []int64
 
 	diags = stateTemplateDeployment.DeviceServicetags.ElementsAs(ctx, &serviceTags, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
-		return
-	}
+	resp.Diagnostics.Append(diags...)
 
 	diags = stateTemplateDeployment.DeviceIDs.ElementsAs(ctx, &devIDs, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -387,22 +370,10 @@ func (r resourceDeployment) Read(ctx context.Context, req resource.ReadRequest, 
 		usedDeviceInput = clients.DeviceIDs
 	}
 
-	//Create Session and differ the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_deploy Read")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -414,9 +385,6 @@ func (r resourceDeployment) Read(ctx context.Context, req resource.ReadRequest, 
 	//Save into State
 	diags = resp.State.Set(ctx, &stateTemplateDeployment)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	tflog.Trace(ctx, "resource_deploy read: finished")
 }
 
@@ -439,22 +407,10 @@ func (r resourceDeployment) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	//Create Session and differ the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_deploy Update")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -471,18 +427,28 @@ func (r resourceDeployment) Update(ctx context.Context, req resource.UpdateReque
 		"name": plan.TemplateName.ValueString(),
 	})
 
+	// get the plan device ids
 	var serviceTags []string
 	var devIDs []int64
 
 	diags = plan.DeviceServicetags.ElementsAs(ctx, &serviceTags, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
-		return
-	}
+	resp.Diagnostics.Append(diags...)
 
 	diags = plan.DeviceIDs.ElementsAs(ctx, &devIDs, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(diags...)
+
+	// get the state devicds's
+
+	var stateServiceTags []string
+	var stateDevIDs []int64
+
+	diags = state.DeviceServicetags.ElementsAs(ctx, &stateServiceTags, true)
+	resp.Diagnostics.Append(diags...)
+
+	diags = state.DeviceIDs.ElementsAs(ctx, &stateDevIDs, true)
+	resp.Diagnostics.Append(diags...)
+
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -503,22 +469,6 @@ func (r resourceDeployment) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	_, planDeviceIDs, _ := omeClient.GetUniqueDevicesIdsAndServiceTags(planDevices)
-	//get the state devicds's
-
-	var stateServiceTags []string
-	var stateDevIDs []int64
-
-	diags = state.DeviceServicetags.ElementsAs(ctx, &stateServiceTags, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
-		return
-	}
-
-	diags = state.DeviceIDs.ElementsAs(ctx, &stateDevIDs, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
-		return
-	}
 
 	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(state.TemplateName.ValueString())
 	if err != nil {
@@ -626,9 +576,6 @@ func (r resourceDeployment) Update(ctx context.Context, req resource.UpdateReque
 	//Save into State
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	tflog.Trace(ctx, "resource_deploy update: finished")
 }
 
@@ -643,22 +590,10 @@ func (r resourceDeployment) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 
-	//Create Session and differ the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_deploy Delete")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -715,23 +650,14 @@ func (r resourceDeployment) ImportState(ctx context.Context, req resource.Import
 	// Save the import identifier in the id attribute
 	var stateTemplateDeployment models.TemplateDeployment
 	templateName := req.ID
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
 
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_deploy ImportState")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
+	defer omeClient.RemoveSession()
 
 	omeTemplate, err := omeClient.GetTemplateByName(templateName)
 	if err != nil {
@@ -739,9 +665,6 @@ func (r resourceDeployment) ImportState(ctx context.Context, req resource.Import
 		return
 	}
 	templateID := omeTemplate.ID
-
-	//Create Session and differ the remove session
-	defer omeClient.RemoveSession()
 
 	profileDevSTVals := []attr.Value{}
 	serverProfiles, err := omeClient.GetServerProfileInfoByTemplateName(templateName)
