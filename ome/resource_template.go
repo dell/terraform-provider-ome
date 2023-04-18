@@ -10,6 +10,7 @@ import (
 	"terraform-provider-ome/models"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -109,7 +110,10 @@ func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, r
 					StringDefaultValue(types.StringValue("Deployment")),
 				},
 				Validators: []validator.String{
-					validTemplateViewTypeValidator{},
+					stringvalidator.OneOf(
+						"Deployment",
+						"Compliance",
+					),
 				},
 			},
 			"view_type_id": schema.Int64Attribute{
@@ -126,7 +130,10 @@ func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, r
 					StringDefaultValue(types.StringValue("Server")),
 				},
 				Validators: []validator.String{
-					validTemplateDeviceTypeValidator{},
+					stringvalidator.OneOf(
+						"Server",
+						"Chassis",
+					),
 				},
 			},
 			"content": schema.StringAttribute{
@@ -267,21 +274,11 @@ func (r *resourceTemplate) Create(ctx context.Context, req resource.CreateReques
 		)
 		return
 	}
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
 
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_template Create")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -525,21 +522,11 @@ func (r *resourceTemplate) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 	templateID, _ := strconv.ParseInt(template.ID.ValueString(), 10, 64)
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
 
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_template Read")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -654,21 +641,10 @@ func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_template Update")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -676,7 +652,10 @@ func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest
 	tflog.Debug(ctx, "resource_template update: Template id", map[string]interface{}{
 		"templateid": templateID,
 	})
-	var identityPool models.IdentityPool
+	var (
+		identityPool models.IdentityPool
+		err          error
+	)
 	if planTemplate.IdentityPoolName.ValueString() != "" {
 		identityPool, err = validateIOPoolName(omeClient, planTemplate.IdentityPoolName.ValueString())
 		if err != nil {
@@ -899,30 +878,21 @@ func (r resourceTemplate) Delete(ctx context.Context, req resource.DeleteRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
 
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_template Delete")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
+
 	tflog.Trace(ctx, "resource_template delete: started delete")
 	tflog.Debug(ctx, "resource_template delete: started delete for template", map[string]interface{}{
 		"templateid": template.ID.ValueString(),
 	})
 
-	_, err = omeClient.Delete(fmt.Sprintf(clients.TemplateAPI+"(%s)", template.ID.ValueString()), nil, nil)
+	_, err := omeClient.Delete(fmt.Sprintf(clients.TemplateAPI+"(%s)", template.ID.ValueString()), nil, nil)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrDeleteTemplate,
@@ -938,21 +908,11 @@ func (r resourceTemplate) ImportState(ctx context.Context, req resource.ImportSt
 	tflog.Trace(ctx, "resource_template import: started")
 	var template models.Template
 	template.Name = types.StringValue(req.ID)
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
 
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_template Import")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
