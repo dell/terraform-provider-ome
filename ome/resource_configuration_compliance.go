@@ -8,6 +8,8 @@ import (
 	"terraform-provider-ome/models"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -29,9 +31,8 @@ const (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ resource.Resource                = &resourceConfigurationCompliance{}
-	_ resource.ResourceWithConfigure   = &resourceConfigurationCompliance{}
-	_ resource.ResourceWithImportState = &resourceConfigurationCompliance{}
+	_ resource.Resource              = &resourceConfigurationCompliance{}
+	_ resource.ResourceWithConfigure = &resourceConfigurationCompliance{}
 )
 
 // NewConfigurationComplianceResource is a new resource for configuration compliance
@@ -94,13 +95,13 @@ func (r resourceConfigurationCompliance) Schema(_ context.Context, _ resource.Sc
 							Description:         "End compliance status of the target device, used to check the drifts in the compliance status.",
 							Required:            true,
 							Validators: []validator.String{
-								complianceStateValidator{},
+								stringvalidator.OneOf(clients.ValidComplainceStatus),
 							},
 						},
 					},
 				},
 				Validators: []validator.Set{
-					sizeAtLeastValidator{min: 1},
+					setvalidator.SizeAtLeast(1),
 				},
 			},
 			"job_retry_count": schema.Int64Attribute{
@@ -157,22 +158,9 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req resourc
 	state := models.ConfigurationRemediation{}
 
 	//Create Session and defer the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	tflog.Trace(ctx, "resource_configuration_compliance: create Creating Session")
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	omeClient, d := r.p.createOMESession(ctx, "resource_configuration_compliance: Create")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -180,7 +168,7 @@ func (r resourceConfigurationCompliance) Create(ctx context.Context, req resourc
 	baseline, err := checkValidBaseline(omeClient, plan.BaselineName.ValueString(), plan.BaselineID.ValueInt64(), false)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrGnrBaseLineCreateRemediation,
+			clients.ErrGnrBaseLineCreateRemediation+", baseline not found",
 			err.Error(),
 		)
 		return
@@ -260,29 +248,17 @@ func (r resourceConfigurationCompliance) Read(ctx context.Context, req resource.
 		return
 	}
 
-	//Create Session and differ the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_configuration_compliance: Read")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
 
 	tflog.Trace(ctx, "resource_configuration_compliance: read checking status report")
 	//check the compliance status to check if the reports are generated
-	err = checkReportsStatus(omeClient, state.BaselineID.ValueInt64())
+	err := checkReportsStatus(omeClient, state.BaselineID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrBaseLineReadRemediation,
@@ -350,22 +326,10 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req resourc
 		return
 	}
 
-	//Create Session and differ the remove session
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
+	//Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_configuration_compliance: Create")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -383,7 +347,7 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req resourc
 	baseline, err := checkValidBaseline(omeClient, plan.BaselineName.ValueString(), plan.BaselineID.ValueInt64(), true)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			clients.ErrGnrBaseLineCreateRemediation,
+			clients.ErrGnrBaseLineCreateRemediation+", baseline not found",
 			err.Error(),
 		)
 		return
@@ -453,39 +417,6 @@ func (r resourceConfigurationCompliance) Update(ctx context.Context, req resourc
 // Delete resource
 func (r resourceConfigurationCompliance) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	resp.State.RemoveResource(ctx)
-}
-
-// Import resource
-func (r resourceConfigurationCompliance) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	// Save the import identifier in the id attribute
-	var state models.ConfigurationRemediation
-	_ = req.ID
-
-	omeClient, err := clients.NewClient(*r.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
-		return
-	}
-
-	defer omeClient.RemoveSession()
-
-	diags := resp.State.Set(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 }
 
 // validate the Devices against the baseline
