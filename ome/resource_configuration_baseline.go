@@ -167,30 +167,6 @@ func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.Sche
 	}
 }
 
-func (p *omeProvider) createOMESession(ctx context.Context, caller string) (*clients.Client, diag.Diagnostics) {
-	//Create Session and defer the remove session
-	var d diag.Diagnostics
-	omeClient, err := clients.NewClient(*p.clientOpt)
-	if err != nil {
-		d.AddError(
-			clients.ErrCreateClient,
-			err.Error(),
-		)
-		return nil, d
-	}
-
-	tflog.Trace(ctx, fmt.Sprintf("resource_configuration_baseline %s Creating Session", caller))
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		d.AddError(
-			clients.ErrCreateSession,
-			err.Error(),
-		)
-		return nil, d
-	}
-	return omeClient, d
-}
-
 // Create a new resource
 func (r resourceConfigurationBaseline) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	//Get Plan Data
