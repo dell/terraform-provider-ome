@@ -3,7 +3,6 @@ package ome
 import (
 	"context"
 	"fmt"
-	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -137,21 +136,9 @@ func (t templateDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 	templateName := template.Name.ValueString()
-	omeClient, err := clients.NewClient(*t.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to create client",
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to create OME session: ",
-			err.Error(),
-		)
+	omeClient, d := t.p.createOMESession(ctx, "datasource_template Read")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -175,15 +162,11 @@ func (t templateDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			"Unable to refresh template attributes:",
 			err.Error(),
 		)
-		return
 	}
 	stateVlan := models.Vlan{}
 	diags = template.Vlan.As(ctx, &stateVlan, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
+	resp.Diagnostics.Append(diags...)
 	if diags.HasError() {
-		resp.Diagnostics.AddError(
-			"Unable to fetch Vlan from state ",
-			"Hence, Cannot refresh the template resource",
-		)
 		return
 	}
 
@@ -203,9 +186,6 @@ func (t templateDataSource) Read(ctx context.Context, req datasource.ReadRequest
 
 	diags = resp.State.Set(ctx, &template)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 }
 
 func updateDataSourceState(template *models.TemplateDataSource, omeTemplateData *models.OMETemplate, omeTemplateAttributes []models.OmeAttribute, omeVlan models.OMEVlan) {

@@ -2,6 +2,7 @@ package ome
 
 import (
 	"os"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -17,6 +18,10 @@ func TestDataSource_ReadVlanNetworks(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
+				Config:      testVlanNetworksWrongCreds,
+				ExpectError: regexp.MustCompile(".*invalid credentials.*"),
+			},
+			{
 				Config: testVlanNetworks,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.ome_vlannetworks_info.vlans", "vlan_networks.#", "3")),
@@ -25,6 +30,17 @@ func TestDataSource_ReadVlanNetworks(t *testing.T) {
 	})
 }
 
+var testVlanNetworksWrongCreds = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "invalid"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	data "ome_vlannetworks_info" "vlans" {
+	}
+`
 var testVlanNetworks = `
 	provider "ome" {
 		username = "` + omeUserName + `"

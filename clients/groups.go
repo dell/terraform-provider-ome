@@ -67,7 +67,6 @@ func (c *Client) GetDevicesByGroupName(groupName string) (models.Devices, error)
 // GetDevicesByGroups - returns the list of device by group names
 func (c *Client) GetDevicesByGroups(groupNames []string) ([]models.Device, error) {
 	devices := []models.Device{}
-	var err error
 	for _, groupName := range groupNames {
 		groupDevices, err := c.GetDevicesByGroupName(groupName)
 		if err != nil && len(groupDevices.Value) == 0 {
@@ -75,5 +74,5 @@ func (c *Client) GetDevicesByGroups(groupNames []string) ([]models.Device, error
 		}
 		devices = append(devices, groupDevices.Value...)
 	}
-	return devices, err
+	return devices, nil
 }

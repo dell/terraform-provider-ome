@@ -13,23 +13,43 @@ func TestDataSource_ReadConfigurationReport(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
+	temps := initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
+				Config:      testConfiguratiponReportDSInvalidCreds,
+				ExpectError: regexp.MustCompile(".*invalid credentials.*"),
+			},
+			{
 				Config:      testConfiguratiponReportDSInvalid,
 				ExpectError: regexp.MustCompile(clients.ErrGnrConfigurationReport),
 			},
 			{
-				Config: testConfiguratiponReportDS,
+				Config: testConfiguratiponReportDS + temps.templateSvcTag1Full,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.ome_configuration_report_info.cr", "compliance_report_device.#", "2")),
 			},
 		},
 	})
 }
+
+var testConfiguratiponReportDSInvalidCreds = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "invalid"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	data "ome_configuration_report_info" "cr" {
+		id = "0"
+		baseline_name = "` + "InvalidBaseline" + `"
+		fetch_attributes = true
+	}
+`
 
 var testConfiguratiponReportDSInvalid = `
 	provider "ome" {
@@ -52,15 +72,6 @@ var testConfiguratiponReportDS = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
-	}
-
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
 	}
 
 	resource "ome_configuration_baseline" "create_baseline" {

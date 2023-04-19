@@ -11,18 +11,22 @@ func TestDataSource_ReadTemplate(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
+	temps := initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testReadTemplate,
+				Config: justProvider + temps.templateSvcTag1Full,
+			},
+			{
+				Config: testReadTemplate + temps.templateSvcTag1Full,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.ome_template_info.template", "name", TestRefTemplateName),
 					resource.TestCheckResourceAttr("data.ome_template_info.template", "view_type_id", "1"),
-					resource.TestCheckResourceAttr("data.ome_template_info.template", "refdevice_id", "10112"),
-					resource.TestCheckResourceAttr("data.ome_template_info.template", "description", ""),
+					resource.TestCheckResourceAttrPair("data.ome_template_info.template", "attributes", "ome_template.terraform-acceptance-test-1", "attributes"),
+					resource.TestCheckResourceAttr("data.ome_template_info.template", "description", "Imported from a file."),
 				),
 			},
 			{
@@ -44,15 +48,6 @@ var testReadTemplate = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
-	}
-
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
 	}
 
 	data "ome_template_info" "template" {

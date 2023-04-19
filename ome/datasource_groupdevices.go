@@ -2,7 +2,6 @@ package ome
 
 import (
 	"context"
-	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -83,48 +82,37 @@ func (g *groupDevicesDatasource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	groupNames := []string{}
-	diags = groupDevices.DeviceGroupNames.ElementsAs(ctx, &groupNames, true)
+	resp.Diagnostics.Append(groupDevices.DeviceGroupNames.ElementsAs(ctx, &groupNames, true)...)
 	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
 		return
 	}
 
-	omeClient, err := clients.NewClient(*g.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to create client",
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to create OME session: ",
-			err.Error(),
-		)
+	omeClient, d := g.p.createOMESession(ctx, "datasource_vlannetworks_info Read")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
 
 	devices, err := omeClient.GetDevicesByGroups(groupNames)
-	if err != nil && len(devices) != 0 {
-		resp.Diagnostics.AddWarning(
-			"Unable to fetch devices during pagination: ",
-			err.Error(),
-		)
-	} else if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to fetch devices for groups: ",
-			err.Error(),
-		)
-		return
-	}
 	devIDs := []attr.Value{}
 	devSvcTags := []attr.Value{}
-	devices = omeClient.GetUniqueDevices(devices)
 
+	if err != nil {
+		if len(devices) != 0 {
+			resp.Diagnostics.AddWarning(
+				"Unable to fetch devices during pagination: ",
+				err.Error(),
+			)
+		} else {
+			resp.Diagnostics.AddError(
+				"Unable to fetch devices for groups: ",
+				err.Error(),
+			)
+			return
+		}
+	}
+	devices = omeClient.GetUniqueDevices(devices)
 	for _, device := range devices {
 		devIDs = append(devIDs, types.Int64Value(device.ID))
 		devSvcTags = append(devSvcTags, types.StringValue(device.DeviceServiceTag))
@@ -146,7 +134,4 @@ func (g *groupDevicesDatasource) Read(ctx context.Context, req datasource.ReadRe
 
 	diags = resp.State.Set(ctx, &groupDevices)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 }

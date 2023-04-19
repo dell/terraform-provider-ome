@@ -2,7 +2,6 @@ package ome
 
 import (
 	"context"
-	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -100,21 +99,9 @@ func (g vlanNetworksDataSource) Read(ctx context.Context, req datasource.ReadReq
 	var state models.VLanNetworksTypeTfsdk
 	state.ID = types.StringValue("0")
 
-	omeClient, err := clients.NewClient(*g.p.clientOpt)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to create client",
-			err.Error(),
-		)
-		return
-	}
-
-	_, err = omeClient.CreateSession()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to create OME session: ",
-			err.Error(),
-		)
+	omeClient, d := g.p.createOMESession(ctx, "datasource_vlannetworks_info Read")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
@@ -143,7 +130,4 @@ func (g vlanNetworksDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 	diags := resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 }

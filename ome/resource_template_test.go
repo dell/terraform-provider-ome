@@ -135,7 +135,7 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.clone-template-test", "description", "This is a template for testing deployments in acceptance testcases. Please do not delete this template"),
 
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "name", "test_acc_clone_template_deployment_compliance"),
-					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type", "compliance"),
+					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type", "Compliance"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "reftemplate_name", ReferenceDeploymentTemplateNameForClone),
 					// resource.TestCheckResourceAttr("ome_template.clone-template-deployment-compliance", "refdevice_servicetag", ""),
@@ -160,54 +160,67 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
+				// step 1
 				Config:      testAccCreateTemplateInvalidSvcTag,
 				ExpectError: regexp.MustCompile(clients.ErrInvalidDeviceIdentifiers),
 			},
 			{
+				// step 2
 				Config:      testAccCreateTemplateMutuallyExclusive1,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
+				// step 3
 				Config:      testAccCreateTemplateMutuallyExclusive2,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
+				// step 4
 				Config:      testAccCreateTemplateMutuallyExclusive3,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
+				// step 5
 				Config:      testAccCreateTemplateMutuallyExclusive4,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
+				// step 6
 				Config:      testAccCreateTemplateWithIOAndVlan,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
+				// step 7
 				Config:      testAccCreateTemplateInvaliddevID,
 				ExpectError: regexp.MustCompile(clients.ErrInvalidDeviceIdentifiers),
 			},
 			{
+				// step 8
 				Config:      testAccCreateTemplateEmptyDevice,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
+				// step 9
 				Config:      testAccCreateTemplateInvalidFqdds,
 				ExpectError: regexp.MustCompile(clients.ErrInvalidFqdds),
 			},
 			{
+				// step 10
 				Config:      testAccCreateTemplateInvalidViewType,
-				ExpectError: regexp.MustCompile(clients.ErrInvalidTemplateViewType),
+				ExpectError: regexp.MustCompile(".*Invalid Attribute Value Match.*"),
 			},
 			{
+				// step 11
 				Config:      testAccCloneTemplateFailure,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
+				// step 12
 				Config:      testAccCloneTemplateFailureForComplainceToDeployment,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
 			{
+				// step 13
 				Config:      testAccCloneTemplateFailureForDescription,
 				ExpectError: regexp.MustCompile(clients.ErrCreateTemplate),
 			},
@@ -742,7 +755,7 @@ resource "ome_template" "clone-template-test" {
 resource "ome_template" "clone-template-deployment-compliance" {
 	name = "test_acc_clone_template_deployment_compliance"
 	reftemplate_name = "` + ReferenceDeploymentTemplateNameForClone + `"
-	view_type = "compliance"
+	view_type = "Compliance"
 }
 
 resource "ome_template" "clone-template-compliance-compliance" {

@@ -2,10 +2,12 @@ package ome
 
 import (
 	"context"
+	"fmt"
 	"terraform-provider-ome/clients"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -156,6 +158,30 @@ func (p *omeProvider) Configure(ctx context.Context, req provider.ConfigureReque
 
 	tflog.Trace(ctx, p.clientOpt.Username)
 	tflog.Trace(ctx, "Finished configuring the provider")
+}
+
+func (p *omeProvider) createOMESession(ctx context.Context, caller string) (*clients.Client, diag.Diagnostics) {
+	//Create Session and defer the remove session
+	var d diag.Diagnostics
+	omeClient, err := clients.NewClient(*p.clientOpt)
+	if err != nil {
+		d.AddError(
+			clients.ErrCreateClient,
+			err.Error(),
+		)
+		return nil, d
+	}
+
+	tflog.Trace(ctx, fmt.Sprintf("resource_configuration_baseline %s Creating Session", caller))
+	_, err = omeClient.CreateSession()
+	if err != nil {
+		d.AddError(
+			clients.ErrCreateSession,
+			err.Error(),
+		)
+		return nil, d
+	}
+	return omeClient, d
 }
 
 func (p *omeProvider) Resources(ctx context.Context) []func() resource.Resource {

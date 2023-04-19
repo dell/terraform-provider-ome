@@ -1,9 +1,9 @@
 package ome
 
 import (
-	"fmt"
 	"os"
 	"regexp"
+
 	"terraform-provider-ome/clients"
 	"testing"
 
@@ -18,39 +18,53 @@ func TestConfigurationRemediationErrors(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
+	temps := initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testConfigureBaselinewithDeviceTag,
+				Config: testConfigureBaselinewithDeviceTag + temps.templateSvcTag1,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "baseline_name", BaselineName)),
 			},
 			{ // Check if the device part of baseline
-				Config:      testConfigureBaselineRemediationDevicePartOfBaseline,
+				Config:      testConfigureBaselineRemediationDevicePartOfBaseline + temps.templateSvcTag1,
 				ExpectError: regexp.MustCompile(clients.ErrGnrBaseLineCreateRemediation),
 			},
+		},
+	})
+
+}
+func TestConfigurationRemediationInvScenarios(t *testing.T) {
+	if os.Getenv("TF_ACC") == "" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
 			{ // Check for the valid baseline with name
 				Config:      testConfigureBaselineRemediationInvalidBaselineName,
-				ExpectError: regexp.MustCompile(clients.ErrGnrBaseLineCreateRemediation),
+				ExpectError: regexp.MustCompile(".*baseline not found.*"),
 			},
 			{ //  Check for the valid baseline with id
 				Config:      testConfigureBaselineRemediationInvalidBaselineID,
-				ExpectError: regexp.MustCompile(clients.ErrGnrBaseLineCreateRemediation),
+				ExpectError: regexp.MustCompile(".*baseline not found.*"),
 			},
 			{ //  any one baseline name or id required
-				Config:      testConfigureBaselineRemediationBaselineMutaully,
-				ExpectError: regexp.MustCompile(clients.ErrGnrBaseLineCreateRemediation),
+				Config:      testConfigureBaselineRemediationBaselineMutually,
+				ExpectError: regexp.MustCompile(".*either baseline name or id is required.*"),
 			},
 			{ //  target device size
 				Config:      testConfigureBaselineRemediationBaselneDevicesRequired,
-				ExpectError: regexp.MustCompile(fmt.Sprintf(clients.ErrBaseLineTargetsSize, 1)),
+				ExpectError: regexp.MustCompile(".*Attribute target_devices set must contain at least 1 elements.*"),
 			},
 			{ //  invalid compliance status
-				Config:      testConfigureBaselineRemediationCompianceStatus,
-				ExpectError: regexp.MustCompile(fmt.Sprintf(clients.ErrBaseLineComplianceStatus, clients.ValidComplainceStatus)),
+				Config:      testConfigureBaselineRemediationComplianceStatus,
+				ExpectError: regexp.MustCompile(".*Error: Invalid Attribute Value Match.*"),
 			},
 			{ //  if both baseline name or id not specfied
 				Config:      testConfigureBaselineRemediationBaselineInfo,
@@ -67,15 +81,6 @@ var testConfigureBaselineRemediationDevicePartOfBaseline = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
-	}
-
-	resource "ome_template" "terraform-acceptance-test-1" {
-		name = "` + TestRefTemplateName + `"
-		refdevice_servicetag = "` + DeviceSvcTag1 + `"
-		fqdds = "EventFilters"
-		view_type = "Compliance"
-		job_retry_count = 20
-		sleep_interval = 30
 	}
 
 	resource "ome_configuration_baseline" "create_baseline" {
@@ -104,13 +109,6 @@ var testConfigureBaselineRemediationInvalidBaselineName = `
 		skipssl = true
 	}
 
-	resource "ome_configuration_baseline" "create_baseline" {
-		baseline_name = "` + BaselineName + `"
-		ref_template_name = "` + TestRefTemplateName + `"
-		device_servicetags = ["` + DeviceSvcTag1 + `"]
-		description = "baseline description"
-	}
-
 	resource "ome_configuration_compliance" "baseline_remediation" {
 		baseline_name = "` + "InValidBaselineName" + `"
 		target_devices = [
@@ -129,13 +127,6 @@ var testConfigureBaselineRemediationInvalidBaselineID = `
 		skipssl = true
 	}
 
-	resource "ome_configuration_baseline" "create_baseline" {
-		baseline_name = "` + BaselineName + `"
-		ref_template_name = "` + TestRefTemplateName + `"
-		device_servicetags = ["` + DeviceSvcTag1 + `"]
-		description = "baseline description"
-	}
-
 	resource "ome_configuration_compliance" "baseline_remediation" {
 		baseline_id = ` + InvalidBaselineID + `
 		target_devices = [
@@ -146,7 +137,7 @@ var testConfigureBaselineRemediationInvalidBaselineID = `
 		  ]
 	}
 `
-var testConfigureBaselineRemediationBaselineMutaully = `
+var testConfigureBaselineRemediationBaselineMutually = `
 	provider "ome" {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
@@ -215,7 +206,7 @@ var testConfigureBaselineRemediationBaselneDevicesRequired = `
 	}
 `
 
-var testConfigureBaselineRemediationCompianceStatus = `
+var testConfigureBaselineRemediationComplianceStatus = `
 	provider "ome" {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
@@ -266,7 +257,7 @@ func TestConfigurationRemediation(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.#", "2"),
 					resource.TestCheckResourceAttr("ome_configuration_compliance.baseline_remediation", "target_devices.0.device_service_tag", DeviceSvcTag2),
 				),
-				// ExpectNonEmptyPlan: true,
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})
