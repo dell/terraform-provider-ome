@@ -76,7 +76,7 @@ func (*resourceTemplate) Metadata(ctx context.Context, req resource.MetadataRequ
 // Order Resource schema
 func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing template on OpenManage Enterprise.Updates are supported for the following parameters: `name`, `description`, `attributes`, `job_retry_count`, `sleep_interval`, `identity_pool_name`, `vlan`.",
+		MarkdownDescription: "Resource for managing template on OpenManage Enterprise.",
 		Version:             1,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
@@ -90,10 +90,16 @@ func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, r
 				Required:            true,
 			},
 			"fqdds": schema.StringAttribute{
-				MarkdownDescription: "Comma seperated values of components from a specified server, should be one of these iDRAC, System, BIOS, NIC, LifeCycleController, RAID, and EventFilters. This field cannot be updated.",
-				Description:         "Comma seperated values of components from a specified server, should be one of these iDRAC, System, BIOS, NIC, LifeCycleController, RAID, and EventFilters. This field cannot be updated.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Comma seperated values of components from a specified server." +
+					" Valid values are `iDRAC`, `System`, `BIOS`, `NIC`, `LifeCycleController`, `RAID`, `EventFilters` and `All`." +
+					" Default value is `All`." +
+					" Cannot be updated.",
+				Description: "Comma seperated values of components from a specified server." +
+					" Valid values are 'iDRAC', 'System', 'BIOS', 'NIC', 'LifeCycleController', 'RAID', 'EventFilters' and 'All'." +
+					" Default value is 'All'." +
+					" Cannot be updated.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					StringDefaultValue(types.StringValue("All")),
 				},
@@ -102,10 +108,16 @@ func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, r
 				},
 			},
 			"view_type": schema.StringAttribute{
-				MarkdownDescription: "OME template view type, supported types are Deployment, Compliance. This field cannot be updated.",
-				Description:         "OME template view type, supported types are Deployment, Compliance. This field cannot be updated.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "OME template view type." +
+					" Valid values are `Deployment` and `Compliance`." +
+					" Default value is `Deployment`." +
+					" Cannot be updated.",
+				Description: "OME template view type." +
+					" Valid values are 'Deployment' and 'Compliance'." +
+					" Default value is 'Deployment'." +
+					" Cannot be updated.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					StringDefaultValue(types.StringValue("Deployment")),
 				},
@@ -122,10 +134,14 @@ func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, r
 				Computed:            true,
 			},
 			"device_type": schema.StringAttribute{
-				MarkdownDescription: "OME template device type, supported types are Server, Chassis. This field cannot be updated and is applicable only for importing xml.",
-				Description:         "OME template device type, supported types are Server, Chassis. This field cannot be updated and is applicable only for importing xml.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "OME template device type, supported types are Server, Chassis. Cannot be updated and is applicable only for importing xml." +
+					" Valid values are `Server` and `Chassis`." +
+					" Default value is `Server`.",
+				Description: "OME template device type, supported types are Server, Chassis. Cannot be updated and is applicable only for importing xml." +
+					" Valid values are 'Server' and 'Chassis'." +
+					" Default value is 'Server'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					StringDefaultValue(types.StringValue("Server")),
 				},
@@ -137,26 +153,26 @@ func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, r
 				},
 			},
 			"content": schema.StringAttribute{
-				MarkdownDescription: "The XML content of template.. This field cannot be updated.",
-				Description:         "The XML content of template.. This field cannot be updated.",
+				MarkdownDescription: "The XML content of template. Cannot be updated.",
+				Description:         "The XML content of template. Cannot be updated.",
 				Optional:            true,
 				Computed:            true,
 			},
 			"refdevice_servicetag": schema.StringAttribute{
-				MarkdownDescription: "Target device servicetag from which the template needs to be created. This field cannot be updated.",
-				Description:         "Target device servicetag from which the template needs to be created. This field cannot be updated.",
+				MarkdownDescription: "Target device servicetag from which the template needs to be created. Cannot be updated.",
+				Description:         "Target device servicetag from which the template needs to be created. Cannot be updated.",
 				Optional:            true,
 				Computed:            true,
 			},
 			"refdevice_id": schema.Int64Attribute{
-				MarkdownDescription: "Target device id from which the template needs to be created. This field cannot be updated.",
-				Description:         "Target device id from which the template needs to be created. This field cannot be updated.",
+				MarkdownDescription: "Target device id from which the template needs to be created. Cannot be updated.",
+				Description:         "Target device id from which the template needs to be created. Cannot be updated.",
 				Optional:            true,
 				Computed:            true,
 			},
 			"reftemplate_name": schema.StringAttribute{
-				MarkdownDescription: "Reference Template name from which the template needs to be cloned. This field cannot be updated.",
-				Description:         "Reference Template name from which the template needs to be cloned. This field cannot be updated.",
+				MarkdownDescription: "Reference Template name from which the template needs to be cloned. Cannot be updated.",
+				Description:         "Reference Template name from which the template needs to be cloned. Cannot be updated.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -187,19 +203,23 @@ func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, r
 				},
 			},
 			"job_retry_count": schema.Int64Attribute{
-				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
-				Description:         "Number of times the job has to be polled to get the final status of the resource.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource." +
+					fmt.Sprintf(" Default value is `%d`.", RetryCount),
+				Description: "Number of times the job has to be polled to get the final status of the resource." +
+					fmt.Sprintf(" Default value is '%d'.", RetryCount),
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
 					Int64DefaultValue(types.Int64Value(RetryCount)),
 				},
 			},
 			"sleep_interval": schema.Int64Attribute{
-				MarkdownDescription: "Sleep time interval for job polling in seconds.",
-				Description:         "Sleep time interval for job polling in seconds.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Sleep time interval for job polling in seconds." +
+					fmt.Sprintf(" Default value is `%d`.", SleepInterval),
+				Description: "Sleep time interval for job polling in seconds." +
+					fmt.Sprintf(" Default value is '%d'.", SleepInterval),
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
 					Int64DefaultValue(types.Int64Value(SleepInterval)),
 				},

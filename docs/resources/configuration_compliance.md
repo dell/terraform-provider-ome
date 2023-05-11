@@ -18,12 +18,12 @@ linkTitle: "ome_configuration_compliance"
 page_title: "ome_configuration_compliance Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing configuration baselines remediation. Updates are supported for the following parameters: target_devices, job_retry_count, sleep_interval, run_later, cron.
+  Resource for managing configuration baselines remediation.
 ---
 
 # ome_configuration_compliance (Resource)
 
-Resource for managing configuration baselines remediation. Updates are supported for the following parameters: `target_devices`, `job_retry_count`, `sleep_interval`, `run_later`, `cron`.
+Resource for managing configuration baselines remediation.
 
 
 ## Example Usage
@@ -50,12 +50,12 @@ resource "ome_configuration_compliance" "remeditation" {
 
 ### Optional
 
-- `baseline_id` (Number) Id of the Baseline.
-- `baseline_name` (String) Name of the Baseline.
+- `baseline_id` (Number) Id of the Baseline. Cannot be updated.
+- `baseline_name` (String) Name of the Baseline. Cannot be updated.
 - `cron` (String) Cron to schedule the remediation task.
-- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource.
+- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource. Default value is `30`.
 - `run_later` (Boolean) Provides options to schedule the remediation task immediately, or at a specified time.
-- `sleep_interval` (Number) Sleep time interval for job polling in seconds.
+- `sleep_interval` (Number) Sleep time interval for job polling in seconds. Default value is `20`.
 
 ### Read-Only
 
@@ -66,6 +66,6 @@ resource "ome_configuration_compliance" "remeditation" {
 
 Required:
 
-- `compliance_status` (String) End compliance status of the target device, used to check the drifts in the compliance status.
+- `compliance_status` (String) End compliance status of the target device, used to check the drifts in the compliance status. Valid values are `Compliant`.
 - `device_service_tag` (String) Target device servicetag to be remediated.
 

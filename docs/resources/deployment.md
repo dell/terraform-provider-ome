@@ -1,4 +1,5 @@
 ---
+# Copyright (c) 2023 Dell Inc., or its subsidiaries. All Rights Reserved.
 # 
 # Licensed under the Mozilla Public License Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +19,14 @@ linkTitle: "ome_deployment"
 page_title: "ome_deployment Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing template deployment on OpenManage Enterprise. Updates are supported for the following parameters: device_ids, device_servicetags, boot_to_network_iso, forced_shutdown, options_time_to_wait_before_shutdown, power_state_off, options_precheck_only, options_strict_checking_vlan, options_continue_on_warning, run_later, cron, device_attributes, job_retry_count, sleep_interval.
+  Resource for managing template deployment on OpenManage Enterprise.
 ---
 
 # ome_deployment (Resource)
 
-Resource for managing template deployment on OpenManage Enterprise. Updates are supported for the following parameters: `device_ids`, `device_servicetags`, `boot_to_network_iso`, `forced_shutdown`, `options_time_to_wait_before_shutdown`, `power_state_off`, `options_precheck_only`, `options_strict_checking_vlan`, `options_continue_on_warning`, `run_later`, `cron`, `device_attributes`, `job_retry_count`, `sleep_interval`.
+Resource for managing template deployment on OpenManage Enterprise.
 
+~> **Note:** Atleast one of `ref_template_name` and `ref_template_id` and exactly one of `device_ids` and `device_servicetags` are required.
 
 ## Example Usage
 
@@ -44,19 +46,19 @@ resource "ome_deployment" "deploy-template-1" {
 - `boot_to_network_iso` (Object) Boot To Network ISO deployment details. (see [below for nested schema](#nestedatt--boot_to_network_iso))
 - `cron` (String) Cron to schedule the deployment task. Cron expression should be of future datetime.
 - `device_attributes` (List of Object) List of template attributes associated with the target devices for deploymnent. (see [below for nested schema](#nestedatt--device_attributes))
-- `device_ids` (Set of Number) List of the device id(s).
-- `device_servicetags` (Set of String) List of the device servicetags.
+- `device_ids` (Set of Number) List of the device id(s). Conflicts with `device_servicetags`.
+- `device_servicetags` (Set of String) List of the device servicetags. Conflicts with `device_ids`.
 - `forced_shutdown` (Boolean) Force shutdown after deployment.
-- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource.
+- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource. Default value is `20`.
 - `options_continue_on_warning` (Boolean) Continue to run the job on warnings.
 - `options_precheck_only` (Boolean) Option to precheck
 - `options_strict_checking_vlan` (Boolean) Checks the strict association of vlan.
-- `options_time_to_wait_before_shutdown` (Number) Option to specify the time to wait before shutdown in seconds. Default and minimum value is 300 and maximum is 3600 seconds respectively.
+- `options_time_to_wait_before_shutdown` (Number) Option to specify the time to wait before shutdown in seconds. Default and minimum value is 300 and maximum is 3600 seconds respectively. Default value is `300`.
 - `power_state_off` (Boolean) End power state of a target devices. Default power state is ON. Make it true to switch it to OFF state.
 - `run_later` (Boolean) Provides options to schedule the deployment task immediately, or at a specified time.
-- `sleep_interval` (Number) Sleep time interval for job polling in seconds.
-- `template_id` (Number) ID of the existing template.
-- `template_name` (String) Name of the existing template.
+- `sleep_interval` (Number) Sleep time interval for job polling in seconds. Default value is `60`.
+- `template_id` (Number) ID of the existing template. If a template with this ID is found, `template_name` will be ignored. Cannot be updated.
+- `template_name` (String) Name of the existing template. Cannot be updated.
 
 ### Read-Only
 

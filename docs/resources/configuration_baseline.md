@@ -1,4 +1,5 @@
 ---
+# Copyright (c) 2023 Dell Inc., or its subsidiaries. All Rights Reserved.
 # 
 # Licensed under the Mozilla Public License Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +19,18 @@ linkTitle: "ome_configuration_baseline"
 page_title: "ome_configuration_baseline Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for all the parameters. When schedule is true, following parameters are considered: notify_on_schedule, cron, email_addresses, output_format
+  Resource for managing configuration baselines on OpenManage Enterprise.
 ---
 
 # ome_configuration_baseline (Resource)
 
-Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for all the parameters. When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`
+Resource for managing configuration baselines on OpenManage Enterprise.
 
+~> **Note:** Exactly one of `ref_template_name` and `ref_template_id` and exactly one of `device_ids` and `device_servicetags` are required.
+
+~> **Note:** When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`.
+
+~> **Note:** Updates are supported for all the parameters.
 
 ## Example Usage
 
@@ -45,18 +51,18 @@ resource "ome_configuration_baseline" "baseline_name" {
 
 ### Optional
 
-- `cron` (String) Cron expression for notification schedule.
+- `cron` (String) Cron expression for notification schedule. Can be set only when both `schedule` and `notify_on_schedule` are set to `true`.
 - `description` (String) Description of the baseline.
-- `device_ids` (Set of Number) List of the device id on which the baseline compliance needs to be run.
-- `device_servicetags` (Set of String) List of the device servicetag on which the baseline compliance needs to be run.
-- `email_addresses` (Set of String) Email addresses for notification.
-- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource.
-- `notify_on_schedule` (Boolean) Schedule notification via cron or any time the baseline becomes non-compliant.
-- `output_format` (String) Output format type, the input is case senitive.
-- `ref_template_id` (Number) Reference template ID.
-- `ref_template_name` (String) Reference template name.
-- `schedule` (Boolean) Schedule notification via email.
-- `sleep_interval` (Number) Sleep time interval for job polling in seconds.
+- `device_ids` (Set of Number) List of the device id on which the baseline compliance needs to be run. Conflicts with `device_servicetags`.
+- `device_servicetags` (Set of String) List of the device servicetag on which the baseline compliance needs to be run. Conflicts with `device_ids`.
+- `email_addresses` (Set of String) Email addresses for notification. Can be set only when `schedule` is `true`.
+- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource. Default value is `30`.
+- `notify_on_schedule` (Boolean) Schedule notification via cron or any time the baseline becomes non-compliant. Default value is `false`.
+- `output_format` (String) Output format type, the input is case senitive. Valid values are `html`, `csv`, `pdf`and `xls`. Default value is `html`.
+- `ref_template_id` (Number) Reference template ID. Conflicts with `ref_template_name`.
+- `ref_template_name` (String) Reference template name. Conflicts with `ref_template_id`.
+- `schedule` (Boolean) Schedule notification via email. Default value is `false`.
+- `sleep_interval` (Number) Sleep time interval for job polling in seconds. Default value is `20`.
 
 ### Read-Only
 

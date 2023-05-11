@@ -1,4 +1,5 @@
 ---
+# Copyright (c) 2023 Dell Inc., or its subsidiaries. All Rights Reserved.
 # 
 # Licensed under the Mozilla Public License Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +19,15 @@ linkTitle: "ome_template"
 page_title: "ome_template Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing template on OpenManage Enterprise.Updates are supported for the following parameters: name, description, attributes, job_retry_count, sleep_interval, identity_pool_name, vlan.
+  Resource for managing template on OpenManage Enterprise.
 ---
 
 # ome_template (Resource)
 
-Resource for managing template on OpenManage Enterprise.Updates are supported for the following parameters: `name`, `description`, `attributes`, `job_retry_count`, `sleep_interval`, `identity_pool_name`, `vlan`.
+Resource for managing template on OpenManage Enterprise.
 
+~> **Note:** Exactly one of `reftemplate_name`, `refdevice_id`, `refdevice_servicetag` and `content` are required. 
+Only one of these fields can be set.
 
 ## Example Usage
 
@@ -46,17 +49,17 @@ resource "ome_template" "template_2" {
 ### Optional
 
 - `attributes` (List of Object) List of attributes associated with a template. This field is ignored while creating a template. (see [below for nested schema](#nestedatt--attributes))
-- `content` (String) The XML content of template.. This field cannot be updated.
+- `content` (String) The XML content of template. Cannot be updated.
 - `description` (String) Description of the template
-- `device_type` (String) OME template device type, supported types are Server, Chassis. This field cannot be updated and is applicable only for importing xml.
-- `fqdds` (String) Comma seperated values of components from a specified server, should be one of these iDRAC, System, BIOS, NIC, LifeCycleController, RAID, and EventFilters. This field cannot be updated.
+- `device_type` (String) OME template device type, supported types are Server, Chassis. Cannot be updated and is applicable only for importing xml. Valid values are `Server` and `Chassis`. Default value is `Server`.
+- `fqdds` (String) Comma seperated values of components from a specified server. Valid values are `iDRAC`, `System`, `BIOS`, `NIC`, `LifeCycleController`, `RAID`, `EventFilters` and `All`. Default value is `All`. Cannot be updated.
 - `identity_pool_name` (String) Identity Pool name to be attached with template.
-- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource.
-- `refdevice_id` (Number) Target device id from which the template needs to be created. This field cannot be updated.
-- `refdevice_servicetag` (String) Target device servicetag from which the template needs to be created. This field cannot be updated.
-- `reftemplate_name` (String) Reference Template name from which the template needs to be cloned. This field cannot be updated.
-- `sleep_interval` (Number) Sleep time interval for job polling in seconds.
-- `view_type` (String) OME template view type, supported types are Deployment, Compliance. This field cannot be updated.
+- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource. Default value is `5`.
+- `refdevice_id` (Number) Target device id from which the template needs to be created. Cannot be updated.
+- `refdevice_servicetag` (String) Target device servicetag from which the template needs to be created. Cannot be updated.
+- `reftemplate_name` (String) Reference Template name from which the template needs to be cloned. Cannot be updated.
+- `sleep_interval` (Number) Sleep time interval for job polling in seconds. Default value is `30`.
+- `view_type` (String) OME template view type. Valid values are `Deployment` and `Compliance`. Default value is `Deployment`. Cannot be updated.
 - `vlan` (Object) VLAN details to be attached with template. (see [below for nested schema](#nestedatt--vlan))
 
 ### Read-Only
