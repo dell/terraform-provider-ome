@@ -50,6 +50,6 @@ provider "ome" {
 
 ### Optional
 
-- `port` (Number) OpenManage Enterprise HTTPS port.
-- `skipssl` (Boolean) Skips SSL certificate validation on OpenManage Enterprise
-- `timeout` (Number) HTTPS timeout for OpenManage Enterprise client
+- `port` (Number) OpenManage Enterprise HTTPS port. Default value is `443`.
+- `skipssl` (Boolean) Skips SSL certificate validation on OpenManage Enterprise. Default value is `false`.
+- `timeout` (Number) HTTPS timeout for OpenManage Enterprise client. Default value is `30`.
