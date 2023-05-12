@@ -238,9 +238,9 @@ func (p *omeProvider) Schema(ctx context.Context, _ provider.SchemaRequest, resp
 				Optional: true,
 			},
 			"timeout": schema.Int64Attribute{
-				MarkdownDescription: "HTTPS timeout for OpenManage Enterprise client." +
+				MarkdownDescription: "HTTPS timeout in seconds for OpenManage Enterprise client." +
 					fmt.Sprintf(" Default value is `%d`.", defaultTimeoutInSeconds),
-				Description: "HTTPS timeout for OpenManage Enterprise client." +
+				Description: "HTTPS timeout in seconds for OpenManage Enterprise client." +
 					fmt.Sprintf(" Default value is '%d'.", defaultTimeoutInSeconds),
 				Optional: true,
 			},
