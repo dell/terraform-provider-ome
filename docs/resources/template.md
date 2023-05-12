@@ -26,8 +26,7 @@ description: |-
 
 Resource for managing template on OpenManage Enterprise.
 
-~> **Note:** Exactly one of `reftemplate_name`, `refdevice_id`, `refdevice_servicetag` and `content` are required. 
-Only one of these fields can be set.
+~> **Note:** Exactly one of `reftemplate_name`, `refdevice_id`, `refdevice_servicetag` and `content` are required.
 
 ## Example Usage
 
