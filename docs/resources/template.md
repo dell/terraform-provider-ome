@@ -260,3 +260,10 @@ Optional:
 - `tagged_networks` (Set of Number)
 - `untagged_network` (Number)
 
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import ome_template.citctest "<existing_template_name>"
+```

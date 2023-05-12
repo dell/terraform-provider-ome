@@ -1,0 +1,1 @@
+terraform import ome_configuration_baseline.create_baseline "<existing_baseline_name>"

@@ -1,0 +1,1 @@
+terraform import ome_template.citctest "<existing_template_name>"

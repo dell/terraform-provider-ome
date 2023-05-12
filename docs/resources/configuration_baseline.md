@@ -103,3 +103,10 @@ resource "ome_configuration_baseline" "baseline3" {
 - `id` (Number) ID of the configuration baseline resource.
 - `task_id` (Number) Task id associated with baseline.
 
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import ome_configuration_baseline.create_baseline "<existing_baseline_name>"
+```

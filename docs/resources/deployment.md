@@ -192,3 +192,10 @@ Optional:
 - `is_ignored` (Boolean)
 - `value` (String)
 
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import ome_deployment.deploy-template-3 "<existing_deployment_name>"
+```
