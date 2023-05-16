@@ -45,9 +45,9 @@ resource "ome_template" "template_2" {
 
 # create a template with fqdds as NIC.
 resource "ome_template" "template_3" {
-  name            = "template_3"
-  refdevice_id    = 10001
-  fqdds           = "NIC"
+  name         = "template_3"
+  refdevice_id = 10001
+  fqdds        = "NIC"
 }
 
 # used to fetch vlan network data
@@ -61,28 +61,28 @@ data "ome_template_info" "template_data" {
 
 #use locals to fetch vlan network ID from vlan name for updating vlan template attributes.
 locals {
-  vlan_network_map = {for vlan_network in  data.ome_vlannetworks_info.vlans.vlan_networks : vlan_network.name => vlan_network.vlan_id}
+  vlan_network_map = { for vlan_network in data.ome_vlannetworks_info.vlans.vlan_networks : vlan_network.name => vlan_network.vlan_id }
 }
 
 #use locals to modify the attributes required for updating a template for assigning identity pool.
 locals {
   attributes_value = tomap({
-    "iDRAC,IO Identity Optimization,IOIDOpt 1 Initiator Persistence Policy": "WarmReset, ColdReset, ACPowerLoss"
-    "iDRAC,IO Identity Optimization,IOIDOpt 1 Storage Target Persistence Policy": "WarmReset, ColdReset, ACPowerLoss"
-    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Auxiliary Powered": "WarmReset, ColdReset, ACPowerLoss"
-    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Non Auxiliary Powered": "WarmReset, ColdReset, ACPowerLoss"
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Initiator Persistence Policy" : "WarmReset, ColdReset, ACPowerLoss"
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Storage Target Persistence Policy" : "WarmReset, ColdReset, ACPowerLoss"
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Auxiliary Powered" : "WarmReset, ColdReset, ACPowerLoss"
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Non Auxiliary Powered" : "WarmReset, ColdReset, ACPowerLoss"
     "iDRAC,IO Identity Optimization,IOIDOpt 1 IOIDOpt Enable" : "Enabled"
 
   })
   attributes_is_ignored = tomap({
-    "iDRAC,IO Identity Optimization,IOIDOpt 1 Initiator Persistence Policy": false
-    "iDRAC,IO Identity Optimization,IOIDOpt 1 Storage Target Persistence Policy": false
-    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Auxiliary Powered": false
-    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Non Auxiliary Powered": false
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Initiator Persistence Policy" : false
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Storage Target Persistence Policy" : false
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Auxiliary Powered" : false
+    "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Non Auxiliary Powered" : false
     "iDRAC,IO Identity Optimization,IOIDOpt 1 IOIDOpt Enable" : false
 
   })
-  
+
   template_attributes = data.ome_template_info.template_data.attributes != null ? [
     for attr in data.ome_template_info.template_data.attributes : tomap({
       attribute_id = attr.attribute_id
@@ -131,10 +131,10 @@ data "ome_template_info" "template_data1" {
 #use locals to modify the attributes required for updating a template using attribute ids.
 locals {
   attributes_map = tomap({
-    2740260: "One Way"
-    2743100: "Disabled"
+    2740260 : "One Way"
+    2743100 : "Disabled"
   })
-  
+
   template_attributes = data.ome_template_info.template_data1.attributes != null ? [
     for attr in data.ome_template_info.template_data1.attributes : tomap({
       attribute_id = attr.attribute_id
@@ -147,11 +147,11 @@ locals {
 #use locals to modify the attributes required for updating a template using display name.
 locals {
   attributes_map = tomap({
-    "iDRAC,Time Zone Configuration Information,Time 1 Time Zone String": "IST"
-    "System,Server Topology,ServerTopology 1 Aisle Name": "Aisle-123"
-    "iDRAC,User Domain,UserDomain 1 User Domain Name": "TestDomain1"
+    "iDRAC,Time Zone Configuration Information,Time 1 Time Zone String" : "IST"
+    "System,Server Topology,ServerTopology 1 Aisle Name" : "Aisle-123"
+    "iDRAC,User Domain,UserDomain 1 User Domain Name" : "TestDomain1"
   })
-  
+
   template_attributes = data.ome_template_info.template_data1.attributes != null ? [
     for attr in data.ome_template_info.template_data1.attributes : tomap({
       attribute_id = attr.attribute_id
@@ -188,15 +188,15 @@ resource "ome_template" "template_6" {
 
 # Create a deployment template from a XML.
 resource "ome_template" "template_7" {
-	name = "template_7"
-	content = file("../testdata/test_acc_template.xml")
+  name    = "template_7"
+  content = file("../testdata/test_acc_template.xml")
 }
 
 # Create a compliance template from a XML.
 resource "ome_template" "template_8" {
-	name = "template_8"
-	content = file("../testdata/test_acc_template.xml")
-	view_type = "Compliance"
+  name      = "template_8"
+  content   = file("../testdata/test_acc_template.xml")
+  view_type = "Compliance"
 }
 ```
 

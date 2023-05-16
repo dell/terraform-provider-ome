@@ -34,8 +34,8 @@ The Terraform Provider for OpenManage Enterprise (OME) is a plugin for Terraform
 provider "ome" {
   username = "username"
   password = "password"
-  host = "yourhost.host.com"
-  skipssl = false
+  host     = "yourhost.host.com"
+  skipssl  = false
 }
 ```
 
