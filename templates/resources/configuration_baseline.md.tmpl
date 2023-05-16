@@ -26,11 +26,16 @@ description: |-
 
 {{ .Description | trimspace }}
 
+~> **Note:** Exactly one of `ref_template_name` and `ref_template_id` and exactly one of `device_ids` and `device_servicetags` are required.
+
+~> **Note:** When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`.
+
+~> **Note:** Updates are supported for all the parameters.
 
 {{ if .HasExample -}}
 ## Example Usage
 
-{{ printf "{{tffile %q}}" .ExampleFile }}
+{{tffile .ExampleFile }}
 {{- end }}
 
 {{ .SchemaMarkdown | trimspace }}
@@ -40,6 +45,6 @@ description: |-
 
 Import is supported using the following syntax:
 
-{{ printf "{{codefile \"shell\" %q}}" .ImportFile }}
+{{codefile "shell" .ImportFile }}
 
 {{- end }}

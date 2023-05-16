@@ -29,7 +29,7 @@ Data source to list the compliance configuration report of a baseline from OpenM
 ## Example Usage
 
 ```terraform
-# Get Deviceid's or servicetags from a specified list of groups
+# Get configuration compliance report for a baseline
 data "ome_configuration_report_info" "cr" {
   baseline_name = "BaselineName"
 }

@@ -29,7 +29,7 @@ Data source to list the vlan networks from OpenManage Enterprise.
 ## Example Usage
 
 ```terraform
-# get the vlan network details 
+# get details of all the vlan networks 
 data "ome_vlannetworks_info" "data-vlans" {
 }
 ```

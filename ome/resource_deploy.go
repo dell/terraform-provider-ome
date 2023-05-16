@@ -52,7 +52,7 @@ func (resourceDeployment) Metadata(ctx context.Context, req resource.MetadataReq
 // Template Deployment Resource schema
 func (r resourceDeployment) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing template deployment on OpenManage Enterprise. Updates are supported for the following parameters: `device_ids`, `device_servicetags`, `boot_to_network_iso`, `forced_shutdown`, `options_time_to_wait_before_shutdown`, `power_state_off`, `options_precheck_only`, `options_strict_checking_vlan`, `options_continue_on_warning`, `run_later`, `cron`, `device_attributes`, `job_retry_count`, `sleep_interval`.",
+		MarkdownDescription: "Resource for managing template deployment on OpenManage Enterprise.",
 		Version:             1,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
@@ -61,34 +61,44 @@ func (r resourceDeployment) Schema(_ context.Context, _ resource.SchemaRequest, 
 				Computed:            true,
 			},
 			"template_id": schema.Int64Attribute{
-				MarkdownDescription: "ID of the existing template.",
-				Description:         "ID of the existing template.",
-				Computed:            true,
-				Optional:            true,
+				MarkdownDescription: "ID of the existing template." +
+					" If a template with this ID is found, `template_name` will be ignored." +
+					" Cannot be updated.",
+				Description: "ID of the existing template." +
+					" If a template with this ID is found, 'template_name' will be ignored." +
+					" Cannot be updated.",
+				Computed: true,
+				Optional: true,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			"template_name": schema.StringAttribute{
-				MarkdownDescription: "Name of the existing template.",
-				Description:         "Name of the existing template.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Name of the existing template." +
+					" Cannot be updated.",
+				Description: "Name of the existing template." +
+					" Cannot be updated.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"device_ids": schema.SetAttribute{
-				MarkdownDescription: "List of the device id(s).",
-				Description:         "List of the device id(s).",
-				ElementType:         types.Int64Type,
-				Optional:            true,
+				MarkdownDescription: "List of the device id(s)." +
+					" Conflicts with `device_servicetags`.",
+				Description: "List of the device id(s)." +
+					" Conflicts with 'device_servicetags.'",
+				ElementType: types.Int64Type,
+				Optional:    true,
 			},
 			"device_servicetags": schema.SetAttribute{
-				MarkdownDescription: "List of the device servicetags.",
-				Description:         "List of the device servicetags.",
-				ElementType:         types.StringType,
-				Optional:            true,
+				MarkdownDescription: "List of the device servicetags." +
+					" Conflicts with `device_ids`.",
+				Description: "List of the device servicetags." +
+					" Conflicts with 'device_ids.'",
+				ElementType: types.StringType,
+				Optional:    true,
 			},
 			"boot_to_network_iso": schema.ObjectAttribute{
 				MarkdownDescription: "Boot To Network ISO deployment details.",
@@ -115,10 +125,12 @@ func (r resourceDeployment) Schema(_ context.Context, _ resource.SchemaRequest, 
 				Optional:            true,
 			},
 			"options_time_to_wait_before_shutdown": schema.Int64Attribute{
-				MarkdownDescription: "Option to specify the time to wait before shutdown in seconds. Default and minimum value is 300 and maximum is 3600 seconds respectively.",
-				Description:         "Option to specify the time to wait before shutdown in seconds. Default and minimum value is 300 and maximum is 3600 seconds respectively.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Option to specify the time to wait before shutdown in seconds. Default and minimum value is 300 and maximum is 3600 seconds respectively." +
+					" Default value is `300`.",
+				Description: "Option to specify the time to wait before shutdown in seconds. Default and minimum value is 300 and maximum is 3600 seconds respectively." +
+					" Default value is '300'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
 					Int64DefaultValue(types.Int64Value(300)),
 				},
@@ -176,19 +188,23 @@ func (r resourceDeployment) Schema(_ context.Context, _ resource.SchemaRequest, 
 				},
 			},
 			"job_retry_count": schema.Int64Attribute{
-				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
-				Description:         "Number of times the job has to be polled to get the final status of the resource.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource." +
+					" Default value is `20`.",
+				Description: "Number of times the job has to be polled to get the final status of the resource." +
+					" Default value is '20'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
 					Int64DefaultValue(types.Int64Value(20)),
 				},
 			},
 			"sleep_interval": schema.Int64Attribute{
-				MarkdownDescription: "Sleep time interval for job polling in seconds.",
-				Description:         "Sleep time interval for job polling in seconds.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Sleep time interval for job polling in seconds." +
+					" Default value is `60`.",
+				Description: "Sleep time interval for job polling in seconds." +
+					" Default value is '60'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
 					Int64DefaultValue(types.Int64Value(60)),
 				},

@@ -16,8 +16,9 @@ import (
 )
 
 const (
-	defaultPort    int64         = 443
-	defaultTimeout time.Duration = time.Second * 30
+	defaultPort             int64         = 443
+	defaultTimeoutInSeconds int           = 30
+	defaultTimeout          time.Duration = time.Second * time.Duration(defaultTimeoutInSeconds)
 )
 
 var (
@@ -223,19 +224,25 @@ func (p *omeProvider) Schema(ctx context.Context, _ provider.SchemaRequest, resp
 				Sensitive:           true,
 			},
 			"port": schema.Int64Attribute{
-				MarkdownDescription: "OpenManage Enterprise HTTPS port.",
-				Description:         "OpenManage Enterprise HTTPS port.",
-				Optional:            true,
+				MarkdownDescription: "OpenManage Enterprise HTTPS port." +
+					fmt.Sprintf(" Default value is `%d`.", defaultPort),
+				Description: "OpenManage Enterprise HTTPS port." +
+					fmt.Sprintf(" Default value is '%d'.", defaultPort),
+				Optional: true,
 			},
 			"skipssl": schema.BoolAttribute{
-				MarkdownDescription: "Skips SSL certificate validation on OpenManage Enterprise",
-				Description:         "Skips SSL certificate validation on OpenManage Enterprise",
-				Optional:            true,
+				MarkdownDescription: "Skips SSL certificate validation on OpenManage Enterprise." +
+					" Default value is `false`.",
+				Description: "Skips SSL certificate validation on OpenManage Enterprise." +
+					" Default value is 'false'.",
+				Optional: true,
 			},
 			"timeout": schema.Int64Attribute{
-				MarkdownDescription: "HTTPS timeout for OpenManage Enterprise client",
-				Description:         "HTTPS timeout for OpenManage Enterprise client",
-				Optional:            true,
+				MarkdownDescription: "HTTPS timeout in seconds for OpenManage Enterprise client." +
+					fmt.Sprintf(" Default value is `%d`.", defaultTimeoutInSeconds),
+				Description: "HTTPS timeout in seconds for OpenManage Enterprise client." +
+					fmt.Sprintf(" Default value is '%d'.", defaultTimeoutInSeconds),
+				Optional: true,
 			},
 		},
 	}

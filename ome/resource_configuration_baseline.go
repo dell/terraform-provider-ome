@@ -57,7 +57,7 @@ func (r resourceConfigurationBaseline) Metadata(ctx context.Context, req resourc
 // Template Deployment Resource schema
 func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise. Updates are supported for all the parameters. When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`",
+		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "ID of the configuration baseline resource.",
@@ -65,16 +65,20 @@ func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.Sche
 				Computed:            true,
 			},
 			"ref_template_id": schema.Int64Attribute{
-				MarkdownDescription: "Reference template ID.",
-				Description:         "Reference template ID.",
-				Computed:            true,
-				Optional:            true,
+				MarkdownDescription: "Reference template ID." +
+					" Conflicts with `ref_template_name`.",
+				Description: "Reference template ID." +
+					" Conflicts with 'ref_template_name'.",
+				Computed: true,
+				Optional: true,
 			},
 			"ref_template_name": schema.StringAttribute{
-				MarkdownDescription: "Reference template name.",
-				Description:         "Reference template name.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Reference template name." +
+					" Conflicts with `ref_template_id`.",
+				Description: "Reference template name." +
+					" Conflicts with 'ref_template_id'.",
+				Optional: true,
+				Computed: true,
 			},
 			"baseline_name": schema.StringAttribute{
 				MarkdownDescription: "Name of the Baseline.",
@@ -88,46 +92,58 @@ func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.Sche
 				Computed:            true,
 			},
 			"device_ids": schema.SetAttribute{
-				MarkdownDescription: "List of the device id on which the baseline compliance needs to be run.",
-				Description:         "List of the device id on which the baseline compliance needs to be run.",
-				ElementType:         types.Int64Type,
-				Optional:            true,
+				MarkdownDescription: "List of the device id on which the baseline compliance needs to be run." +
+					" Conflicts with `device_servicetags`.",
+				Description: "List of the device id on which the baseline compliance needs to be run." +
+					" Conflicts with 'device_servicetags'.",
+				ElementType: types.Int64Type,
+				Optional:    true,
 			},
 			"device_servicetags": schema.SetAttribute{
-				MarkdownDescription: "List of the device servicetag on which the baseline compliance needs to be run.",
-				Description:         "List of the device servicetag on which the baseline compliance needs to be run.",
-				ElementType:         types.StringType,
-				Optional:            true,
+				MarkdownDescription: "List of the device servicetag on which the baseline compliance needs to be run." +
+					" Conflicts with `device_ids`.",
+				Description: "List of the device servicetag on which the baseline compliance needs to be run." +
+					" Conflicts with 'device_ids'.",
+				ElementType: types.StringType,
+				Optional:    true,
 			},
 			"schedule": schema.BoolAttribute{
-				MarkdownDescription: "Schedule notification via email.",
-				Description:         "Schedule notification via email.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Schedule notification via email." +
+					" Default value is `false`.",
+				Description: "Schedule notification via email." +
+					" Default value is 'false'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Bool{
 					BoolDefaultValue(types.BoolValue(false)),
 				},
 			},
 			"notify_on_schedule": schema.BoolAttribute{
-				MarkdownDescription: "Schedule notification via cron or any time the baseline becomes non-compliant.",
-				Description:         "Schedule notification via cron or any time the baseline becomes non-compliant.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Schedule notification via cron or any time the baseline becomes non-compliant." +
+					" Default value is `false`.",
+				Description: "Schedule notification via cron or any time the baseline becomes non-compliant." +
+					" Default value is 'false'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Bool{
 					BoolDefaultValue(types.BoolValue(false)),
 				},
 			},
 			"email_addresses": schema.SetAttribute{
-				MarkdownDescription: "Email addresses for notification.",
-				Description:         "Email addresses for notification.",
-				ElementType:         types.StringType,
-				Optional:            true,
+				MarkdownDescription: "Email addresses for notification." +
+					" Can be set only when `schedule` is `true`.",
+				Description: "Email addresses for notification." +
+					" Can be set only when 'schedule' is 'true'.",
+				ElementType: types.StringType,
+				Optional:    true,
 			},
 			"output_format": schema.StringAttribute{
-				MarkdownDescription: "Output format type, the input is case senitive.",
-				Description:         "Output format type, the input is case senitive.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Output format type, the input is case senitive." +
+					" Valid values are `html`, `csv`, `pdf`and `xls`. Default value is `html`.",
+				Description: "Output format type, the input is case senitive." +
+					" Valid values are 'html', 'csv', 'pdf'and 'xls'. Default value is 'html'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.String{
 					StringDefaultValue(types.StringValue("html")),
 				},
@@ -136,9 +152,11 @@ func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.Sche
 				},
 			},
 			"cron": schema.StringAttribute{
-				MarkdownDescription: "Cron expression for notification schedule.",
-				Description:         "Cron expression for notification schedule.",
-				Optional:            true,
+				MarkdownDescription: "Cron expression for notification schedule." +
+					" Can be set only when both `schedule` and `notify_on_schedule` are set to `true`.",
+				Description: "Cron expression for notification schedule." +
+					" Can be set only when both 'schedule' and 'notify_on_schedule' are set to 'true'.",
+				Optional: true,
 			},
 			"task_id": schema.Int64Attribute{
 				MarkdownDescription: "Task id associated with baseline.",
@@ -146,19 +164,23 @@ func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.Sche
 				Computed:            true,
 			},
 			"job_retry_count": schema.Int64Attribute{
-				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
-				Description:         "Number of times the job has to be polled to get the final status of the resource.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource." +
+					" Default value is `30`.",
+				Description: "Number of times the job has to be polled to get the final status of the resource." +
+					" Default value is '30'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
 					Int64DefaultValue(types.Int64Value(30)),
 				},
 			},
 			"sleep_interval": schema.Int64Attribute{
-				MarkdownDescription: "Sleep time interval for job polling in seconds.",
-				Description:         "Sleep time interval for job polling in seconds.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Sleep time interval for job polling in seconds." +
+					" Default value is `20`.",
+				Description: "Sleep time interval for job polling in seconds." +
+					" Default value is '20'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
 					Int64DefaultValue(types.Int64Value(20)),
 				},

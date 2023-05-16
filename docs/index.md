@@ -31,11 +31,20 @@ The Terraform Provider for OpenManage Enterprise (OME) is a plugin for Terraform
 ## Example Usage
 
 ```terraform
+terraform {
+  required_providers {
+    ome = {
+      version = "0.0.1"
+      source  = "registry.terraform.io/dell/ome"
+    }
+  }
+}
+
 provider "ome" {
   username = "username"
   password = "password"
-  host = "yourhost.host.com"
-  skipssl = false
+  host     = "yourhost.host.com"
+  skipssl  = false
 }
 ```
 
@@ -50,6 +59,6 @@ provider "ome" {
 
 ### Optional
 
-- `port` (Number) OpenManage Enterprise HTTPS port.
-- `skipssl` (Boolean) Skips SSL certificate validation on OpenManage Enterprise
-- `timeout` (Number) HTTPS timeout for OpenManage Enterprise client
+- `port` (Number) OpenManage Enterprise HTTPS port. Default value is `443`.
+- `skipssl` (Boolean) Skips SSL certificate validation on OpenManage Enterprise. Default value is `false`.
+- `timeout` (Number) HTTPS timeout in seconds for OpenManage Enterprise client. Default value is `30`.

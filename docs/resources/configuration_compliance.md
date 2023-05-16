@@ -1,4 +1,5 @@
 ---
+# Copyright (c) 2023 Dell Inc., or its subsidiaries. All Rights Reserved.
 # 
 # Licensed under the Mozilla Public License Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,26 +19,62 @@ linkTitle: "ome_configuration_compliance"
 page_title: "ome_configuration_compliance Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing configuration baselines remediation. Updates are supported for the following parameters: target_devices, job_retry_count, sleep_interval, run_later, cron.
+  Resource for managing configuration baselines remediation.
 ---
 
 # ome_configuration_compliance (Resource)
 
-Resource for managing configuration baselines remediation. Updates are supported for the following parameters: `target_devices`, `job_retry_count`, `sleep_interval`, `run_later`, `cron`.
+Resource for managing configuration baselines remediation.
 
 
 ## Example Usage
 
 ```terraform
-# Manage remediation using baseline and Device Servicetags
+# remediate baseline for the specified target devices 
+resource "ome_configuration_compliance" "remeditation0" {
+  baseline_name = "baseline_name"
+  target_devices = [
+    {
+      device_service_tag = "MX12345"
+      compliance_status  = "Compliant"
+    }
+  ]
+}
+
+# remediate baseline for the specified target devices with scheduling
+resource "ome_configuration_compliance" "remeditation1" {
+  baseline_name = "baseline_name"
+  target_devices = [
+    {
+      device_service_tag = "MX12345"
+      compliance_status  = "Compliant"
+    }
+  ]
+  run_later = true
+  cron      = "0 00 11 14 02 ? 2032"
+}
+
+# Manage a baseline and also remediate it
+# create baseline 
+resource "ome_configuration_baseline" "baseline" {
+  baseline_name      = var.baselinename
+  ref_template_name  = "Mytemplate"
+  device_servicetags = ["MX12345"]
+  description        = "baseline description"
+}
+
+# create a compliance resource from above baseline
 resource "ome_configuration_compliance" "remeditation" {
-	baseline_name = "baseline_name"
-	target_devices = [
-      {
-        device_service_tag = "MX12345"
-        compliance_status = "Compliant"
-      }
-    ]
+  baseline_name = var.baselinename
+  target_devices = [
+    {
+      device_service_tag = "MX12345"
+      compliance_status  = "Compliant"
+    }
+  ]
+  depends_on = [
+    ome_configuration_baseline.baseline
+  ]
 }
 ```
 
@@ -50,12 +87,12 @@ resource "ome_configuration_compliance" "remeditation" {
 
 ### Optional
 
-- `baseline_id` (Number) Id of the Baseline.
-- `baseline_name` (String) Name of the Baseline.
+- `baseline_id` (Number) Id of the Baseline. Cannot be updated.
+- `baseline_name` (String) Name of the Baseline. Cannot be updated.
 - `cron` (String) Cron to schedule the remediation task.
-- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource.
+- `job_retry_count` (Number) Number of times the job has to be polled to get the final status of the resource. Default value is `30`.
 - `run_later` (Boolean) Provides options to schedule the remediation task immediately, or at a specified time.
-- `sleep_interval` (Number) Sleep time interval for job polling in seconds.
+- `sleep_interval` (Number) Sleep time interval for job polling in seconds. Default value is `20`.
 
 ### Read-Only
 
@@ -66,6 +103,6 @@ resource "ome_configuration_compliance" "remeditation" {
 
 Required:
 
-- `compliance_status` (String) End compliance status of the target device, used to check the drifts in the compliance status.
+- `compliance_status` (String) End compliance status of the target device, used to check the drifts in the compliance status. Valid values are `Compliant`.
 - `device_service_tag` (String) Target device servicetag to be remediated.
 

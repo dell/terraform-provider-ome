@@ -60,7 +60,7 @@ func (*resourceConfigurationCompliance) Metadata(ctx context.Context, req resour
 func (r resourceConfigurationCompliance) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Version:             1,
-		MarkdownDescription: "Resource for managing configuration baselines remediation. Updates are supported for the following parameters: `target_devices`, `job_retry_count`, `sleep_interval`, `run_later`, `cron`.",
+		MarkdownDescription: "Resource for managing configuration baselines remediation.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID of the configuration compliance resource.",
@@ -68,16 +68,20 @@ func (r resourceConfigurationCompliance) Schema(_ context.Context, _ resource.Sc
 				Computed:            true,
 			},
 			"baseline_name": schema.StringAttribute{
-				MarkdownDescription: "Name of the Baseline.",
-				Description:         "Name of the Baseline.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Name of the Baseline." +
+					" Cannot be updated.",
+				Description: "Name of the Baseline." +
+					" Cannot be updated.",
+				Optional: true,
+				Computed: true,
 			},
 			"baseline_id": schema.Int64Attribute{
-				MarkdownDescription: "Id of the Baseline.",
-				Description:         "Id of the Baseline.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Id of the Baseline." +
+					" Cannot be updated.",
+				Description: "Id of the Baseline." +
+					" Cannot be updated.",
+				Optional: true,
+				Computed: true,
 			},
 			"target_devices": schema.SetNestedAttribute{
 				MarkdownDescription: "Target devices to be remediated.",
@@ -91,9 +95,11 @@ func (r resourceConfigurationCompliance) Schema(_ context.Context, _ resource.Sc
 							Required:            true,
 						},
 						"compliance_status": schema.StringAttribute{
-							MarkdownDescription: "End compliance status of the target device, used to check the drifts in the compliance status.",
-							Description:         "End compliance status of the target device, used to check the drifts in the compliance status.",
-							Required:            true,
+							MarkdownDescription: "End compliance status of the target device, used to check the drifts in the compliance status." +
+								" Valid values are `Compliant`.",
+							Description: "End compliance status of the target device, used to check the drifts in the compliance status." +
+								" Valid values are 'Compliant'.",
+							Required: true,
 							Validators: []validator.String{
 								stringvalidator.OneOf(clients.ValidComplainceStatus),
 							},
@@ -105,19 +111,23 @@ func (r resourceConfigurationCompliance) Schema(_ context.Context, _ resource.Sc
 				},
 			},
 			"job_retry_count": schema.Int64Attribute{
-				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource.",
-				Description:         "Number of times the job has to be polled to get the final status of the resource.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Number of times the job has to be polled to get the final status of the resource." +
+					" Default value is `30`.",
+				Description: "Number of times the job has to be polled to get the final status of the resource." +
+					" Default value is '30'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
 					Int64DefaultValue(types.Int64Value(30)),
 				},
 			},
 			"sleep_interval": schema.Int64Attribute{
-				MarkdownDescription: "Sleep time interval for job polling in seconds.",
-				Description:         "Sleep time interval for job polling in seconds.",
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: "Sleep time interval for job polling in seconds." +
+					" Default value is `20`.",
+				Description: "Sleep time interval for job polling in seconds." +
+					" Default value is '20'.",
+				Optional: true,
+				Computed: true,
 				PlanModifiers: []planmodifier.Int64{
 					Int64DefaultValue(types.Int64Value(20)),
 				},
