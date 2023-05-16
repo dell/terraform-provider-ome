@@ -31,6 +31,15 @@ The Terraform Provider for OpenManage Enterprise (OME) is a plugin for Terraform
 ## Example Usage
 
 ```terraform
+terraform {
+  required_providers {
+    ome = {
+      version = "0.0.1"
+      source  = "registry.terraform.io/dell/ome"
+    }
+  }
+}
+
 provider "ome" {
   username = "username"
   password = "password"
