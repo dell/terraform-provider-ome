@@ -11,7 +11,13 @@ require (
 	github.com/stretchr/testify v1.7.2
 )
 
-require golang.org/x/mod v0.7.0 // indirect
+require (
+	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d // indirect
+	github.com/securego/gosec v0.0.0-20200401082031-e946c8c39989 // indirect
+	golang.org/x/mod v0.7.0 // indirect
+	golang.org/x/tools v0.1.12 // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
+)
 
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
