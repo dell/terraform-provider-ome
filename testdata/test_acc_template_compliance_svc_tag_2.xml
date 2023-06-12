@@ -1,4 +1,4 @@
-<SystemConfiguration Model="PowerEdge MX840c" ServiceTag="4111H63" TimeStamp="Wed Apr 5 11:51:25 2023">
+<SystemConfiguration Model="PowerEdge R730xd" ServiceTag="3T5TQD2" TimeStamp="Wed Apr 5 11:51:25 2023">
 <Component FQDD="EventFilters.Audit.1">
 <!--  ReadOnly  <Attribute Name="SRV_4_3#DisplayName">SRV_4_3 (Informational)</Attribute> -->
 <!--  ReadOnly  <Attribute Name="SWC_4_2#DisplayName">Software Config (Warning)</Attribute> -->
