@@ -1,3 +1,17 @@
+# v1.0.0
+
+## Release Summary
+First major release for terraform provider for Dell OpenManage Enterprise (OME).
+
+## Features
+Migrated to terraform-provider-framework v1.1 but no new feature added.
+
+## Enhancements
+N/A
+
+## Bug Fixes
+N/A
+
 # v1.0.0-beta
 ## Release Summary
 The release supports the resources and data sources to manage baseline and remediation of baseline devices in OpenManage Enterprise (OME).
