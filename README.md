@@ -51,3 +51,6 @@ For adding resources, please refer [examples](https://github.com/dell/terraform-
 
 ## About
 Terraform Provider for OpenManage Enterprise is 100% open source and community-driven. All components are available under [MPL-2.0 license](https://www.mozilla.org/en-US/MPL/2.0/) on GitHub.
+
+## Documentation
+For more detailed information on the provider, please refer to [Dell Terraform Providers documentation](https://dell.github.io/terraform-docs/).
