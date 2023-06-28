@@ -35,6 +35,18 @@ For general information about Terraform, visit the [official website][tf-website
   * [Terraform >= 1.3.2](https://www.terraform.io)
   * Go >= 1.19
 
+## List of DataSources in Terraform Provider for Dell OME
+  * Configuration Report
+  * Device Groups
+  * Template
+  * VLAN Networks
+
+## List of Resources in Terraform Provider for Dell OME
+  * Configuration Baseline
+  * Configuartion Compliance
+  * Deployment
+  * Template
+
 ## Installation
 Install Terraform Provider for OpenManage Enterprise from terraform registry by adding the following block
 ```terraform
@@ -53,4 +65,4 @@ For adding resources, please refer [examples](https://github.com/dell/terraform-
 Terraform Provider for OpenManage Enterprise is 100% open source and community-driven. All components are available under [MPL-2.0 license](https://www.mozilla.org/en-US/MPL/2.0/) on GitHub.
 
 ## Documentation
-For more detailed information on the provider, please refer to [Dell Terraform Providers documentation](https://dell.github.io/terraform-docs/).
+For more detailed information on the provider, please refer to [Dell Terraform Providers Documentation](https://dell.github.io/terraform-docs/).
