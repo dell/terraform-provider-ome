@@ -43,7 +43,7 @@ For general information about Terraform, visit the [official website][tf-website
 
 ## List of Resources in Terraform Provider for Dell OME
   * Configuration Baseline
-  * Configuartion Compliance
+  * Configuration Compliance
   * Deployment
   * Template
 
