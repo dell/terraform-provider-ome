@@ -64,7 +64,13 @@ const (
 	// TemplateDeviceTypeAPI - api to get view type
 	TemplateDeviceTypeAPI = "/api/TemplateService/TemplateTypes"
 	//GroupAPI - api for fetching group details
-	GroupAPI = "/api/GroupService/Groups"
+	GroupAPI        = "/api/GroupService/Groups"
+	GroupServiceAPI = GroupAPI + "(%d)"
+	// Group Service Actions API
+	// /api/GroupService/Actions/GroupService.CreateGroup
+	// GroupServiceActionsAPI = "/GroupService/Actions/GroupService.%sGroup"
+	//                            /GroupService/Actions/GroupService.CreateGroup
+	GroupServiceActionsAPI = "/api/GroupService/Actions/GroupService.%sGroup"
 	//GroupServiceDevicesAPI - api for fetching device ids from a group id
 	GroupServiceDevicesAPI = GroupAPI + "(%d)/Devices"
 	//DeployAPI - api to deploy a template on the given devices

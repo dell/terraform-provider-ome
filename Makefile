@@ -3,7 +3,7 @@ HOSTNAME=registry.terraform.io
 NAMESPACE=dell
 NAME=ome
 BINARY=terraform-provider-${NAME}
-VERSION=1.0.0
+VERSION=1.1.0
 OS_ARCH=linux_amd64
 
 default: install
