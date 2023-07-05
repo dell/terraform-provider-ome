@@ -215,3 +215,15 @@ func TestClient_GetDevicesByGroups(t *testing.T) {
 		})
 	}
 }
+
+// func TestClient_CreateDeviceGroup(t *testing.T) {
+// 	ts := createNewTLSServer(t)
+// 	defer ts.Close()
+
+// 	opts := initOptions(ts)
+
+// 	c, _ := NewClient(opts)
+// 	id, err := c.CreateGroupDevices("rounak-test3")
+// 	assert.Nil(t, err)
+// 	assert.NotZero(t, id)
+// }

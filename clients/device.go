@@ -172,3 +172,36 @@ func (c *Client) GetUniqueDevicesIdsAndServiceTags(devices []models.Device) ([]m
 	}
 	return uniqueDevices, uniqueDevicesIDs, uniqueDevicesSTs
 }
+
+// GetDevice is used to get device using serviceTag or devID in OME
+func (c *Client) GetDeviceByIp(ips []string, ranges []string) (models.Devices, error) {
+	devices, err := c.GetAllDevices(nil)
+	if err != nil {
+		return devices, err
+	}
+	ret := models.Devices{
+		Value: make([]models.Device, 0),
+	}
+	for _, v := range devices.Value {
+		if v.DeviceManagement[0].NetworkAddress != ips[0] {
+			continue
+		}
+		ret.Value = append(ret.Value, v)
+	}
+	return ret, err
+}
+
+func (c *Client) GetAllDevices(queries map[string]string) (models.Devices, error) {
+	devices := models.Devices{}
+	response, err := c.Get(DeviceAPI, nil, queries)
+	if err != nil {
+		return devices, err
+	}
+	// devices := models.Devices{}
+	bodyData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshal(bodyData, &devices)
+	if err != nil {
+		return devices, err
+	}
+	return devices, err
+}

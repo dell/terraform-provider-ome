@@ -15,12 +15,15 @@ package ome
 
 import (
 	"context"
+	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -78,14 +81,9 @@ func (r resourceDeviceGroup) Schema(_ context.Context, _ resource.SchemaRequest,
 				Required:            true,
 			},
 			"parent_id": schema.Int64Attribute{
-				MarkdownDescription: "ID of the parent group of the template." +
-					" If the group is to be a root group, this field should be put to `0`." +
-					" Defaults to `0`.",
-				Description: "ID of the parent group of the template." +
-					" If the group is to be a root group, this field should be put to `0`." +
-					" Defaults to `0`.",
-				Optional: true,
-				Computed: true,
+				MarkdownDescription: "ID of the parent group of the template.",
+				Description:         "ID of the parent group of the template.",
+				Required:            true,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
 				},
@@ -97,6 +95,12 @@ func (r resourceDeviceGroup) Schema(_ context.Context, _ resource.SchemaRequest,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
 				},
+			},
+			"device_ids": schema.SetAttribute{
+				MarkdownDescription: "Device ids in the group",
+				Description:         "Device ids in the group",
+				Required:            true,
+				ElementType:         types.Int64Type,
 			},
 		},
 	}
@@ -121,28 +125,34 @@ func (r resourceDeviceGroup) Create(ctx context.Context, req resource.CreateRequ
 	defer omeClient.RemoveSession()
 
 	var (
-		id    int64
-		err   error
-		group models.Group
+		id  int64
+		err error
 	)
 
-	if id, err = omeClient.CreateGroupDevice(plan.GetPayload()); err != nil {
+	createPayload, _ := plan.GetPayload(plan)
+	if id, err = omeClient.CreateGroupDevice(createPayload); err != nil {
 		resp.Diagnostics.AddError(
 			"Error while creation", err.Error(),
 		)
 		return
 	}
 
-	group, err = omeClient.GetGroupById(id)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error fetching group after creation", err.Error(),
-		)
+	initialState, dgs := r.ReadRes(omeClient, id)
+	resp.Diagnostics.Append(dgs...)
+	if dgs.HasError() {
+		return
+	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, initialState)...)
+	if dgs.HasError() {
 		return
 	}
 
-	state, _ := models.NewGroupDeviceRes(group)
-	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
+	finalState, dgs2 := r.UpdateRes(omeClient, plan, initialState, ctx)
+	resp.Diagnostics.Append(dgs2...)
+	if dgs2.HasError() {
+		return
+	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, finalState)...)
 }
 
 // Read resource information
@@ -166,15 +176,12 @@ func (r resourceDeviceGroup) Read(ctx context.Context, req resource.ReadRequest,
 
 	tflog.Trace(ctx, "resource_group_device read: client created started updating state")
 
-	group, err := omeClient.GetGroupById(state.ID.ValueInt64())
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error fetching group after creation", err.Error(),
-		)
+	finalState, dgs := r.ReadRes(omeClient, state.ID.ValueInt64())
+	resp.Diagnostics.Append(dgs...)
+	if dgs.HasError() {
+		return
 	}
-
-	state, _ = models.NewGroupDeviceRes(group)
-	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, finalState)...)
 
 	tflog.Trace(ctx, "resource_group_device read: finished")
 }
@@ -206,23 +213,72 @@ func (r resourceDeviceGroup) Update(ctx context.Context, req resource.UpdateRequ
 	}
 	defer omeClient.RemoveSession()
 
-	if err := omeClient.UpdateGroupDevice(plan.GetPayload()); err != nil {
-		resp.Diagnostics.AddError(
-			"Error while updation", err.Error(),
-		)
+	finalState, dgs := r.UpdateRes(omeClient, plan, state, ctx)
+	resp.Diagnostics.Append(dgs...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, finalState)...)
+}
 
-	group, err := omeClient.GetGroupById(state.ID.ValueInt64())
+func (r resourceDeviceGroup) UpdateRes(omeClient *clients.Client, plan, state models.GroupDeviceRes, ctx context.Context) (models.GroupDeviceRes, diag.Diagnostics) {
+
+	var d diag.Diagnostics
+	if payload, ok := plan.GetPayload(state); !ok {
+		if err := omeClient.UpdateGroupDevice(payload); err != nil {
+			d.AddError(
+				"Error while updation", err.Error(),
+			)
+			return state, d
+		}
+	}
+
+	payloadAdd, payloadRmv, dgs := plan.GetMemberPayload(ctx, state)
+	d.Append(dgs...)
+	if d.HasError() {
+		return state, d
+	}
+	if len(payloadAdd.DeviceIds) != 0 {
+		if err := omeClient.AddGroupDeviceMembers(payloadAdd); err != nil {
+			d.AddError(
+				"Error while adding group devices", err.Error(),
+			)
+			return state, d
+		}
+	}
+	if len(payloadRmv.DeviceIds) != 0 {
+		if err := omeClient.RemoveGroupDeviceMembers(payloadRmv); err != nil {
+			d.AddError(
+				"Error while removing group devices", err.Error(),
+			)
+			return state, d
+		}
+	}
+
+	ret, dgs2 := r.ReadRes(omeClient, state.ID.ValueInt64())
+	d.Append(dgs2...)
+	return ret, d
+}
+
+func (r resourceDeviceGroup) ReadRes(omeClient *clients.Client, id int64) (ret models.GroupDeviceRes, d diag.Diagnostics) {
+	group, err := omeClient.GetGroupById(id)
 	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error fetching group after updation", err.Error(),
+		d.AddError(
+			"Error fetching group by id", err.Error(),
+		)
+		return ret, d
+	}
+
+	devs, err2 := omeClient.GetDevicesByGroupID(id)
+	if err2 != nil {
+		d.AddError(
+			"Error reading devices of group", err.Error(),
 		)
 		return
 	}
 
-	state, _ = models.NewGroupDeviceRes(group)
-	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
+	ret, _ = models.NewGroupDeviceRes(group, devs)
+	return ret, d
 }
 
 // Delete resource
@@ -279,7 +335,14 @@ func (r resourceDeviceGroup) ImportState(ctx context.Context, req resource.Impor
 		return
 	}
 
-	state, _ := models.NewGroupDeviceRes(group)
+	devs, err2 := omeClient.GetDevicesByGroupID(group.ID)
+	if err2 != nil {
+		resp.Diagnostics.AddError(
+			"Error importing devices of group", err.Error(),
+		)
+		return
+	}
+	state, _ := models.NewGroupDeviceRes(group, devs)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 
 	tflog.Trace(ctx, "resource_group_device import: finished")

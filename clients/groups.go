@@ -164,3 +164,28 @@ func (c *Client) UpdateGroupDevice(group models.Group) error {
 	}
 	return nil
 }
+
+// AddGroupDeviceMembers - Adds devices to a static device group
+func (c *Client) AddGroupDeviceMembers(payload models.GroupMemberPayload) error {
+	return c.updateGroupDeviceMembers(payload, true)
+}
+
+// RemoveGroupDeviceMembers - Removes devices from a static device group
+func (c *Client) RemoveGroupDeviceMembers(payload models.GroupMemberPayload) error {
+	return c.updateGroupDeviceMembers(payload, false)
+}
+
+// updateGroupDeviceMembers - Updates a static device group
+func (c *Client) updateGroupDeviceMembers(payload models.GroupMemberPayload, toAdd bool) error {
+	payloadb, err := c.JSONMarshal(payload)
+	if err != nil {
+		return err
+	}
+	action := map[bool]string{
+		true:  "Add",
+		false: "Remove",
+	}[toAdd]
+	path := fmt.Sprintf("/api/GroupService/Actions/GroupService.%sMemberDevices", action)
+	_, err2 := c.Post(path, nil, payloadb)
+	return err2
+}

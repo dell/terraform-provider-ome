@@ -38,6 +38,7 @@ func TestDeviceGroupCreation(t *testing.T) {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1"
 		parent_id = 1021
+		device_ids = [` + DeviceID1 + `, ` + DeviceID2 + `]
 	}
 	`
 
@@ -53,6 +54,7 @@ func TestDeviceGroupCreation(t *testing.T) {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id = 1021
+		device_ids = [` + DeviceID1 + `]
 	}
 	`
 
