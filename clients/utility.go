@@ -15,6 +15,9 @@ package clients
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/netdata/go.d.plugin/pkg/iprange"
 )
 
 // DeviceMutuallyExclusive checks if the service tag , device ids  are mutually exclusive
@@ -80,4 +83,10 @@ func FindElementInIntArray(arr []int64, find int64) int {
 		}
 	}
 	return index
+}
+
+func ParseNetworks(networks []string) (iprange.Pool, error) {
+	input := strings.Join(networks, " ")
+	ranges, err := iprange.ParseRanges(input)
+	return ranges, err
 }
