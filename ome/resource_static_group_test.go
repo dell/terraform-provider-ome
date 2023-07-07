@@ -39,7 +39,7 @@ func TestStaticGroup(t *testing.T) {
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1"
-		parent_id = 1021
+		parent_id = ` + GroupID1 + `
 		device_ids = [` + DeviceID1 + `, ` + DeviceID2 + `]
 	}
 	`
@@ -48,7 +48,7 @@ func TestStaticGroup(t *testing.T) {
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = 1021
+		parent_id = ` + GroupID1 + `
 		device_ids = [` + DeviceID1 + `]
 	}
 	`
@@ -57,13 +57,13 @@ func TestStaticGroup(t *testing.T) {
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = 1021
+		parent_id = ` + GroupID1 + `
 		device_ids = [` + DeviceID1 + `]
 	}
 	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = 1021
+		parent_id = ` + GroupID1 + `
 		device_ids = [` + DeviceID2 + `]
 	}
 	`
@@ -72,13 +72,13 @@ func TestStaticGroup(t *testing.T) {
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = 1021
+		parent_id = ` + GroupID1 + `
 		device_ids = [` + DeviceID1 + `]
 	}
 	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = 1021
+		parent_id = ` + GroupID1 + `
 		device_ids = [-1]
 	}
 	`
@@ -87,13 +87,13 @@ func TestStaticGroup(t *testing.T) {
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = 1021
+		parent_id = ` + GroupID1 + `
 		device_ids = [` + DeviceID1 + `]
 	}
 	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = 1021
+		parent_id = ` + GroupID1 + `
 		device_ids = []
 	}
 	`
