@@ -9,7 +9,7 @@
             "DiscoveryConfigTargets": [
                 {
                     "DiscoveryConfigTargetId": 0,
-                    "NetworkAddressDetail": "10.226.197.136",
+                    "NetworkAddressDetail": "x.x.x.x",
                     "AddressType": 30,
                     "Disabled": false,
                     "Exclude": false
