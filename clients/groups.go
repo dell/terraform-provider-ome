@@ -131,6 +131,7 @@ func (c *Client) GetDevicesByGroups(groupNames []string) ([]models.Device, error
 
 // CreateGroupDevice - Creates a new static device group and returns its id
 func (c *Client) CreateGroupDevice(group models.Group) (int64, error) {
+	group.ID = 0
 	payload := map[string]any{
 		"GroupModel": group,
 	}
@@ -185,7 +186,7 @@ func (c *Client) updateGroupDeviceMembers(payload models.GroupMemberPayload, toA
 		true:  "Add",
 		false: "Remove",
 	}[toAdd]
-	path := fmt.Sprintf("/api/GroupService/Actions/GroupService.%sMemberDevices", action)
+	path := fmt.Sprintf(GroupServiceDeviceActionsAPI, action)
 	_, err2 := c.Post(path, nil, payloadb)
 	return err2
 }

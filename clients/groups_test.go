@@ -14,6 +14,7 @@ limitations under the License.
 package clients
 
 import (
+	"log"
 	"terraform-provider-ome/models"
 	"testing"
 
@@ -44,7 +45,7 @@ func TestClientGetGroupIdByGroupName(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.Equal(t, 1, len(response.Value))
 				assert.Equal(t, int64(1011), response.Value[0].ID)
-				assert.Equal(t, "Linux Servers", response.Value[0].Name)
+				assert.Equal(t, "valid_group1", response.Value[0].Name)
 			}
 			if tt.groupName == "invalid_group1" {
 				assert.Nil(t, err)
@@ -216,14 +217,201 @@ func TestClient_GetDevicesByGroups(t *testing.T) {
 	}
 }
 
-// func TestClient_CreateDeviceGroup(t *testing.T) {
-// 	ts := createNewTLSServer(t)
-// 	defer ts.Close()
+func TestClient_CreateGroupDevice(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
 
-// 	opts := initOptions(ts)
+	opts := initOptions(ts)
 
-// 	c, _ := NewClient(opts)
-// 	id, err := c.CreateGroupDevices("rounak-test3")
-// 	assert.Nil(t, err)
-// 	assert.NotZero(t, id)
-// }
+	c, _ := NewClient(opts)
+
+	type args struct {
+		Name          string
+		parentGroupID int64
+		isValid       bool
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"Create group with existing name", args{"Extroup", 1015, false}},
+		{"Create group with non-existing parent id", args{"TestGroup", 1015, false}},
+		{"Create group success", args{"TestGroup", 1011, true}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			log.Println("Hola " + tt.name)
+			response, err := c.CreateGroupDevice(models.Group{
+				Name:        tt.args.Name,
+				Description: "dummy",
+				ParentId:    tt.args.parentGroupID,
+			})
+			if tt.args.isValid {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.EqualValues(t, 1012, response)
+			} else {
+				assert.NotNil(t, err)
+			}
+		})
+	}
+}
+
+func TestClient_ModifyGroupDevice(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	type args struct {
+		Name    string
+		GroupID int64
+		isValid bool
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"Update group to existing name", args{"ExtGroup", 1011, false}},
+		{"Update non-existing group", args{"TestGroup", 1055, false}},
+		{"Update group success", args{"TestGroup", 1011, true}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := c.UpdateGroupDevice(models.Group{
+				Name:        tt.args.Name,
+				Description: "dummy",
+				ParentId:    tt.args.GroupID,
+			})
+			if tt.args.isValid {
+				assert.Nil(t, err)
+			} else {
+				assert.NotNil(t, err)
+			}
+		})
+	}
+}
+
+func TestClient_UpdateGroupDeviceMembers(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	type args struct {
+		DeviceID int64
+		GroupID  int64
+		Add      bool
+		isValid  bool
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"Add pre existing device to group", args{10056, 1011, true, false}},
+		{"Add device to non existent group", args{10057, 1055, true, false}},
+		{"Add device to group success", args{10057, 1011, true, true}},
+		{"Remove non existent device from group", args{10057, 1011, false, false}},
+		{"Remove device from non existent group", args{10056, 1055, false, false}},
+		{"Remove device from group success", args{10056, 1011, false, true}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var err error
+			if tt.args.Add {
+				err = c.AddGroupDeviceMembers(models.GroupMemberPayload{
+					GroupId:   tt.args.GroupID,
+					DeviceIds: []int64{tt.args.DeviceID},
+				})
+			} else {
+				err = c.RemoveGroupDeviceMembers(models.GroupMemberPayload{
+					GroupId:   tt.args.GroupID,
+					DeviceIds: []int64{tt.args.DeviceID},
+				})
+			}
+			if tt.args.isValid {
+				assert.Nil(t, err)
+			} else {
+				assert.NotNil(t, err)
+			}
+		})
+	}
+}
+
+func TestClient_ReadGroupDevice(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	type args struct {
+		GroupName string
+		GroupID   int64
+		toId      bool
+		isValid   bool
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"Get group by existing name", args{"valid_group1", 1011, false, true}},
+		{"Get group by non existing name", args{"invalid_group1", 0, false, false}},
+		{"Get group by existing id", args{"group 1011", 1011, true, true}},
+		{"Get group by non existing id", args{"", -1, true, false}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var err error
+			var group models.Group
+			if tt.args.toId {
+				group, err = c.GetGroupById(tt.args.GroupID)
+			} else {
+				group, err = c.GetSingleGroupByName(tt.args.GroupName)
+			}
+			if tt.args.isValid {
+				assert.Nil(t, err)
+				assert.EqualValues(t, tt.args.GroupID, group.ID)
+				assert.EqualValues(t, tt.args.GroupName, group.Name)
+			} else {
+				assert.NotNil(t, err)
+			}
+		})
+	}
+}
+
+func TestClient_DeleteGroupDevice(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	type args struct {
+		GroupID int64
+		isValid bool
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{"Delete existing group", args{1011, true}},
+		{"Delete non existing group", args{1055, false}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := c.DeleteGroupDevice(tt.args.GroupID)
+			if tt.args.isValid {
+				assert.Nil(t, err)
+			} else {
+				assert.NotNil(t, err)
+			}
+		})
+	}
+}

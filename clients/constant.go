@@ -70,7 +70,8 @@ const (
 	// /api/GroupService/Actions/GroupService.CreateGroup
 	// GroupServiceActionsAPI = "/GroupService/Actions/GroupService.%sGroup"
 	//                            /GroupService/Actions/GroupService.CreateGroup
-	GroupServiceActionsAPI = "/api/GroupService/Actions/GroupService.%sGroup"
+	GroupServiceActionsAPI       = "/api/GroupService/Actions/GroupService.%sGroup"
+	GroupServiceDeviceActionsAPI = "/api/GroupService/Actions/GroupService.%sMemberDevices"
 	//GroupServiceDevicesAPI - api for fetching device ids from a group id
 	GroupServiceDevicesAPI = GroupAPI + "(%d)/Devices"
 	//DeployAPI - api to deploy a template on the given devices

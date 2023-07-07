@@ -14,6 +14,7 @@ limitations under the License.
 package ome
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -24,16 +25,17 @@ const (
 	DeviceGroup1Update = "test_acc_group_device_1_updated"
 )
 
-func TestDeviceGroupCreation(t *testing.T) {
+func TestDeviceGroup(t *testing.T) {
 
-	testAccCreateGroupSuccess := `
+	testAccProvider := `
 	provider "ome" {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		skipssl = true
 	}
-	
+	`
+	testAccCreateGroupSuccess := testAccProvider + `	
 	resource "ome_group_device" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1"
@@ -42,19 +44,57 @@ func TestDeviceGroupCreation(t *testing.T) {
 	}
 	`
 
-	testAccUpdateGroupSuccess := `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-	
+	testAccUpdateGroupSuccess := testAccProvider + `	
 	resource "ome_group_device" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id = 1021
 		device_ids = [` + DeviceID1 + `]
+	}
+	`
+
+	testAccDuplicateNameNeg := testAccProvider + `	
+	resource "ome_group_device" "terraform-acceptance-test-1" {
+		name = "` + DeviceGroup1Update + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id = 1021
+		device_ids = [` + DeviceID1 + `]
+	}
+	resource "ome_group_device" "terraform-acceptance-test-2" {
+		name = "` + DeviceGroup1Update + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id = 1021
+		device_ids = [` + DeviceID2 + `]
+	}
+	`
+
+	testAccInvalidDeviceNeg := testAccProvider + `	
+	resource "ome_group_device" "terraform-acceptance-test-1" {
+		name = "` + DeviceGroup1Update + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id = 1021
+		device_ids = [` + DeviceID1 + `]
+	}
+	resource "ome_group_device" "terraform-acceptance-test-2" {
+		name = "` + DeviceGroup1 + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id = 1021
+		device_ids = [-1]
+	}
+	`
+
+	testAccCreate2 := testAccProvider + `	
+	resource "ome_group_device" "terraform-acceptance-test-1" {
+		name = "` + DeviceGroup1Update + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id = 1021
+		device_ids = [` + DeviceID1 + `]
+	}
+	resource "ome_group_device" "terraform-acceptance-test-2" {
+		name = "` + DeviceGroup1 + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id = 1021
+		device_ids = []
 	}
 	`
 
@@ -85,18 +125,40 @@ func TestDeviceGroupCreation(t *testing.T) {
 				ResourceName:      "ome_group_device.terraform-acceptance-test-1",
 				ImportState:       true,
 				ImportStateVerify: true,
-				// ImportStateCheck: assertTFImportState,
-				ExpectError:   nil,
-				ImportStateId: DeviceGroup1Update,
+				ExpectError:       nil,
+				ImportStateId:     DeviceGroup1Update,
 			},
-			// {
-			// 	Config:      testAccUpdateTemplateWithExistingName,
-			// 	ExpectError: regexp.MustCompile(clients.ErrUpdateTemplate),
-			// },
-			// {
-			// 	Config:      testAccUpdateTemplateWithInvalidVlanNetworkID,
-			// 	ExpectError: regexp.MustCompile(clients.ErrUpdateTemplate),
-			// },
+			{
+				ResourceName:      "ome_group_device.terraform-acceptance-test-1",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ExpectError:       regexp.MustCompile("Error importing group"),
+				ImportStateId:     "invalid",
+			},
+			{
+				// create group with existing group name
+				Config:      testAccDuplicateNameNeg,
+				ExpectError: regexp.MustCompile("Error while creation"),
+			},
+			{
+				// create group with invalid device ids
+				Config:      testAccInvalidDeviceNeg,
+				ExpectError: regexp.MustCompile("Error while adding group devices"),
+			},
+			{
+				// this just sets up 2 groups for update test cases next
+				Config: testAccCreate2,
+			},
+			{
+				// update group name to existing group name
+				Config:      testAccDuplicateNameNeg,
+				ExpectError: regexp.MustCompile("Error while updation"),
+			},
+			{
+				// update group by adding invalid device id
+				Config:      testAccInvalidDeviceNeg,
+				ExpectError: regexp.MustCompile("Error while adding group devices"),
+			},
 		},
 	})
 }

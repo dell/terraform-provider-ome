@@ -66,7 +66,7 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 
 		shouldReturn6 := mockBaselineAPIs(r, w) || mockGetBaselineByIDAPI(r, w) ||
 			mockGetBaselineDevComplianceReportByIDAPI(r, w) || mockGetBaselineDevAttrComplianceReportByIDAPI(r, w) || mockGetBaselineByNameAPI(r, w) ||
-			mockImportTemplateAPI(r, w)
+			mockImportTemplateAPI(r, w) || mockGroupServiceActionsAPIs(r, w)
 		if shouldReturn6 {
 			return
 		}
@@ -312,39 +312,88 @@ func buildJobResponse(id int, msg string) string {
 }
 
 func mockDeviceAPIs(r *http.Request, w http.ResponseWriter) bool {
-	if (strings.Contains(r.URL.RawQuery, "SVT123") || strings.Contains(r.URL.RawQuery, "SVT223")) && r.Method == "GET" {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{
-			"value": [
-				{
-					"Id": 123456,
-					"DeviceManagement": [
-						{
-							"NetworkAddress": "1.2.3.4"
-						}
-					]
-				}
-			]
-		}`))
-		return true
-	}
 
 	if r.URL.Path == "/api/DeviceService/Devices" && r.Method == "GET" {
+		if strings.Contains(r.URL.RawQuery, "SVT123") || strings.Contains(r.URL.RawQuery, "SVT223") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"value": [
+					{
+						"Id": 123456,
+						"DeviceManagement": [
+							{
+								"NetworkAddress": "1.2.3.4"
+							}
+						]
+					}
+				]
+			}`))
+			return true
+		}
+
+		if strings.Contains(r.URL.RawQuery, "SV6789") && r.Method == "GET" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"value": []
+			}`))
+			return true
+		}
+		if strings.Contains(r.URL.RawQuery, "INVJSON") && r.Method == "GET" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"value": [
+					{
+						"Id": 
+					},
+				]
+			}`))
+			return true
+		}
+		if strings.Contains(r.URL.RawQuery, "NOAUTH") && r.Method == "GET" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return true
+		}
+
+		if (strings.Contains(r.URL.RawQuery, "123456") || strings.Contains(r.URL.RawQuery, "223456")) && r.Method == "GET" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"value": [
+					{
+						"Id": 123456,
+						"DeviceManagement": [
+							{
+								"NetworkAddress": "1.2.3.4"
+							}
+						]
+					}
+				]
+			}`))
+			return true
+		}
+
+		if strings.Contains(r.URL.RawQuery, "123457") && r.Method == "GET" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"value": []
+			}`))
+			return true
+		}
+
 		w.Write([]byte(`{
-			"value": [
+			"value": [				
 				{
-					"Id": 123456,
+					"Id": 123450,
 					"DeviceManagement": [
 						{
-							"NetworkAddress": "1.2.3.4"
+							"NetworkAddress": "192.35.0.1"
 						}
 					]
 				},
 				{
-					"Id": 123457,
+					"Id": 123456,
 					"DeviceManagement": [
 						{
-							"NetworkAddress": "192.35.0.1"
+							"NetworkAddress": "1.2.3.4"
 						}
 					]
 				},
@@ -377,53 +426,6 @@ func mockDeviceAPIs(r *http.Request, w http.ResponseWriter) bool {
 		return true
 	}
 
-	if strings.Contains(r.URL.RawQuery, "SV6789") && r.Method == "GET" {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{
-			"value": []
-		}`))
-		return true
-	}
-	if strings.Contains(r.URL.RawQuery, "INVJSON") && r.Method == "GET" {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{
-			"value": [
-				{
-					"Id": 
-				},
-			]
-		}`))
-		return true
-	}
-	if strings.Contains(r.URL.RawQuery, "NOAUTH") && r.Method == "GET" {
-		w.WriteHeader(http.StatusUnauthorized)
-		return true
-	}
-
-	if (strings.Contains(r.URL.RawQuery, "123456") || strings.Contains(r.URL.RawQuery, "223456")) && r.Method == "GET" {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{
-			"value": [
-				{
-					"Id": 123456,
-					"DeviceManagement": [
-						{
-							"NetworkAddress": "1.2.3.4"
-						}
-					]
-				}
-			]
-		}`))
-		return true
-	}
-
-	if strings.Contains(r.URL.RawQuery, "123457") && r.Method == "GET" {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{
-			"value": []
-		}`))
-		return true
-	}
 	return false
 }
 
@@ -1183,7 +1185,7 @@ func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
 				"value": [
 					{
 						"Id": 1011,
-						"Name": "Linux Servers"
+						"Name": "valid_group1"
 					}
 				]
 			}`))
@@ -1196,7 +1198,7 @@ func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
 				"value": [
 					{
 						"Id": 1012,
-						"Name": "IDRAC Servers"
+						"Name": "valid_group2"
 					}
 				]
 			}`))
@@ -1377,6 +1379,301 @@ func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
 				]
 			}
 		}`))
+		return true
+	}
+
+	// get group by id
+	if r.URL.Path == (fmt.Sprintf(GroupServiceAPI, 1011)) && r.Method == "GET" {
+		w.Write([]byte(`{
+			"Id": 1011,
+			"Name": "group 1011",
+			"Description": "group 1011",
+			"ParentId": 1010
+		}`))
+		return true
+	} else if r.URL.Path == (fmt.Sprintf(GroupServiceAPI, 1012)) && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{
+			"error": {
+				"code": "Base.1.0.GeneralError",
+				"message": "A general error has occurred. See ExtendedInfo for more information.",
+				"@Message.ExtendedInfo": [
+					{
+						"MessageId": "CGEN1004",
+						"RelatedProperties": [],
+						"Message": "Unable to complete the operation because the value provided for GroupId is invalid.",
+						"MessageArgs": [
+							"36"
+						],
+						"Severity": "Informational",
+						"Resolution": "Enter a valid value and retry the operation."
+					}
+				]
+			}
+		}`))
+		return true
+	}
+
+	// delete group by id
+	// assumptions: group id 1011 exists, but not 1055
+	if r.URL.Path == (fmt.Sprintf(GroupServiceAPI, 1011)) && r.Method == "DELETE" {
+		w.WriteHeader(http.StatusNoContent)
+		return true
+	} else if r.URL.Path == (fmt.Sprintf(GroupServiceAPI, 1055)) && r.Method == "DELETE" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{
+			"error": {
+				"code": "Base.1.0.GeneralError",
+				"message": "A general error has occurred. See ExtendedInfo for more information.",
+				"@Message.ExtendedInfo": [
+					{
+						"MessageId": "CGEN1004",
+						"RelatedProperties": [],
+						"Message": "Unable to complete the operation because the value provided for GroupId is invalid.",
+						"MessageArgs": [
+							"36"
+						],
+						"Severity": "Informational",
+						"Resolution": "Enter a valid value and retry the operation."
+					}
+				]
+			}
+		}`))
+		return true
+	}
+
+	return false
+}
+
+func mockGroupServiceActionsAPIs(r *http.Request, w http.ResponseWriter) bool {
+	if r.Method != "POST" {
+		return false
+	}
+
+	// create group
+	if r.URL.Path == (fmt.Sprintf(GroupServiceActionsAPI, "Create")) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+		input := string(body)
+		// Assumptions:
+		// group by name ExtGroup but TestGroup does not exist; when TestGroup is created, it is given the id 1012
+		// group by id 1015 does not exist
+		if strings.Contains(input, "1015") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM1025",
+							"RelatedProperties": [],
+							"Message": "Unable to create the group because the parent group ID 1015 is invalid.",
+							"MessageArgs": [
+								"1009"
+							],
+							"Severity": "Warning",
+							"Resolution": "Enter a valid group ID and retry the operation."
+						}
+					]
+				}
+			}`))
+		} else if strings.Contains(input, "ExtGroup") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM1027",
+							"RelatedProperties": [],
+							"Message": "Unable to create the group because the group name ExtGroup already exists.",
+							"MessageArgs": [
+								"Temp12"
+							],
+							"Severity": "Warning",
+							"Resolution": "Enter a unique group name and retry the operation."
+						}
+					]
+				}
+			}`))
+		} else if strings.Contains(input, "TestGroup") {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`1012`))
+		}
+		return true
+	}
+
+	// modify group
+	if r.URL.Path == (fmt.Sprintf(GroupServiceActionsAPI, "Update")) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+		input := string(body)
+		// group id 1011 exists, 1055 does not exist
+		// group name ExtGroup exists
+		if strings.Contains(input, "1055") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CGEN1004",
+							"RelatedProperties": [],
+							"Message": "Unable to complete the operation because the value provided for GroupId is invalid.",
+							"MessageArgs": [
+								"36"
+							],
+							"Severity": "Informational",
+							"Resolution": "Enter a valid value and retry the operation."
+						}
+					]
+				}
+			}`))
+		} else if strings.Contains(input, "ExtGroup") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM1027",
+							"RelatedProperties": [],
+							"Message": "Unable to create the group because the group name ExtGroup already exists.",
+							"MessageArgs": [
+								"Temp12"
+							],
+							"Severity": "Warning",
+							"Resolution": "Enter a unique group name and retry the operation."
+						}
+					]
+				}
+			}`))
+		} else if strings.Contains(input, "1011") {
+			w.WriteHeader(http.StatusOK)
+		}
+		return false
+	}
+
+	// add devices to group
+	if r.URL.Path == (fmt.Sprintf(GroupServiceDeviceActionsAPI, "Add")) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+		input := string(body)
+		// Assumptions:
+		// group id 1011 exists, 1055 does not exist
+		// device id 10056 exists in group but device 10057 does not exist
+		if strings.Contains(input, "1055") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CGEN1004",
+							"RelatedProperties": [],
+							"Message": "Unable to complete the operation because the value provided for GroupId is invalid.",
+							"MessageArgs": [
+								"36"
+							],
+							"Severity": "Informational",
+							"Resolution": "Enter a valid value and retry the operation."
+						}
+					]
+				}
+			}`))
+		} else if strings.Contains(input, "10056") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CGEN1004",
+							"RelatedProperties": [],
+							"Message": "Unable to complete the operation because the value provided for GroupId is invalid.",
+							"MessageArgs": [
+								"36"
+							],
+							"Severity": "Informational",
+							"Resolution": "Enter a valid value and retry the operation."
+						}
+					]
+				}
+			}`))
+		} else if strings.Contains(input, "10057") && strings.Contains(input, "1011") {
+			w.WriteHeader(http.StatusOK)
+		}
+		return true
+	}
+
+	// remove devices from group
+	if r.URL.Path == (fmt.Sprintf(GroupServiceDeviceActionsAPI, "Remove")) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+		input := string(body)
+		// group id 1011 exists, 1055 does not exist
+		// device id 10056 exists in group but device 10057 does not exist
+		if strings.Contains(input, "1055") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CGEN1004",
+							"RelatedProperties": [],
+							"Message": "Unable to complete the operation because the value provided for GroupId is invalid.",
+							"MessageArgs": [
+								"36"
+							],
+							"Severity": "Informational",
+							"Resolution": "Enter a valid value and retry the operation."
+						}
+					]
+				}
+			}`))
+		} else if strings.Contains(input, "10057") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CGEN1004",
+							"RelatedProperties": [],
+							"Message": "Unable to complete the operation because the provided DeviceId is invalid.",
+							"MessageArgs": [
+								"36"
+							],
+							"Severity": "Informational",
+							"Resolution": "Enter a valid value and retry the operation."
+						}
+					]
+				}
+			}`))
+		} else if strings.Contains(input, "1011") && strings.Contains(input, "10056") {
+			w.WriteHeader(http.StatusOK)
+		}
 		return true
 	}
 

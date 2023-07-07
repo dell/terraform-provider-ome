@@ -78,11 +78,11 @@ func TestClient_GetDeviceByIP(t *testing.T) {
 				"fe80::ffff:ffff:ffff:1111-fe80::ffff:ffff:ffff:ffff",
 				"192.37.0.0/24",
 			},
-			ids: []int64{123457, 123458},
+			ids: []int64{123450, 123458},
 		}},
 		{"test-invalid", args{
 			ips:     []string{"192.35.0.344"},
-			ids:     []int64{123457, 123458},
+			ids:     []int64{},
 			isError: true,
 		}},
 	}
