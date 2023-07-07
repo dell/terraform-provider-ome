@@ -37,9 +37,8 @@ func (c *Client) GetGroupById(id int64) (models.Group, error) {
 	return group, nil
 }
 
-func (c *Client) DeleteGroupDevice(id int64) error {
+func (c *Client) DeleteGroup(id int64) error {
 	path := fmt.Sprintf(GroupServiceAPI, id)
-	fmt.Println(path)
 	_, err := c.Delete(path, nil, nil)
 	return err
 }
@@ -129,8 +128,8 @@ func (c *Client) GetDevicesByGroups(groupNames []string) ([]models.Device, error
 	return devices, nil
 }
 
-// CreateGroupDevice - Creates a new static device group and returns its id
-func (c *Client) CreateGroupDevice(group models.Group) (int64, error) {
+// CreateGroup - Creates a new static device group and returns its id
+func (c *Client) CreateGroup(group models.Group) (int64, error) {
 	group.ID = 0
 	payload := map[string]any{
 		"GroupModel": group,
@@ -149,8 +148,8 @@ func (c *Client) CreateGroupDevice(group models.Group) (int64, error) {
 	return val, nil
 }
 
-// UpdateGroupDevice - Updates a static device group
-func (c *Client) UpdateGroupDevice(group models.Group) error {
+// UpdateGroup - Updates a static device group
+func (c *Client) UpdateGroup(group models.Group) error {
 	payload := map[string]any{
 		"GroupModel": group,
 	}
@@ -166,18 +165,18 @@ func (c *Client) UpdateGroupDevice(group models.Group) error {
 	return nil
 }
 
-// AddGroupDeviceMembers - Adds devices to a static device group
-func (c *Client) AddGroupDeviceMembers(payload models.GroupMemberPayload) error {
-	return c.updateGroupDeviceMembers(payload, true)
+// AddGroupMembers - Adds devices to a static device group
+func (c *Client) AddGroupMembers(payload models.GroupMemberPayload) error {
+	return c.updateGroupMembers(payload, true)
 }
 
-// RemoveGroupDeviceMembers - Removes devices from a static device group
-func (c *Client) RemoveGroupDeviceMembers(payload models.GroupMemberPayload) error {
-	return c.updateGroupDeviceMembers(payload, false)
+// RemoveGroupMembers - Removes devices from a static device group
+func (c *Client) RemoveGroupMembers(payload models.GroupMemberPayload) error {
+	return c.updateGroupMembers(payload, false)
 }
 
-// updateGroupDeviceMembers - Updates a static device group
-func (c *Client) updateGroupDeviceMembers(payload models.GroupMemberPayload, toAdd bool) error {
+// updateGroupMembers - Adds/Removes devices to/from a static device group
+func (c *Client) updateGroupMembers(payload models.GroupMemberPayload, toAdd bool) error {
 	payloadb, err := c.JSONMarshal(payload)
 	if err != nil {
 		return err

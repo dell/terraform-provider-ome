@@ -217,7 +217,7 @@ func TestClient_GetDevicesByGroups(t *testing.T) {
 	}
 }
 
-func TestClient_CreateGroupDevice(t *testing.T) {
+func TestClient_CreateGroup(t *testing.T) {
 	ts := createNewTLSServer(t)
 	defer ts.Close()
 
@@ -241,7 +241,7 @@ func TestClient_CreateGroupDevice(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			log.Println("Hola " + tt.name)
-			response, err := c.CreateGroupDevice(models.Group{
+			response, err := c.CreateGroup(models.Group{
 				Name:        tt.args.Name,
 				Description: "dummy",
 				ParentId:    tt.args.parentGroupID,
@@ -257,7 +257,7 @@ func TestClient_CreateGroupDevice(t *testing.T) {
 	}
 }
 
-func TestClient_ModifyGroupDevice(t *testing.T) {
+func TestClient_ModifyGroup(t *testing.T) {
 	ts := createNewTLSServer(t)
 	defer ts.Close()
 
@@ -280,7 +280,7 @@ func TestClient_ModifyGroupDevice(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := c.UpdateGroupDevice(models.Group{
+			err := c.UpdateGroup(models.Group{
 				Name:        tt.args.Name,
 				Description: "dummy",
 				ParentId:    tt.args.GroupID,
@@ -294,7 +294,7 @@ func TestClient_ModifyGroupDevice(t *testing.T) {
 	}
 }
 
-func TestClient_UpdateGroupDeviceMembers(t *testing.T) {
+func TestClient_UpdateGroupMembers(t *testing.T) {
 	ts := createNewTLSServer(t)
 	defer ts.Close()
 
@@ -323,12 +323,12 @@ func TestClient_UpdateGroupDeviceMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 			if tt.args.Add {
-				err = c.AddGroupDeviceMembers(models.GroupMemberPayload{
+				err = c.AddGroupMembers(models.GroupMemberPayload{
 					GroupId:   tt.args.GroupID,
 					DeviceIds: []int64{tt.args.DeviceID},
 				})
 			} else {
-				err = c.RemoveGroupDeviceMembers(models.GroupMemberPayload{
+				err = c.RemoveGroupMembers(models.GroupMemberPayload{
 					GroupId:   tt.args.GroupID,
 					DeviceIds: []int64{tt.args.DeviceID},
 				})
@@ -342,7 +342,7 @@ func TestClient_UpdateGroupDeviceMembers(t *testing.T) {
 	}
 }
 
-func TestClient_ReadGroupDevice(t *testing.T) {
+func TestClient_ReadGroup(t *testing.T) {
 	ts := createNewTLSServer(t)
 	defer ts.Close()
 
@@ -385,7 +385,7 @@ func TestClient_ReadGroupDevice(t *testing.T) {
 	}
 }
 
-func TestClient_DeleteGroupDevice(t *testing.T) {
+func TestClient_DeleteGroup(t *testing.T) {
 	ts := createNewTLSServer(t)
 	defer ts.Close()
 
@@ -406,7 +406,7 @@ func TestClient_DeleteGroupDevice(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := c.DeleteGroupDevice(tt.args.GroupID)
+			err := c.DeleteGroup(tt.args.GroupID)
 			if tt.args.isValid {
 				assert.Nil(t, err)
 			} else {

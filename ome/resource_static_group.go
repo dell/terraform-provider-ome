@@ -29,22 +29,22 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ resource.Resource                = &resourceDeviceGroup{}
-	_ resource.ResourceWithConfigure   = &resourceDeviceGroup{}
-	_ resource.ResourceWithImportState = &resourceDeviceGroup{}
+	_ resource.Resource                = &resourceStaticGroup{}
+	_ resource.ResourceWithConfigure   = &resourceStaticGroup{}
+	_ resource.ResourceWithImportState = &resourceStaticGroup{}
 )
 
 // NewDeviceGroupResource is a new resource for deployment
-func NewDeviceGroupResource() resource.Resource {
-	return &resourceDeviceGroup{}
+func NewStaticGroupResource() resource.Resource {
+	return &resourceStaticGroup{}
 }
 
-type resourceDeviceGroup struct {
+type resourceStaticGroup struct {
 	p *omeProvider
 }
 
 // Configure implements resource.ResourceWithConfigure
-func (r *resourceDeviceGroup) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *resourceStaticGroup) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -52,45 +52,45 @@ func (r *resourceDeviceGroup) Configure(ctx context.Context, req resource.Config
 }
 
 // Metadata implements resource.Resource
-func (resourceDeviceGroup) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "group_device"
+func (resourceStaticGroup) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "static_group"
 }
 
 // Template DeviceGroup Resource schema
-func (r resourceDeviceGroup) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r resourceStaticGroup) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Resource for static Device Groups on OpenManage Enterprise.",
 		Version:             1,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				MarkdownDescription: "ID of the device group resource.",
-				Description:         "ID of the device group resource.",
+				MarkdownDescription: "ID of the static group resource.",
+				Description:         "ID of the static group resource.",
 				Computed:            true,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Name of the template resource.",
-				Description:         "Name of the template resource.",
+				MarkdownDescription: "Name of the static group resource.",
+				Description:         "Name of the static group resource.",
 				Required:            true,
 			},
 			"description": schema.StringAttribute{
-				MarkdownDescription: "Description of the template",
-				Description:         "Description of the template",
+				MarkdownDescription: "Description of the static group",
+				Description:         "Description of the static group",
 				Required:            true,
 			},
 			"parent_id": schema.Int64Attribute{
-				MarkdownDescription: "ID of the parent group of the template.",
-				Description:         "ID of the parent group of the template.",
+				MarkdownDescription: "ID of the parent group of the static group.",
+				Description:         "ID of the parent group of the static group.",
 				Required:            true,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			"membership_type_id": schema.Int64Attribute{
-				MarkdownDescription: "Membership type of the template",
-				Description:         "Membership type of the template",
+				MarkdownDescription: "Membership type of the static group",
+				Description:         "Membership type of the static group",
 				Computed:            true,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.UseStateForUnknown(),
@@ -107,17 +107,17 @@ func (r resourceDeviceGroup) Schema(_ context.Context, _ resource.SchemaRequest,
 }
 
 // Create a new resource
-func (r resourceDeviceGroup) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	tflog.Trace(ctx, "resource_group_device create : Started")
+func (r resourceStaticGroup) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+	tflog.Trace(ctx, "resource_static_group create : Started")
 	//Get Plan Data
-	var plan models.GroupDeviceRes
+	var plan models.StaticGroup
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	//Create Session and defer the remove session
-	omeClient, d := r.p.createOMESession(ctx, "resource_group_device Create")
+	omeClient, d := r.p.createOMESession(ctx, "resource_static_group Create")
 	resp.Diagnostics.Append(d...)
 	if d.HasError() {
 		return
@@ -130,7 +130,7 @@ func (r resourceDeviceGroup) Create(ctx context.Context, req resource.CreateRequ
 	)
 
 	createPayload, _ := plan.GetPayload(plan)
-	if id, err = omeClient.CreateGroupDevice(createPayload); err != nil {
+	if id, err = omeClient.CreateGroup(createPayload); err != nil {
 		resp.Diagnostics.AddError(
 			"Error while creation", err.Error(),
 		)
@@ -156,10 +156,10 @@ func (r resourceDeviceGroup) Create(ctx context.Context, req resource.CreateRequ
 }
 
 // Read resource information
-func (r resourceDeviceGroup) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r resourceStaticGroup) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	//Get State Data
-	tflog.Trace(ctx, "resource_group_device read: started")
-	var state models.GroupDeviceRes
+	tflog.Trace(ctx, "resource_static_group read: started")
+	var state models.StaticGroup
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -167,14 +167,14 @@ func (r resourceDeviceGroup) Read(ctx context.Context, req resource.ReadRequest,
 	}
 
 	//Create Session and defer the remove session
-	omeClient, d := r.p.createOMESession(ctx, "resource_group_device Read")
+	omeClient, d := r.p.createOMESession(ctx, "resource_static_group Read")
 	resp.Diagnostics.Append(d...)
 	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
 
-	tflog.Trace(ctx, "resource_group_device read: client created started updating state")
+	tflog.Trace(ctx, "resource_static_group read: client created started updating state")
 
 	finalState, dgs := r.ReadRes(omeClient, state.ID.ValueInt64())
 	resp.Diagnostics.Append(dgs...)
@@ -183,14 +183,14 @@ func (r resourceDeviceGroup) Read(ctx context.Context, req resource.ReadRequest,
 	}
 	resp.Diagnostics.Append(resp.State.Set(ctx, finalState)...)
 
-	tflog.Trace(ctx, "resource_group_device read: finished")
+	tflog.Trace(ctx, "resource_static_group read: finished")
 }
 
 // Update resource
-func (r resourceDeviceGroup) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r resourceStaticGroup) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get state Data
-	tflog.Trace(ctx, "resource_group_device update: started")
-	var state models.GroupDeviceRes
+	tflog.Trace(ctx, "resource_static_group update: started")
+	var state models.StaticGroup
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -198,7 +198,7 @@ func (r resourceDeviceGroup) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	// Get plan Data
-	var plan models.GroupDeviceRes
+	var plan models.StaticGroup
 	diags = req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -206,7 +206,7 @@ func (r resourceDeviceGroup) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	//Create Session and defer the remove session
-	omeClient, d := r.p.createOMESession(ctx, "resource_group_device Update")
+	omeClient, d := r.p.createOMESession(ctx, "resource_static_group Update")
 	resp.Diagnostics.Append(d...)
 	if d.HasError() {
 		return
@@ -221,11 +221,11 @@ func (r resourceDeviceGroup) Update(ctx context.Context, req resource.UpdateRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, finalState)...)
 }
 
-func (r resourceDeviceGroup) UpdateRes(omeClient *clients.Client, plan, state models.GroupDeviceRes, ctx context.Context) (models.GroupDeviceRes, diag.Diagnostics) {
+func (r resourceStaticGroup) UpdateRes(omeClient *clients.Client, plan, state models.StaticGroup, ctx context.Context) (models.StaticGroup, diag.Diagnostics) {
 
 	var d diag.Diagnostics
 	if payload, ok := plan.GetPayload(state); !ok {
-		if err := omeClient.UpdateGroupDevice(payload); err != nil {
+		if err := omeClient.UpdateGroup(payload); err != nil {
 			d.AddError(
 				"Error while updation", err.Error(),
 			)
@@ -239,7 +239,7 @@ func (r resourceDeviceGroup) UpdateRes(omeClient *clients.Client, plan, state mo
 		return state, d
 	}
 	if len(payloadAdd.DeviceIds) != 0 {
-		if err := omeClient.AddGroupDeviceMembers(payloadAdd); err != nil {
+		if err := omeClient.AddGroupMembers(payloadAdd); err != nil {
 			d.AddError(
 				"Error while adding group devices", err.Error(),
 			)
@@ -247,7 +247,7 @@ func (r resourceDeviceGroup) UpdateRes(omeClient *clients.Client, plan, state mo
 		}
 	}
 	if len(payloadRmv.DeviceIds) != 0 {
-		if err := omeClient.RemoveGroupDeviceMembers(payloadRmv); err != nil {
+		if err := omeClient.RemoveGroupMembers(payloadRmv); err != nil {
 			d.AddError(
 				"Error while removing group devices", err.Error(),
 			)
@@ -260,7 +260,7 @@ func (r resourceDeviceGroup) UpdateRes(omeClient *clients.Client, plan, state mo
 	return ret, d
 }
 
-func (r resourceDeviceGroup) ReadRes(omeClient *clients.Client, id int64) (ret models.GroupDeviceRes, d diag.Diagnostics) {
+func (r resourceStaticGroup) ReadRes(omeClient *clients.Client, id int64) (ret models.StaticGroup, d diag.Diagnostics) {
 	group, err := omeClient.GetGroupById(id)
 	if err != nil {
 		d.AddError(
@@ -277,15 +277,15 @@ func (r resourceDeviceGroup) ReadRes(omeClient *clients.Client, id int64) (ret m
 		return
 	}
 
-	ret, _ = models.NewGroupDeviceRes(group, devs)
+	ret, _ = models.NewStaticGroup(group, devs)
 	return ret, d
 }
 
 // Delete resource
-func (r resourceDeviceGroup) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	tflog.Trace(ctx, "resource_group_device delete: started")
+func (r resourceStaticGroup) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	tflog.Trace(ctx, "resource_static_group delete: started")
 	// Get State Data
-	var state models.GroupDeviceRes
+	var state models.StaticGroup
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -293,34 +293,34 @@ func (r resourceDeviceGroup) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	//Create Session and defer the remove session
-	omeClient, d := r.p.createOMESession(ctx, "resource_group_device Delete")
+	omeClient, d := r.p.createOMESession(ctx, "resource_static_group Delete")
 	resp.Diagnostics.Append(d...)
 	if d.HasError() {
 		return
 	}
 	defer omeClient.RemoveSession()
 
-	err := omeClient.DeleteGroupDevice(state.ID.ValueInt64())
+	err := omeClient.DeleteGroup(state.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error deleting device group",
+			"Error deleting static group",
 			err.Error(),
 		)
 		return
 	}
 	resp.State.RemoveResource(ctx)
-	tflog.Trace(ctx, "resource_group_device delete: finished")
+	tflog.Trace(ctx, "resource_static_group delete: finished")
 }
 
 // Import resource
-func (r resourceDeviceGroup) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	tflog.Trace(ctx, "resource_group_device import: started")
+func (r resourceStaticGroup) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	tflog.Trace(ctx, "resource_static_group import: started")
 	// Save the import identifier in the id attribute
-	// var state models.GroupDeviceRes
+	// var state models.StaticGroup
 	groupName := req.ID
 
 	//Create Session and defer the remove session
-	omeClient, d := r.p.createOMESession(ctx, "resource_group_device ImportState")
+	omeClient, d := r.p.createOMESession(ctx, "resource_static_group ImportState")
 	resp.Diagnostics.Append(d...)
 	if d.HasError() {
 		return
@@ -342,8 +342,8 @@ func (r resourceDeviceGroup) ImportState(ctx context.Context, req resource.Impor
 		)
 		return
 	}
-	state, _ := models.NewGroupDeviceRes(group, devs)
+	state, _ := models.NewStaticGroup(group, devs)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 
-	tflog.Trace(ctx, "resource_group_device import: finished")
+	tflog.Trace(ctx, "resource_static_group import: finished")
 }

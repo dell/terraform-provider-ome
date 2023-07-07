@@ -25,7 +25,7 @@ const (
 	DeviceGroup1Update = "test_acc_group_device_1_updated"
 )
 
-func TestDeviceGroup(t *testing.T) {
+func TestStaticGroup(t *testing.T) {
 
 	testAccProvider := `
 	provider "ome" {
@@ -36,7 +36,7 @@ func TestDeviceGroup(t *testing.T) {
 	}
 	`
 	testAccCreateGroupSuccess := testAccProvider + `	
-	resource "ome_group_device" "terraform-acceptance-test-1" {
+	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1"
 		parent_id = 1021
@@ -45,7 +45,7 @@ func TestDeviceGroup(t *testing.T) {
 	`
 
 	testAccUpdateGroupSuccess := testAccProvider + `	
-	resource "ome_group_device" "terraform-acceptance-test-1" {
+	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id = 1021
@@ -54,13 +54,13 @@ func TestDeviceGroup(t *testing.T) {
 	`
 
 	testAccDuplicateNameNeg := testAccProvider + `	
-	resource "ome_group_device" "terraform-acceptance-test-1" {
+	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id = 1021
 		device_ids = [` + DeviceID1 + `]
 	}
-	resource "ome_group_device" "terraform-acceptance-test-2" {
+	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id = 1021
@@ -69,13 +69,13 @@ func TestDeviceGroup(t *testing.T) {
 	`
 
 	testAccInvalidDeviceNeg := testAccProvider + `	
-	resource "ome_group_device" "terraform-acceptance-test-1" {
+	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id = 1021
 		device_ids = [` + DeviceID1 + `]
 	}
-	resource "ome_group_device" "terraform-acceptance-test-2" {
+	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id = 1021
@@ -84,13 +84,13 @@ func TestDeviceGroup(t *testing.T) {
 	`
 
 	testAccCreate2 := testAccProvider + `	
-	resource "ome_group_device" "terraform-acceptance-test-1" {
+	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id = 1021
 		device_ids = [` + DeviceID1 + `]
 	}
-	resource "ome_group_device" "terraform-acceptance-test-2" {
+	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id = 1021
@@ -105,31 +105,24 @@ func TestDeviceGroup(t *testing.T) {
 			{
 				Config: testAccCreateGroupSuccess,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_group_device.terraform-acceptance-test-1", "name", DeviceGroup1),
-					// resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "refdevice_servicetag", DeviceSvcTag1),
-					// resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "fqdds", "iDRAC,niC"),
-
-					// resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-2", "name", TemplateName2),
-					// resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-2", "refdevice_id", DeviceID2),
-					// resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-2", "fqdds", "All"),
-					// resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-2", "description", "This is sample description"),
+					resource.TestCheckResourceAttr("ome_static_group.terraform-acceptance-test-1", "name", DeviceGroup1),
 				),
 			},
 			{
 				Config: testAccUpdateGroupSuccess,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_group_device.terraform-acceptance-test-1", "name", DeviceGroup1Update),
+					resource.TestCheckResourceAttr("ome_static_group.terraform-acceptance-test-1", "name", DeviceGroup1Update),
 				),
 			},
 			{
-				ResourceName:      "ome_group_device.terraform-acceptance-test-1",
+				ResourceName:      "ome_static_group.terraform-acceptance-test-1",
 				ImportState:       true,
 				ImportStateVerify: true,
 				ExpectError:       nil,
 				ImportStateId:     DeviceGroup1Update,
 			},
 			{
-				ResourceName:      "ome_group_device.terraform-acceptance-test-1",
+				ResourceName:      "ome_static_group.terraform-acceptance-test-1",
 				ImportState:       true,
 				ImportStateVerify: true,
 				ExpectError:       regexp.MustCompile("Error importing group"),

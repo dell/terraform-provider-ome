@@ -59,8 +59,8 @@ type GroupDevicesData struct {
 	DeviceGroupNames  types.Set    `tfsdk:"device_group_names"`
 }
 
-// GroupDevicesRes - schema for resource groupdevices
-type GroupDeviceRes struct {
+// StaticGroup - schema for resource static group
+type StaticGroup struct {
 	ID               types.Int64  `tfsdk:"id"`
 	Name             types.String `tfsdk:"name"`
 	Description      types.String `tfsdk:"description"`
@@ -69,13 +69,13 @@ type GroupDeviceRes struct {
 	DeviceIds        types.Set    `tfsdk:"device_ids"`
 }
 
-func NewGroupDeviceRes(g Group, devs Devices) (GroupDeviceRes, diag.Diagnostics) {
+func NewStaticGroup(g Group, devs Devices) (StaticGroup, diag.Diagnostics) {
 	devidVals := make([]attr.Value, 0)
 	for _, device := range devs.Value {
 		devidVals = append(devidVals, types.Int64Value(device.ID))
 	}
 	deviceIds, dgs := types.SetValue(types.Int64Type, devidVals)
-	return GroupDeviceRes{
+	return StaticGroup{
 		ID:               types.Int64Value(g.ID),
 		Name:             types.StringValue(g.Name),
 		Description:      types.StringValue(g.Description),
@@ -85,7 +85,7 @@ func NewGroupDeviceRes(g Group, devs Devices) (GroupDeviceRes, diag.Diagnostics)
 	}, dgs
 }
 
-func (g *GroupDeviceRes) GetPayload(state GroupDeviceRes) (Group, bool) {
+func (g *StaticGroup) GetPayload(state StaticGroup) (Group, bool) {
 	ret := Group{
 		ID:               state.ID.ValueInt64(),
 		Name:             g.Name.ValueString(),
@@ -96,7 +96,7 @@ func (g *GroupDeviceRes) GetPayload(state GroupDeviceRes) (Group, bool) {
 	return ret, ret.Name == state.Name.ValueString() && ret.Description == state.Description.ValueString()
 }
 
-func (plan *GroupDeviceRes) GetMemberPayload(ctx context.Context, state GroupDeviceRes) (GroupMemberPayload,
+func (plan *StaticGroup) GetMemberPayload(ctx context.Context, state StaticGroup) (GroupMemberPayload,
 	GroupMemberPayload, diag.Diagnostics) {
 	var d diag.Diagnostics
 	toAdd, toRmv := NewGroupMemberPayload(state.ID.ValueInt64()), NewGroupMemberPayload(state.ID.ValueInt64())
@@ -129,7 +129,7 @@ func (plan *GroupDeviceRes) GetMemberPayload(ctx context.Context, state GroupDev
 	return toAdd, toRmv, d
 }
 
-func (g *GroupDeviceRes) GetDeviceIdMap(ctx context.Context) (map[int64]bool, diag.Diagnostics) {
+func (g *StaticGroup) GetDeviceIdMap(ctx context.Context) (map[int64]bool, diag.Diagnostics) {
 	var d diag.Diagnostics
 	ret, devIds := make(map[int64]bool), make([]int64, 0)
 	d.Append(g.DeviceIds.ElementsAs(ctx, &devIds, false)...)
