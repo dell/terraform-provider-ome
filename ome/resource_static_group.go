@@ -18,11 +18,14 @@ import (
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -74,19 +77,22 @@ func (r resourceStaticGroup) Schema(_ context.Context, _ resource.SchemaRequest,
 				MarkdownDescription: "Name of the static group resource.",
 				Description:         "Name of the static group resource.",
 				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtLeast(1),
+				},
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Description of the static group",
 				Description:         "Description of the static group",
-				Required:            true,
+				Optional:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"parent_id": schema.Int64Attribute{
 				MarkdownDescription: "ID of the parent group of the static group.",
 				Description:         "ID of the parent group of the static group.",
 				Required:            true,
-				PlanModifiers: []planmodifier.Int64{
-					int64planmodifier.UseStateForUnknown(),
-				},
 			},
 			"membership_type_id": schema.Int64Attribute{
 				MarkdownDescription: "Membership type of the static group",
