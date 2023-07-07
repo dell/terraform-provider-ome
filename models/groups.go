@@ -136,7 +136,7 @@ func (plan *StaticGroup) GetMemberPayload(ctx context.Context, state StaticGroup
 	return toAdd, toRmv, d
 }
 
-// GetDeviceIdMap - helper function that converts a static group's list of devices into a map of its ids
+// GetDeviceIDMap - helper function that converts a static group's list of devices into a map of its ids
 // this helps in quick comparison of device lists of two static groups
 func (plan *StaticGroup) GetDeviceIDMap(ctx context.Context) (map[int64]bool, diag.Diagnostics) {
 	var d diag.Diagnostics

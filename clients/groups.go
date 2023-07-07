@@ -19,8 +19,8 @@ import (
 	"terraform-provider-ome/models"
 )
 
-// GetGroupById - method to get a group object by id.
-func (c *Client) GetGroupById(id int64) (models.Group, error) {
+// GetGroupByID - method to get a group object by id.
+func (c *Client) GetGroupByID(id int64) (models.Group, error) {
 	path := fmt.Sprintf(GroupServiceAPI, id)
 	response, err := c.Get(path, nil, nil)
 	if err != nil {

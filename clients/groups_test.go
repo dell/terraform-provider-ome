@@ -370,7 +370,7 @@ func TestClient_ReadGroup(t *testing.T) {
 			var err error
 			var group models.Group
 			if tt.args.toID {
-				group, err = c.GetGroupById(tt.args.GroupID)
+				group, err = c.GetGroupByID(tt.args.GroupID)
 			} else {
 				group, err = c.GetSingleGroupByName(tt.args.GroupName)
 			}

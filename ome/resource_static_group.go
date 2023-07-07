@@ -37,7 +37,7 @@ var (
 	_ resource.ResourceWithImportState = &resourceStaticGroup{}
 )
 
-// NewDeviceGroupResource is a new resource for deployment
+// NewStaticGroupResource initializes a new static group resource
 func NewStaticGroupResource() resource.Resource {
 	return &resourceStaticGroup{}
 }
@@ -59,7 +59,7 @@ func (resourceStaticGroup) Metadata(ctx context.Context, req resource.MetadataRe
 	resp.TypeName = req.ProviderTypeName + "static_group"
 }
 
-// Template DeviceGroup Resource schema
+// StaticGroup Resource schema
 func (r resourceStaticGroup) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Resource for static Device Groups on OpenManage Enterprise.",
@@ -153,7 +153,7 @@ func (r resourceStaticGroup) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	finalState, dgs2 := r.UpdateRes(omeClient, plan, initialState, ctx)
+	finalState, dgs2 := r.UpdateRes(ctx, omeClient, plan, initialState)
 	resp.Diagnostics.Append(dgs2...)
 	if dgs2.HasError() {
 		return
@@ -219,7 +219,7 @@ func (r resourceStaticGroup) Update(ctx context.Context, req resource.UpdateRequ
 	}
 	defer omeClient.RemoveSession()
 
-	finalState, dgs := r.UpdateRes(omeClient, plan, state, ctx)
+	finalState, dgs := r.UpdateRes(ctx, omeClient, plan, state)
 	resp.Diagnostics.Append(dgs...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -227,7 +227,9 @@ func (r resourceStaticGroup) Update(ctx context.Context, req resource.UpdateRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, finalState)...)
 }
 
-func (r resourceStaticGroup) UpdateRes(omeClient *clients.Client, plan, state models.StaticGroup, ctx context.Context) (models.StaticGroup, diag.Diagnostics) {
+// UpdateRes - method for common update workflow
+func (r resourceStaticGroup) UpdateRes(ctx context.Context, omeClient *clients.Client,
+	plan, state models.StaticGroup) (models.StaticGroup, diag.Diagnostics) {
 
 	var d diag.Diagnostics
 	if payload, ok := plan.GetPayload(state); !ok {
@@ -266,8 +268,9 @@ func (r resourceStaticGroup) UpdateRes(omeClient *clients.Client, plan, state mo
 	return ret, d
 }
 
+// ReadRes - method for common read workflow
 func (r resourceStaticGroup) ReadRes(omeClient *clients.Client, id int64) (ret models.StaticGroup, d diag.Diagnostics) {
-	group, err := omeClient.GetGroupById(id)
+	group, err := omeClient.GetGroupByID(id)
 	if err != nil {
 		d.AddError(
 			"Error fetching group by id", err.Error(),
