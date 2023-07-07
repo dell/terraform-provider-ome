@@ -175,7 +175,7 @@ func (c *Client) GetUniqueDevicesIdsAndServiceTags(devices []models.Device) ([]m
 	return uniqueDevices, uniqueDevicesIDs, uniqueDevicesSTs
 }
 
-// GetDeviceByIp is used to get device using ips in OME
+// GetDeviceByIps - method to get device using ips in OME
 func (c *Client) GetDeviceByIps(networks []string) (models.Devices, error) {
 	var (
 		err     error
@@ -201,6 +201,7 @@ func (c *Client) GetDeviceByIps(networks []string) (models.Devices, error) {
 	return ret, err
 }
 
+// GetAllDevices - method to gfetch all devices filtered by input queries
 func (c *Client) GetAllDevices(queries map[string]string) (models.Devices, error) {
 	devices := models.Devices{}
 	response, err := c.Get(DeviceAPI, nil, queries)

@@ -244,7 +244,7 @@ func TestClient_CreateGroup(t *testing.T) {
 			response, err := c.CreateGroup(models.Group{
 				Name:        tt.args.Name,
 				Description: "dummy",
-				ParentId:    tt.args.parentGroupID,
+				ParentID:    tt.args.parentGroupID,
 			})
 			if tt.args.isValid {
 				assert.Nil(t, err)
@@ -283,7 +283,7 @@ func TestClient_ModifyGroup(t *testing.T) {
 			err := c.UpdateGroup(models.Group{
 				Name:        tt.args.Name,
 				Description: "dummy",
-				ParentId:    tt.args.GroupID,
+				ParentID:    tt.args.GroupID,
 			})
 			if tt.args.isValid {
 				assert.Nil(t, err)
@@ -324,12 +324,12 @@ func TestClient_UpdateGroupMembers(t *testing.T) {
 			var err error
 			if tt.args.Add {
 				err = c.AddGroupMembers(models.GroupMemberPayload{
-					GroupId:   tt.args.GroupID,
+					GroupID:   tt.args.GroupID,
 					DeviceIds: []int64{tt.args.DeviceID},
 				})
 			} else {
 				err = c.RemoveGroupMembers(models.GroupMemberPayload{
-					GroupId:   tt.args.GroupID,
+					GroupID:   tt.args.GroupID,
 					DeviceIds: []int64{tt.args.DeviceID},
 				})
 			}
@@ -353,7 +353,7 @@ func TestClient_ReadGroup(t *testing.T) {
 	type args struct {
 		GroupName string
 		GroupID   int64
-		toId      bool
+		toID      bool
 		isValid   bool
 	}
 	tests := []struct {
@@ -369,7 +369,7 @@ func TestClient_ReadGroup(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 			var group models.Group
-			if tt.args.toId {
+			if tt.args.toID {
 				group, err = c.GetGroupById(tt.args.GroupID)
 			} else {
 				group, err = c.GetSingleGroupByName(tt.args.GroupName)

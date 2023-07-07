@@ -63,14 +63,13 @@ const (
 	TemplateViewTypeAPI = "/api/TemplateService/TemplateViewTypes"
 	// TemplateDeviceTypeAPI - api to get view type
 	TemplateDeviceTypeAPI = "/api/TemplateService/TemplateTypes"
-	//GroupAPI - api for fetching group details
-	GroupAPI        = "/api/GroupService/Groups"
+	// GroupAPI - api for fetching group details
+	GroupAPI = "/api/GroupService/Groups"
+	// GroupServiceAPI - api to get and delete group by id
 	GroupServiceAPI = GroupAPI + "(%d)"
-	// Group Service Actions API
-	// /api/GroupService/Actions/GroupService.CreateGroup
-	// GroupServiceActionsAPI = "/GroupService/Actions/GroupService.%sGroup"
-	//                            /GroupService/Actions/GroupService.CreateGroup
-	GroupServiceActionsAPI       = "/api/GroupService/Actions/GroupService.%sGroup"
+	// GroupServiceActionsAPI - api to create and modify a group
+	GroupServiceActionsAPI = "/api/GroupService/Actions/GroupService.%sGroup"
+	// GroupServiceDeviceActionsAPI - api to add and remove devices from a group
 	GroupServiceDeviceActionsAPI = "/api/GroupService/Actions/GroupService.%sMemberDevices"
 	//GroupServiceDevicesAPI - api for fetching device ids from a group id
 	GroupServiceDevicesAPI = GroupAPI + "(%d)/Devices"

@@ -85,6 +85,7 @@ func FindElementInIntArray(arr []int64, find int64) int {
 	return index
 }
 
+// ParseNetworks converts a slice of strings to iprange.Pool if valid
 func ParseNetworks(networks []string) (iprange.Pool, error) {
 	input := strings.Join(networks, " ")
 	ranges, err := iprange.ParseRanges(input)

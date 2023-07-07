@@ -19,7 +19,7 @@ import (
 	"terraform-provider-ome/models"
 )
 
-// GetGroupByName - method to get a group object by name.
+// GetGroupById - method to get a group object by id.
 func (c *Client) GetGroupById(id int64) (models.Group, error) {
 	path := fmt.Sprintf(GroupServiceAPI, id)
 	response, err := c.Get(path, nil, nil)
@@ -37,6 +37,7 @@ func (c *Client) GetGroupById(id int64) (models.Group, error) {
 	return group, nil
 }
 
+// DeleteGroup - method to delete a group by id
 func (c *Client) DeleteGroup(id int64) error {
 	path := fmt.Sprintf(GroupServiceAPI, id)
 	_, err := c.Delete(path, nil, nil)

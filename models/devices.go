@@ -33,6 +33,7 @@ type Device struct {
 	DeviceManagement   []DeviceManagement `json:"DeviceManagement"`
 }
 
+// BelongsToPool - method to check if a device belongs to that ip pool
 func (d *Device) BelongsToPool(pool iprange.Pool) bool {
 	for _, devM := range d.DeviceManagement {
 		if pool.Contains(devM.NetworkAddress) {
@@ -42,6 +43,7 @@ func (d *Device) BelongsToPool(pool iprange.Pool) bool {
 	return false
 }
 
+// DeviceManagement - embedded device management response from the Devices
 type DeviceManagement struct {
 	NetworkAddress net.IP `json:"NetworkAddress"`
 }

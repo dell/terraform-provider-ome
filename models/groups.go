@@ -31,24 +31,27 @@ type Group struct {
 	ID               int64  `json:"Id,omitempty"`
 	Name             string `json:"Name"`
 	Description      string `json:"Description"`
-	MembershipTypeId int64  `json:"MembershipTypeId"`
-	ParentId         int64  `json:"ParentId"`
+	MembershipTypeID int64  `json:"MembershipTypeId"`
+	ParentID         int64  `json:"ParentId"`
 }
 
+// GroupMemberPayload - Payload struct for adding or removing devices from static groups
 type GroupMemberPayload struct {
-	GroupId   int64   `json:"GroupId"`
+	GroupID   int64   `json:"GroupId"`
 	DeviceIds []int64 `json:"MemberDeviceIds,omitempty"`
 }
 
+// NewGroupMemberPayload initializes a GroupMemberPayload struct
 func NewGroupMemberPayload(gid int64) GroupMemberPayload {
 	return GroupMemberPayload{
-		GroupId:   gid,
+		GroupID:   gid,
 		DeviceIds: make([]int64, 0),
 	}
 }
 
-func (g *GroupMemberPayload) RegisterDevice(id int64) {
-	g.DeviceIds = append(g.DeviceIds, id)
+// RegisterDevice - helper function to add devices to the payload
+func (plan *GroupMemberPayload) RegisterDevice(id int64) {
+	plan.DeviceIds = append(plan.DeviceIds, id)
 }
 
 // GroupDevicesData - schema for data source groupdevices
@@ -64,38 +67,42 @@ type StaticGroup struct {
 	ID               types.Int64  `tfsdk:"id"`
 	Name             types.String `tfsdk:"name"`
 	Description      types.String `tfsdk:"description"`
-	MembershipTypeId types.Int64  `tfsdk:"membership_type_id"`
-	ParentId         types.Int64  `tfsdk:"parent_id"`
+	MembershipTypeID types.Int64  `tfsdk:"membership_type_id"`
+	ParentID         types.Int64  `tfsdk:"parent_id"`
 	DeviceIds        types.Set    `tfsdk:"device_ids"`
 }
 
-func NewStaticGroup(g Group, devs Devices) (StaticGroup, diag.Diagnostics) {
+// NewStaticGroup - marshalls api response group and devices structs in a static group state
+func NewStaticGroup(plan Group, devs Devices) (StaticGroup, diag.Diagnostics) {
 	devidVals := make([]attr.Value, 0)
 	for _, device := range devs.Value {
 		devidVals = append(devidVals, types.Int64Value(device.ID))
 	}
 	deviceIds, dgs := types.SetValue(types.Int64Type, devidVals)
 	return StaticGroup{
-		ID:               types.Int64Value(g.ID),
-		Name:             types.StringValue(g.Name),
-		Description:      types.StringValue(g.Description),
-		MembershipTypeId: types.Int64Value(g.MembershipTypeId),
-		ParentId:         types.Int64Value(g.ParentId),
+		ID:               types.Int64Value(plan.ID),
+		Name:             types.StringValue(plan.Name),
+		Description:      types.StringValue(plan.Description),
+		MembershipTypeID: types.Int64Value(plan.MembershipTypeID),
+		ParentID:         types.Int64Value(plan.ParentID),
 		DeviceIds:        deviceIds,
 	}, dgs
 }
 
-func (g *StaticGroup) GetPayload(state StaticGroup) (Group, bool) {
+// GetPayload - returns the diff between plan and state sttaic groups in terms of its modify api request
+func (plan *StaticGroup) GetPayload(state StaticGroup) (Group, bool) {
 	ret := Group{
 		ID:               state.ID.ValueInt64(),
-		Name:             g.Name.ValueString(),
-		Description:      g.Description.ValueString(),
-		MembershipTypeId: 12,
-		ParentId:         g.ParentId.ValueInt64(),
+		Name:             plan.Name.ValueString(),
+		Description:      plan.Description.ValueString(),
+		MembershipTypeID: 12,
+		ParentID:         plan.ParentID.ValueInt64(),
 	}
 	return ret, ret.Name == state.Name.ValueString() && ret.Description == state.Description.ValueString()
 }
 
+// GetMemberPayload - returns the diff between plan and state sttaic groups in terms of
+// its device add and remove api requests
 func (plan *StaticGroup) GetMemberPayload(ctx context.Context, state StaticGroup) (GroupMemberPayload,
 	GroupMemberPayload, diag.Diagnostics) {
 	var d diag.Diagnostics
@@ -103,9 +110,9 @@ func (plan *StaticGroup) GetMemberPayload(ctx context.Context, state StaticGroup
 	if plan.DeviceIds.Equal(state.DeviceIds) {
 		return toAdd, toRmv, d
 	}
-	planDevIds, dgs1 := plan.GetDeviceIdMap(ctx)
+	planDevIds, dgs1 := plan.GetDeviceIDMap(ctx)
 	d.Append(dgs1...)
-	stateDevIds, dgs2 := state.GetDeviceIdMap(ctx)
+	stateDevIds, dgs2 := state.GetDeviceIDMap(ctx)
 	d.Append(dgs2...)
 
 	// Loop over all devices in state
@@ -129,10 +136,12 @@ func (plan *StaticGroup) GetMemberPayload(ctx context.Context, state StaticGroup
 	return toAdd, toRmv, d
 }
 
-func (g *StaticGroup) GetDeviceIdMap(ctx context.Context) (map[int64]bool, diag.Diagnostics) {
+// GetDeviceIdMap - helper function that converts a static group's list of devices into a map of its ids
+// this helps in quick comparison of device lists of two static groups
+func (plan *StaticGroup) GetDeviceIDMap(ctx context.Context) (map[int64]bool, diag.Diagnostics) {
 	var d diag.Diagnostics
 	ret, devIds := make(map[int64]bool), make([]int64, 0)
-	d.Append(g.DeviceIds.ElementsAs(ctx, &devIds, false)...)
+	d.Append(plan.DeviceIds.ElementsAs(ctx, &devIds, false)...)
 	for _, id := range devIds {
 		ret[id] = true
 	}
