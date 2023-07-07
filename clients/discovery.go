@@ -5,46 +5,58 @@ import (
 	"terraform-provider-ome/models"
 )
 
-func (c *Client) CreateDiscoveryJob(discoveryJob models.DiscoveryJobPayload) (models.DiscoveryJobResponse, error) {
+func (c *Client) CreateDiscoveryJob(discoveryJob models.DiscoveryJobPayload) (models.DiscoveryJob, error) {
 	data, _ := c.JSONMarshal(discoveryJob)
 	response, err := c.Post(DiscoveryJobAPI, nil, data)
 	if err != nil {
-		return models.DiscoveryJobResponse{}, err
+		return models.DiscoveryJob{}, err
 	}
 	respData, _ := c.GetBodyData(response.Body)
-	omeDiscoveryJob := models.DiscoveryJobResponse{}
+	omeDiscoveryJob := models.DiscoveryJob{}
 	err = c.JSONUnMarshal(respData, &omeDiscoveryJob)
 	return omeDiscoveryJob, err
 }
 
-func (c *Client) UpdateDiscoveryJob(discoveryJob models.DiscoveryJobPayload) (models.DiscoveryJobResponse, error){
+func (c *Client) UpdateDiscoveryJob(discoveryJob models.DiscoveryJobPayload) (models.DiscoveryJob, error) {
 	data, _ := c.JSONMarshal(discoveryJob)
-	response, err := c.Post(fmt.Sprintf(DiscoveryJobAPI+"?groupId=%d",discoveryJob.DiscoveryConfigGroupID), nil, data)
+	x := DiscoveryJobAPI + "?groupId=" + fmt.Sprint(discoveryJob.DiscoveryConfigGroupID)
+	response, err := c.Post(x, nil, data)
 	if err != nil {
-		return models.DiscoveryJobResponse{}, err
+		return models.DiscoveryJob{}, err
 	}
 	respData, _ := c.GetBodyData(response.Body)
-	omeDiscoveryJob := models.DiscoveryJobResponse{}
+	omeDiscoveryJob := models.DiscoveryJob{}
 	err = c.JSONUnMarshal(respData, &omeDiscoveryJob)
+	fmt.Println(string(respData))
 	return omeDiscoveryJob, err
 }
 
-func (c *Client) DeleteDiscoveryJob(discoveryGroupIds models.DiscoveryJobDeletePayload) error {
+func (c *Client) DeleteDiscoveryJob(discoveryGroupIds models.DiscoveryJobDeletePayload) (string, error) {
 	data, _ := c.JSONMarshal(discoveryGroupIds)
-	_, err := c.Post(DiscoveryJobRemoveAPI, nil, data)
+	resp, err := c.Post(DiscoveryJobRemoveAPI, nil, data)
 	if err != nil {
-		return err
+		return "", err
 	}
-	return nil
+	return resp.Status, nil
 }
 
-func (c *Client) GetDiscoveryJobByGroupID(groupId int64) (models.DiscoveryJobResponse, error) {
-	omeDiscoveryJob := models.DiscoveryJobResponse{}
-	response, err := c.Get(fmt.Sprintf(DiscoveryJobByGroupIDAPI,groupId),nil,nil)
+func (c *Client) GetDiscoveryJobByGroupID(groupId int64) (models.DiscoveryJob, error) {
+	omeDiscoveryJob := models.DiscoveryJob{}
+	endpoint := fmt.Sprintf(DiscoveryJobByGroupIDAPI, groupId)
+	// h := addHeaders()
+	response, err := c.Get(endpoint, nil, nil)
 	if err != nil {
 		return omeDiscoveryJob, err
 	}
 	respData, _ := c.GetBodyData(response.Body)
 	err = c.JSONUnMarshal(respData, &omeDiscoveryJob)
+	fmt.Println(string(respData))
 	return omeDiscoveryJob, err
 }
+
+// func addHeaders() map[string]string{
+// 	headers := make(map[string]string)
+// 	headers["Content-Type"] = "application/json"
+// 	headers["X-Auth-Token"] = "get your x-auth token"
+// 	return headers
+// }

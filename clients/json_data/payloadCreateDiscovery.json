@@ -1,0 +1,35 @@
+{
+    "DiscoveryConfigGroupName": "CreateDiscoveryCT",
+    "DiscoveryConfigGroupDescription": "null",
+    "DiscoveryConfigModels": [
+        {
+            "DiscoveryConfigId": 331105536,
+            "DiscoveryConfigDescription": "",
+            "DiscoveryConfigStatus": "",
+            "DiscoveryConfigTargets": [
+                {
+                    "DiscoveryConfigTargetId": 0,
+                    "NetworkAddressDetail": "10.226.197.136",
+                    "AddressType": 30,
+                    "Disabled": false,
+                    "Exclude": false
+                }
+            ],
+            "DiscoveryConfigVendorPlatforms":[],
+            "ConnectionProfileId": 0,
+            "ConnectionProfile": "{\"profileName\":\"\",\"profileDescription\":\"\",\"type\":\"DISCOVERY\",\"credentials\":[{\"id\":0,\"type\":\"WSMAN\",\"authType\":\"Basic\",\"modified\":false,\"credentials\":{\"username\":\"root\",\"password\":\"calvin\",\"caCheck\":false,\"cnCheck\":false,\"port\":443,\"retries\":3,\"timeout\":60,\"isHttp\":false,\"keepAlive\":false}}]}",
+            "DeviceType": [
+                1000
+            ]
+        }
+    ],
+    "Schedule": {
+        "RunNow": true,
+        "RunLater": false,
+        "Cron": "startnow",
+        "StartTime": "",
+        "EndTime": ""
+    },
+    "CreateGroup": true,
+    "TrapDestination": false
+}

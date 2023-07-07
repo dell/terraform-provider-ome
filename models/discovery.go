@@ -1,95 +1,72 @@
-package models 
+package models
 
 // DiscoveryJobPayload will be used in create and update functionality
 type DiscoveryJobPayload struct {
-	ChassisIdentifier               any    `json:"ChassisIdentifier"`
-	CommunityString                 bool   `json:"CommunityString"`
-	CreateGroup                     bool   `json:"CreateGroup"`
-	DiscoveryConfigGroupDescription string `json:"DiscoveryConfigGroupDescription"`
-	DiscoveryConfigGroupID          int    `json:"DiscoveryConfigGroupId"`
-	DiscoveryConfigGroupName        string `json:"DiscoveryConfigGroupName"`
-	DiscoveryConfigModels           []struct {
-		ConnectionProfile          string `json:"ConnectionProfile"`
-		ConnectionProfileID        int    `json:"ConnectionProfileId"`
-		DeviceType                 []int  `json:"DeviceType"`
-		DiscoveryConfigDescription string `json:"DiscoveryConfigDescription"`
-		DiscoveryConfigID          int    `json:"DiscoveryConfigId"`
-		DiscoveryConfigStatus      string `json:"DiscoveryConfigStatus"`
-		DiscoveryConfigTargets     []struct {
-			AddressType             int    `json:"AddressType"`
-			Disabled                bool   `json:"Disabled"`
-			DiscoveryConfigTargetID int    `json:"DiscoveryConfigTargetId"`
-			Exclude                 bool   `json:"Exclude"`
-			NetworkAddressDetail    string `json:"NetworkAddressDetail"`
-			SubnetMask              any    `json:"SubnetMask"`
-		} `json:"DiscoveryConfigTargets"`
-		DiscoveryConfigVendorPlatforms []any `json:"DiscoveryConfigVendorPlatforms"`
-	} `json:"DiscoveryConfigModels"`
-	DiscoveryConfigParentGroupID int `json:"DiscoveryConfigParentGroupId"`
-	DiscoveryConfigTaskParam     []struct {
-		ExecutionSequence int `json:"ExecutionSequence"`
-		TaskID            int `json:"TaskId"`
-		TaskTypeID        int `json:"TaskTypeId"`
-	} `json:"DiscoveryConfigTaskParam"`
-	DiscoveryConfigTasks          []any `json:"DiscoveryConfigTasks"`
-	DiscoveryStatusEmailRecipient any   `json:"DiscoveryStatusEmailRecipient"`
-	Schedule                      struct {
-		Cron      string `json:"Cron"`
-		EndTime   any    `json:"EndTime"`
-		Recurring any    `json:"Recurring"`
-		RunLater  bool   `json:"RunLater"`
-		RunNow    bool   `json:"RunNow"`
-		StartTime any    `json:"StartTime"`
-	} `json:"Schedule"`
-	TrapDestination bool `json:"TrapDestination"`
-	UseAllProfiles  any  `json:"UseAllProfiles"`
-}
-
-// DiscoveryJobResponse will be used in read, create and update
-type DiscoveryJobResponse struct {
-	ChassisIdentifier               any    `json:"ChassisIdentifier"`
-	CommunityString                 bool   `json:"CommunityString"`
-	CreateGroup                     bool   `json:"CreateGroup"`
-	DiscoveryConfigGroupDescription string `json:"DiscoveryConfigGroupDescription"`
-	DiscoveryConfigGroupID          int    `json:"DiscoveryConfigGroupId"`
-	DiscoveryConfigGroupName        string `json:"DiscoveryConfigGroupName"`
-	DiscoveryConfigModels           []struct {
-		ConnectionProfile          string `json:"ConnectionProfile"`
-		ConnectionProfileID        int    `json:"ConnectionProfileId"`
-		DeviceType                 []int  `json:"DeviceType"`
-		DiscoveryConfigDescription string `json:"DiscoveryConfigDescription"`
-		DiscoveryConfigID          int    `json:"DiscoveryConfigId"`
-		DiscoveryConfigStatus      string `json:"DiscoveryConfigStatus"`
-		DiscoveryConfigTargets     []struct {
-			AddressType             int    `json:"AddressType"`
-			Disabled                bool   `json:"Disabled"`
-			DiscoveryConfigTargetID int    `json:"DiscoveryConfigTargetId"`
-			Exclude                 bool   `json:"Exclude"`
-			NetworkAddressDetail    string `json:"NetworkAddressDetail"`
-			SubnetMask              any    `json:"SubnetMask"`
-		} `json:"DiscoveryConfigTargets"`
-		DiscoveryConfigVendorPlatforms []any `json:"DiscoveryConfigVendorPlatforms"`
-	} `json:"DiscoveryConfigModels"`
-	DiscoveryConfigParentGroupID int `json:"DiscoveryConfigParentGroupId"`
-	DiscoveryConfigTaskParam     []struct {
-		ExecutionSequence int `json:"ExecutionSequence"`
-		TaskID            int `json:"TaskId"`
-		TaskTypeID        int `json:"TaskTypeId"`
-	} `json:"DiscoveryConfigTaskParam"`
-	DiscoveryConfigTasks          []any `json:"DiscoveryConfigTasks"`
-	DiscoveryStatusEmailRecipient any   `json:"DiscoveryStatusEmailRecipient"`
-	Schedule                      struct {
-		Cron      string `json:"Cron"`
-		EndTime   any    `json:"EndTime"`
-		Recurring any    `json:"Recurring"`
-		RunLater  bool   `json:"RunLater"`
-		RunNow    bool   `json:"RunNow"`
-		StartTime any    `json:"StartTime"`
-	} `json:"Schedule"`
-	TrapDestination bool `json:"TrapDestination"`
-	UseAllProfiles  any  `json:"UseAllProfiles"`
+	ChassisIdentifier               any                        `json:"ChassisIdentifier,omitempty"`
+	CommunityString                 bool                       `json:"CommunityString,omitempty"`
+	CreateGroup                     bool                       `json:"CreateGroup,omitempty"`
+	DiscoveryConfigGroupDescription string                     `json:"DiscoveryConfigGroupDescription,omitempty"`
+	DiscoveryConfigGroupID          int                        `json:"DiscoveryConfigGroupId,omitempty"`
+	DiscoveryConfigGroupName        string                     `json:"DiscoveryConfigGroupName,omitempty"`
+	DiscoveryConfigModels           []DiscoveryConfigModels    `json:"DiscoveryConfigModels,omitempty"`
+	DiscoveryConfigParentGroupID    int                        `json:"DiscoveryConfigParentGroupId,omitempty"`
+	DiscoveryConfigTaskParam        []DiscoveryConfigTaskParam `json:"DiscoveryConfigTaskParam,omitempty"`
+	DiscoveryConfigTasks            []any                      `json:"DiscoveryConfigTasks,omitempty"`
+	DiscoveryStatusEmailRecipient   any                        `json:"DiscoveryStatusEmailRecipient,omitempty"`
+	Schedule                        ScheduleJob                `json:"Schedule,omitempty"`
+	TrapDestination                 bool                       `json:"TrapDestination,omitempty"`
+	UseAllProfiles                  any                        `json:"UseAllProfiles,omitempty"`
 }
 
 type DiscoveryJobDeletePayload struct {
-	DiscoveryGroupIds []int `json:"DiscoveryGroupIds"`
+	DiscoveryGroupIds []int `json:"DiscoveryGroupIds,omitempty"`
+}
+
+// DiscoveryJob will be used in read, create and update
+type DiscoveryJob struct {
+	DiscoveryConfigGroupID          int                        `json:"DiscoveryConfigGroupId,omitempty"`
+	DiscoveryConfigGroupName        string                     `json:"DiscoveryConfigGroupName,omitempty"`
+	DiscoveryConfigGroupDescription string                     `json:"DiscoveryConfigGroupDescription,omitempty"`
+	DiscoveryStatusEmailRecipient   interface{}                `json:"DiscoveryStatusEmailRecipient,omitempty"`
+	DiscoveryConfigParentGroupID    int                        `json:"DiscoveryConfigParentGroupId,omitempty"`
+	CreateGroup                     bool                       `json:"CreateGroup,omitempty"`
+	DiscoveryConfigModels           []DiscoveryConfigModels    `json:"DiscoveryConfigModels,omitempty"`
+	DiscoveryConfigTaskParam        []DiscoveryConfigTaskParam `json:"DiscoveryConfigTaskParam,omitempty"`
+	DiscoveryConfigTasks            []interface{}              `json:"DiscoveryConfigTasks,omitempty"`
+	Schedule                        ScheduleJob                `json:"Schedule,omitempty"`
+	TrapDestination                 bool                       `json:"TrapDestination,omitempty"`
+	CommunityString                 bool                       `json:"CommunityString,omitempty"`
+	ChassisIdentifier               interface{}                `json:"ChassisIdentifier,omitempty"`
+	UseAllProfiles                  interface{}                `json:"UseAllProfiles,omitempty"`
+}
+type DiscoveryConfigTargets struct {
+	DiscoveryConfigTargetID int         `json:"DiscoveryConfigTargetId,omitempty"`
+	NetworkAddressDetail    string      `json:"NetworkAddressDetail,omitempty"`
+	SubnetMask              interface{} `json:"SubnetMask,omitempty"`
+	AddressType             int         `json:"AddressType,omitempty"`
+	Disabled                bool        `json:"Disabled,omitempty"`
+	Exclude                 bool        `json:"Exclude,omitempty"`
+}
+type DiscoveryConfigModels struct {
+	DiscoveryConfigID              int                      `json:"DiscoveryConfigId,omitempty"`
+	DiscoveryConfigDescription     string                   `json:"DiscoveryConfigDescription,omitempty"`
+	DiscoveryConfigStatus          string                   `json:"DiscoveryConfigStatus,omitempty"`
+	DiscoveryConfigTargets         []DiscoveryConfigTargets `json:"DiscoveryConfigTargets,omitempty"`
+	ConnectionProfileID            int                      `json:"ConnectionProfileId,omitempty"`
+	ConnectionProfile              string                   `json:"ConnectionProfile,omitempty"`
+	DeviceType                     []int                    `json:"DeviceType,omitempty"`
+	DiscoveryConfigVendorPlatforms []interface{}            `json:"DiscoveryConfigVendorPlatforms,omitempty"`
+}
+type DiscoveryConfigTaskParam struct {
+	TaskID            int `json:"TaskId,omitempty"`
+	TaskTypeID        int `json:"TaskTypeId,omitempty"`
+	ExecutionSequence int `json:"ExecutionSequence,omitempty"`
+}
+type ScheduleJob struct {
+	RunNow    bool        `json:"RunNow,omitempty"`
+	RunLater  bool        `json:"RunLater,omitempty"`
+	Recurring interface{} `json:"Recurring,omitempty"`
+	Cron      string      `json:"Cron,omitempty"`
+	StartTime string      `json:"StartTime,omitempty"`
+	EndTime   string      `json:"EndTime,omitempty"`
 }

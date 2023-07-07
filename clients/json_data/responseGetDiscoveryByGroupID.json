@@ -1,0 +1,50 @@
+{
+    "@odata.context": "/api/$metadata#DiscoveryConfigService.DiscoveryConfigGroup",
+    "@odata.type": "#DiscoveryConfigService.DiscoveryConfigGroup",
+    "@odata.id": "/api/DiscoveryConfigService/DiscoveryConfigGroups(51)",
+    "DiscoveryConfigGroupId": 51,
+    "DiscoveryConfigGroupName": "Discovery-Get-By-Id",
+    "DiscoveryStatusEmailRecipient": null,
+    "DiscoveryConfigExpectedDeviceCount": null,
+    "DiscoveryConfigDiscoveredDeviceCount": null,
+    "DiscoveryConfigModels": [
+        {
+            "DiscoveryConfigId": 55,
+            "DiscoveryConfigStatus": null,
+            "DiscoveryConfigTargets": [
+                {
+                    "DiscoveryConfigTargetId": 55,
+                    "NetworkAddressDetail": "10.226.197.136",
+                    "SubnetMask": null,
+                    "AddressType": 3,
+                    "Disabled": false,
+                    "Exclude": false
+                }
+            ],
+            "ConnectionProfileId": 12846,
+            "ConnectionProfile": "{\n  \"profileId\" : 12846,\n  \"profileName\" : \"\",\n  \"profileDescription\" : \"\",\n  \"type\" : \"DISCOVERY\",\n  \"updatedBy\" : null,\n  \"updateTime\" : 1688524303826,\n  \"credentials\" : [ {\n    \"type\" : \"WSMAN\",\n    \"authType\" : \"Basic\",\n    \"modified\" : false,\n    \"id\" : 91,\n    \"credentials\" : {\n      \"username\" : \"root\",\n      \"password\" : null,\n      \"domain\" : null,\n      \"caCheck\" : false,\n      \"cnCheck\" : false,\n      \"certificateData\" : null,\n      \"certificateDetail\" : null,\n      \"port\" : 443,\n      \"retries\" : 3,\n      \"timeout\" : 60,\n      \"serviceCheckTimeoutSecs\" : 0,\n      \"isHttp\" : false,\n      \"keepAlive\" : false\n    }\n  } ]\n}",
+            "DeviceType": [
+                1000
+            ],
+            "DiscoveryConfigVendorPlatforms": [
+                {
+                    "DiscoveryConfigVendorPlatformId": 55,
+                    "VendorPlatformId": 3
+                }
+            ]
+        }
+    ],
+    "DiscoveryJobStatusModel": null,
+    "Schedule": {
+        "RunNow": false,
+        "RunLater": false,
+        "Recurring": null,
+        "Cron": "0 55 19 16 9 ? 2023",
+        "StartTime": null,
+        "EndTime": null
+    },
+    "CreateGroup": true,
+    "TrapDestination": false,
+    "CommunityString": false,
+    "UseAllProfiles": false
+}

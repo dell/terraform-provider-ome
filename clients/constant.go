@@ -89,7 +89,7 @@ const (
 	ImportTemplateAPI = "/api/TemplateService/Actions/TemplateService.Import"
 	// TemplateNameContainsAPI - api to fetch templates by name
 	TemplateNameContainsAPI = "/api/TemplateService/Templates?$filter=contains(Name, '%s')"
-	// DiscoveryJobAPI - api to create and update discovery job 
+	// DiscoveryJobAPI - api to create and update discovery job
 	DiscoveryJobAPI = "/api/DiscoveryConfigService/DiscoveryConfigGroups"
 	// DiscoveryJobRemoveAPI - api to delete the discovery job using group ids.
 	DiscoveryJobRemoveAPI = "/api/DiscoveryConfigService/Actions/DiscoveryConfigService.RemoveDiscoveryGroup"
