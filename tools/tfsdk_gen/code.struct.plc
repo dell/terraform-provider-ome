@@ -1,28 +1,3 @@
-package models
-
-// DiscoveryJobPayload will be used in create and update functionality
-type DiscoveryJobPayload struct {
-	ChassisIdentifier               string                     `json:"ChassisIdentifier,omitempty"`
-	CommunityString                 bool                       `json:"CommunityString,omitempty"`
-	CreateGroup                     bool                       `json:"CreateGroup,omitempty"`
-	DiscoveryConfigGroupDescription string                     `json:"DiscoveryConfigGroupDescription,omitempty"`
-	DiscoveryConfigGroupID          int                        `json:"DiscoveryConfigGroupId,omitempty"`
-	DiscoveryConfigGroupName        string                     `json:"DiscoveryConfigGroupName,omitempty"`
-	DiscoveryConfigModels           []DiscoveryConfigModels    `json:"DiscoveryConfigModels,omitempty"`
-	DiscoveryConfigParentGroupID    int                        `json:"DiscoveryConfigParentGroupId,omitempty"`
-	DiscoveryConfigTaskParam        []DiscoveryConfigTaskParam `json:"DiscoveryConfigTaskParam,omitempty"`
-	DiscoveryConfigTasks            []DiscoveryConfigTasks     `json:"DiscoveryConfigTasks,omitempty"`
-	DiscoveryStatusEmailRecipient   string                     `json:"DiscoveryStatusEmailRecipient,omitempty"`
-	Schedule                        ScheduleJob                `json:"Schedule,omitempty"`
-	TrapDestination                 bool                       `json:"TrapDestination,omitempty"`
-	UseAllProfiles                  bool                       `json:"UseAllProfiles,omitempty"`
-}
-
-// DiscoveryJobDeletePayload for delete functionality
-type DiscoveryJobDeletePayload struct {
-	DiscoveryGroupIds []int `json:"DiscoveryGroupIds,omitempty"`
-}
-
 // DiscoveryJob will be used in read, create and update
 type DiscoveryJob struct {
 	DiscoveryConfigGroupID          int                        `json:"DiscoveryConfigGroupId,omitempty"`
@@ -125,5 +100,3 @@ type Time struct {
 	Minutes int `json:"Minutes,omitempty"`
 	Hour    int `json:"Hour,omitempty"`
 }
-
-// golang struct to convert terraform schema to golang type with tfsdk struct

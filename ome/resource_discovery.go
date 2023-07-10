@@ -42,7 +42,9 @@ func (r *discoveryResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Resource for managing discovery on OpenManage Enterprise.",
 		Version:             1,
-		Attributes:          map[string]schema.Attribute{},
+		Attributes:          map[string]schema.Attribute{
+			
+		},
 	}
 }
 
