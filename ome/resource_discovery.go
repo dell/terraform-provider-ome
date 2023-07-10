@@ -116,7 +116,7 @@ func (r *discoveryResource) Delete(ctx context.Context, req resource.DeleteReque
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	
+
 	resp.State.RemoveResource(ctx)
 	tflog.Trace(ctx, "resource_discovery delete: finished")
 }

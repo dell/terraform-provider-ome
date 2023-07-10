@@ -10,12 +10,12 @@ import (
 )
 
 //go:embed resource.go.tmpl
-var resourceTemplate embed.FS 
+var resourceTemplate embed.FS
 
 type CodeGenResource struct {
 	Provider string
-	Resource string 
-	Model string
+	Resource string
+	Model    string
 }
 
 func main() {
@@ -28,9 +28,9 @@ func main() {
 		Label: "Enter the provider",
 	}
 
-	provider, err:= providerPrompt.Run()
-	if err !=nil {
-		log.Fatalf("Failed to get provider: %v",err)
+	provider, err := providerPrompt.Run()
+	if err != nil {
+		log.Fatalf("Failed to get provider: %v", err)
 	}
 
 	resourcePrompt := promptui.Prompt{
@@ -39,22 +39,22 @@ func main() {
 
 	resource, err := resourcePrompt.Run()
 	if err != nil {
-		log.Fatalf("Failed to get resource: %v",err)
+		log.Fatalf("Failed to get resource: %v", err)
 	}
 
-	modelPrompt := promptui.Prompt {
+	modelPrompt := promptui.Prompt{
 		Label: "Enter the model",
 	}
 
-	model, err := modelPrompt.Run() 
-	if err !=nil {
+	model, err := modelPrompt.Run()
+	if err != nil {
 		log.Fatalf("Failed to get model: %v", err)
 	}
 
 	codegen := CodeGenResource{
 		Provider: provider,
 		Resource: resource,
-		Model: model,
+		Model:    model,
 	}
 
 	tmpl, err := template.New("codegen").Parse(string(templateContent))
@@ -62,15 +62,14 @@ func main() {
 		log.Fatalf("Failed to parse the template: %v", err)
 	}
 
-	f, err := os.Create("resource_"+codegen.Resource+".go")
-    if err != nil {
-        log.Fatalf("Failed to create resource.go file")
-    }
-    defer f.Close()
+	f, err := os.Create("resource_" + codegen.Resource + ".go")
+	if err != nil {
+		log.Fatalf("Failed to create resource.go file")
+	}
+	defer f.Close()
 
 	err = tmpl.Execute(f, codegen)
 	if err != nil {
 		log.Fatalf("Failed to generate code from template: %v", err)
 	}
 }
-
