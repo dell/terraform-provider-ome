@@ -64,6 +64,7 @@ check:
 	gofmt -s -w .
 	go vet
 	golangci-lint run --fix --timeout 5m
+	# install golangci-lint on local : curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | tee golangci-lint.sh | sh golangci-lint.sh
 
 gosec:
 	gosec -quiet -log gosec.log -out=gosecresults.csv -fmt=csv ./...

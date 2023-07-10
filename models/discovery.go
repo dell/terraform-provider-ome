@@ -18,6 +18,7 @@ type DiscoveryJobPayload struct {
 	UseAllProfiles                  bool                       `json:"UseAllProfiles,omitempty"`
 }
 
+// DiscoveryJobDeletePayload for delete functionality
 type DiscoveryJobDeletePayload struct {
 	DiscoveryGroupIds []int `json:"DiscoveryGroupIds,omitempty"`
 }
@@ -39,6 +40,8 @@ type DiscoveryJob struct {
 	ChassisIdentifier               string                     `json:"ChassisIdentifier,omitempty"`
 	UseAllProfiles                  bool                       `json:"UseAllProfiles,omitempty"`
 }
+
+// DiscoveryConfigTargets for adding device details
 type DiscoveryConfigTargets struct {
 	DiscoveryConfigTargetID int    `json:"DiscoveryConfigTargetId,omitempty"`
 	NetworkAddressDetail    string `json:"NetworkAddressDetail,omitempty"`
@@ -47,6 +50,8 @@ type DiscoveryConfigTargets struct {
 	Disabled                bool   `json:"Disabled,omitempty"`
 	Exclude                 bool   `json:"Exclude,omitempty"`
 }
+
+// DiscoveryConfigModels for discovery configuration
 type DiscoveryConfigModels struct {
 	DiscoveryConfigID              int                              `json:"DiscoveryConfigId,omitempty"`
 	DiscoveryConfigDescription     string                           `json:"DiscoveryConfigDescription,omitempty"`
@@ -57,11 +62,15 @@ type DiscoveryConfigModels struct {
 	DeviceType                     []int                            `json:"DeviceType,omitempty"`
 	DiscoveryConfigVendorPlatforms []DiscoveryConfigVendorPlatforms `json:"DiscoveryConfigVendorPlatforms,omitempty"`
 }
+
+// DiscoveryConfigTaskParam to config task execution
 type DiscoveryConfigTaskParam struct {
 	TaskID            int `json:"TaskId,omitempty"`
 	TaskTypeID        int `json:"TaskTypeId,omitempty"`
 	ExecutionSequence int `json:"ExecutionSequence,omitempty"`
 }
+
+// ScheduleJob Schedule of job execution.
 type ScheduleJob struct {
 	RunNow    bool      `json:"RunNow,omitempty"`
 	RunLater  bool      `json:"RunLater,omitempty"`
@@ -71,6 +80,7 @@ type ScheduleJob struct {
 	EndTime   string    `json:"EndTime,omitempty"`
 }
 
+// DiscoveryConfigTasks to configure discovery task
 type DiscoveryConfigTasks struct {
 	DiscoveryConfigDescription           string `json:"DiscoveryConfigDescription,omitempty"`
 	DiscoveryConfigEmailRecipient        string `json:"DiscoveryConfigEmailRecipient,omitempty"`
@@ -80,31 +90,37 @@ type DiscoveryConfigTasks struct {
 	DiscoveryConfigName                  string `json:"DiscoveryConfigName,omitempty"`
 }
 
+// DiscoveryConfigVendorPlatforms to provider vendor platform details.
 type DiscoveryConfigVendorPlatforms struct {
 	VendorPlatformId                int `json:"VendorPlatformId,omitempty"`
 	DiscoveryConfigVendorPlatformId int `json:"DiscoveryConfigVendorPlatformId,omitempty"`
 }
 
+// Recurring for schedule job
 type Recurring struct {
 	Hourly  Hourly  `json:"Hourly,omitempty"`
 	Daily   Daily   `json:"Daily,omitempty"`
 	Weekley Weekley `json:"Weekley,omitempty"`
 }
 
+// Hourly for setting hourly recurring job schedule
 type Hourly struct {
 	Frequency int `json:"Frequency,omitempty"`
 }
 
+// Daily for setting daily recurring job schedule
 type Daily struct {
 	Frequency int  `json:"Frequency,omitempty"`
 	Time      Time `json:"Time,omitempty"`
 }
 
+// Weekley for setting daily recurring job schedule
 type Weekley struct {
 	Day  string `json:"Day,omitempty"`
 	Time Time   `json:"Time,omitempty"`
 }
 
+// Time for setting minutes and hours.
 type Time struct {
 	Minutes int `json:"Minutes,omitempty"`
 	Hour    int `json:"Hour,omitempty"`
