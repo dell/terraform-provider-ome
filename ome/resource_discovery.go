@@ -42,9 +42,7 @@ func (r *discoveryResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Resource for managing discovery on OpenManage Enterprise.",
 		Version:             1,
-		Attributes:          map[string]schema.Attribute{
-			
-		},
+		Attributes:          OmeDiscoveryJobSchema(),
 	}
 }
 
@@ -52,7 +50,7 @@ func (r *discoveryResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 func (r *discoveryResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	tflog.Trace(ctx, "resource_discovery create : Started")
 	//Get Plan Data
-	var plan, state models.DiscoveryJob
+	var plan, state models.OmeDiscoveryJob
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -69,7 +67,7 @@ func (r *discoveryResource) Create(ctx context.Context, req resource.CreateReque
 // Read refreshes the Terraform state with the latest data.
 func (r *discoveryResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	tflog.Trace(ctx, "resource_discovery read: started")
-	var state models.DiscoveryJob
+	var state models.OmeDiscoveryJob
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -87,7 +85,7 @@ func (r *discoveryResource) Read(ctx context.Context, req resource.ReadRequest, 
 func (r *discoveryResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	//Get state Data
 	tflog.Trace(ctx, "resource_discovery update: started")
-	var state, plan models.DiscoveryJob
+	var state, plan models.OmeDiscoveryJob
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -118,7 +116,8 @@ func (r *discoveryResource) Delete(ctx context.Context, req resource.DeleteReque
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
+	
 	resp.State.RemoveResource(ctx)
 	tflog.Trace(ctx, "resource_discovery delete: finished")
 }
+

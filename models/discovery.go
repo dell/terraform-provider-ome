@@ -1,5 +1,7 @@
 package models
 
+import "github.com/hashicorp/terraform-plugin-framework/types"
+
 // DiscoveryJobPayload will be used in create and update functionality
 type DiscoveryJobPayload struct {
 	ChassisIdentifier               string                     `json:"ChassisIdentifier,omitempty"`
@@ -126,4 +128,107 @@ type Time struct {
 	Hour    int `json:"Hour,omitempty"`
 }
 
-// golang struct to convert terraform schema to golang type with tfsdk struct
+// golang struct to convert terraform schema to golang type with tfsdk tagged struct 
+
+// DiscoveryJob will be used in read, create and update
+type OmeDiscoveryJob struct {
+	DiscoveryConfigGroupID          types.Int64                   `tfsdk:"discovery_config_group_id"`
+	DiscoveryConfigGroupName        types.String                  `tfsdk:"discovery_config_group_name"`
+	DiscoveryConfigGroupDescription types.String                  `tfsdk:"discovery_config_group_description"`
+	DiscoveryStatusEmailRecipient   types.String                  `tfsdk:"discovery_status_email_recipient"`
+	DiscoveryConfigParentGroupID    types.Int64                   `tfsdk:"discovery_config_parent_group_id"`
+	CreateGroup                     types.Bool                    `tfsdk:"create_group"`
+	DiscoveryConfigModels           []OmeDiscoveryConfigModels    `tfsdk:"discovery_config_models"`
+	DiscoveryConfigTaskParam        []OmeDiscoveryConfigTaskParam `tfsdk:"discovery_config_task_param"`
+	DiscoveryConfigTasks            []OmeDiscoveryConfigTasks     `tfsdk:"discovery_config_tasks"`
+	Schedule                        ScheduleJob                   `tfsdk:"schedule"`
+	TrapDestination                 types.Bool                    `tfsdk:"trap_destination"`
+	CommunityString                 types.Bool                    `tfsdk:"community_string"`
+	ChassisIdentifier               types.String                  `tfsdk:"chassis_identifier"`
+	UseAllProfiles                  types.Bool                    `tfsdk:"use_all_profiles"`
+}
+
+// DiscoveryConfigTargets for adding device details
+type OmeDiscoveryConfigTargets struct {
+	DiscoveryConfigTargetID types.Int64  `tfsdk:"discovery_config_target_id"`
+	NetworkAddressDetail    types.String `tfsdk:"network_address_detail"`
+	SubnetMask              types.String `tfsdk:"subnet_mask"`
+	AddressType             types.Int64  `tfsdk:"address_type"`
+	Disabled                types.Bool   `tfsdk:"disabled"`
+	Exclude                 types.Bool   `tfsdk:"exclude"`
+}
+
+// DiscoveryConfigModels for discovery configuration
+type OmeDiscoveryConfigModels struct {
+	DiscoveryConfigID              types.Int64                         `tfsdk:"discovery_config_id"`
+	DiscoveryConfigDescription     types.String                        `tfsdk:"discovery_config_description"`
+	DiscoveryConfigStatus          types.String                        `tfsdk:"discovery_config_status"`
+	DiscoveryConfigTargets         []OmeDiscoveryConfigTargets         `tfsdk:"discovery_config_targets"`
+	ConnectionProfileID            types.Int64                         `tfsdk:"connection_profile_id"`
+	ConnectionProfile              types.String                        `tfsdk:"connection_profile"`
+	DeviceType                     []types.Int64                       `tfsdk:"device_type"`
+	DiscoveryConfigVendorPlatforms []OmeDiscoveryConfigVendorPlatforms `tfsdk:"discovery_config_vendor_platforms"`
+}
+
+// DiscoveryConfigTaskParam to config task execution
+type OmeDiscoveryConfigTaskParam struct {
+	TaskID            types.Int64 `tfsdk:"task_id"`
+	TaskTypeID        types.Int64 `tfsdk:"task_type_id"`
+	ExecutionSequence types.Int64 `tfsdk:"execution_sequence"`
+}
+
+// ScheduleJob Schedule of job execution.
+type OmeScheduleJob struct {
+	RunNow    types.Bool   `tfsdk:"run_now"`
+	RunLater  types.Bool   `tfsdk:"run_later"`
+	Recurring OmeRecurring `tfsdk:"recurring"`
+	Cron      types.String `tfsdk:"cron"`
+	StartTime types.String `tfsdk:"start_time"`
+	EndTime   types.String `tfsdk:"end_time"`
+}
+
+// DiscoveryConfigTasks to configure discovery task
+type OmeDiscoveryConfigTasks struct {
+	DiscoveryConfigDescription           types.String `tfsdk:"discovery_config_description"`
+	DiscoveryConfigEmailRecipient        types.String `tfsdk:"discovery_config_email_recipient"`
+	DiscoveryConfigDiscoveredDeviceCount types.String `tfsdk:"discovery_config_discovered_device_count"`
+	DiscoveryConfigRequestId             types.Int64  `tfsdk:"discovery_config_request_id"`
+	DiscoveryConfigExpectedDeviceCount   types.String `tfsdk:"discovery_config_expected_device_count"`
+	DiscoveryConfigName                  types.String `tfsdk:"discovery_config_name"`
+}
+
+// DiscoveryConfigVendorPlatforms to provider vendor platform details.
+type OmeDiscoveryConfigVendorPlatforms struct {
+	VendorPlatformId                types.Int64 `tfsdk:"vendor_platform_id"`
+	DiscoveryConfigVendorPlatformId types.Int64 `tfsdk:"discovery_config_vendor_platform_id"`
+}
+
+// Recurring for schedule job
+type OmeRecurring struct {
+	Hourly  OmeHourly  `tfsdk:"hourly"`
+	Daily   OmeDaily   `tfsdk:"daily"`
+	Weekley OmeWeekley `tfsdk:"weekley"`
+}
+
+// Hourly for setting hourly recurring job schedule
+type OmeHourly struct {
+	Frequency types.Int64 `tfsdk:"frequency"`
+}
+
+// Daily for setting daily recurring job schedule
+type OmeDaily struct {
+	Frequency types.Int64 `tfsdk:"frequency"`
+	Time      OmeTime     `tfsdk:"time"`
+}
+
+// Weekley for setting daily recurring job schedule
+type OmeWeekley struct {
+	Day  types.String `tfsdk:"day"`
+	Time OmeTime      `tfsdk:"time"`
+}
+
+// Time for setting minutes and hours.
+type OmeTime struct {
+	Minutes types.Int64 `tfsdk:"minutes"`
+	Hour    types.Int64 `tfsdk:"hour"`
+}
