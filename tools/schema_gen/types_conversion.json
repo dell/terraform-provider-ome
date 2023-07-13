@@ -1,0 +1,11 @@
+{
+    "types.Bool": "schema.BoolAttribute",
+    "types.Float64": "schema.Float64Attribute",
+    "types.Int64": "schema.Int64Attribute",
+    "types.Number": "schema.NumberAttribute",
+    "types.List": "schema.ListAttribute",
+    "types.Map": "schema.MapAttribute",
+    "types.Object": "schema.ObjectAttribute",
+    "types.Set": "schema.SetAttribute",
+    "types.String": "schema.StringAttribute"
+}

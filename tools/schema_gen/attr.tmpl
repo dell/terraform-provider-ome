@@ -1,0 +1,7 @@
+func {{.FuncName}}Attr() map[string]attr.Type {
+    return map[string]attr.Type{
+        {{ range .SchemaList }}
+            "{{.Name}}" : {{.Attr}},
+        {{ end }}
+    }
+}

@@ -1,0 +1,13 @@
+func {{ .FuncName }}Schema() map[string]schema.Attribute {
+    return map[string]schema.Attribute{
+        {{ range .SchemaList }}
+            "{{.Name}}": {{.Attr}}{
+            	MarkdownDescription: "{{.Desc}}",
+            	Description: "{{.Desc}}",
+            	Optional: true,
+            	Computed: true,
+                {{ if .IsSpecial }}{{ .AttrSpecial }}{{ end }}
+            },
+        {{end}}
+        }
+    }
