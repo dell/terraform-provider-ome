@@ -16,6 +16,8 @@ package clients
 import (
 	"fmt"
 	"terraform-provider-ome/models"
+
+	"github.com/netdata/go.d.plugin/pkg/iprange"
 )
 
 // GetDevice is used to get device using serviceTag or devID in OME
@@ -171,4 +173,46 @@ func (c *Client) GetUniqueDevicesIdsAndServiceTags(devices []models.Device) ([]m
 		}
 	}
 	return uniqueDevices, uniqueDevicesIDs, uniqueDevicesSTs
+}
+
+// GetDeviceByIps - method to get device using ips in OME
+func (c *Client) GetDeviceByIps(networks []string) (models.Devices, error) {
+	var (
+		err     error
+		pool    iprange.Pool
+		devices models.Devices
+	)
+	ret := models.Devices{
+		Value: make([]models.Device, 0),
+	}
+	pool, err = ParseNetworks(networks)
+	if err != nil {
+		return ret, err
+	}
+	devices, err = c.GetAllDevices(nil)
+	if err != nil {
+		return ret, err
+	}
+	for _, v := range devices.Value {
+		if v.BelongsToPool(pool) {
+			ret.Value = append(ret.Value, v)
+		}
+	}
+	return ret, err
+}
+
+// GetAllDevices - method to gfetch all devices filtered by input queries
+func (c *Client) GetAllDevices(queries map[string]string) (models.Devices, error) {
+	devices := models.Devices{}
+	response, err := c.Get(DeviceAPI, nil, queries)
+	if err != nil {
+		return devices, err
+	}
+	// devices := models.Devices{}
+	bodyData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshal(bodyData, &devices)
+	if err != nil {
+		return devices, err
+	}
+	return devices, err
 }

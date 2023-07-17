@@ -14,6 +14,7 @@ limitations under the License.
 package clients
 
 import (
+	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -48,5 +49,36 @@ func TestDeviceMutuallyExclusive(t *testing.T) {
 				assert.Equal(t, got, tt.want)
 			}
 		})
+	}
+}
+
+func TestNetworkParser(t *testing.T) {
+	inputs := []string{
+		"192.35.0.1",
+		"10.36.0.0-192.36.0.255",
+		"fe80::ffff:ffff:ffff:ffff",
+		"fe80::ffff:192.0.2.0/125",
+		"fe80::ffff:ffff:ffff:1111-fe80::ffff:ffff:ffff:ffff",
+		"192.37.0.0/24",
+	}
+
+	outputs := map[string]bool{
+		"192.35.0.1":                true,
+		"10.36.0.20":                true,
+		"fe80::ffff:ffff:ffff:ffff": true,
+		"fe80::ffff:c000:202":       true,
+		"fe80::ffff:192.0.2.11":     false,
+		"fe80::ffff:ffff:ffff:1111": true,
+		"fe80::ffff:ffff:ffff:f000": true,
+		"192.37.0.5":                true,
+		"192.39.0.5":                false,
+	}
+	pool, err := ParseNetworks(inputs)
+	assert.Nil(t, err)
+
+	for ipString, result := range outputs {
+		ip := net.ParseIP(ipString)
+		assert.NotNilf(t, ip, ipString, "is not valid")
+		assert.Equal(t, result, pool.Contains(ip), ipString, "not found")
 	}
 }

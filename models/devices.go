@@ -13,6 +13,12 @@ limitations under the License.
 
 package models
 
+import (
+	"net"
+
+	"github.com/netdata/go.d.plugin/pkg/iprange"
+)
+
 // Devices - list of device response from on OME
 type Devices struct {
 	Value    []Device `json:"value"`
@@ -21,7 +27,23 @@ type Devices struct {
 
 // Device - embedded device response from the Devices
 type Device struct {
-	ID                 int64   `json:"Id"`
-	DeviceServiceTag   string  `json:"DeviceServiceTag"`
-	DeviceCapabilities []int64 `json:"DeviceCapabilities,omitempty"`
+	ID                 int64              `json:"Id"`
+	DeviceServiceTag   string             `json:"DeviceServiceTag"`
+	DeviceCapabilities []int64            `json:"DeviceCapabilities,omitempty"`
+	DeviceManagement   []DeviceManagement `json:"DeviceManagement"`
+}
+
+// BelongsToPool - method to check if a device belongs to that ip pool
+func (d *Device) BelongsToPool(pool iprange.Pool) bool {
+	for _, devM := range d.DeviceManagement {
+		if pool.Contains(devM.NetworkAddress) {
+			return true
+		}
+	}
+	return false
+}
+
+// DeviceManagement - embedded device management response from the Devices
+type DeviceManagement struct {
+	NetworkAddress net.IP `json:"NetworkAddress"`
 }

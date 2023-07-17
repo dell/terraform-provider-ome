@@ -15,10 +15,49 @@ package clients
 
 import (
 	"fmt"
+	"strconv"
 	"terraform-provider-ome/models"
 )
 
-// GetGroupByName - method to get a group object by name.
+// GetGroupByID - method to get a group object by id.
+func (c *Client) GetGroupByID(id int64) (models.Group, error) {
+	path := fmt.Sprintf(GroupServiceAPI, id)
+	response, err := c.Get(path, nil, nil)
+	if err != nil {
+		return models.Group{}, err
+	}
+
+	bodyData, _ := c.GetBodyData(response.Body)
+
+	group := models.Group{}
+	err = c.JSONUnMarshal(bodyData, &group)
+	if err != nil {
+		return models.Group{}, err
+	}
+	return group, nil
+}
+
+// DeleteGroup - method to delete a group by id
+func (c *Client) DeleteGroup(id int64) error {
+	path := fmt.Sprintf(GroupServiceAPI, id)
+	_, err := c.Delete(path, nil, nil)
+	return err
+}
+
+// GetSingleGroupByName - method to get a single group object by name.
+func (c *Client) GetSingleGroupByName(groupName string) (models.Group, error) {
+	groups, err := c.GetGroupByName(groupName)
+	if err != nil {
+		return models.Group{}, nil
+	}
+	if num := len(groups.Value); num != 1 {
+		return models.Group{},
+			fmt.Errorf("received %d groups by name %s, while expecting only 1", num, groupName)
+	}
+	return groups.Value[0], nil
+}
+
+// GetGroupByName - method to get a groups object by name.
 func (c *Client) GetGroupByName(groupName string) (models.Groups, error) {
 	response, err := c.Get(GroupAPI, nil, map[string]string{"Name": groupName})
 	if err != nil {
@@ -88,4 +127,66 @@ func (c *Client) GetDevicesByGroups(groupNames []string) ([]models.Device, error
 		devices = append(devices, groupDevices.Value...)
 	}
 	return devices, nil
+}
+
+// CreateGroup - Creates a new static device group and returns its id
+func (c *Client) CreateGroup(group models.Group) (int64, error) {
+	group.ID = 0
+	payload := map[string]any{
+		"GroupModel": group,
+	}
+	payloadb, err := c.JSONMarshal(payload)
+	if err != nil {
+		return 0, err
+	}
+	path := fmt.Sprintf(GroupServiceActionsAPI, "Create")
+	response, err2 := c.Post(path, nil, payloadb)
+	if err2 != nil {
+		return 0, err2
+	}
+	respData, _ := c.GetBodyData(response.Body)
+	val, _ := strconv.ParseInt(string(respData), 10, 64)
+	return val, nil
+}
+
+// UpdateGroup - Updates a static device group
+func (c *Client) UpdateGroup(group models.Group) error {
+	payload := map[string]any{
+		"GroupModel": group,
+	}
+	payloadb, err := c.JSONMarshal(payload)
+	if err != nil {
+		return err
+	}
+	path := fmt.Sprintf(GroupServiceActionsAPI, "Update")
+	_, err2 := c.Post(path, nil, payloadb)
+	if err2 != nil {
+		return err2
+	}
+	return nil
+}
+
+// AddGroupMembers - Adds devices to a static device group
+func (c *Client) AddGroupMembers(payload models.GroupMemberPayload) error {
+	return c.updateGroupMembers(payload, true)
+}
+
+// RemoveGroupMembers - Removes devices from a static device group
+func (c *Client) RemoveGroupMembers(payload models.GroupMemberPayload) error {
+	return c.updateGroupMembers(payload, false)
+}
+
+// updateGroupMembers - Adds/Removes devices to/from a static device group
+func (c *Client) updateGroupMembers(payload models.GroupMemberPayload, toAdd bool) error {
+	payloadb, err := c.JSONMarshal(payload)
+	if err != nil {
+		return err
+	}
+	action := map[bool]string{
+		true:  "Add",
+		false: "Remove",
+	}[toAdd]
+	path := fmt.Sprintf(GroupServiceDeviceActionsAPI, action)
+	_, err2 := c.Post(path, nil, payloadb)
+	return err2
 }

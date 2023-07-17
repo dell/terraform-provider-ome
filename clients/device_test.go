@@ -59,6 +59,57 @@ func TestClient_GetDevice(t *testing.T) {
 	}
 }
 
+func TestClient_GetDeviceByIP(t *testing.T) {
+	type args struct {
+		ips     []string
+		ids     []int64
+		isError bool
+	}
+	tests := []struct {
+		name string
+		args
+	}{
+		{"test-valid", args{
+			ips: []string{
+				"192.35.0.1",
+				"10.36.0.0-192.36.0.255",
+				"fe80::ffff:ffff:ffff:ffff",
+				"fe80::ffff:192.0.2.0/125",
+				"fe80::ffff:ffff:ffff:1111-fe80::ffff:ffff:ffff:ffff",
+				"192.37.0.0/24",
+			},
+			ids: []int64{123450, 123458},
+		}},
+		{"test-invalid", args{
+			ips:     []string{"192.35.0.344"},
+			ids:     []int64{},
+			isError: true,
+		}},
+	}
+
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			response, err := c.GetDeviceByIps(tt.args.ips)
+			if !tt.args.isError {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				for i, id := range tt.args.ids {
+					assert.Equal(t, id, response.Value[i].ID)
+				}
+			} else {
+				assert.NotNil(t, err)
+			}
+		})
+	}
+}
+
 func TestClientValidateDevice(t *testing.T) {
 	type args struct {
 		serviceTag string
