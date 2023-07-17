@@ -95,6 +95,9 @@ const (
 	ImportTemplateAPI = "/api/TemplateService/Actions/TemplateService.Import"
 	// TemplateNameContainsAPI - api to fetch templates by name
 	TemplateNameContainsAPI = "/api/TemplateService/Templates?$filter=contains(Name, '%s')"
+	//UserAPI - api to manage users
+	UserAPI = "/api/AccountService/Accounts"
+
 )
 
 // Messages constants
@@ -236,6 +239,16 @@ const (
 	ErrBaseLineScheduleValid = "attributes `cron` and `email_addresses` are accepted only when `schedule` is true"
 	//ErrBaseLineNotifyValid
 	ErrBaseLineNotifyValid = "attributes `cron` is not accepted only when `schedule` is true and `notify_on_schedule` is false"
+	// ErrGnrCreateUser - summary returned when failed to create User
+	ErrGnrCreateUser = "error creating a User"
+	// ErrGnrUpdateUser - summary returned when failed to update User
+	ErrGnrUpdateUser = "error updating a User"
+	// ErrGnrDeleteUser - summary returned when failed to delete User
+	ErrGnrDeleteUser = "error deleting a User"
+	// ErrGnrReadUser - summary returned when failed to read User
+	ErrGnrReadUser = "error reading a User"
+	// ErrGnrImportUser - message returned when import User fails
+	ErrGnrImportUser = "Unable to import User"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job
