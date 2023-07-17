@@ -25,8 +25,8 @@ func OmeDiscoveryJobSchema() map[string]schema.Attribute {
 		"discovery_config_group_description": schema.StringAttribute{
 			MarkdownDescription: "Discovery Config Group Description",
 			Description:         "Discovery Config Group Description",
-			Optional:            true,
-			Computed:            true,
+			// Optional:            true,
+			Computed: true,
 		},
 
 		"discovery_status_email_recipient": schema.StringAttribute{

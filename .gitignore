@@ -57,3 +57,4 @@ go.work
 *.dylib
 # Test binary, built with `go test -c`
 terraform.txt
+test

@@ -30,16 +30,16 @@ type VariableInfo struct {
 }
 
 type SchemaFunc struct {
-	FuncName string
+	FuncName   string
 	SchemaList []SchemaVars
 }
 
 type SchemaVars struct {
-	Name string 
-	Attr string 
-	Desc string 
-	IsSpecial bool 
-	AttrSpecial string 
+	Name        string
+	Attr        string
+	Desc        string
+	IsSpecial   bool
+	AttrSpecial string
 }
 
 func main() {
@@ -64,27 +64,27 @@ func main() {
 		log.Fatalf("Failed to create schema.gen file")
 	}
 	defer f.Close()
-	
+
 	for _, sF := range schemaFuncs {
 		// if !contains(schemaSkipList,strings.Trim(sF.FuncName,"Ome")){
-			templateContent, err := schemaTemplate.ReadFile("schema.tmpl")
-			if err != nil {
-				log.Fatalf("Failed to read resource template file: %v", err)
-			}
-			tmpl, err := template.New("schemaFuncs").Parse(string(templateContent))
-			if err != nil {
-				log.Fatalf("Failed to parse the template: %v", err)
-			}
-			err = tmpl.Execute(f, sF)
-			if err != nil {
-				log.Fatalf("Failed to generate code from template: %v", err)
-			}
-			f.WriteString("\n\n")
+		templateContent, err := schemaTemplate.ReadFile("schema.tmpl")
+		if err != nil {
+			log.Fatalf("Failed to read resource template file: %v", err)
+		}
+		tmpl, err := template.New("schemaFuncs").Parse(string(templateContent))
+		if err != nil {
+			log.Fatalf("Failed to parse the template: %v", err)
+		}
+		err = tmpl.Execute(f, sF)
+		if err != nil {
+			log.Fatalf("Failed to generate code from template: %v", err)
+		}
+		f.WriteString("\n\n")
 	}
 }
 
-func getSchemaFuncs(structs []StructInfo, dictionary map[string]string) ([]SchemaFunc){
-	schemaFuncs := make([]SchemaFunc,0)
+func getSchemaFuncs(structs []StructInfo, dictionary map[string]string) []SchemaFunc {
+	schemaFuncs := make([]SchemaFunc, 0)
 	for _, structin := range structs {
 		schemaList := make([]SchemaVars, 0)
 		funcName := structin.StructName
@@ -102,20 +102,20 @@ func getSchemaFuncs(structs []StructInfo, dictionary map[string]string) ([]Schem
 				re := regexp.MustCompile(listReg)
 				if strings.Contains(vars.Type, "types") {
 					attr = "schema.ListAttribute"
-					attrSpecial = "ElementType: " + strings.Trim(vars.Type,"[]") + "Type,"
+					attrSpecial = "ElementType: " + strings.Trim(vars.Type, "[]") + "Type,"
 				} else if ok := re.MatchString(vars.Type); ok {
 					attr = re.ReplaceAllString(vars.Type, "schema.SetNestedAttribute")
-					attrSpecial = "NestedObject: schema.NestedAttributeObject{Attributes: Ome" + strings.Trim(vars.Type,"[]") + "Schema(),},"
+					attrSpecial = "NestedObject: schema.NestedAttributeObject{Attributes: Ome" + strings.Trim(vars.Type, "[]") + "Schema(),},"
 				} else {
 					attr = "schema.SingleNestedAttribute"
 					attrSpecial = "Attributes: Ome" + vars.Type + "Schema(),"
 				}
 			}
 			schemaVar := SchemaVars{
-				Name: matchName[1],
-				Attr: attr,
-				Desc: description,
-				IsSpecial: isSpecial,
+				Name:        matchName[1],
+				Attr:        attr,
+				Desc:        description,
+				IsSpecial:   isSpecial,
 				AttrSpecial: attrSpecial,
 			}
 			schemaList = append(schemaList, schemaVar)
@@ -196,7 +196,7 @@ func getStructFile(input string) (string, bool) {
 }
 
 func getDictionary(filepath string) (map[string]string, bool) {
-	dictionary := make(map[string]string,0)
+	dictionary := make(map[string]string, 0)
 	conversion, err := os.Open(filepath)
 	if err != nil {
 		fmt.Println(err)

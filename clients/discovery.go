@@ -53,10 +53,3 @@ func (c *Client) GetDiscoveryJobByGroupID(groupId int64) (models.DiscoveryJob, e
 	fmt.Println(string(respData))
 	return omeDiscoveryJob, err
 }
-
-// func addHeaders() map[string]string{
-// 	headers := make(map[string]string)
-// 	headers["Content-Type"] = "application/json"
-// 	headers["X-Auth-Token"] = "get your x-auth token"
-// 	return headers
-// }

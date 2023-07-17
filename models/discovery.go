@@ -128,7 +128,7 @@ type Time struct {
 	Hour    int `json:"Hour,omitempty"`
 }
 
-// golang struct to convert terraform schema to golang type with tfsdk tagged struct 
+// golang struct to convert terraform schema to golang type with tfsdk tagged struct
 
 // DiscoveryJob will be used in read, create and update
 type OmeDiscoveryJob struct {
@@ -141,7 +141,7 @@ type OmeDiscoveryJob struct {
 	DiscoveryConfigModels           []OmeDiscoveryConfigModels    `tfsdk:"discovery_config_models"`
 	DiscoveryConfigTaskParam        []OmeDiscoveryConfigTaskParam `tfsdk:"discovery_config_task_param"`
 	DiscoveryConfigTasks            []OmeDiscoveryConfigTasks     `tfsdk:"discovery_config_tasks"`
-	Schedule                        ScheduleJob                   `tfsdk:"schedule"`
+	Schedule                        OmeScheduleJob                `tfsdk:"schedule"`
 	TrapDestination                 types.Bool                    `tfsdk:"trap_destination"`
 	CommunityString                 types.Bool                    `tfsdk:"community_string"`
 	ChassisIdentifier               types.String                  `tfsdk:"chassis_identifier"`

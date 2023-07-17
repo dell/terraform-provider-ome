@@ -19,7 +19,7 @@ func main() {
 	file, err := os.Open("code.struct.plc")
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return
 	}
 	defer file.Close()
 
@@ -29,7 +29,7 @@ func main() {
 	conversion, err := os.Open("conversion.json")
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return
 	}
 	defer conversion.Close()
 	var dictionary map[string]string
@@ -38,7 +38,7 @@ func main() {
 	err = decoder.Decode(&dictionary)
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return
 	}
 
 	var lines []string
@@ -48,32 +48,32 @@ func main() {
 		matchStruct := reStruct.FindStringSubmatch(line)
 		if len(matchStruct) > 1 {
 			structName := matchStruct[1]
-			line = strings.ReplaceAll(line,structName,"Ome"+structName)
+			line = strings.ReplaceAll(line, structName, "Ome"+structName)
 		}
 		reCamel := regexp.MustCompile(`json:"(.*?)"`)
 		matchCamel := reCamel.FindStringSubmatch(line)
 		if len(matchCamel) > 1 {
 			camelCase := matchCamel[1]
 			underscore := camelCaseToUnderscore(camelCase)
-			line = strings.ReplaceAll(line,camelCase,underscore)
+			line = strings.ReplaceAll(line, camelCase, underscore)
 		}
 		for key, value := range dictionary {
-			line = strings.ReplaceAll(line,key,value)
+			line = strings.ReplaceAll(line, key, value)
 		}
-		lines = append(lines,line)
+		lines = append(lines, line)
 	}
 
 	output := strings.Join(lines, "\n")
 	outputFile, err := os.Create("code.tfsdk.gen")
 	if err != nil {
 		fmt.Println(err)
-		return 
+		return
 	}
-	
+
 	defer outputFile.Close()
 
 	writer := bufio.NewWriter(outputFile)
 	defer writer.Flush()
 
-	fmt.Fprintln(writer,output)
+	fmt.Fprintln(writer, output)
 }
