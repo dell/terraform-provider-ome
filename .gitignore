@@ -52,8 +52,10 @@ go.work
 # Binaries for programs and plugins
 *.exe
 *.exe~
+*.out
 *.dll
 *.so
 *.dylib
 # Test binary, built with `go test -c`
 terraform.txt
+test

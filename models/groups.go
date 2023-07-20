@@ -28,11 +28,25 @@ type Groups struct {
 
 // Group - embedded group response from the groups
 type Group struct {
-	ID               int64  `json:"Id,omitempty"`
-	Name             string `json:"Name"`
-	Description      string `json:"Description"`
-	MembershipTypeID int64  `json:"MembershipTypeId"`
-	ParentID         int64  `json:"ParentId"`
+	ID                    int64  `json:"Id,omitempty"`
+	Name                  string `json:"Name"`
+	Description           string `json:"Description"`
+	MembershipTypeID      int64  `json:"MembershipTypeId"`
+	ParentID              int64  `json:"ParentId"`
+	GlobalStatus          int    `json:"GlobalStatus"`
+	IDOwner               int    `json:"IdOwner"`
+	CreationTime          string `json:"CreationTime"`
+	UpdatedTime           string `json:"UpdatedTime"`
+	CreatedBy             string `json:"CreatedBy"`
+	UpdatedBy             string `json:"UpdatedBy"`
+	Visible               bool   `json:"Visible"`
+	DefinitionID          int    `json:"DefinitionId"`
+	DefinitionDescription string `json:"DefinitionDescription"`
+	TypeID                int    `json:"TypeId"`
+	HasAttributes         bool   `json:"HasAttributes"`
+	IsAccessAllowed       bool   `json:"IsAccessAllowed"`
+	// SubGroups are only present when expanded
+	SubGroups []Group `json:"SubGroups,omitempty"`
 }
 
 // GroupMemberPayload - Payload struct for adding or removing devices from static groups
@@ -56,10 +70,111 @@ func (plan *GroupMemberPayload) RegisterDevice(id int64) {
 
 // GroupDevicesData - schema for data source groupdevices
 type GroupDevicesData struct {
-	ID                types.String `tfsdk:"id"`
-	DeviceIDs         types.List   `tfsdk:"device_ids"`
-	DeviceServicetags types.List   `tfsdk:"device_servicetags"`
-	DeviceGroupNames  types.Set    `tfsdk:"device_group_names"`
+	ID                types.String        `tfsdk:"id"`
+	DeviceIDs         types.List          `tfsdk:"device_ids"`
+	DeviceServicetags types.List          `tfsdk:"device_servicetags"`
+	DeviceGroupNames  types.Set           `tfsdk:"device_group_names"`
+	DeviceGroups      map[string]OmeGroup `tfsdk:"device_groups"`
+}
+
+func (g *GroupDevicesData) SetDevices(devices []Device) {
+	devIDs := []attr.Value{}
+	devSvcTags := []attr.Value{}
+
+	for _, device := range devices {
+		devIDs = append(devIDs, types.Int64Value(device.ID))
+		devSvcTags = append(devSvcTags, types.StringValue(device.DeviceServiceTag))
+	}
+
+	devIDsTfsdk, _ := types.ListValue(
+		types.Int64Type,
+		devIDs,
+	)
+
+	g.DeviceIDs = devIDsTfsdk
+
+	devSTsTfsdk, _ := types.ListValue(
+		types.StringType,
+		devSvcTags,
+	)
+
+	g.DeviceServicetags = devSTsTfsdk
+}
+
+func (g *GroupDevicesData) SetGroup(group Group, devices []Device) {
+	if g.DeviceGroups == nil {
+		g.DeviceGroups = make(map[string]OmeGroup)
+	}
+
+	omeDevices := make([]OmeDeviceIDData, 0)
+	for _, dev := range devices {
+		omeDevices = append(omeDevices, OmeDeviceIDData{
+			ID:         types.Int64Value(dev.ID),
+			ServiceTag: types.StringValue(dev.DeviceServiceTag),
+		})
+	}
+
+	subGroupTfsdk := make([]OmeSubGroup, 0)
+	for _, subGroup := range group.SubGroups {
+		subGroupTfsdk = append(subGroupTfsdk, OmeSubGroup{
+			ID:   types.Int64Value(subGroup.ID),
+			Name: types.StringValue(subGroup.Name),
+		})
+	}
+
+	g.DeviceGroups[group.Name] = OmeGroup{
+		ID:                    types.Int64Value(group.ID),
+		Name:                  types.StringValue(group.Name),
+		Description:           types.StringValue(group.Description),
+		MembershipTypeID:      types.Int64Value(group.MembershipTypeID),
+		ParentID:              types.Int64Value(group.ParentID),
+		GlobalStatus:          types.Int64Value(group.ParentID),
+		IDOwner:               types.Int64Value(group.ParentID),
+		CreationTime:          types.StringValue(group.CreationTime),
+		UpdatedTime:           types.StringValue(group.UpdatedTime),
+		CreatedBy:             types.StringValue(group.UpdatedBy),
+		UpdatedBy:             types.StringValue(group.CreatedBy),
+		Visible:               types.BoolValue(group.Visible),
+		DefinitionID:          types.Int64Value(group.ParentID),
+		DefinitionDescription: types.StringValue(group.Name),
+		TypeID:                types.Int64Value(int64(group.TypeID)),
+		HasAttributes:         types.BoolValue(group.HasAttributes),
+		IsAccessAllowed:       types.BoolValue(group.IsAccessAllowed),
+		Devices:               omeDevices,
+		SubGroups:             subGroupTfsdk,
+	}
+}
+
+type OmeGroup struct {
+	ID                    types.Int64       `tfsdk:"id"`
+	Name                  types.String      `tfsdk:"name"`
+	Description           types.String      `tfsdk:"description"`
+	MembershipTypeID      types.Int64       `tfsdk:"membership_type_id"`
+	ParentID              types.Int64       `tfsdk:"parent_id"`
+	GlobalStatus          types.Int64       `tfsdk:"global_status"`
+	IDOwner               types.Int64       `tfsdk:"id_owner"`
+	CreationTime          types.String      `tfsdk:"creation_time"`
+	UpdatedTime           types.String      `tfsdk:"updated_time"`
+	CreatedBy             types.String      `tfsdk:"created_by"`
+	UpdatedBy             types.String      `tfsdk:"updated_by"`
+	Visible               types.Bool        `tfsdk:"visible"`
+	DefinitionID          types.Int64       `tfsdk:"definition_id"`
+	DefinitionDescription types.String      `tfsdk:"definition_description"`
+	TypeID                types.Int64       `tfsdk:"type_id"`
+	HasAttributes         types.Bool        `tfsdk:"has_attributes"`
+	IsAccessAllowed       types.Bool        `tfsdk:"is_access_allowed"`
+	Devices               []OmeDeviceIDData `tfsdk:"devices"`
+	SubGroups             []OmeSubGroup     `tfsdk:"sub_groups"`
+}
+
+type OmeDeviceIDData struct {
+	ID         types.Int64  `tfsdk:"id"`
+	ServiceTag types.String `tfsdk:"servicetag"`
+}
+
+type OmeSubGroup struct {
+	ID   types.Int64  `tfsdk:"id"`
+	Name types.String `tfsdk:"name"`
 }
 
 // StaticGroup - schema for resource static group

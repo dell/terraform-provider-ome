@@ -95,6 +95,12 @@ const (
 	ImportTemplateAPI = "/api/TemplateService/Actions/TemplateService.Import"
 	// TemplateNameContainsAPI - api to fetch templates by name
 	TemplateNameContainsAPI = "/api/TemplateService/Templates?$filter=contains(Name, '%s')"
+	// DiscoveryJobAPI - api to create and update discovery job
+	DiscoveryJobAPI = "/api/DiscoveryConfigService/DiscoveryConfigGroups"
+	// DiscoveryJobRemoveAPI - api to delete the discovery job using group ids.
+	DiscoveryJobRemoveAPI = "/api/DiscoveryConfigService/Actions/DiscoveryConfigService.RemoveDiscoveryGroup"
+	// DiscoveryJobByIDAP - api to get info of discovery job
+	DiscoveryJobByGroupIDAPI = "/api/DiscoveryConfigService/DiscoveryConfigGroups(%d)"
 )
 
 // Messages constants
@@ -236,6 +242,16 @@ const (
 	ErrBaseLineScheduleValid = "attributes `cron` and `email_addresses` are accepted only when `schedule` is true"
 	//ErrBaseLineNotifyValid
 	ErrBaseLineNotifyValid = "attributes `cron` is not accepted only when `schedule` is true and `notify_on_schedule` is false"
+	// ErrGnrCreateDiscovery - summary returned when failed to create discovery job
+	ErrGnrCreateDiscovery = "error creating a discovery job"
+	// ErrGnrReadDiscovery - summary returned when failed to read discovery
+	ErrGnrReadDiscovery = "error reading a discovery"
+	// ErrGnrUpdateDiscovery - summary returned when failed to update discovery
+	ErrGnrUpdateDiscovery = "error updating a discovery"
+	// ErrGnrDeleteDiscovery - summary returned when failed to delete discovery
+	ErrGnrDeleteDiscovery = "error deleting a discovery"
+	// ErrDiscoveryJobIsRunning - device capablity
+	ErrDiscoveryJobIsRunning = "job with id %d is already running please wait for sometime and try again"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job

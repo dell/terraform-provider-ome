@@ -1,0 +1,7 @@
+{
+    "int": "types.Int64",
+    "string": "types.String",
+    "bool": "types.Bool",
+    "json": "tfsdk",
+    ",omitempty": ""
+}

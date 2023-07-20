@@ -14,9 +14,11 @@ limitations under the License.
 package clients
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -68,6 +70,11 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 			mockGetBaselineDevComplianceReportByIDAPI(r, w) || mockGetBaselineDevAttrComplianceReportByIDAPI(r, w) || mockGetBaselineByNameAPI(r, w) ||
 			mockImportTemplateAPI(r, w) || mockGroupServiceActionsAPIs(r, w)
 		if shouldReturn6 {
+			return
+		}
+
+		shouldReturn7 := mockDiscoveryAPIs(r, w)
+		if shouldReturn7 {
 			return
 		}
 
@@ -1175,9 +1182,13 @@ func mockUpdateNetworkConfigAPI(r *http.Request, w http.ResponseWriter) bool {
 	return false
 }
 
+//go:embed json_data/responseGetExpandedGroup.json
+var getExpandedGroupResponse []byte
+
 func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
-	if r.URL.Path == GroupAPI {
-		if r.URL.RawQuery == "Name=valid_group1" && r.Method == "GET" {
+
+	if r.URL.Path == GroupAPI && r.Method == "GET" {
+		if r.URL.RawQuery == "Name=valid_group1" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{
 				"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
@@ -1190,7 +1201,7 @@ func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
 				]
 			}`))
 			return true
-		} else if r.URL.RawQuery == "Name=valid_group2" && r.Method == "GET" {
+		} else if r.URL.RawQuery == "Name=valid_group2" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{
 				"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
@@ -1203,7 +1214,7 @@ func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
 				]
 			}`))
 			return true
-		} else if r.URL.RawQuery == "Name=invalid_group1" {
+		} else if strings.Contains(r.URL.RawQuery, "Name=invalid_group1") {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{
 				"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
@@ -1211,6 +1222,31 @@ func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
 				"value": []
 			}`))
 			return true
+		} else if strings.Contains(r.URL.RawQuery, "Name=invalid_request_group") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
+				"@odata.count": 0,
+				"value": "invalid value"
+			}`))
+			return true
+		}
+
+		// if query is like Name=Dummy&$expand=...
+		if strings.Contains(r.URL.RawQuery, "Name=Dummy") && strings.Contains(r.URL.RawQuery, "expand") {
+			if strings.Contains(r.URL.RawQuery, "SubGroups") {
+				w.WriteHeader(http.StatusOK)
+				w.Write(getExpandedGroupResponse)
+				return true
+			} else if strings.Contains(r.URL.RawQuery, "InvalidExpansion") {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(`{
+					"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
+					"@odata.count": 0,
+					"value": "invalid expansion"
+				}`))
+				return true
+			}
 		}
 	}
 
@@ -2737,6 +2773,43 @@ func mockImportTemplateAPI(r *http.Request, w http.ResponseWriter) bool {
 			}`))
 		}
 		return true
+	}
+	return false
+}
+
+func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == DiscoveryJobAPI) && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "CreateDiscoveryCT") {
+			jsonData, _ := ioutil.ReadFile("json_data/responseCreateDiscovery.json")
+			w.WriteHeader(http.StatusCreated)
+			w.Write([]byte(jsonData))
+		}
+		return true
+	}
+	if r.URL.Path == DiscoveryJobAPI+"?groupId=57" && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "UpdateDiscoveryCT") {
+			groupId := r.URL.Query().Get("groupId")
+			if groupId != "" {
+				jsonData, _ := ioutil.ReadFile("json_data/responseUpdateDiscovery.json")
+				w.WriteHeader(http.StatusCreated)
+				w.Write([]byte(jsonData))
+			}
+		}
+		return true
+	}
+	if r.URL.Path == DiscoveryJobRemoveAPI && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "DiscoveryGroupIds") {
+			w.WriteHeader(http.StatusNoContent)
+		}
+	}
+
+	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, 51) && r.Method == "GET" {
+		jsonData, _ := ioutil.ReadFile("json_data/responseGetDiscoveryByGroupID")
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonData)
 	}
 	return false
 }
