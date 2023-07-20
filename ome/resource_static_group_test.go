@@ -98,6 +98,21 @@ func TestStaticGroup(t *testing.T) {
 	}
 	`
 
+	testAccUpdateMultipleDevices := testAccProvider + `	
+	resource "ome_static_group" "terraform-acceptance-test-1" {
+		name = "` + DeviceGroup1Update + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id = ` + GroupID1 + `
+		device_ids = [` + DeviceID1 + `]
+	}
+	resource "ome_static_group" "terraform-acceptance-test-2" {
+		name = "` + DeviceGroup1 + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id = ` + GroupID1 + `
+		device_ids = [` + DeviceID1 + `, ` + DeviceID2 + `]
+	}
+	`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -151,6 +166,13 @@ func TestStaticGroup(t *testing.T) {
 				// update group by adding invalid device id
 				Config:      testAccInvalidDeviceNeg,
 				ExpectError: regexp.MustCompile("Error while adding group devices"),
+			},
+			{
+				// update Group to add 2 devices at once
+				Config: testAccUpdateMultipleDevices,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_static_group.terraform-acceptance-test-2", "device_ids.#", "2"),
+				),
 			},
 		},
 	})
