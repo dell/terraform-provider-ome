@@ -19,12 +19,12 @@ linkTitle: "ome_groupdevices_info"
 page_title: "ome_groupdevices_info Data Source - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Data source to list the devices in the group from OpenManage Enterprise.
+  Data source to list groups from OpenManage Enterprise.
 ---
 
 # ome_groupdevices_info (Data Source)
 
-Data source to list the devices in the group from OpenManage Enterprise.
+Data source to list groups from OpenManage Enterprise.
 
 ## Example Usage
 
@@ -44,7 +44,17 @@ limitations under the License.
 
 # Get Deviceid's and servicetags of all devices that belong to a specified list of groups
 data "ome_groupdevices_info" "gd" {
-  device_group_names = ["WINDOWS"]
+  device_group_names = ["WINDOWS", "WINDOWS-10"]
+}
+
+output "out" {
+  value = {
+    "common_device_ids"            = data.ome_groupdevices_info.gd.device_ids,
+    "common_device_scvtags"        = data.ome_groupdevices_info.gd.device_servicetags,
+    "group_windows"                = data.ome_groupdevices_info.gd.device_groups["WINDOWS"],
+    "group_windows_subgroup_names" = data.ome_groupdevices_info.gd.device_groups["WINDOWS"].sub_groups[*].name,
+    "group_windows_device_ids"     = data.ome_groupdevices_info.gd.device_groups["WINDOWS"].devices[*].id,
+  }
 }
 ```
 
@@ -61,5 +71,48 @@ data "ome_groupdevices_info" "gd" {
 
 ### Read-Only
 
-- `device_ids` (List of Number) List of the device id(s) associated with a group
-- `device_servicetags` (List of String) List of the device servicetags associated with a group
+- `device_groups` (Attributes Map) Map of the groups fetched keyed by its name. (see [below for nested schema](#nestedatt--device_groups))
+- `device_ids` (List of Number) List of the device id(s) associated with every given group.
+- `device_servicetags` (List of String) List of the device servicetags associated with every given group.
+
+<a id="nestedatt--device_groups"></a>
+### Nested Schema for `device_groups`
+
+Read-Only:
+
+- `created_by` (String) The user who created the group.
+- `creation_time` (String) Creation time of the group.
+- `definition_description` (String) Definition description of the group.
+- `definition_id` (Number) Definition ID of the group.
+- `description` (String) Description of the group.
+- `devices` (Attributes Set) Devices of the group. (see [below for nested schema](#nestedatt--device_groups--devices))
+- `global_status` (Number) global_status of the group.
+- `has_attributes` (Boolean) If the group has attributes.
+- `id` (Number) ID of the group.
+- `id_owner` (Number) ID Owner of the group.
+- `is_access_allowed` (Boolean) If access of this group is allowed.
+- `membership_type_id` (Number) Membership Type ID of the group.
+- `name` (String) Name of the group.
+- `parent_id` (Number) Parent ID of the group.
+- `sub_groups` (Attributes Set) Sub Groups of the group. (see [below for nested schema](#nestedatt--device_groups--sub_groups))
+- `type_id` (Number) Type ID of the group.
+- `updated_by` (String) The user who updated the group.
+- `updated_time` (String) Last updation time of the group.
+- `visible` (Boolean) If the group is visible or not.
+
+<a id="nestedatt--device_groups--devices"></a>
+### Nested Schema for `device_groups.devices`
+
+Read-Only:
+
+- `id` (Number) ID of the device.
+- `servicetag` (String) Service Tag of the device
+
+
+<a id="nestedatt--device_groups--sub_groups"></a>
+### Nested Schema for `device_groups.sub_groups`
+
+Read-Only:
+
+- `id` (Number) ID of the sub group.
+- `name` (String) Name of the sub group.

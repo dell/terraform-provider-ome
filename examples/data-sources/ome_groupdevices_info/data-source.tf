@@ -13,5 +13,15 @@ limitations under the License.
 
 # Get Deviceid's and servicetags of all devices that belong to a specified list of groups
 data "ome_groupdevices_info" "gd" {
-  device_group_names = ["WINDOWS"]
+  device_group_names = ["WINDOWS", "WINDOWS-10"]
+}
+
+output "out" {
+  value = {
+    "common_device_ids"            = data.ome_groupdevices_info.gd.device_ids,
+    "common_device_scvtags"        = data.ome_groupdevices_info.gd.device_servicetags,
+    "group_windows"                = data.ome_groupdevices_info.gd.device_groups["WINDOWS"],
+    "group_windows_subgroup_names" = data.ome_groupdevices_info.gd.device_groups["WINDOWS"].sub_groups[*].name,
+    "group_windows_device_ids"     = data.ome_groupdevices_info.gd.device_groups["WINDOWS"].devices[*].id,
+  }
 }
