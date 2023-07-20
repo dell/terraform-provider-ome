@@ -55,26 +55,23 @@ func (*groupDevicesDatasource) Metadata(ctx context.Context, req datasource.Meta
 // Schema implements datasource.DataSource
 func (*groupDevicesDatasource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Data source to list the devices in the group from OpenManage Enterprise.",
+		MarkdownDescription: "Data source to list groups from OpenManage Enterprise.",
 		Attributes: map[string]schema.Attribute{
-
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID for group devices data source.",
 				Description:         "ID for group devices data source.",
 				Computed:            true,
 				Optional:            true,
 			},
-
 			"device_ids": schema.ListAttribute{
-				MarkdownDescription: "List of the device id(s) associated with a group",
-				Description:         "List of the device id(s) associated with a group",
+				MarkdownDescription: "List of the device id(s) associated with every given group.",
+				Description:         "List of the device id(s) associated with every given group.",
 				ElementType:         types.Int64Type,
 				Computed:            true,
 			},
-
 			"device_servicetags": schema.ListAttribute{
-				MarkdownDescription: "List of the device servicetags associated with a group",
-				Description:         "List of the device servicetags associated with a group",
+				MarkdownDescription: "List of the device servicetags associated with every given group.",
+				Description:         "List of the device servicetags associated with every given group.",
 				ElementType:         types.StringType,
 				Computed:            true,
 			},
@@ -88,178 +85,142 @@ func (*groupDevicesDatasource) Schema(ctx context.Context, req datasource.Schema
 				},
 			},
 			"device_groups": schema.MapNestedAttribute{
-				MarkdownDescription: "List of the device group names.",
-				Description:         "List of the device group names.",
-				NestedObject:        schema.NestedAttributeObject{Attributes: OmeGroupSchema()},
+				MarkdownDescription: "Map of the groups fetched keyed by its name.",
+				Description:         "Map of the groups fetched keyed by its name.",
+				NestedObject:        schema.NestedAttributeObject{Attributes: groupSchema()},
 				Computed:            true,
 			},
 		},
 	}
 }
 
-func OmeGroupSchema() map[string]schema.Attribute {
+func groupSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"id": schema.Int64Attribute{
-			MarkdownDescription: "ID",
-			Description:         "ID",
+			MarkdownDescription: "ID of the group.",
+			Description:         "ID of the group.",
 			Computed:            true,
 		},
-
 		"name": schema.StringAttribute{
-			MarkdownDescription: "name",
-			Description:         "name",
+			MarkdownDescription: "Name of the group.",
+			Description:         "Name of the group.",
 			Computed:            true,
 		},
-
 		"description": schema.StringAttribute{
-			MarkdownDescription: "description",
-			Description:         "description",
+			MarkdownDescription: "Description of the group.",
+			Description:         "Description of the group.",
 			Computed:            true,
 		},
-
 		"membership_type_id": schema.Int64Attribute{
-			MarkdownDescription: "Membership Type ID",
-			Description:         "Membership Type ID",
-
-			Computed: true,
-			// ElementType: types.Int64Type,
+			MarkdownDescription: "Membership Type ID of the group.",
+			Description:         "Membership Type ID of the group.",
+			Computed:            true,
 		},
-
 		"parent_id": schema.Int64Attribute{
-			MarkdownDescription: "Parent ID",
-			Description:         "Parent ID",
-
-			Computed: true,
-			// ElementType: types.Int64Type,
+			MarkdownDescription: "Parent ID of the group.",
+			Description:         "Parent ID of the group.",
+			Computed:            true,
 		},
-
 		"global_status": schema.Int64Attribute{
-			MarkdownDescription: "global_status",
-			Description:         "global_status",
-
-			Computed: true,
+			MarkdownDescription: "global_status of the group.",
+			Description:         "global_status of the group.",
+			Computed:            true,
 		},
-
 		"id_owner": schema.Int64Attribute{
-			MarkdownDescription: "IDOwner",
-			Description:         "IDOwner",
-
-			Computed: true,
+			MarkdownDescription: "ID Owner of the group.",
+			Description:         "ID Owner of the group.",
+			Computed:            true,
 		},
-
 		"creation_time": schema.StringAttribute{
-			MarkdownDescription: "creation_time",
-			Description:         "creation_time",
-
-			Computed: true,
+			MarkdownDescription: "Creation time of the group.",
+			Description:         "Creation time of the group.",
+			Computed:            true,
 		},
-
 		"updated_time": schema.StringAttribute{
-			MarkdownDescription: "updated_time",
-			Description:         "updated_time",
-
-			Computed: true,
+			MarkdownDescription: "Last updation time of the group.",
+			Description:         "Last updation time of the group.",
+			Computed:            true,
 		},
-
 		"created_by": schema.StringAttribute{
-			MarkdownDescription: "created_by",
-			Description:         "created_by",
-
-			Computed: true,
+			MarkdownDescription: "The user who created the group.",
+			Description:         "The user who created the group.",
+			Computed:            true,
 		},
-
 		"updated_by": schema.StringAttribute{
-			MarkdownDescription: "updated_by",
-			Description:         "updated_by",
-
-			Computed: true,
+			MarkdownDescription: "The user who updated the group.",
+			Description:         "The user who updated the group.",
+			Computed:            true,
 		},
-
 		"visible": schema.BoolAttribute{
-			MarkdownDescription: "visible",
-			Description:         "visible",
-
-			Computed: true,
+			MarkdownDescription: "If the group is visible or not.",
+			Description:         "If the group is visible or not.",
+			Computed:            true,
 		},
-
 		"definition_id": schema.Int64Attribute{
-			MarkdownDescription: "Definition ID",
-			Description:         "Definition ID",
-
-			Computed: true,
+			MarkdownDescription: "Definition ID of the group.",
+			Description:         "Definition ID of the group.",
+			Computed:            true,
 		},
-
 		"definition_description": schema.StringAttribute{
-			MarkdownDescription: "definition_description",
-			Description:         "definition_description",
-
-			Computed: true,
+			MarkdownDescription: "Definition description of the group.",
+			Description:         "Definition description of the group.",
+			Computed:            true,
 		},
-
 		"type_id": schema.Int64Attribute{
-			MarkdownDescription: "Type ID",
-			Description:         "Type ID",
-
-			Computed: true,
+			MarkdownDescription: "Type ID of the group.",
+			Description:         "Type ID of the group.",
+			Computed:            true,
 		},
-
 		"has_attributes": schema.BoolAttribute{
-			MarkdownDescription: "has_attributes",
-			Description:         "has_attributes",
-
-			Computed: true,
+			MarkdownDescription: "If the group has attributes.",
+			Description:         "If the group has attributes.",
+			Computed:            true,
 		},
-
 		"is_access_allowed": schema.BoolAttribute{
-			MarkdownDescription: "is_access_allowed",
-			Description:         "is_access_allowed",
-
-			Computed: true,
+			MarkdownDescription: "If access of this group is allowed.",
+			Description:         "If access of this group is allowed.",
+			Computed:            true,
 		},
 		"devices": schema.SetNestedAttribute{
-			MarkdownDescription: "device ids",
-			Description:         "device ids",
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeDeviceInputSchema()},
+			MarkdownDescription: "Devices of the group.",
+			Description:         "Devices of the group.",
+			NestedObject:        schema.NestedAttributeObject{Attributes: deviceInputSchema()},
 			Computed:            true,
 		},
-
 		"sub_groups": schema.SetNestedAttribute{
-			MarkdownDescription: "Sub Groups",
-			Description:         "Sub Groups",
-
-			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeSubGroupSchema()},
+			MarkdownDescription: "Sub Groups of the group.",
+			Description:         "Sub Groups of the group.",
+			Computed:            true,
+			NestedObject:        schema.NestedAttributeObject{Attributes: subGroupSchema()},
 		},
 	}
 }
 
-func OmeSubGroupSchema() map[string]schema.Attribute {
+func subGroupSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
-
 		"id": schema.Int64Attribute{
-			MarkdownDescription: "ID",
-			Description:         "ID",
+			MarkdownDescription: "ID of the sub group.",
+			Description:         "ID of the sub group.",
 			Computed:            true,
 		},
-
 		"name": schema.StringAttribute{
-			MarkdownDescription: "Name",
-			Description:         "Name",
+			MarkdownDescription: "Name of the sub group.",
+			Description:         "Name of the sub group.",
 			Computed:            true,
 		},
 	}
 }
 
-func OmeDeviceInputSchema() map[string]schema.Attribute {
+func deviceInputSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"id": schema.Int64Attribute{
-			MarkdownDescription: "ID",
-			Description:         "ID",
+			MarkdownDescription: "ID of the device.",
+			Description:         "ID of the device.",
 			Computed:            true,
 		},
 		"servicetag": schema.StringAttribute{
-			MarkdownDescription: "Name",
-			Description:         "Name",
+			MarkdownDescription: "Service Tag of the device",
+			Description:         "Service Tag of the device",
 			Computed:            true,
 		},
 	}

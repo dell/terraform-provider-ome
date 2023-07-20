@@ -77,6 +77,7 @@ type GroupDevicesData struct {
 	DeviceGroups      map[string]OmeGroup `tfsdk:"device_groups"`
 }
 
+// SetDevices - sets a list of devices in the device_ids and device_servicetags fields
 func (g *GroupDevicesData) SetDevices(devices []Device) {
 	devIDs := []attr.Value{}
 	devSvcTags := []attr.Value{}
@@ -101,6 +102,7 @@ func (g *GroupDevicesData) SetDevices(devices []Device) {
 	g.DeviceServicetags = devSTsTfsdk
 }
 
+// SetGroup - registers a group and its child devices in the device_groups map
 func (g *GroupDevicesData) SetGroup(group Group, devices []Device) {
 	if g.DeviceGroups == nil {
 		g.DeviceGroups = make(map[string]OmeGroup)
@@ -145,6 +147,7 @@ func (g *GroupDevicesData) SetGroup(group Group, devices []Device) {
 	}
 }
 
+// OmeGroup - schema for group info in data source groupdevices
 type OmeGroup struct {
 	ID                    types.Int64       `tfsdk:"id"`
 	Name                  types.String      `tfsdk:"name"`
@@ -167,11 +170,13 @@ type OmeGroup struct {
 	SubGroups             []OmeSubGroup     `tfsdk:"sub_groups"`
 }
 
+// OmeDeviceIDData - schema for device info info in data source groupdevices
 type OmeDeviceIDData struct {
 	ID         types.Int64  `tfsdk:"id"`
 	ServiceTag types.String `tfsdk:"servicetag"`
 }
 
+// OmeSubGroup - schema for sub groups in data source groupdevices
 type OmeSubGroup struct {
 	ID   types.Int64  `tfsdk:"id"`
 	Name types.String `tfsdk:"name"`
