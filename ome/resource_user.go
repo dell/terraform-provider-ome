@@ -3,9 +3,11 @@ package ome
 import (
 	"context"
 	"reflect"
+	"strings"
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -17,7 +19,7 @@ var (
 	_ resource.Resource = &userResource{}
 )
 
-// NewuserResource is a helper function to simplify the provider implementation.
+// NewUserResource is a helper function to simplify the provider implementation.
 func NewUserResource() resource.Resource {
 	return &userResource{}
 }
@@ -45,7 +47,7 @@ func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Resource for managing user on OpenManage Enterprise.",
 		Version:             1,
-		Attributes:          OmeUserSchema(),
+		Attributes:          UserSchema(),
 	}
 }
 
@@ -92,6 +94,7 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	tflog.Trace(ctx, "resource_user create: updating state finished, saving ...")
 	// Save into State
 	state = saveState(cUser)
+	state.Password = plan.Password
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	tflog.Trace(ctx, "resource_user create: finish")
@@ -125,8 +128,9 @@ func (r *userResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 
 	tflog.Trace(ctx, "resource_user read: finished reading state")
 	//Save into State
-	state = saveState(user)
-	diags = resp.State.Set(ctx, &state)
+	istate := saveState(user)
+	istate.Password = state.Password
+	diags = resp.State.Set(ctx, &istate)
 	resp.Diagnostics.Append(diags...)
 	tflog.Trace(ctx, "resource_user read: finished")
 }
@@ -163,7 +167,6 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 			UserTypeID:         int(plan.UserTypeID.ValueInt64()),
 			DirectoryServiceID: int(plan.DirectoryServiceID.ValueInt64()),
 			Description:        plan.Description.ValueString(),
-			Name:               plan.Name.ValueString(),
 			Password:           plan.Password.ValueString(),
 			UserName:           plan.UserName.ValueString(),
 			RoleID:             plan.RoleID.ValueString(),
@@ -178,6 +181,7 @@ func (r *userResource) Update(ctx context.Context, req resource.UpdateRequest, r
 			return
 		}
 		state = saveState(user)
+		state.Password = plan.Password
 		tflog.Trace(ctx, "resource_configuration_baseline : update Finished creating Baseline")
 	}
 	tflog.Trace(ctx, "resource_user update: finished state update")
@@ -219,12 +223,30 @@ func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 	tflog.Trace(ctx, "resource_user delete: finished "+status)
 }
 
+func (r *userResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// Retrieve import ID and save to id attribute
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	parser := req.ID
+	items := strings.SplitN(parser, ",", 2)
+	if len(items) != 2 {
+		resp.Diagnostics.AddError(
+			"Error while import",
+			"Error while import",
+		)
+	}
+	id := items[0]
+	password := items[1]
+	idAttrPath := path.Root("id")
+	passwordAttrPath := path.Root("password")
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, idAttrPath, id)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, passwordAttrPath, password)...)
+}
+
 func getUserPayload(ctx context.Context, plan *models.OmeUser) (models.UserPayload, error) {
 	user := models.UserPayload{
 		UserTypeID:         int(plan.UserTypeID.ValueInt64()),
 		DirectoryServiceID: int(plan.DirectoryServiceID.ValueInt64()),
 		Description:        plan.Description.ValueString(),
-		Name:               plan.Name.ValueString(),
 		Password:           plan.Password.ValueString(),
 		UserName:           plan.UserName.ValueString(),
 		RoleID:             plan.RoleID.ValueString(),
@@ -237,8 +259,6 @@ func getUserPayload(ctx context.Context, plan *models.OmeUser) (models.UserPaylo
 func saveState(resp models.User) (state models.OmeUser) {
 	state.Description = types.StringValue(resp.Description)
 	state.ID = types.StringValue(resp.ID)
-	state.Name = types.StringValue(resp.Name)
-	// state.Password = types.StringValue(resp.Password)
 	state.UserName = types.StringValue(resp.UserName)
 	state.RoleID = types.StringValue(resp.RoleID)
 	state.Enabled = types.BoolValue(resp.Enabled)

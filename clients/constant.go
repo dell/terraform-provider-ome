@@ -97,7 +97,6 @@ const (
 	TemplateNameContainsAPI = "/api/TemplateService/Templates?$filter=contains(Name, '%s')"
 	//UserAPI - api to manage users
 	UserAPI = "/api/AccountService/Accounts"
-
 )
 
 // Messages constants

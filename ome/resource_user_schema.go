@@ -2,13 +2,13 @@ package ome
 
 import "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
-func OmeUserSchema() map[string]schema.Attribute {
+// UserSchema - schema for terraform config of ome user
+func UserSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.StringAttribute{
 			MarkdownDescription: "ID",
 			Description:         "ID",
-			Optional:            true,
 			Computed:            true,
 		},
 
@@ -33,18 +33,11 @@ func OmeUserSchema() map[string]schema.Attribute {
 			Computed:            true,
 		},
 
-		"name": schema.StringAttribute{
-			MarkdownDescription: "Name",
-			Description:         "Name",
-			Optional:            true,
-			Computed:            true,
-		},
-
 		"password": schema.StringAttribute{
 			MarkdownDescription: "Password",
 			Description:         "Password",
 			Optional:            true,
-			Sensitive: true,
+			Sensitive:           true,
 		},
 
 		"username": schema.StringAttribute{
