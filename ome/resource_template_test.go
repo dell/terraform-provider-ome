@@ -65,6 +65,7 @@ func init() {
 
 			templateBody, _ := omeClient.GetBodyData(templateResp.Body)
 			omeTemplates := models.OMETemplates{}
+			//nolint: errcheck
 			omeClient.JSONUnMarshal(templateBody, &omeTemplates)
 
 			for _, omeTemplateValue := range omeTemplates.Value {

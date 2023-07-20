@@ -49,7 +49,10 @@ func init() {
 	// acceptance testing. The factory function will be invoked for every Terraform
 	// CLI command executed to create a provider server to which the CLI can
 	// reattach.
-	godotenv.Load("ome_test.env")
+	err := godotenv.Load("ome_test.env")
+	if err != nil {
+		panic(err)
+	}
 	testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
 		// newProvider is an example function that returns a tfsdk.Provider
 		"ome": providerserver.NewProtocol6WithError(New()),

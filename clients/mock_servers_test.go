@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -70,11 +69,6 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 			mockGetBaselineDevComplianceReportByIDAPI(r, w) || mockGetBaselineDevAttrComplianceReportByIDAPI(r, w) || mockGetBaselineByNameAPI(r, w) ||
 			mockImportTemplateAPI(r, w) || mockGroupServiceActionsAPIs(r, w)
 		if shouldReturn6 {
-			return
-		}
-
-		shouldReturn7 := mockDiscoveryAPIs(r, w)
-		if shouldReturn7 {
 			return
 		}
 
@@ -2773,43 +2767,6 @@ func mockImportTemplateAPI(r *http.Request, w http.ResponseWriter) bool {
 			}`))
 		}
 		return true
-	}
-	return false
-}
-
-func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
-	if (r.URL.Path == DiscoveryJobAPI) && r.Method == "POST" {
-		body, _ := io.ReadAll(r.Body)
-		if strings.Contains(string(body), "CreateDiscoveryCT") {
-			jsonData, _ := ioutil.ReadFile("json_data/responseCreateDiscovery.json")
-			w.WriteHeader(http.StatusCreated)
-			w.Write([]byte(jsonData))
-		}
-		return true
-	}
-	if r.URL.Path == DiscoveryJobAPI+"?groupId=57" && r.Method == "POST" {
-		body, _ := io.ReadAll(r.Body)
-		if strings.Contains(string(body), "UpdateDiscoveryCT") {
-			groupId := r.URL.Query().Get("groupId")
-			if groupId != "" {
-				jsonData, _ := ioutil.ReadFile("json_data/responseUpdateDiscovery.json")
-				w.WriteHeader(http.StatusCreated)
-				w.Write([]byte(jsonData))
-			}
-		}
-		return true
-	}
-	if r.URL.Path == DiscoveryJobRemoveAPI && r.Method == "POST" {
-		body, _ := io.ReadAll(r.Body)
-		if strings.Contains(string(body), "DiscoveryGroupIds") {
-			w.WriteHeader(http.StatusNoContent)
-		}
-	}
-
-	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, 51) && r.Method == "GET" {
-		jsonData, _ := ioutil.ReadFile("json_data/responseGetDiscoveryByGroupID")
-		w.WriteHeader(http.StatusOK)
-		w.Write(jsonData)
 	}
 	return false
 }
