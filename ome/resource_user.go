@@ -69,14 +69,8 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	}
 	defer omeClient.RemoveSession()
 
-	up, err := getUserPayload(ctx, &plan)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			clients.ErrGnrCreateUser, err.Error(),
-		)
-		return
-	}
-
+	up := getUserPayload(ctx, &plan) 
+	
 	tflog.Trace(ctx, "resource_user create Creating User")
 	tflog.Debug(ctx, "resource_user create Creating User", map[string]interface{}{
 		"Create User Request": up,
@@ -227,23 +221,22 @@ func (r *userResource) ImportState(ctx context.Context, req resource.ImportState
 	// Retrieve import ID and save to id attribute
 	parser := req.ID
 	items := strings.SplitN(parser, ",", 2)
-	if len(items) == 2 {
-		id := items[0]
-		password := items[1]
-		idAttrPath := path.Root("id")
-		passwordAttrPath := path.Root("password")
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, idAttrPath, id)...)
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, passwordAttrPath, password)...)
+	if len(items) < 2 {
+		resp.Diagnostics.AddError(
+			"Error while user import",
+			"Error while user import",
+		)
 		return
 	}
-	resp.Diagnostics.AddError(
-		"Error while user import",
-		"Error while user import",
-	)
-
+	id := items[0]
+	password := items[1]
+	idAttrPath := path.Root("id")
+	passwordAttrPath := path.Root("password")
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, idAttrPath, id)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, passwordAttrPath, password)...)
 }
 
-func getUserPayload(ctx context.Context, plan *models.OmeUser) (models.UserPayload, error) {
+func getUserPayload(ctx context.Context, plan *models.OmeUser) (models.UserPayload) {
 	user := models.UserPayload{
 		UserTypeID:         int(plan.UserTypeID.ValueInt64()),
 		DirectoryServiceID: int(plan.DirectoryServiceID.ValueInt64()),
@@ -254,7 +247,7 @@ func getUserPayload(ctx context.Context, plan *models.OmeUser) (models.UserPaylo
 		Locked:             plan.Locked.ValueBool(),
 		Enabled:            plan.Enabled.ValueBool(),
 	}
-	return user, nil
+	return user
 }
 
 func saveState(resp models.User) (state models.OmeUser) {

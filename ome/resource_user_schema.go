@@ -43,7 +43,7 @@ func UserSchema() map[string]schema.Attribute {
 		"password": schema.StringAttribute{
 			MarkdownDescription: "Password of the OME user.",
 			Description:         "Password of the OME user.",
-			Optional:            true,
+			Required:            true,
 			Sensitive:           true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
@@ -53,8 +53,7 @@ func UserSchema() map[string]schema.Attribute {
 		"username": schema.StringAttribute{
 			MarkdownDescription: "Username of the OME user.",
 			Description:         "Username of the OME user.",
-			Optional:            true,
-			Computed:            true,
+			Required:            true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
 			},
@@ -63,8 +62,7 @@ func UserSchema() map[string]schema.Attribute {
 		"role_id": schema.StringAttribute{
 			MarkdownDescription: "Role ID of the OME user.",
 			Description:         "Role ID of the OME user.",
-			Optional:            true,
-			Computed:            true,
+			Required:            true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
 			},
