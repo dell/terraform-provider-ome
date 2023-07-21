@@ -225,21 +225,22 @@ func (r *userResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 
 func (r *userResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Retrieve import ID and save to id attribute
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	parser := req.ID
 	items := strings.SplitN(parser, ",", 2)
-	if len(items) != 2 {
-		resp.Diagnostics.AddError(
-			"Error while import",
-			"Error while import",
-		)
+	if len(items) == 2 {
+		id := items[0]
+		password := items[1]
+		idAttrPath := path.Root("id")
+		passwordAttrPath := path.Root("password")
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, idAttrPath, id)...)
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, passwordAttrPath, password)...)
+		return
 	}
-	id := items[0]
-	password := items[1]
-	idAttrPath := path.Root("id")
-	passwordAttrPath := path.Root("password")
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, idAttrPath, id)...)
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, passwordAttrPath, password)...)
+	resp.Diagnostics.AddError(
+		"Error while user import",
+		"Error while user import",
+	)
+
 }
 
 func getUserPayload(ctx context.Context, plan *models.OmeUser) (models.UserPayload, error) {

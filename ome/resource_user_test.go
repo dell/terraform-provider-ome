@@ -14,6 +14,9 @@ limitations under the License.
 package ome
 
 import (
+	"fmt"
+	"regexp"
+	"terraform-provider-ome/clients"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -21,13 +24,13 @@ import (
 )
 
 const (
-	User       = "test_acc_user_1"
-	UserUpdate = "test_acc_user_2"
+	User        = "test_create_user"
+	UserUpdate  = "test_update_user"
+	User1       = "test_create"
+	UserUpdate1 = "test_update"
 )
 
 func TestUser(t *testing.T) {
-
-	var userID string
 
 	testAccProvider := `
 	provider "ome" {
@@ -63,6 +66,30 @@ func TestUser(t *testing.T) {
 	}
 	`
 
+	testAccCreateFailure := testAccProvider + `
+	resource "ome_user" "code_2" {
+		username = "123456789123456789"
+		password = "Abcde123!"
+		role_id = "101"
+	}
+	`
+
+	testAccCreateUpdate := testAccProvider + `
+	resource "ome_user" "code_3" {
+		username = "` + User1 + `"
+		password = "Abcde123!"
+		role_id = "101"
+	}
+	`
+
+	testAccUpdateFailure := testAccProvider + `
+	resource "ome_user" "code_3" {
+		username = "` + UserUpdate1 + `"
+		password = "Abcde123!"
+		role_id = "invalid"
+	}
+	`
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -77,10 +104,6 @@ func TestUser(t *testing.T) {
 				Config: testAccUpdateGroupSuccess,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_user.code_1", "username", UserUpdate),
-					func(s *terraform.State) error {
-						userID = s.RootModule().Resources["ome_user.code_1"].Primary.Attributes["id"]
-						return nil
-					},
 				),
 			},
 			{
@@ -88,13 +111,36 @@ func TestUser(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ExpectError:       nil,
-				ImportStateId:     userID,
+				ImportStateIdFunc: testAccImportStateIDFunc("ome_user.code_1"),
 			},
-			// {
-			// 	// create group with existing group name
-			// 	Config:      testAccDuplicateNameNeg,
-			// 	ExpectError: regexp.MustCompile("Error while creation"),
-			// },
+			{
+				ResourceName:      "ome_user.code_1",
+				ImportState:       true,
+				ImportStateVerify: true,
+				ExpectError:       regexp.MustCompile("Error while user import"),
+				ImportStateId:     "invalid",
+			},
+			{
+				Config:      testAccCreateFailure,
+				ExpectError: regexp.MustCompile(clients.ErrGnrCreateUser),
+			},
+			{
+				Config: testAccCreateUpdate,
+			},
+			{
+				Config:      testAccUpdateFailure,
+				ExpectError: regexp.MustCompile(clients.ErrGnrUpdateUser),
+			},
 		},
 	})
+}
+
+func testAccImportStateIDFunc(resourceName string) resource.ImportStateIdFunc {
+	return func(s *terraform.State) (string, error) {
+		rs, ok := s.RootModule().Resources[resourceName]
+		if !ok {
+			return "", fmt.Errorf("Not found: %s", resourceName)
+		}
+		return fmt.Sprintf("%s,%s", rs.Primary.Attributes["id"], rs.Primary.Attributes["password"]), nil
+	}
 }

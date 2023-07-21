@@ -1,6 +1,10 @@
 package ome
 
-import "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+)
 
 // UserSchema - schema for terraform config of ome user
 func UserSchema() map[string]schema.Attribute {
@@ -31,6 +35,9 @@ func UserSchema() map[string]schema.Attribute {
 			Description:         "Description",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"password": schema.StringAttribute{
@@ -38,6 +45,9 @@ func UserSchema() map[string]schema.Attribute {
 			Description:         "Password",
 			Optional:            true,
 			Sensitive:           true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"username": schema.StringAttribute{
@@ -45,6 +55,9 @@ func UserSchema() map[string]schema.Attribute {
 			Description:         "User Name",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"role_id": schema.StringAttribute{
@@ -52,6 +65,9 @@ func UserSchema() map[string]schema.Attribute {
 			Description:         "Role ID",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"locked": schema.BoolAttribute{
