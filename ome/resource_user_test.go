@@ -117,7 +117,7 @@ func TestUser(t *testing.T) {
 				ResourceName:      "ome_user.code_1",
 				ImportState:       true,
 				ImportStateVerify: true,
-				ExpectError:       regexp.MustCompile("Error while user import"),
+				ExpectError:       regexp.MustCompile(clients.ErrGnrImportUser),
 				ImportStateId:     "invalid",
 			},
 			{

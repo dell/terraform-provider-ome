@@ -69,8 +69,8 @@ func (r *userResource) Create(ctx context.Context, req resource.CreateRequest, r
 	}
 	defer omeClient.RemoveSession()
 
-	up := getUserPayload(ctx, &plan) 
-	
+	up := getUserPayload(ctx, &plan)
+
 	tflog.Trace(ctx, "resource_user create Creating User")
 	tflog.Debug(ctx, "resource_user create Creating User", map[string]interface{}{
 		"Create User Request": up,
@@ -223,7 +223,7 @@ func (r *userResource) ImportState(ctx context.Context, req resource.ImportState
 	items := strings.SplitN(parser, ",", 2)
 	if len(items) < 2 {
 		resp.Diagnostics.AddError(
-			"Error while user import",
+			clients.ErrGnrImportUser,
 			"Error while user import",
 		)
 		return
@@ -236,7 +236,7 @@ func (r *userResource) ImportState(ctx context.Context, req resource.ImportState
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, passwordAttrPath, password)...)
 }
 
-func getUserPayload(ctx context.Context, plan *models.OmeUser) (models.UserPayload) {
+func getUserPayload(ctx context.Context, plan *models.OmeUser) models.UserPayload {
 	user := models.UserPayload{
 		UserTypeID:         int(plan.UserTypeID.ValueInt64()),
 		DirectoryServiceID: int(plan.DirectoryServiceID.ValueInt64()),
