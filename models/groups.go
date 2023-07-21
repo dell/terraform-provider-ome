@@ -33,16 +33,16 @@ type Group struct {
 	Description           string `json:"Description"`
 	MembershipTypeID      int64  `json:"MembershipTypeId"`
 	ParentID              int64  `json:"ParentId"`
-	GlobalStatus          int    `json:"GlobalStatus"`
-	IDOwner               int    `json:"IdOwner"`
+	GlobalStatus          int64  `json:"GlobalStatus"`
+	IDOwner               int64  `json:"IdOwner"`
 	CreationTime          string `json:"CreationTime"`
 	UpdatedTime           string `json:"UpdatedTime"`
 	CreatedBy             string `json:"CreatedBy"`
 	UpdatedBy             string `json:"UpdatedBy"`
 	Visible               bool   `json:"Visible"`
-	DefinitionID          int    `json:"DefinitionId"`
+	DefinitionID          int64  `json:"DefinitionId"`
 	DefinitionDescription string `json:"DefinitionDescription"`
-	TypeID                int    `json:"TypeId"`
+	TypeID                int64  `json:"TypeId"`
 	HasAttributes         bool   `json:"HasAttributes"`
 	IsAccessAllowed       bool   `json:"IsAccessAllowed"`
 	// SubGroups are only present when expanded
@@ -130,8 +130,8 @@ func (g *GroupDevicesData) SetGroup(group Group, devices []Device) {
 		Description:           types.StringValue(group.Description),
 		MembershipTypeID:      types.Int64Value(group.MembershipTypeID),
 		ParentID:              types.Int64Value(group.ParentID),
-		GlobalStatus:          types.Int64Value(group.ParentID),
-		IDOwner:               types.Int64Value(group.ParentID),
+		GlobalStatus:          types.Int64Value(group.GlobalStatus),
+		IDOwner:               types.Int64Value(group.IDOwner),
 		CreationTime:          types.StringValue(group.CreationTime),
 		UpdatedTime:           types.StringValue(group.UpdatedTime),
 		CreatedBy:             types.StringValue(group.UpdatedBy),
@@ -139,7 +139,7 @@ func (g *GroupDevicesData) SetGroup(group Group, devices []Device) {
 		Visible:               types.BoolValue(group.Visible),
 		DefinitionID:          types.Int64Value(group.ParentID),
 		DefinitionDescription: types.StringValue(group.Name),
-		TypeID:                types.Int64Value(int64(group.TypeID)),
+		TypeID:                types.Int64Value(group.TypeID),
 		HasAttributes:         types.BoolValue(group.HasAttributes),
 		IsAccessAllowed:       types.BoolValue(group.IsAccessAllowed),
 		Devices:               omeDevices,
