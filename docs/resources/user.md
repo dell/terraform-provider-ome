@@ -47,18 +47,18 @@ resource "ome_user" "code_1" {
 
 ### Optional
 
-- `description` (String) Description
-- `directory_service_id` (Number) Directory Service ID
-- `enabled` (Boolean) Enabled
-- `locked` (Boolean) Locked
-- `password` (String, Sensitive) Password
-- `role_id` (String) Role ID
-- `user_type_id` (Number) User Type ID
-- `username` (String) User Name
+- `description` (String) Description of the OME user.
+- `directory_service_id` (Number) Directory Service ID of the OME user.
+- `enabled` (Boolean) Enable OME user.
+- `locked` (Boolean) Lock OME user.
+- `password` (String, Sensitive) Password of the OME user.
+- `role_id` (String) Role ID of the OME user.
+- `user_type_id` (Number) User Type ID of the OME user.
+- `username` (String) Username of the OME user.
 
 ### Read-Only
 
-- `id` (String) ID
+- `id` (String) ID of the OME user.
 
 ## Import
 

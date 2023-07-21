@@ -11,28 +11,28 @@ func UserSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.StringAttribute{
-			MarkdownDescription: "ID",
-			Description:         "ID",
+			MarkdownDescription: "ID of the OME user.",
+			Description:         "ID of the OME user.",
 			Computed:            true,
 		},
 
 		"user_type_id": schema.Int64Attribute{
-			MarkdownDescription: "User Type ID",
-			Description:         "User Type ID",
+			MarkdownDescription: "User Type ID of the OME user.",
+			Description:         "User Type ID of the OME user.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"directory_service_id": schema.Int64Attribute{
-			MarkdownDescription: "Directory Service ID",
-			Description:         "Directory Service ID",
+			MarkdownDescription: "Directory Service ID of the OME user.",
+			Description:         "Directory Service ID of the OME user.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"description": schema.StringAttribute{
-			MarkdownDescription: "Description",
-			Description:         "Description",
+			MarkdownDescription: "Description of the OME user.",
+			Description:         "Description of the OME user.",
 			Optional:            true,
 			Computed:            true,
 			Validators: []validator.String{
@@ -41,8 +41,8 @@ func UserSchema() map[string]schema.Attribute {
 		},
 
 		"password": schema.StringAttribute{
-			MarkdownDescription: "Password",
-			Description:         "Password",
+			MarkdownDescription: "Password of the OME user.",
+			Description:         "Password of the OME user.",
 			Optional:            true,
 			Sensitive:           true,
 			Validators: []validator.String{
@@ -51,8 +51,8 @@ func UserSchema() map[string]schema.Attribute {
 		},
 
 		"username": schema.StringAttribute{
-			MarkdownDescription: "User Name",
-			Description:         "User Name",
+			MarkdownDescription: "Username of the OME user.",
+			Description:         "Username of the OME user.",
 			Optional:            true,
 			Computed:            true,
 			Validators: []validator.String{
@@ -61,8 +61,8 @@ func UserSchema() map[string]schema.Attribute {
 		},
 
 		"role_id": schema.StringAttribute{
-			MarkdownDescription: "Role ID",
-			Description:         "Role ID",
+			MarkdownDescription: "Role ID of the OME user.",
+			Description:         "Role ID of the OME user.",
 			Optional:            true,
 			Computed:            true,
 			Validators: []validator.String{
@@ -71,15 +71,15 @@ func UserSchema() map[string]schema.Attribute {
 		},
 
 		"locked": schema.BoolAttribute{
-			MarkdownDescription: "Locked",
-			Description:         "Locked",
+			MarkdownDescription: "Lock OME user.",
+			Description:         "Lock OME user.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"enabled": schema.BoolAttribute{
-			MarkdownDescription: "Enabled",
-			Description:         "Enabled",
+			MarkdownDescription: "Enable OME user.",
+			Description:         "Enable OME user.",
 			Optional:            true,
 			Computed:            true,
 		},
