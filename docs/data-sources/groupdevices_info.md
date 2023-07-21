@@ -19,12 +19,12 @@ linkTitle: "ome_groupdevices_info"
 page_title: "ome_groupdevices_info Data Source - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Data source to list groups from OpenManage Enterprise.
+  Data source to list groups and their devices from OpenManage Enterprise.
 ---
 
 # ome_groupdevices_info (Data Source)
 
-Data source to list groups from OpenManage Enterprise.
+Data source to list groups and their devices from OpenManage Enterprise.
 
 ## Example Usage
 
@@ -42,7 +42,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-# Get Deviceid's and servicetags of all devices that belong to a specified list of groups
+# Get Group Info, Deviceids and servicetags of all devices that belong to a specified list of groups
 data "ome_groupdevices_info" "gd" {
   device_group_names = ["WINDOWS", "WINDOWS-10"]
 }
@@ -55,6 +55,18 @@ output "out" {
     "group_windows_subgroup_names" = data.ome_groupdevices_info.gd.device_groups["WINDOWS"].sub_groups[*].name,
     "group_windows_device_ids"     = data.ome_groupdevices_info.gd.device_groups["WINDOWS"].devices[*].id,
   }
+}
+
+# Get Sub Group Info of all specified groups
+locals {
+  gd_names_with_non_zero_children = toset([for i in data.ome_groupdevices_info.gd.device_group_names : i if
+  length(data.ome_groupdevices_info.gd.device_groups[i].sub_groups) > 0])
+}
+
+data "ome_groupdevices_info" "gd_children" {
+  id                 = "1"
+  device_group_names = data.ome_groupdevices_info.gd.device_groups[each.key].sub_groups[*].name
+  for_each           = local.gd_names_with_non_zero_children
 }
 ```
 
@@ -72,8 +84,8 @@ output "out" {
 ### Read-Only
 
 - `device_groups` (Attributes Map) Map of the groups fetched keyed by its name. (see [below for nested schema](#nestedatt--device_groups))
-- `device_ids` (List of Number) List of the device id(s) associated with every given group.
-- `device_servicetags` (List of String) List of the device servicetags associated with every given group.
+- `device_ids` (List of Number) List of the device id(s) associated with any of the groups.
+- `device_servicetags` (List of String) List of the device servicetags associated with any of the groups.
 
 <a id="nestedatt--device_groups"></a>
 ### Nested Schema for `device_groups`

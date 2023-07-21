@@ -55,7 +55,7 @@ func (*groupDevicesDatasource) Metadata(ctx context.Context, req datasource.Meta
 // Schema implements datasource.DataSource
 func (*groupDevicesDatasource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Data source to list groups from OpenManage Enterprise.",
+		MarkdownDescription: "Data source to list groups and their devices from OpenManage Enterprise.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID for group devices data source.",
@@ -64,14 +64,14 @@ func (*groupDevicesDatasource) Schema(ctx context.Context, req datasource.Schema
 				Optional:            true,
 			},
 			"device_ids": schema.ListAttribute{
-				MarkdownDescription: "List of the device id(s) associated with every given group.",
-				Description:         "List of the device id(s) associated with every given group.",
+				MarkdownDescription: "List of the device id(s) associated with any of the groups.",
+				Description:         "List of the device id(s) associated with any of the groups.",
 				ElementType:         types.Int64Type,
 				Computed:            true,
 			},
 			"device_servicetags": schema.ListAttribute{
-				MarkdownDescription: "List of the device servicetags associated with every given group.",
-				Description:         "List of the device servicetags associated with every given group.",
+				MarkdownDescription: "List of the device servicetags associated with any of the groups.",
+				Description:         "List of the device servicetags associated with any of the groups.",
 				ElementType:         types.StringType,
 				Computed:            true,
 			},
