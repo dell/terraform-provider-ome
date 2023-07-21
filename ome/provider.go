@@ -205,6 +205,7 @@ func (p *omeProvider) Resources(ctx context.Context) []func() resource.Resource 
 		NewConfigurationBaselineResource,
 		NewConfigurationComplianceResource,
 		NewStaticGroupResource,
+		NewUserResource,
 	}
 }
 

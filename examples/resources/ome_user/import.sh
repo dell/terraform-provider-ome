@@ -1,0 +1,1 @@
+terraform import ome_user.code_3 "<user-id>,<user-password>"
