@@ -19,6 +19,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -485,4 +486,82 @@ func TestClientJsonUnMarshal(t *testing.T) {
 			assert.Equal(t, "Your Name", st.DisplayName)
 		})
 	}
+}
+
+func TestUnmarshalValue(t *testing.T) {
+	c := Client{}
+
+	t.Run("not_a_json_neg", func(t *testing.T) {
+		in, data := "&st", []byte(`not a json`)
+		err := c.JSONUnMarshalValue(data, &in)
+		assert.NotEqual(t, nil, err)
+	})
+
+	t.Run("no_value_field_neg", func(t *testing.T) {
+		in, data := "&st", []byte(`{"name": "is a json", "description": "no value field"}`)
+		err := c.JSONUnMarshalValue(data, &in)
+		assert.NotEqual(t, nil, err)
+	})
+
+	t.Run("has_value_field", func(t *testing.T) {
+		in, data, out := "&st", []byte(`{"name": "is a json", "value": "here is the value field"}`), "here is the value field"
+		err := c.JSONUnMarshalValue(data, &in)
+		assert.Nil(t, err)
+		assert.Truef(t, reflect.DeepEqual(in, out), "Expected:%v Got:%v", out, in)
+	})
+
+	t.Run("value_type_mismatch_neg", func(t *testing.T) {
+		in, data := make([]int, 0), []byte(`{"name": "is a json", "value": ["this","field", "is", "not","a", "list","of","ints"]`)
+		err := c.JSONUnMarshalValue(data, &in)
+		assert.NotEqual(t, nil, err)
+	})
+
+	t.Run("value_type_match", func(t *testing.T) {
+		in, data, out := make([]string, 0), []byte(`{"name": "is a json", "value": ["a", "b", "c"]}`), []string{"a", "b", "c"}
+		err := c.JSONUnMarshalValue(data, &in)
+		assert.Nil(t, err)
+		assert.Truef(t, reflect.DeepEqual(in, out), "Expected:%v Got:%v", out, in)
+	})
+}
+
+func TestUnmarshalSingleValue(t *testing.T) {
+	c := Client{}
+	t.Run("no_value_field_neg", func(t *testing.T) {
+		in, data := "dummy", []byte(`{"name": "is a json", "description": "no value field"}`)
+		err := c.JSONUnMarshalSingleValue(data, &in)
+		assert.NotEqual(t, nil, err)
+	})
+
+	t.Run("value_is_not_list_neg", func(t *testing.T) {
+		in, data := "dummy", []byte(`{"name": "is a json", "value": "not a list"}`)
+		err := c.JSONUnMarshalSingleValue(data, &in)
+		assert.NotEqual(t, nil, err)
+	})
+
+	t.Run("multiple_items_neg", func(t *testing.T) {
+		in, data := "dummy", []byte(`{"name": "multiple items", "value": [1, 2, 3]}`)
+		err := c.JSONUnMarshalSingleValue(data, &in)
+		assert.NotEqual(t, nil, err)
+	})
+
+	t.Run("zero_items_neg", func(t *testing.T) {
+		in, data := "dummy", []byte(`{"name": "zero items", "value": []}`)
+		err := c.JSONUnMarshalSingleValue(data, &in)
+		assert.NotEqual(t, nil, err)
+	})
+
+	t.Run("item_type_mismatch_neg", func(t *testing.T) {
+		var in int
+		data := []byte(`{"name": "string", "value": ["this item is not an int"]}`)
+		err := c.JSONUnMarshalSingleValue(data, &in)
+		assert.NotEqual(t, nil, err)
+	})
+
+	t.Run("item_type_match", func(t *testing.T) {
+		var in int
+		data, out := []byte(`{"name": "int", "value": [100]}`), 100
+		err := c.JSONUnMarshalSingleValue(data, &in)
+		assert.Nil(t, err)
+		assert.Equal(t, out, in)
+	})
 }

@@ -52,6 +52,7 @@ go.work
 # Binaries for programs and plugins
 *.exe
 *.exe~
+*.out
 *.dll
 *.so
 *.dylib

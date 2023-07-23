@@ -11,7 +11,29 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-# Get Deviceid's and servicetags of all devices that belong to a specified list of groups
+# Get Group Info, Deviceids and servicetags of all devices that belong to a specified list of groups
 data "ome_groupdevices_info" "gd" {
-  device_group_names = ["WINDOWS"]
+  device_group_names = ["WINDOWS", "WINDOWS-10"]
+}
+
+output "out" {
+  value = {
+    "common_device_ids"            = data.ome_groupdevices_info.gd.device_ids,
+    "common_device_scvtags"        = data.ome_groupdevices_info.gd.device_servicetags,
+    "group_windows"                = data.ome_groupdevices_info.gd.device_groups["WINDOWS"],
+    "group_windows_subgroup_names" = data.ome_groupdevices_info.gd.device_groups["WINDOWS"].sub_groups[*].name,
+    "group_windows_device_ids"     = data.ome_groupdevices_info.gd.device_groups["WINDOWS"].devices[*].id,
+  }
+}
+
+# Get Sub Group Info of all specified groups
+locals {
+  gd_names_with_non_zero_children = toset([for i in data.ome_groupdevices_info.gd.device_group_names : i if
+  length(data.ome_groupdevices_info.gd.device_groups[i].sub_groups) > 0])
+}
+
+data "ome_groupdevices_info" "gd_children" {
+  id                 = "1"
+  device_group_names = data.ome_groupdevices_info.gd.device_groups[each.key].sub_groups[*].name
+  for_each           = local.gd_names_with_non_zero_children
 }

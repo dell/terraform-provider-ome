@@ -284,3 +284,39 @@ func (c *Client) JSONMarshal(in interface{}) ([]byte, error) {
 func (c *Client) JSONUnMarshal(data []byte, in interface{}) error {
 	return json.Unmarshal(data, in)
 }
+
+// JSONUnMarshalValue - unmarshals the byte to a interface
+func (c *Client) JSONUnMarshalValue(data []byte, in interface{}) error {
+	inV := make(map[string]json.RawMessage)
+	if err := json.Unmarshal(data, &inV); err != nil {
+		return fmt.Errorf("error unmarshalling response base: %w", err)
+	}
+	dataV, ok := inV["value"]
+	if !ok {
+		return fmt.Errorf("field \"value\" could not be found in response")
+	}
+
+	if err := json.Unmarshal(dataV, in); err != nil {
+		return fmt.Errorf("error unmarshalling response value: %w", err)
+	}
+	return nil
+}
+
+// JSONUnMarshalSingleValue - unmarshals the byte to a interface
+func (c *Client) JSONUnMarshalSingleValue(data []byte, in interface{}) error {
+	inV := make([]json.RawMessage, 0)
+	if err := c.JSONUnMarshalValue(data, &inV); err != nil {
+		return err
+	}
+	if l := len(inV); l == 0 {
+		return fmt.Errorf("no items found, expecting one")
+	} else if l > 1 {
+		return fmt.Errorf("multiple items found, expecting one")
+	}
+	bytes := inV[0]
+	fmt.Sprintln(string(bytes))
+	if err := json.Unmarshal(bytes, in); err != nil {
+		return fmt.Errorf("error unmarshalling the item in response value: %w", err)
+	}
+	return nil
+}

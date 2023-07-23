@@ -8,6 +8,8 @@ require (
 	github.com/hashicorp/terraform-plugin-framework-validators v0.10.0
 	github.com/hashicorp/terraform-plugin-go v0.17.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.25.0
+	github.com/joho/godotenv v1.5.1
+	github.com/manifoldco/promptui v0.9.0
 	github.com/netdata/go.d.plugin v0.53.2
 	github.com/stretchr/testify v1.8.4
 )
@@ -27,6 +29,7 @@ require (
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -52,7 +55,6 @@ require (
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
-	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mitchellh/cli v1.1.5 // indirect

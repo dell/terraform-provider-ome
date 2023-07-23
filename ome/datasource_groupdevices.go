@@ -15,11 +15,13 @@ package ome
 
 import (
 	"context"
+	"fmt"
 	"terraform-provider-ome/models"
 
-	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -53,26 +55,23 @@ func (*groupDevicesDatasource) Metadata(ctx context.Context, req datasource.Meta
 // Schema implements datasource.DataSource
 func (*groupDevicesDatasource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Data source to list the devices in the group from OpenManage Enterprise.",
+		MarkdownDescription: "Data source to list groups and their devices from OpenManage Enterprise.",
 		Attributes: map[string]schema.Attribute{
-
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID for group devices data source.",
 				Description:         "ID for group devices data source.",
 				Computed:            true,
 				Optional:            true,
 			},
-
 			"device_ids": schema.ListAttribute{
-				MarkdownDescription: "List of the device id(s) associated with a group",
-				Description:         "List of the device id(s) associated with a group",
+				MarkdownDescription: "List of the device id(s) associated with any of the groups.",
+				Description:         "List of the device id(s) associated with any of the groups.",
 				ElementType:         types.Int64Type,
 				Computed:            true,
 			},
-
 			"device_servicetags": schema.ListAttribute{
-				MarkdownDescription: "List of the device servicetags associated with a group",
-				Description:         "List of the device servicetags associated with a group",
+				MarkdownDescription: "List of the device servicetags associated with any of the groups.",
+				Description:         "List of the device servicetags associated with any of the groups.",
 				ElementType:         types.StringType,
 				Computed:            true,
 			},
@@ -81,7 +80,148 @@ func (*groupDevicesDatasource) Schema(ctx context.Context, req datasource.Schema
 				Description:         "List of the device group names.",
 				ElementType:         types.StringType,
 				Required:            true,
+				Validators: []validator.Set{
+					setvalidator.SizeAtLeast(1),
+				},
 			},
+			"device_groups": schema.MapNestedAttribute{
+				MarkdownDescription: "Map of the groups fetched keyed by its name.",
+				Description:         "Map of the groups fetched keyed by its name.",
+				NestedObject:        schema.NestedAttributeObject{Attributes: groupSchema()},
+				Computed:            true,
+			},
+		},
+	}
+}
+
+func groupSchema() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+		"id": schema.Int64Attribute{
+			MarkdownDescription: "ID of the group.",
+			Description:         "ID of the group.",
+			Computed:            true,
+		},
+		"name": schema.StringAttribute{
+			MarkdownDescription: "Name of the group.",
+			Description:         "Name of the group.",
+			Computed:            true,
+		},
+		"description": schema.StringAttribute{
+			MarkdownDescription: "Description of the group.",
+			Description:         "Description of the group.",
+			Computed:            true,
+		},
+		"membership_type_id": schema.Int64Attribute{
+			MarkdownDescription: "Membership Type ID of the group.",
+			Description:         "Membership Type ID of the group.",
+			Computed:            true,
+		},
+		"parent_id": schema.Int64Attribute{
+			MarkdownDescription: "Parent ID of the group.",
+			Description:         "Parent ID of the group.",
+			Computed:            true,
+		},
+		"global_status": schema.Int64Attribute{
+			MarkdownDescription: "global_status of the group.",
+			Description:         "global_status of the group.",
+			Computed:            true,
+		},
+		"id_owner": schema.Int64Attribute{
+			MarkdownDescription: "ID Owner of the group.",
+			Description:         "ID Owner of the group.",
+			Computed:            true,
+		},
+		"creation_time": schema.StringAttribute{
+			MarkdownDescription: "Creation time of the group.",
+			Description:         "Creation time of the group.",
+			Computed:            true,
+		},
+		"updated_time": schema.StringAttribute{
+			MarkdownDescription: "Last updation time of the group.",
+			Description:         "Last updation time of the group.",
+			Computed:            true,
+		},
+		"created_by": schema.StringAttribute{
+			MarkdownDescription: "The user who created the group.",
+			Description:         "The user who created the group.",
+			Computed:            true,
+		},
+		"updated_by": schema.StringAttribute{
+			MarkdownDescription: "The user who updated the group.",
+			Description:         "The user who updated the group.",
+			Computed:            true,
+		},
+		"visible": schema.BoolAttribute{
+			MarkdownDescription: "If the group is visible or not.",
+			Description:         "If the group is visible or not.",
+			Computed:            true,
+		},
+		"definition_id": schema.Int64Attribute{
+			MarkdownDescription: "Definition ID of the group.",
+			Description:         "Definition ID of the group.",
+			Computed:            true,
+		},
+		"definition_description": schema.StringAttribute{
+			MarkdownDescription: "Definition description of the group.",
+			Description:         "Definition description of the group.",
+			Computed:            true,
+		},
+		"type_id": schema.Int64Attribute{
+			MarkdownDescription: "Type ID of the group.",
+			Description:         "Type ID of the group.",
+			Computed:            true,
+		},
+		"has_attributes": schema.BoolAttribute{
+			MarkdownDescription: "If the group has attributes.",
+			Description:         "If the group has attributes.",
+			Computed:            true,
+		},
+		"is_access_allowed": schema.BoolAttribute{
+			MarkdownDescription: "If access of this group is allowed.",
+			Description:         "If access of this group is allowed.",
+			Computed:            true,
+		},
+		"devices": schema.SetNestedAttribute{
+			MarkdownDescription: "Devices of the group.",
+			Description:         "Devices of the group.",
+			NestedObject:        schema.NestedAttributeObject{Attributes: deviceInputSchema()},
+			Computed:            true,
+		},
+		"sub_groups": schema.SetNestedAttribute{
+			MarkdownDescription: "Sub Groups of the group.",
+			Description:         "Sub Groups of the group.",
+			Computed:            true,
+			NestedObject:        schema.NestedAttributeObject{Attributes: subGroupSchema()},
+		},
+	}
+}
+
+func subGroupSchema() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+		"id": schema.Int64Attribute{
+			MarkdownDescription: "ID of the sub group.",
+			Description:         "ID of the sub group.",
+			Computed:            true,
+		},
+		"name": schema.StringAttribute{
+			MarkdownDescription: "Name of the sub group.",
+			Description:         "Name of the sub group.",
+			Computed:            true,
+		},
+	}
+}
+
+func deviceInputSchema() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+		"id": schema.Int64Attribute{
+			MarkdownDescription: "ID of the device.",
+			Description:         "ID of the device.",
+			Computed:            true,
+		},
+		"servicetag": schema.StringAttribute{
+			MarkdownDescription: "Service Tag of the device",
+			Description:         "Service Tag of the device",
+			Computed:            true,
 		},
 	}
 }
@@ -107,43 +247,39 @@ func (g *groupDevicesDatasource) Read(ctx context.Context, req datasource.ReadRe
 	}
 	defer omeClient.RemoveSession()
 
-	devices, err := omeClient.GetDevicesByGroups(groupNames)
-	devIDs := []attr.Value{}
-	devSvcTags := []attr.Value{}
-
-	if err != nil {
-		if len(devices) != 0 {
-			resp.Diagnostics.AddWarning(
-				"Unable to fetch devices during pagination: ",
-				err.Error(),
-			)
-		} else {
+	allDevices := make([]models.Device, 0)
+	for _, groupName := range groupNames {
+		group, err := omeClient.GetExpandedGroupByName(groupName, "")
+		if err != nil {
 			resp.Diagnostics.AddError(
-				"Unable to fetch devices for groups: ",
+				fmt.Sprintf("Error getting group by name: %s", groupName),
 				err.Error(),
 			)
-			return
+			continue
 		}
+
+		devices, err := omeClient.GetDevicesByGroupID(group.ID)
+		if err != nil {
+			if len(devices.Value) != 0 {
+				resp.Diagnostics.AddWarning(
+					"Unable to fetch devices during pagination",
+					err.Error(),
+				)
+			} else {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("Unable to fetch devices for group %s", group.Name),
+					err.Error(),
+				)
+				return
+			}
+			continue
+		}
+		allDevices = append(allDevices, devices.Value...)
+		groupDevices.SetGroup(group, devices.Value)
 	}
-	devices = omeClient.GetUniqueDevices(devices)
-	for _, device := range devices {
-		devIDs = append(devIDs, types.Int64Value(device.ID))
-		devSvcTags = append(devSvcTags, types.StringValue(device.DeviceServiceTag))
-	}
 
-	devIDsTfsdk, _ := types.ListValue(
-		types.Int64Type,
-		devIDs,
-	)
-
-	groupDevices.DeviceIDs = devIDsTfsdk
-
-	devSTsTfsdk, _ := types.ListValue(
-		types.StringType,
-		devSvcTags,
-	)
-
-	groupDevices.DeviceServicetags = devSTsTfsdk
+	uniqueDevices := omeClient.GetUniqueDevices(allDevices)
+	groupDevices.SetDevices(uniqueDevices)
 
 	diags = resp.State.Set(ctx, &groupDevices)
 	resp.Diagnostics.Append(diags...)

@@ -62,8 +62,8 @@ test: check
 
 check:
 	gofmt -s -w .
-	golint ./...
 	go vet
+	golangci-lint run --fix --timeout 5m
 
 gosec:
 	gosec -quiet -log gosec.log -out=gosecresults.csv -fmt=csv ./...

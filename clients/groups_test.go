@@ -385,6 +385,40 @@ func TestClient_ReadGroup(t *testing.T) {
 	}
 }
 
+func TestClient_ReadExpandedGroupByName(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	t.Run("Invalid expansion", func(t *testing.T) {
+		groupName := "Dummy"
+		_, err := c.GetExpandedGroupByName(groupName, "InvalidExpansion")
+		assert.NotNil(t, err)
+	})
+
+	t.Run("Invalid name", func(t *testing.T) {
+		groupName := "invalid_group1"
+		_, err := c.GetExpandedGroupByName(groupName, "")
+		t.Logf(err.Error())
+		assert.NotNil(t, err)
+	})
+
+	t.Run("Valid name and expansion", func(t *testing.T) {
+		// t.Log(string(getExpandedGroupResponse))
+		groupName := "Dummy"
+		group, err := c.GetExpandedGroupByName(groupName, "")
+		assert.Nil(t, err)
+		assert.EqualValues(t, 1011, group.ID)
+		assert.EqualValues(t, "The Dummy group", group.Description)
+		assert.EqualValues(t, 2, len(group.SubGroups))
+		assert.EqualValues(t, "dummy-test2", group.SubGroups[0].Name)
+		assert.EqualValues(t, "dummy-test", group.SubGroups[1].Name)
+	})
+}
+
 func TestClient_DeleteGroup(t *testing.T) {
 	ts := createNewTLSServer(t)
 	defer ts.Close()

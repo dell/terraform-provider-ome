@@ -15,6 +15,7 @@ package ome
 
 import (
 	"os"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -33,19 +34,48 @@ func TestDataSource_ReadGroupDevices(t *testing.T) {
 				Config: testgroupDeviceDS,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_ids.#", "2"),
-					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_servicetags.#", "2")),
+					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_servicetags.#", "2"),
+					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.%", "1"),
+					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.test_device_group.name", "test_device_group"),
+					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.test_device_group.devices.#", "2"),
+					resource.TestCheckResourceAttrSet("data.ome_groupdevices_info.gd", "device_groups.test_device_group.id"),
+					resource.TestCheckResourceAttrSet("data.ome_groupdevices_info.gd", "device_groups.test_device_group.parent_id"),
+					resource.TestCheckResourceAttrSet("data.ome_groupdevices_info.gd", "device_groups.test_device_group.description"),
+					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.test_device_group.visible", "true"),
+					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.test_device_group.sub_groups.#", "0"),
+				),
+			},
+
+			{
+				// create subGroup, but it wont reflect in datasource yet
+				Config: testgroupDeviceDSWithSubGroups,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.test_device_group.sub_groups.#", "0"),
+				),
+			},
+
+			{
+				// now it will reflect
+				Config: testgroupDeviceDSWithSubGroups,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.test_device_group.sub_groups.#", "1"),
+					resource.TestCheckTypeSetElemNestedAttrs(
+						"data.ome_groupdevices_info.gd",
+						"device_groups.test_device_group.sub_groups.*",
+						map[string]string{
+							"name": "Linux",
+						},
+					),
+				),
 			},
 			{
-				Config: testgroupDeviceDSInvalidGroup,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_ids.#", "0"),
-					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_servicetags.#", "0")),
+				Config:      testgroupDeviceDSEmptyGroup,
+				PlanOnly:    true,
+				ExpectError: regexp.MustCompile(".*at least 1 elements, got: 0.*"),
 			},
 			{
-				Config: testgroupDeviceDSEmptyGroup,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_ids.#", "0"),
-					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_servicetags.#", "0")),
+				Config:      testgroupDeviceDSInvalidGroup,
+				ExpectError: regexp.MustCompile(".*no items found, expecting one.*"),
 			},
 		},
 	})
@@ -64,6 +94,28 @@ var testgroupDeviceDS = `
 		device_group_names = ["test_device_group"]
 	}
 `
+
+var testgroupDeviceDSWithSubGroups = `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		skipssl = true
+	}
+
+	data "ome_groupdevices_info" "gd" {
+		id = "0"
+		device_group_names = ["test_device_group"]
+	}
+
+	resource "ome_static_group" "linux-group" {
+		name        = "Linux"
+		description = "All linux servers"
+		parent_id   = data.ome_groupdevices_info.gd.device_groups["test_device_group"].id
+		device_ids = []
+	}
+`
+
 var testgroupDeviceDSInvalidGroup = `
 	provider "ome" {
 		username = "` + omeUserName + `"
@@ -88,6 +140,6 @@ var testgroupDeviceDSEmptyGroup = `
 
 	data "ome_groupdevices_info" "gd" {
 		id = "0"
-		device_group_names = ["NO_GROUP"]
+		device_group_names = []
 	}
 `

@@ -65,11 +65,30 @@ func (c *Client) GetGroupByName(groupName string) (models.Groups, error) {
 	}
 	groups := models.Groups{}
 	bodyData, _ := c.GetBodyData(response.Body)
+
 	err = c.JSONUnMarshal(bodyData, &groups)
 	if err != nil {
 		return models.Groups{}, err
 	}
 	return groups, nil
+}
+
+// GetExpandedGroupByName - method to get a groups object by name with expansion
+func (c *Client) GetExpandedGroupByName(groupName string, expansion string) (models.Group, error) {
+	if expansion == "" {
+		expansion = "SubGroups"
+	}
+	response, err := c.Get(GroupAPI, nil, map[string]string{"Name": groupName, "$expand": expansion})
+	if err != nil {
+		return models.Group{}, fmt.Errorf("error querying group by name: %w", err)
+	}
+	group := models.Group{}
+	bodyData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshalSingleValue(bodyData, &group)
+	if err != nil {
+		return models.Group{}, fmt.Errorf("error getting group by name : %w", err)
+	}
+	return group, nil
 }
 
 // GetDevicesByGroupID - method to get device objects by group id.

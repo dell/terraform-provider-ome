@@ -14,6 +14,7 @@ limitations under the License.
 package clients
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -1175,9 +1176,13 @@ func mockUpdateNetworkConfigAPI(r *http.Request, w http.ResponseWriter) bool {
 	return false
 }
 
+//go:embed json_data/responseGetExpandedGroup.json
+var getExpandedGroupResponse []byte
+
 func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
-	if r.URL.Path == GroupAPI {
-		if r.URL.RawQuery == "Name=valid_group1" && r.Method == "GET" {
+
+	if r.URL.Path == GroupAPI && r.Method == "GET" {
+		if r.URL.RawQuery == "Name=valid_group1" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{
 				"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
@@ -1190,7 +1195,7 @@ func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
 				]
 			}`))
 			return true
-		} else if r.URL.RawQuery == "Name=valid_group2" && r.Method == "GET" {
+		} else if r.URL.RawQuery == "Name=valid_group2" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{
 				"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
@@ -1203,7 +1208,7 @@ func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
 				]
 			}`))
 			return true
-		} else if r.URL.RawQuery == "Name=invalid_group1" {
+		} else if strings.Contains(r.URL.RawQuery, "Name=invalid_group1") {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{
 				"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
@@ -1211,6 +1216,31 @@ func mockGroupServiceAPIs(r *http.Request, w http.ResponseWriter) bool {
 				"value": []
 			}`))
 			return true
+		} else if strings.Contains(r.URL.RawQuery, "Name=invalid_request_group") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
+				"@odata.count": 0,
+				"value": "invalid value"
+			}`))
+			return true
+		}
+
+		// if query is like Name=Dummy&$expand=...
+		if strings.Contains(r.URL.RawQuery, "Name=Dummy") && strings.Contains(r.URL.RawQuery, "expand") {
+			if strings.Contains(r.URL.RawQuery, "SubGroups") {
+				w.WriteHeader(http.StatusOK)
+				w.Write(getExpandedGroupResponse)
+				return true
+			} else if strings.Contains(r.URL.RawQuery, "InvalidExpansion") {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(`{
+					"@odata.context": "/api/$metadata#Collection(GroupService.Group)",
+					"@odata.count": 0,
+					"value": "invalid expansion"
+				}`))
+				return true
+			}
 		}
 	}
 
