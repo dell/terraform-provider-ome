@@ -97,6 +97,12 @@ const (
 	TemplateNameContainsAPI = "/api/TemplateService/Templates?$filter=contains(Name, '%s')"
 	//UserAPI - api to manage users
 	UserAPI = "/api/AccountService/Accounts"
+	// DiscoveryJobAPI - api to create and update discovery job
+	DiscoveryJobAPI = "/api/DiscoveryConfigService/DiscoveryConfigGroups"
+	// DiscoveryJobRemoveAPI - api to delete the discovery job using group ids.
+	DiscoveryJobRemoveAPI = "/api/DiscoveryConfigService/Actions/DiscoveryConfigService.RemoveDiscoveryGroup"
+	// DiscoveryJobByIDAP - api to get info of discovery job
+	DiscoveryJobByGroupIDAPI = "/api/DiscoveryConfigService/DiscoveryConfigGroups(%d)"
 )
 
 // Messages constants
@@ -248,6 +254,16 @@ const (
 	ErrGnrReadUser = "error reading a User"
 	// ErrGnrImportUser - message returned when import User fails
 	ErrGnrImportUser = "Unable to import User"
+	// ErrGnrCreateDiscovery - summary returned when failed to create discovery job
+	ErrGnrCreateDiscovery = "error creating a discovery job"
+	// ErrGnrReadDiscovery - summary returned when failed to read discovery
+	ErrGnrReadDiscovery = "error reading a discovery"
+	// ErrGnrUpdateDiscovery - summary returned when failed to update discovery
+	ErrGnrUpdateDiscovery = "error updating a discovery"
+	// ErrGnrDeleteDiscovery - summary returned when failed to delete discovery
+	ErrGnrDeleteDiscovery = "error deleting a discovery"
+	// ErrDiscoveryJobIsRunning - device capablity
+	ErrDiscoveryJobIsRunning = "job with id %d is already running please wait for sometime and try again"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job
