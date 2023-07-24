@@ -59,6 +59,12 @@ output "out" {
 
 # Get Sub Group Info of all specified groups
 locals {
+  # gd_names_with_non_zero_children is the subset of the specified list of group names where the group
+  # has one or more child groups.
+  # In the below code, we iterate over the specified list of groups and check if the sub_groups
+  # field for that group in the ome_groupdevices_info data source has any entries. If it does, then that name is added
+  # to a list. Then we use the to_set function to convert the list of names to a set to ensure that there is no 
+  # duplication of names. Then that set is assigned to gd_names_with_non_zero_children.
   gd_names_with_non_zero_children = toset([for i in data.ome_groupdevices_info.gd.device_group_names : i if
   length(data.ome_groupdevices_info.gd.device_groups[i].sub_groups) > 0])
 }
