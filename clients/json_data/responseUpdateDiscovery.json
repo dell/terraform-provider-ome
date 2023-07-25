@@ -1,0 +1,51 @@
+{
+    "DiscoveryConfigGroupId": 40,
+    "DiscoveryConfigGroupName": "Discovery-Update",
+    "DiscoveryConfigGroupDescription": "Discovery-Update",
+    "DiscoveryStatusEmailRecipient": null,
+    "DiscoveryConfigParentGroupId": 0,
+    "CreateGroup": true,
+    "DiscoveryConfigModels": [
+        {
+            "DiscoveryConfigId": 916135421,
+            "DiscoveryConfigDescription": "",
+            "DiscoveryConfigStatus": "",
+            "DiscoveryConfigTargets": [
+                {
+                    "DiscoveryConfigTargetId": 0,
+                    "NetworkAddressDetail": "10.226.197.136",
+                    "SubnetMask": null,
+                    "AddressType": 3,
+                    "Disabled": false,
+                    "Exclude": false
+                }
+            ],
+            "ConnectionProfileId": 0,
+            "ConnectionProfile": "{\"profileName\":\"\",\"profileDescription\":\"\",\"type\":\"DISCOVERY\",\"credentials\":[{\"id\":0,\"type\":\"WSMAN\",\"authType\":\"Basic\",\"modified\":false,\"credentials\":{\"username\":\"root\",\"password\":\"calvin\",\"caCheck\":false,\"cnCheck\":false,\"port\":443,\"retries\":3,\"timeout\":60,\"isHttp\":false,\"keepAlive\":false}}]}",
+            "DeviceType": [
+                1000
+            ],
+            "DiscoveryConfigVendorPlatforms": []
+        }
+    ],
+    "DiscoveryConfigTaskParam": [
+        {
+            "TaskId": 12718,
+            "TaskTypeId": 0,
+            "ExecutionSequence": 0
+        }
+    ],
+    "DiscoveryConfigTasks": [],
+    "Schedule": {
+        "RunNow": false,
+        "RunLater": false,
+        "Recurring": null,
+        "Cron": "0 55 19 16 9 ? 2024",
+        "StartTime": "",
+        "EndTime": ""
+    },
+    "TrapDestination": false,
+    "CommunityString": false,
+    "ChassisIdentifier": null,
+    "UseAllProfiles": null
+}

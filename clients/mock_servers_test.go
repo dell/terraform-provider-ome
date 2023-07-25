@@ -29,6 +29,15 @@ import (
 	"time"
 )
 
+var (
+	//go:embed json_data/responseCreateDiscovery.json
+	responseCreateDiscovery []byte
+	//go:embed json_data/responseUpdateDiscovery.json
+	responseUpdateDiscovery []byte
+	//go:embed json_data/responseGetDiscoveryByGroupID.json
+	responseGetDiscoveryByGroupID []byte
+)
+
 func createNewTLSServer(t *testing.T) *httptest.Server {
 	// create a listener with the desired port.
 	attemtp := 0
@@ -69,6 +78,11 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 			mockGetBaselineDevComplianceReportByIDAPI(r, w) || mockGetBaselineDevAttrComplianceReportByIDAPI(r, w) || mockGetBaselineByNameAPI(r, w) ||
 			mockImportTemplateAPI(r, w) || mockGroupServiceActionsAPIs(r, w)
 		if shouldReturn6 {
+			return
+		}
+
+		shouldReturn7 := mockDiscoveryAPIs(r, w)
+		if shouldReturn7 {
 			return
 		}
 
@@ -2767,6 +2781,54 @@ func mockImportTemplateAPI(r *http.Request, w http.ResponseWriter) bool {
 			}`))
 		}
 		return true
+	}
+	return false
+}
+
+func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
+	if (r.URL.Path == DiscoveryJobAPI) && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "CreateDiscoveryCT") {
+			w.WriteHeader(http.StatusCreated)
+			w.Write(responseCreateDiscovery)
+		} else if strings.Contains(string(body), "invalid-create") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid discovery create`))
+		}
+		return true
+	}
+	if r.URL.Path == DiscoveryJobAPI+"?groupId=57" && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "UpdateDiscoveryCT") {
+			groupID := r.URL.Query().Get("groupId")
+			if groupID != "" {
+				w.WriteHeader(http.StatusCreated)
+				w.Write(responseUpdateDiscovery)
+			}
+		} else if strings.Contains(string(body), "invalid-update") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid discovery update`))
+		}
+		return true
+	}
+	if r.URL.Path == DiscoveryJobRemoveAPI && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "DiscoveryGroupIds") {
+			w.WriteHeader(http.StatusNoContent)
+		} else if strings.Contains(string(body), "-1") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid discovery delete`))
+		}
+	}
+
+	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, 51) && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write(responseGetDiscoveryByGroupID)
+	}
+
+	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, -1) && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`invalid discovery get`))
 	}
 	return false
 }
