@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -28,6 +27,15 @@ import (
 	"terraform-provider-ome/models"
 	"testing"
 	"time"
+)
+
+var (
+	//go:embed json_data/responseCreateDiscovery.json
+	jsonData4 []byte
+	//go:embed json_data/responseUpdateDiscovery.json
+	jsonData5 []byte
+	//go:embed json_data/responseGetDiscoveryByGroupID.json
+	jsonData6 []byte
 )
 
 func createNewTLSServer(t *testing.T) *httptest.Server {
@@ -2781,20 +2789,18 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 	if (r.URL.Path == DiscoveryJobAPI) && r.Method == "POST" {
 		body, _ := io.ReadAll(r.Body)
 		if strings.Contains(string(body), "CreateDiscoveryCT") {
-			jsonData, _ := ioutil.ReadFile("json_data/responseCreateDiscovery.json")
 			w.WriteHeader(http.StatusCreated)
-			w.Write([]byte(jsonData))
+			w.Write(jsonData4)
 		}
 		return true
 	}
 	if r.URL.Path == DiscoveryJobAPI+"?groupId=57" && r.Method == "POST" {
 		body, _ := io.ReadAll(r.Body)
 		if strings.Contains(string(body), "UpdateDiscoveryCT") {
-			groupId := r.URL.Query().Get("groupId")
-			if groupId != "" {
-				jsonData, _ := ioutil.ReadFile("json_data/responseUpdateDiscovery.json")
+			groupID := r.URL.Query().Get("groupId")
+			if groupID != "" {
 				w.WriteHeader(http.StatusCreated)
-				w.Write([]byte(jsonData))
+				w.Write(jsonData5)
 			}
 		}
 		return true
@@ -2807,9 +2813,8 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 	}
 
 	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, 51) && r.Method == "GET" {
-		jsonData, _ := ioutil.ReadFile("json_data/responseGetDiscoveryByGroupID")
 		w.WriteHeader(http.StatusOK)
-		w.Write(jsonData)
+		w.Write(jsonData6)
 	}
 	return false
 }

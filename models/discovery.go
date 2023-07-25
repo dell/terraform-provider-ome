@@ -84,13 +84,13 @@ type DiscoveryConfigTasks struct {
 	DiscoveryConfigDescription           string `json:"DiscoveryConfigDescription,omitempty"`
 	DiscoveryConfigEmailRecipient        string `json:"DiscoveryConfigEmailRecipient,omitempty"`
 	DiscoveryConfigDiscoveredDeviceCount string `json:"DiscoveryConfigDiscoveredDeviceCount,omitempty"`
-	DiscoveryConfigRequestId             int    `json:"DiscoveryConfigRequestId,omitempty"`
+	DiscoveryConfigRequestID             int    `json:"DiscoveryConfigRequestId,omitempty"`
 	DiscoveryConfigExpectedDeviceCount   string `json:"DiscoveryConfigExpectedDeviceCount,omitempty"`
 	DiscoveryConfigName                  string `json:"DiscoveryConfigName,omitempty"`
 }
 
 // DiscoveryConfigVendorPlatforms to provider vendor platform details.
 type DiscoveryConfigVendorPlatforms struct {
-	VendorPlatformId                int `json:"VendorPlatformId,omitempty"`
-	DiscoveryConfigVendorPlatformId int `json:"DiscoveryConfigVendorPlatformId,omitempty"`
+	VendorPlatformID                int `json:"VendorPlatformId,omitempty"`
+	DiscoveryConfigVendorPlatformID int `json:"DiscoveryConfigVendorPlatformId,omitempty"`
 }

@@ -1,11 +1,20 @@
 package clients
 
 import (
-	"io/ioutil"
+	_ "embed"
 	"terraform-provider-ome/models"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+)
+
+var (
+	//go:embed json_data/payloadCreateDiscovery.json
+	jsonData1 []byte
+	// go:embed json_data/payloadUpdateDiscovery.json
+	jsonData2 []byte
+	//go:embed json_data/payloadDeleteDiscovery.json
+	jsonData3 []byte
 )
 
 func TestClient_DiscoveryCreateJob(t *testing.T) {
@@ -16,11 +25,8 @@ func TestClient_DiscoveryCreateJob(t *testing.T) {
 
 	c, _ := NewClient(opts)
 	var createDiscoveryJobPayloadSuccess models.DiscoveryJobPayload
-	jsonData, err := ioutil.ReadFile("json_data/payloadCreateDiscovery.json")
-	if err != nil {
-		t.Error(err)
-	}
-	err = c.JSONUnMarshal(jsonData, &createDiscoveryJobPayloadSuccess)
+
+	err := c.JSONUnMarshal(jsonData1, &createDiscoveryJobPayloadSuccess)
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,27 +56,24 @@ func TestClient_DiscoveryUpdateJob(t *testing.T) {
 
 	c, _ := NewClient(opts)
 
-	var updateDiscoveryJobPayloadSuccess models.DiscoveryJobPayload
-	jsonData, err := ioutil.ReadFile("json_data/payloadUpdateDiscovery.json")
-	if err != nil {
-		t.Error(err)
-	}
-	err = c.JSONUnMarshal(jsonData, &updateDiscoveryJobPayloadSuccess)
+	var updateDiscoveryJobSuccess models.DiscoveryJob
+
+	err := c.JSONUnMarshal(jsonData2, &updateDiscoveryJobSuccess)
 	if err != nil {
 		t.Error(err)
 	}
 	tests := []struct {
 		name string
-		args models.DiscoveryJobPayload
+		args models.DiscoveryJob
 	}{
-		{"Update Discovery Job Successfully", updateDiscoveryJobPayloadSuccess},
+		{"Update Discovery Job Successfully", updateDiscoveryJobSuccess},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			discoveryJob, err := c.UpdateDiscoveryJob(tt.args)
 			t.Log(discoveryJob, err)
 			if err == nil {
-				assert.Equal(t, updateDiscoveryJobPayloadSuccess.DiscoveryConfigGroupName, discoveryJob.DiscoveryConfigGroupName)
+				assert.Equal(t, updateDiscoveryJobSuccess.DiscoveryConfigGroupName, discoveryJob.DiscoveryConfigGroupName)
 			}
 		})
 	}
@@ -84,11 +87,8 @@ func TestClient_DiscoveryDeleteJob(t *testing.T) {
 	c, _ := NewClient(opts)
 
 	var deleteDiscoveryJobPayloadSuccess models.DiscoveryJobDeletePayload
-	jsonData, err := ioutil.ReadFile("json_data/payloadDeleteDiscovery.json")
-	if err != nil {
-		t.Error(err)
-	}
-	err = c.JSONUnMarshal(jsonData, &deleteDiscoveryJobPayloadSuccess)
+
+	err := c.JSONUnMarshal(jsonData3, &deleteDiscoveryJobPayloadSuccess)
 	if err != nil {
 		t.Error(err)
 	}
@@ -133,4 +133,3 @@ func TestClient_DiscoveryGetJobByGroupID(t *testing.T) {
 		})
 	}
 }
-
