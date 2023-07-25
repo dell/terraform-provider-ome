@@ -31,11 +31,11 @@ import (
 
 var (
 	//go:embed json_data/responseCreateDiscovery.json
-	jsonData4 []byte
+	responseCreateDiscovery []byte
 	//go:embed json_data/responseUpdateDiscovery.json
-	jsonData5 []byte
+	responseUpdateDiscovery []byte
 	//go:embed json_data/responseGetDiscoveryByGroupID.json
-	jsonData6 []byte
+	responseGetDiscoveryByGroupID []byte
 )
 
 func createNewTLSServer(t *testing.T) *httptest.Server {
@@ -2790,7 +2790,7 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 		body, _ := io.ReadAll(r.Body)
 		if strings.Contains(string(body), "CreateDiscoveryCT") {
 			w.WriteHeader(http.StatusCreated)
-			w.Write(jsonData4)
+			w.Write(responseCreateDiscovery)
 		} else if strings.Contains(string(body), "invalid-create") {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(`invalid discovery create`))
@@ -2803,9 +2803,9 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 			groupID := r.URL.Query().Get("groupId")
 			if groupID != "" {
 				w.WriteHeader(http.StatusCreated)
-				w.Write(jsonData5)
+				w.Write(responseUpdateDiscovery)
 			}
-		}  else if strings.Contains(string(body), "invalid-update") {
+		} else if strings.Contains(string(body), "invalid-update") {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(`invalid discovery update`))
 		}
@@ -2815,7 +2815,7 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 		body, _ := io.ReadAll(r.Body)
 		if strings.Contains(string(body), "DiscoveryGroupIds") {
 			w.WriteHeader(http.StatusNoContent)
-		}  else if strings.Contains(string(body), "-1") {
+		} else if strings.Contains(string(body), "-1") {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(`invalid discovery delete`))
 		}
@@ -2823,7 +2823,7 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 
 	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, 51) && r.Method == "GET" {
 		w.WriteHeader(http.StatusOK)
-		w.Write(jsonData6)
+		w.Write(responseGetDiscoveryByGroupID)
 	}
 
 	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, -1) && r.Method == "GET" {

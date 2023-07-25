@@ -10,11 +10,11 @@ import (
 
 var (
 	//go:embed json_data/payloadCreateDiscovery.json
-	jsonData1 []byte
+	payloadCreateDiscovery []byte
 	//go:embed json_data/payloadUpdateDiscovery.json
-	jsonData2 []byte
+	payloadUpdateDiscovery []byte
 	//go:embed json_data/payloadDeleteDiscovery.json
-	jsonData3 []byte
+	payloadDeleteDiscovery []byte
 )
 
 func TestClient_DiscoveryCreateJob(t *testing.T) {
@@ -26,7 +26,7 @@ func TestClient_DiscoveryCreateJob(t *testing.T) {
 	c, _ := NewClient(opts)
 	var createDiscoveryJobPayloadSuccess models.DiscoveryJobPayload
 
-	err := c.JSONUnMarshal(jsonData1, &createDiscoveryJobPayloadSuccess)
+	err := c.JSONUnMarshal(payloadCreateDiscovery, &createDiscoveryJobPayloadSuccess)
 	if err != nil {
 		t.Error(err)
 	}
@@ -36,7 +36,7 @@ func TestClient_DiscoveryCreateJob(t *testing.T) {
 		args models.DiscoveryJobPayload
 	}{
 		{"Create Discovery Job Successfully", createDiscoveryJobPayloadSuccess},
-		{"Create Discovery Job Failed", models.DiscoveryJobPayload{DiscoveryConfigGroupName:"invalid-create"}},
+		{"Create Discovery Job Failed", models.DiscoveryJobPayload{DiscoveryConfigGroupName: "invalid-create"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -58,8 +58,8 @@ func TestClient_DiscoveryUpdateJob(t *testing.T) {
 	c, _ := NewClient(opts)
 
 	var updateDiscoveryJobSuccess models.DiscoveryJob
-	t.Logf(string(jsonData2))
-	err := c.JSONUnMarshal(jsonData2, &updateDiscoveryJobSuccess)
+	t.Logf(string(payloadUpdateDiscovery))
+	err := c.JSONUnMarshal(payloadUpdateDiscovery, &updateDiscoveryJobSuccess)
 	if err != nil {
 		t.Error(err)
 	}
@@ -68,7 +68,7 @@ func TestClient_DiscoveryUpdateJob(t *testing.T) {
 		args models.DiscoveryJob
 	}{
 		{"Update Discovery Job Successfully", updateDiscoveryJobSuccess},
-		{"Update Discovery Job Failed", models.DiscoveryJob{DiscoveryConfigGroupName:"invalid-update"}},
+		{"Update Discovery Job Failed", models.DiscoveryJob{DiscoveryConfigGroupName: "invalid-update"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -90,7 +90,7 @@ func TestClient_DiscoveryDeleteJob(t *testing.T) {
 
 	var deleteDiscoveryJobPayloadSuccess models.DiscoveryJobDeletePayload
 
-	err := c.JSONUnMarshal(jsonData3, &deleteDiscoveryJobPayloadSuccess)
+	err := c.JSONUnMarshal(payloadDeleteDiscovery, &deleteDiscoveryJobPayloadSuccess)
 	if err != nil {
 		t.Error(err)
 	}
