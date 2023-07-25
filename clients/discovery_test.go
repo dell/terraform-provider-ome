@@ -11,7 +11,7 @@ import (
 var (
 	//go:embed json_data/payloadCreateDiscovery.json
 	jsonData1 []byte
-	// go:embed json_data/payloadUpdateDiscovery.json
+	//go:embed json_data/payloadUpdateDiscovery.json
 	jsonData2 []byte
 	//go:embed json_data/payloadDeleteDiscovery.json
 	jsonData3 []byte
@@ -36,6 +36,7 @@ func TestClient_DiscoveryCreateJob(t *testing.T) {
 		args models.DiscoveryJobPayload
 	}{
 		{"Create Discovery Job Successfully", createDiscoveryJobPayloadSuccess},
+		{"Create Discovery Job Failed", models.DiscoveryJobPayload{DiscoveryConfigGroupName:"invalid-create"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -57,7 +58,7 @@ func TestClient_DiscoveryUpdateJob(t *testing.T) {
 	c, _ := NewClient(opts)
 
 	var updateDiscoveryJobSuccess models.DiscoveryJob
-
+	t.Logf(string(jsonData2))
 	err := c.JSONUnMarshal(jsonData2, &updateDiscoveryJobSuccess)
 	if err != nil {
 		t.Error(err)
@@ -67,6 +68,7 @@ func TestClient_DiscoveryUpdateJob(t *testing.T) {
 		args models.DiscoveryJob
 	}{
 		{"Update Discovery Job Successfully", updateDiscoveryJobSuccess},
+		{"Update Discovery Job Failed", models.DiscoveryJob{DiscoveryConfigGroupName:"invalid-update"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -98,10 +100,13 @@ func TestClient_DiscoveryDeleteJob(t *testing.T) {
 		args models.DiscoveryJobDeletePayload
 	}{
 		{"Delete Discovery Job Successfully", deleteDiscoveryJobPayloadSuccess},
+		{"Delete Discovery Job Failed", models.DiscoveryJobDeletePayload{
+			DiscoveryGroupIds: []int{-1},
+		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := c.DeleteDiscoveryJob(deleteDiscoveryJobPayloadSuccess)
+			resp, err := c.DeleteDiscoveryJob(tt.args)
 			t.Log(resp)
 			if err == nil {
 				assert.Equal(t, resp, "204 No Content")
@@ -122,13 +127,14 @@ func TestClient_DiscoveryGetJobByGroupID(t *testing.T) {
 		args int64
 	}{
 		{"Get Discovery Job By Group ID Successfully", 51},
+		{"Get Discovery Job By Group ID Failed", -1},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := c.GetDiscoveryJobByGroupID(51)
+			resp, err := c.GetDiscoveryJobByGroupID(tt.args)
 			t.Log(resp)
 			if err == nil {
-				assert.Equal(t, resp.DiscoveryConfigGroupID, 51)
+				assert.Equal(t, resp.DiscoveryConfigGroupID, tt.args)
 			}
 		})
 	}

@@ -1,6 +1,6 @@
 {
-	"DiscoveryConfigGroupId":58,
-    "DiscoveryConfigGroupName": "UpdateDiscoveyCT",
+	"DiscoveryConfigGroupId":40,
+    "DiscoveryConfigGroupName": "Discovery-Update",
     "DiscoveryConfigGroupDescription": "null",
     "DiscoveryConfigModels": [
         {
@@ -10,7 +10,7 @@
             "DiscoveryConfigTargets": [
                 {
                     "DiscoveryConfigTargetId": 0,
-                    "NetworkAddressDetail": "x.x.x.x",
+                    "NetworkAddressDetail": "10.226.197.136",
                     "AddressType": 30,
                     "Disabled": false,
                     "Exclude": false

@@ -2791,6 +2791,9 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 		if strings.Contains(string(body), "CreateDiscoveryCT") {
 			w.WriteHeader(http.StatusCreated)
 			w.Write(jsonData4)
+		} else if strings.Contains(string(body), "invalid-create") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid discovery create`))
 		}
 		return true
 	}
@@ -2802,6 +2805,9 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 				w.WriteHeader(http.StatusCreated)
 				w.Write(jsonData5)
 			}
+		}  else if strings.Contains(string(body), "invalid-update") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid discovery update`))
 		}
 		return true
 	}
@@ -2809,12 +2815,20 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 		body, _ := io.ReadAll(r.Body)
 		if strings.Contains(string(body), "DiscoveryGroupIds") {
 			w.WriteHeader(http.StatusNoContent)
+		}  else if strings.Contains(string(body), "-1") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid discovery delete`))
 		}
 	}
 
 	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, 51) && r.Method == "GET" {
 		w.WriteHeader(http.StatusOK)
 		w.Write(jsonData6)
+	}
+
+	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, -1) && r.Method == "GET" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`invalid discovery get`))
 	}
 	return false
 }
