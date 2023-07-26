@@ -208,9 +208,16 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 				- SERVER - \"redfish\", \"snmp\", and \"ssh\".
 				- CHASSIS - \"redfish\".
 				- NETWORK SWITCH - \"snmp\".
-				- STORAGE - \"snmp\".
-				`,
-			Description: "Device Type",
+				- STORAGE - \"snmp\".`,
+			Description: `
+			- Provide the type of devices to be discovered.
+			- The accepted types are SERVER, CHASSIS, NETWORK SWITCH, and STORAGE.
+			- A combination or all of the above can be provided.
+			- "Supported protocols for each device type are:"
+			- SERVER - \"redfish\", \"snmp\", and \"ssh\".
+			- CHASSIS - \"redfish\".
+			- NETWORK SWITCH - \"snmp\".
+			- STORAGE - \"snmp\".`,
 			Required:    true,
 			ElementType: types.StringType,
 			Validators: []validator.List{

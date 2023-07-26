@@ -2,8 +2,10 @@ package ome
 
 import (
 	"context"
+	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -14,8 +16,8 @@ var (
 	_ resource.Resource = &discoveryResource{}
 )
 
-// NewdiscoveryResource is a helper function to simplify the provider implementation.
-func NewdiscoveryResource() resource.Resource {
+// NewDiscoveryResource is a helper function to simplify the provider implementation.
+func NewDiscoveryResource() resource.Resource {
 	return &discoveryResource{}
 }
 
@@ -34,7 +36,7 @@ func (r *discoveryResource) Configure(ctx context.Context, req resource.Configur
 
 // Metadata returns the resource type name.
 func (r *discoveryResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_discovery"
+	resp.TypeName = req.ProviderTypeName + "discovery"
 }
 
 // Schema defines the schema for the resource.
@@ -73,7 +75,20 @@ func (r *discoveryResource) Read(ctx context.Context, req resource.ReadRequest, 
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	omeClient, d := r.p.createOMESession(ctx, "resource_discovery Read")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
+		return
+	}
+	defer omeClient.RemoveSession()
 
+	_, err := omeClient.GetDiscoveryJobByGroupID(state.DiscoveryJobID.ValueInt64())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrGnrReadDiscovery, err.Error(),
+		)
+		return
+	}
 	tflog.Trace(ctx, "resource_discovery read: finished reading state")
 	//Save into State
 	diags = resp.State.Set(ctx, &state)
@@ -117,6 +132,32 @@ func (r *discoveryResource) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 
+	//Create Session and differ the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_discovery Delete")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
+		return
+	}
+	defer omeClient.RemoveSession()
+	ddj := models.DiscoveryJobDeletePayload{
+		DiscoveryGroupIds: []int{
+			int(state.DiscoveryJobID.ValueInt64()),
+		},
+	}
+	tflog.Debug(ctx, "delete group id :", map[string]interface{}{"ids": ddj})
+	status, err := omeClient.DeleteDiscoveryJob(ddj)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrGnrDeleteDiscovery,
+			err.Error(),
+		)
+	}
+	tflog.Trace(ctx, "resource_discovery delete: finished with status "+status)
 	resp.State.RemoveResource(ctx)
 	tflog.Trace(ctx, "resource_discovery delete: finished")
+}
+
+func (r *discoveryResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	// Retrieve import ID and save to id attribute
+	resource.ImportStatePassthroughID(ctx, path.Root("discovery_job_id"), req, resp)
 }
