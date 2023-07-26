@@ -99,7 +99,7 @@ type DiscoveryConfigVendorPlatforms struct {
 
 // tfsdk struct
 
-// DiscoveryJob will be used in read, create and update
+// OmeDiscoveryJob will be used in read, create and update
 type OmeDiscoveryJob struct {
 	DiscoveryJobID         types.Int64                 `tfsdk:"discovery_job_id"`
 	DiscoveryJobName       types.String                `tfsdk:"discovery_job_name"`
@@ -114,15 +114,16 @@ type OmeDiscoveryJob struct {
 	CommunityString        types.Bool                  `tfsdk:"community_types.String"`
 }
 
-// DiscoveryConfigTargets for discovery configuration
+// OmeDiscoveryConfigTargets for discovery configuration
 type OmeDiscoveryConfigTargets struct {
-	NetworkAddressDetail types.String  `tfsdk:"network_address_detail"`
+	NetworkAddressDetail types.String   `tfsdk:"network_address_detail"`
 	DeviceType           []types.String `tfsdk:"device_type"`
-	Redfish              OmeRedfish    `tfsdk:"redfish"`
-	Snmp                 OmeSnmp       `tfsdk:"snmp"`
-	Ssh                  OmeSsh        `tfsdk:"ssh"`
+	Redfish              OmeRedfish     `tfsdk:"redfish"`
+	SNMP                 OmeSNMP        `tfsdk:"snmp"`
+	SSH                  OmeSSH         `tfsdk:"ssh"`
 }
 
+// OmeRedfish for discovery configuration target REDFISH protocol.
 type OmeRedfish struct {
 	Username        types.String `tfsdk:"username"`
 	Password        types.String `tfsdk:"password"`
@@ -135,14 +136,16 @@ type OmeRedfish struct {
 	CertificateData types.String `tfsdk:"certificate_data"`
 }
 
-type OmeSnmp struct {
+// OmeSNMP for discovery configuration target REDFISH protocol.
+type OmeSNMP struct {
 	Community types.String `tfsdk:"community"`
 	Port      types.Int64  `tfsdk:"port"`
 	Retries   types.Int64  `tfsdk:"retries"`
 	Timeout   types.Int64  `tfsdk:"timeout"`
 }
 
-type OmeSsh struct {
+// OmeSSH for discovery configuration target REDFISH protocol.
+type OmeSSH struct {
 	Username        types.String `tfsdk:"username"`
 	Password        types.String `tfsdk:"password"`
 	Port            types.Int64  `tfsdk:"port"`
