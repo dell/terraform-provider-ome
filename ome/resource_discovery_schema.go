@@ -13,13 +13,13 @@ import (
 func DiscoveryJobSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
-		"discovery_job_id": schema.Int64Attribute{
+		"id": schema.Int64Attribute{
 			MarkdownDescription: "ID of the discovery configuration group",
 			Description:         "ID of the discovery configuration group",
 			Computed:            true,
 		},
 
-		"discovery_job_name": schema.StringAttribute{
+		"name": schema.StringAttribute{
 			MarkdownDescription: "Name of the discovery configuration job",
 			Description:         "Name of the discovery configuration job",
 			Required:            true,
@@ -36,7 +36,6 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 				- Enter the email address to which notifications are to be sent about the discovery job status.
 				- Configure the SMTP settings to allow sending notifications to an email address.`,
 			Optional: true,
-			Computed: true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
 			},
@@ -45,10 +44,10 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 		"discovery_config_targets": schema.SetNestedAttribute{
 			MarkdownDescription: `
 				- Provide the list of discovery targets.
-      			- Each discovery target is a set of \"network_address_detail\", \"device_types\", and one or more protocol credentials.`,
+      			- Each discovery target is a set of "network_address_detail", "device_types", and one or more protocol credentials.`,
 			Description: `
 				- Provide the list of discovery targets.
-      			- Each discovery target is a set of \"network_address_detail\", \"device_types\", and one or more protocol credentials.`,
+      			- Each discovery target is a set of "network_address_detail", "device_types", and one or more protocol credentials.`,
 			Required:     true,
 			NestedObject: schema.NestedAttributeObject{Attributes: DiscoveryConfigTargetsSchema()},
 		},
@@ -69,13 +68,13 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			Optional:            true,
 			Computed:            true,
 			PlanModifiers: []planmodifier.Int64{
-				Int64DefaultValue(types.Int64Value(10800)),
+				Int64DefaultValue(types.Int64Value(1200)),
 			},
 		},
 
 		"schedule": schema.StringAttribute{
-			MarkdownDescription: "Provides the option to schedule the discovery job. If \"RunLater\" is selected, then attribute \"cron\" must be specified.",
-			Description:         "Provides the option to schedule the discovery job. If \"RunLater\" is selected, then attribute \"cron\" must be specified.",
+			MarkdownDescription: "Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.",
+			Description:         "Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.",
 			Optional:            true,
 			Computed:            true,
 			Validators: []validator.String{stringvalidator.OneOf(
@@ -103,14 +102,14 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 				- Partial failures occur when there is a combination of both discovered and undiscovered IPs.
       			- If ignore_partial_failur is set to false, then the partial failure is not ignored, and the resource will error out.
       			- If ignore_partial_failur is set to true, then the partial failure is ignored.
-      			- This option is only applicable if \"job_wait\" is set to true.
+      			- This option is only applicable if "job_wait" is set to true.
 				`,
 			Description: `
 				- Provides the option to ignore partial failures. 
 				- Partial failures occur when there is a combination of both discovered and undiscovered IPs.
       			- If ignore_partial_failur is set to false, then the partial failure is not ignored, and the resource will error out.
       			- If ignore_partial_failur is set to true, then the partial failure is ignored.
-      			- This option is only applicable if \"job_wait\" is set to true.
+      			- This option is only applicable if "job_wait" is set to true.
 				`,
 			Optional: true,
 			Computed: true,
@@ -205,19 +204,19 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 				- The accepted types are SERVER, CHASSIS, NETWORK SWITCH, and STORAGE.
 				- A combination or all of the above can be provided.
 				- "Supported protocols for each device type are:"
-				- SERVER - \"redfish\", \"snmp\", and \"ssh\".
-				- CHASSIS - \"redfish\".
-				- NETWORK SWITCH - \"snmp\".
-				- STORAGE - \"snmp\".`,
+				- SERVER - "redfish", "snmp", and "ssh".
+				- CHASSIS - "redfish".
+				- NETWORK SWITCH - "snmp".
+				- STORAGE - "snmp".`,
 			Description: `
 			- Provide the type of devices to be discovered.
 			- The accepted types are SERVER, CHASSIS, NETWORK SWITCH, and STORAGE.
 			- A combination or all of the above can be provided.
 			- "Supported protocols for each device type are:"
-			- SERVER - \"redfish\", \"snmp\", and \"ssh\".
-			- CHASSIS - \"redfish\".
-			- NETWORK SWITCH - \"snmp\".
-			- STORAGE - \"snmp\".`,
+			- SERVER - "redfish", "snmp", and "ssh".
+			- CHASSIS - "redfish".
+			- NETWORK SWITCH - "snmp".
+			- STORAGE - "snmp".`,
 			Required:    true,
 			ElementType: types.StringType,
 			Validators: []validator.List{

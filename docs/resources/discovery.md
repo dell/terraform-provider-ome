@@ -35,8 +35,8 @@ Resource for managing discovery on OpenManage Enterprise.
 ### Required
 
 - `discovery_config_targets` (Attributes Set) - Provide the list of discovery targets.
-      			- Each discovery target is a set of \"network_address_detail\", \"device_types\", and one or more protocol credentials. (see [below for nested schema](#nestedatt--discovery_config_targets))
-- `discovery_job_name` (String) Name of the discovery configuration job
+      			- Each discovery target is a set of "network_address_detail", "device_types", and one or more protocol credentials. (see [below for nested schema](#nestedatt--discovery_config_targets))
+- `name` (String) Name of the discovery configuration job
 
 ### Optional
 
@@ -49,16 +49,16 @@ Resource for managing discovery on OpenManage Enterprise.
 				- Partial failures occur when there is a combination of both discovered and undiscovered IPs.
       			- If ignore_partial_failur is set to false, then the partial failure is not ignored, and the resource will error out.
       			- If ignore_partial_failur is set to true, then the partial failure is ignored.
-      			- This option is only applicable if \"job_wait\" is set to true.
+      			- This option is only applicable if "job_wait" is set to true.
 - `job_wait` (Boolean) Provides the option to wait for job completion
 - `job_wait_timeout` (Number) The maximum wait time of job_wait in seconds. The job is tracked only for this duration.
-- `schedule` (String) Provides the option to schedule the discovery job. If "RunLater" is selected, then attribute "cron" must be specified.
+- `schedule` (String) Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.
 - `trap_destination` (Boolean) - Enable OpenManage Enterprise to receive the incoming SNMP traps from the discovered devices. 
 				- This is effective only for servers discovered by using their iDRAC interface.
 
 ### Read-Only
 
-- `discovery_job_id` (Number) ID of the discovery configuration group
+- `id` (Number) ID of the discovery configuration group
 
 <a id="nestedatt--discovery_config_targets"></a>
 ### Nested Schema for `discovery_config_targets`
@@ -69,10 +69,10 @@ Required:
 				- The accepted types are SERVER, CHASSIS, NETWORK SWITCH, and STORAGE.
 				- A combination or all of the above can be provided.
 				- "Supported protocols for each device type are:"
-				- SERVER - \"redfish\", \"snmp\", and \"ssh\".
-				- CHASSIS - \"redfish\".
-				- NETWORK SWITCH - \"snmp\".
-				- STORAGE - \"snmp\".
+				- SERVER - "redfish", "snmp", and "ssh".
+				- CHASSIS - "redfish".
+				- NETWORK SWITCH - "snmp".
+				- STORAGE - "snmp".
 - `network_address_detail` (List of String) - "Provide the list of IP addresses, host names, or the range of IP addresses of the devices to be discoveredor included."
          		- "Sample Valid IP Range Formats"
          		- "   192.35.0.0"
