@@ -1,5 +1,7 @@
 package models
 
+import "github.com/hashicorp/terraform-plugin-framework/types"
+
 // DiscoveryJobPayload will be used in create and update functionality
 type DiscoveryJobPayload struct {
 	ChassisIdentifier               string                     `json:"ChassisIdentifier,omitempty"`
@@ -93,4 +95,62 @@ type DiscoveryConfigTasks struct {
 type DiscoveryConfigVendorPlatforms struct {
 	VendorPlatformID                int `json:"VendorPlatformId,omitempty"`
 	DiscoveryConfigVendorPlatformID int `json:"DiscoveryConfigVendorPlatformId,omitempty"`
+}
+
+// tfsdk struct
+
+// OmeDiscoveryJob will be used in read, create and update
+type OmeDiscoveryJob struct {
+	DiscoveryJobID         types.Int64                 `tfsdk:"discovery_job_id"`
+	DiscoveryJobName       types.String                `tfsdk:"discovery_job_name"`
+	EmailRecipient         types.String                `tfsdk:"email_recipient"`
+	DiscoveryConfigTargets []OmeDiscoveryConfigTargets `tfsdk:"discovery_config_targets"`
+	JobWait                types.Bool                  `tfsdk:"job_wait"`
+	JobWaitTimeout         types.Int64                 `tfsdk:"job_wait_timeout"`
+	Schedule               types.String                `tfsdk:"schedule"`
+	Cron                   types.String                `tfsdk:"cron"`
+	IgnorePartialFailure   types.Bool                  `tfsdk:"ignore_partial_failure"`
+	TrapDestination        types.Bool                  `tfsdk:"trap_destination"`
+	CommunityString        types.Bool                  `tfsdk:"community_types.String"`
+}
+
+// OmeDiscoveryConfigTargets for discovery configuration
+type OmeDiscoveryConfigTargets struct {
+	NetworkAddressDetail types.String   `tfsdk:"network_address_detail"`
+	DeviceType           []types.String `tfsdk:"device_type"`
+	Redfish              OmeRedfish     `tfsdk:"redfish"`
+	SNMP                 OmeSNMP        `tfsdk:"snmp"`
+	SSH                  OmeSSH         `tfsdk:"ssh"`
+}
+
+// OmeRedfish for discovery configuration target REDFISH protocol.
+type OmeRedfish struct {
+	Username        types.String `tfsdk:"username"`
+	Password        types.String `tfsdk:"password"`
+	Domain          types.String `tfsdk:"domain"`
+	Port            types.Int64  `tfsdk:"port"`
+	Retries         types.Int64  `tfsdk:"retries"`
+	Timeout         types.Int64  `tfsdk:"timeout"`
+	CnCheck         types.Bool   `tfsdk:"cn_check"`
+	CaCheck         types.Bool   `tfsdk:"ca_check"`
+	CertificateData types.String `tfsdk:"certificate_data"`
+}
+
+// OmeSNMP for discovery configuration target REDFISH protocol.
+type OmeSNMP struct {
+	Community types.String `tfsdk:"community"`
+	Port      types.Int64  `tfsdk:"port"`
+	Retries   types.Int64  `tfsdk:"retries"`
+	Timeout   types.Int64  `tfsdk:"timeout"`
+}
+
+// OmeSSH for discovery configuration target REDFISH protocol.
+type OmeSSH struct {
+	Username        types.String `tfsdk:"username"`
+	Password        types.String `tfsdk:"password"`
+	Port            types.Int64  `tfsdk:"port"`
+	Retries         types.Int64  `tfsdk:"retries"`
+	Timeout         types.Int64  `tfsdk:"timeout"`
+	CheckKnownHosts types.Bool   `tfsdk:"check_known_hosts"`
+	IsSudoUser      types.Bool   `tfsdk:"is_sudo_user"`
 }
