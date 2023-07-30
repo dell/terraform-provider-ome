@@ -1,7 +1,6 @@
 package ome
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -13,7 +12,7 @@ import (
 func DiscoveryJobSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
-		"id": schema.Int64Attribute{
+		"id": schema.StringAttribute{
 			MarkdownDescription: "ID of the discovery configuration group",
 			Description:         "ID of the discovery configuration group",
 			Computed:            true,
@@ -132,7 +131,7 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			},
 		},
 
-		"community_types_string": schema.BoolAttribute{
+		"community_string": schema.BoolAttribute{
 			MarkdownDescription: `
 				- Enable the use of SNMP community strings to receive SNMP traps using Application Settings in OpenManage Enterprise. 
 				- This option is available only for the discovered iDRAC servers and MX7000 chassis.`,
@@ -189,13 +188,13 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
          		- NOTE: Both IPv6 and IPv6 CIDR formats are supported.`,
 			Required:    true,
 			ElementType: types.StringType,
-			Validators: []validator.List{
-				// Validate this List must contain List elements
-				// which have at least 1 String element.
-				listvalidator.ValueListsAre(listvalidator.SizeAtLeast(1)),
-				// Validate this List must contain string values which are at least 3 characters.
-				listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-			},
+			// Validators: []validator.List{
+			// 	// Validate this List must contain List elements
+			// 	// which have at least 1 String element.
+			// 	listvalidator.ValueListsAre(listvalidator.SizeAtLeast(1)),
+			// 	// Validate this List must contain string values which are at least 3 characters.
+			// 	listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
+			// },
 		},
 
 		"device_type": schema.ListAttribute{
@@ -219,20 +218,20 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			- STORAGE - "snmp".`,
 			Required:    true,
 			ElementType: types.StringType,
-			Validators: []validator.List{
-				// Validate this List must contain List elements
-				// which have at least 1 String element.
-				listvalidator.ValueListsAre(listvalidator.SizeAtLeast(1)),
-				// Validate this List must contain string values which are at least 3 characters.
-				listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-				// Validate this List must contain string values which are SERVER, CHASSIS, NETWORK SWITCH and STORAGE
-				listvalidator.ValueStringsAre(stringvalidator.OneOf(
-					"SERVER",
-					"CHASSIS",
-					"NETWORK SWITCH",
-					"STORAGE",
-				)),
-			},
+			// Validators: []validator.List{
+			// 	// Validate this List must contain List elements
+			// 	// which have at least 1 String element.
+			// 	listvalidator.ValueListsAre(listvalidator.SizeAtLeast(1)),
+			// 	// Validate this List must contain string values which are at least 3 characters.
+			// 	listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
+			// 	// Validate this List must contain string values which are SERVER, CHASSIS, NETWORK SWITCH and STORAGE
+			// 	listvalidator.ValueStringsAre(stringvalidator.OneOf(
+			// 		"SERVER",
+			// 		"CHASSIS",
+			// 		"NETWORK SWITCH",
+			// 		"STORAGE",
+			// 	)),
+			// },
 		},
 
 		"redfish": schema.SingleNestedAttribute{
@@ -278,16 +277,6 @@ func RedfishSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Provide a password for the protocol.",
 			Description:         "Provide a password for the protocol.",
 			Required:            true,
-			Validators: []validator.String{
-				stringvalidator.LengthAtLeast(1),
-			},
-		},
-
-		"domain": schema.StringAttribute{
-			MarkdownDescription: "Provide a domain for the protocol.",
-			Description:         "Provide a domain for the protocol.",
-			Optional:            true,
-			Computed:            true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
 			},
@@ -343,15 +332,25 @@ func RedfishSchema() map[string]schema.Attribute {
 			},
 		},
 
-		"certificate_data": schema.StringAttribute{
-			MarkdownDescription: "Provide certificate data for the CA check.",
-			Description:         "Provide certificate data for the CA check.",
-			Optional:            true,
-			Computed:            true,
-			Validators: []validator.String{
-				stringvalidator.LengthAtLeast(1),
-			},
-		},
+		// "domain": schema.StringAttribute{
+		// 	MarkdownDescription: "Provide a domain for the protocol.",
+		// 	Description:         "Provide a domain for the protocol.",
+		// 	Optional:            true,
+		// 	Computed:            true,
+		// 	Validators: []validator.String{
+		// 		stringvalidator.LengthAtLeast(1),
+		// 	},
+		// },
+
+		// "certificate_data": schema.StringAttribute{
+		// 	MarkdownDescription: "Provide certificate data for the CA check.",
+		// 	Description:         "Provide certificate data for the CA check.",
+		// 	Optional:            true,
+		// 	Computed:            true,
+		// 	Validators: []validator.String{
+		// 		stringvalidator.LengthAtLeast(1),
+		// 	},
+		// },
 	}
 }
 

@@ -2,13 +2,17 @@ package ome
 
 import (
 	"context"
+	"encoding/json"
+	"strconv"
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/mitchellh/mapstructure"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -48,6 +52,14 @@ func (r *discoveryResource) Schema(_ context.Context, _ resource.SchemaRequest, 
 	}
 }
 
+func (r *discoveryResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var data models.OmeDiscoveryJob
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+}
+
 // Create creates the resource and sets the initial Terraform state.
 func (r *discoveryResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	tflog.Trace(ctx, "resource_discovery create : Started")
@@ -59,9 +71,34 @@ func (r *discoveryResource) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	tflog.Trace(ctx, "resource_discovery create: updating state finished, saving ...")
+	// Create Session and defer the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_discovery Create")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
+		return
+	}
+	defer omeClient.RemoveSession()
+
+	discoveryPayload := getDiscoveryPayload(ctx, &plan)
+
+	tflog.Debug(ctx, "resource_discovery create Creating Discovery Job", map[string]interface{}{
+		"Create Discovery Request": discoveryPayload,
+	})
+
+	cDiscovery, err := omeClient.CreateDiscoveryJob(discoveryPayload)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrGnrCreateDiscovery, err.Error(),
+		)
+		return
+	}
+
+	tflog.Trace(ctx, "resource_discovery : create Finished creating discovery")
+	tflog.Trace(ctx, "resource_discovery : create Fetching discovery id for a discovery")
+	state = discoveryState(ctx, cDiscovery, state)
 	// Save into State
 	diags = resp.State.Set(ctx, &state)
+	tflog.Trace(ctx, "resource_discovery create: updating state finished, saving ...")
 	resp.Diagnostics.Append(diags...)
 	tflog.Trace(ctx, "resource_discovery create: finish")
 }
@@ -82,13 +119,15 @@ func (r *discoveryResource) Read(ctx context.Context, req resource.ReadRequest, 
 	}
 	defer omeClient.RemoveSession()
 
-	_, err := omeClient.GetDiscoveryJobByGroupID(state.DiscoveryJobID.ValueInt64())
+	did, _ := strconv.Atoi(state.DiscoveryJobID.ValueString())
+	respDiscovery, err := omeClient.GetDiscoveryJobByGroupID(int64(did))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrReadDiscovery, err.Error(),
 		)
 		return
 	}
+	state = discoveryState(ctx, respDiscovery, state)
 	tflog.Trace(ctx, "resource_discovery read: finished reading state")
 	//Save into State
 	diags = resp.State.Set(ctx, &state)
@@ -139,9 +178,10 @@ func (r *discoveryResource) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 	defer omeClient.RemoveSession()
+	did, _ := strconv.Atoi(state.DiscoveryJobID.ValueString())
 	ddj := models.DiscoveryJobDeletePayload{
 		DiscoveryGroupIds: []int{
-			int(state.DiscoveryJobID.ValueInt64()),
+			did,
 		},
 	}
 	tflog.Debug(ctx, "delete group id :", map[string]interface{}{"ids": ddj})
@@ -160,4 +200,108 @@ func (r *discoveryResource) Delete(ctx context.Context, req resource.DeleteReque
 func (r *discoveryResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// Retrieve import ID and save to id attribute
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+}
+
+func getDiscoveryPayload(ctx context.Context, plan *models.OmeDiscoveryJob) (payload models.DiscoveryJobPayload) {
+	return payload
+}
+
+func discoveryState(ctx context.Context, resp models.DiscoveryJob, plan models.OmeDiscoveryJob) (state models.OmeDiscoveryJob) {
+	state = models.OmeDiscoveryJob{
+		DiscoveryJobID:   types.StringValue(strconv.Itoa(resp.DiscoveryConfigGroupID)),
+		DiscoveryJobName: types.StringValue(resp.DiscoveryConfigGroupName),
+		EmailRecipient:   types.StringValue(resp.DiscoveryStatusEmailRecipient),
+		TrapDestination:  types.BoolValue(resp.TrapDestination),
+		CommunityString:  types.BoolValue(resp.CommunityString),
+	}
+	if plan.Schedule.ValueString() == "RunNow" || resp.Schedule.RunNow || resp.Schedule.Cron == "startnow" {
+		state.Schedule = types.StringValue("RunNow")
+		if !plan.JobWait.IsNull() {
+			state.JobWait = types.BoolValue(plan.JobWait.ValueBool())
+		} else {
+			state.JobWait = types.BoolValue(true)
+		}
+		if !plan.JobWaitTimeout.IsNull() {
+			state.JobWaitTimeout = types.Int64Value(plan.JobWaitTimeout.ValueInt64())
+		} else {
+			state.JobWaitTimeout = types.Int64Value(1200)
+		}
+		if !plan.IgnorePartialFailure.IsNull() {
+			state.IgnorePartialFailure = types.BoolValue(plan.IgnorePartialFailure.ValueBool())
+		} else {
+			state.IgnorePartialFailure = types.BoolValue(false)
+		}
+	} else if plan.Schedule.ValueString() == "RunLater" || resp.Schedule.RunLater || len(resp.Schedule.Cron) > 0 {
+		state.Schedule = types.StringValue("RunLater")
+		state.Cron = types.StringValue(resp.Schedule.Cron)
+	}
+	for _, dct := range resp.DiscoveryConfigModels {
+		state.DiscoveryConfigTargets = append(state.DiscoveryConfigTargets, getOmeDiscoveryConfigTargets(ctx, dct))
+	}
+	return
+}
+
+func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConfigModels) (state models.OmeDiscoveryConfigTargets) {
+	var connectionProfiles models.ConnectionProfiles
+	deviceMap := map[int]string{
+		1000: "SERVER",
+		7000: "NETWORK SWITCH",
+		2000: "CHASSIS",
+		5000: "STORAGE",
+	}
+	for _, did := range resp.DeviceType {
+		if val, ok := deviceMap[did]; ok {
+			state.DeviceType = append(state.DeviceType, types.StringValue(val))
+		}
+	}
+	for _, network := range resp.DiscoveryConfigTargets {
+		state.NetworkAddressDetail = append(state.NetworkAddressDetail, types.StringValue(network.NetworkAddressDetail))
+	}
+	err := json.Unmarshal([]byte(resp.ConnectionProfile), &connectionProfiles)
+	if err != nil {
+		tflog.Debug(ctx, "Error unmarshaling JSON: "+err.Error())
+		return
+	}
+	for _, creds := range connectionProfiles.Credentials {
+		if credMap, ok := creds.Credential.(map[string]interface{}); ok {
+			if creds.Type == "REDFISH" {
+				var cred models.CredREDFISH
+				err := mapstructure.Decode(credMap,&cred)
+				if err != nil{
+					continue
+				}
+				state.Redfish.Username = types.StringValue(cred.Username)
+				state.Redfish.Password = types.StringValue(cred.Password)
+				state.Redfish.Port = types.Int64Value(int64(cred.Port))
+				state.Redfish.Retries = types.Int64Value(int64(cred.Retries))
+				state.Redfish.Timeout = types.Int64Value(int64(cred.Timeout))
+				state.Redfish.CaCheck = types.BoolValue(cred.CaCheck)
+				state.Redfish.CnCheck = types.BoolValue(cred.CnCheck)
+			} else if creds.Type == "SNMP" {
+				var cred models.CredSNMP
+				err := mapstructure.Decode(credMap,&cred)
+				if err != nil{
+					continue
+				}
+				state.SNMP.Community = types.StringValue(cred.Community)
+				state.SNMP.Port = types.Int64Value(int64(cred.Port))
+				state.SNMP.Retries = types.Int64Value(int64(cred.Retries))
+				state.SNMP.Timeout = types.Int64Value(int64(cred.Timeout))
+			} else if creds.Type == "SSH" {
+				var cred models.CredSSH
+				err := mapstructure.Decode(credMap,&cred)
+				if err != nil{
+					continue
+				}
+				state.SSH.Username = types.StringValue(cred.Username)
+				state.SSH.Password = types.StringValue(cred.Password)
+				state.SSH.Port = types.Int64Value(int64(cred.Port))
+				state.SSH.Retries = types.Int64Value(int64(cred.Retries))
+				state.SSH.Timeout = types.Int64Value(int64(cred.Timeout))
+				state.SSH.IsSudoUser = types.BoolValue(cred.IsSudoUser)
+				state.SSH.CheckKnownHosts = types.BoolValue(cred.CheckKnownHosts)
+			}
+		}
+	}
+	return
 }

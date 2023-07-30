@@ -97,12 +97,63 @@ type DiscoveryConfigVendorPlatforms struct {
 	DiscoveryConfigVendorPlatformID int `json:"DiscoveryConfigVendorPlatformId,omitempty"`
 }
 
+// ConnectionProfiles to get the credentials for different protocols
+type ConnectionProfiles struct {
+	ProfileName        string        `json:"profileName"`
+	ProfileDescription string        `json:"profileDescription"`
+	Type               string        `json:"type"`
+	Credentials        []Credentials `json:"credentials"`
+}
+
+// CredSNMP to get the credential of the SNMP protocol.
+type CredSNMP struct {
+	Community  string `json:"community"`
+	EnableV1V2 bool   `json:"enableV1V2"`
+	Port       int    `json:"port"`
+	Retries    int    `json:"retries"`
+	Timeout    int    `json:"timeout"`
+}
+
+// CredSSH to get the credential of the SSH protocol.
+type CredSSH struct {
+	Username        string `json:"username"`
+	IsSudoUser      bool   `json:"isSudoUser"`
+	Password        string `json:"password"`
+	Port            int    `json:"port"`
+	UseKey          bool   `json:"useKey"`
+	Retries         int    `json:"retries"`
+	Timeout         int    `json:"timeout"`
+	CheckKnownHosts bool   `json:"checkKnownHosts"`
+}
+
+// CredREDFISH to get the credential of the REDFISH protocol.
+type CredREDFISH struct {
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	CaCheck   bool   `json:"caCheck"`
+	CnCheck   bool   `json:"cnCheck"`
+	Port      int    `json:"port"`
+	Retries   int    `json:"retries"`
+	Timeout   int    `json:"timeout"`
+	IsHTTP    bool   `json:"isHttp"`
+	KeepAlive bool   `json:"keepAlive"`
+}
+
+// Credentials to branch out the different protocol based on credentials attribute with interface{} type.
+type Credentials struct {
+	ID          int         `json:"id"`
+	Type        string      `json:"type"`
+	AuthType    string      `json:"authType"`
+	Modified    bool        `json:"modified"`
+	Credential interface{} `json:"credentials,omitempty"`
+}
+
 // tfsdk struct
 
 // OmeDiscoveryJob will be used in read, create and update
 type OmeDiscoveryJob struct {
-	DiscoveryJobID         types.Int64                 `tfsdk:"discovery_job_id"`
-	DiscoveryJobName       types.String                `tfsdk:"discovery_job_name"`
+	DiscoveryJobID         types.String                `tfsdk:"id"`
+	DiscoveryJobName       types.String                `tfsdk:"name"`
 	EmailRecipient         types.String                `tfsdk:"email_recipient"`
 	DiscoveryConfigTargets []OmeDiscoveryConfigTargets `tfsdk:"discovery_config_targets"`
 	JobWait                types.Bool                  `tfsdk:"job_wait"`
@@ -111,12 +162,12 @@ type OmeDiscoveryJob struct {
 	Cron                   types.String                `tfsdk:"cron"`
 	IgnorePartialFailure   types.Bool                  `tfsdk:"ignore_partial_failure"`
 	TrapDestination        types.Bool                  `tfsdk:"trap_destination"`
-	CommunityString        types.Bool                  `tfsdk:"community_types.String"`
+	CommunityString        types.Bool                  `tfsdk:"community_string"`
 }
 
 // OmeDiscoveryConfigTargets for discovery configuration
 type OmeDiscoveryConfigTargets struct {
-	NetworkAddressDetail types.String   `tfsdk:"network_address_detail"`
+	NetworkAddressDetail []types.String `tfsdk:"network_address_detail"`
 	DeviceType           []types.String `tfsdk:"device_type"`
 	Redfish              OmeRedfish     `tfsdk:"redfish"`
 	SNMP                 OmeSNMP        `tfsdk:"snmp"`
@@ -127,13 +178,13 @@ type OmeDiscoveryConfigTargets struct {
 type OmeRedfish struct {
 	Username        types.String `tfsdk:"username"`
 	Password        types.String `tfsdk:"password"`
-	Domain          types.String `tfsdk:"domain"`
 	Port            types.Int64  `tfsdk:"port"`
 	Retries         types.Int64  `tfsdk:"retries"`
 	Timeout         types.Int64  `tfsdk:"timeout"`
 	CnCheck         types.Bool   `tfsdk:"cn_check"`
 	CaCheck         types.Bool   `tfsdk:"ca_check"`
-	CertificateData types.String `tfsdk:"certificate_data"`
+	// Domain          types.String `tfsdk:"domain"`
+	// CertificateData types.String `tfsdk:"certificate_data"`
 }
 
 // OmeSNMP for discovery configuration target REDFISH protocol.
