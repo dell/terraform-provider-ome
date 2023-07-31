@@ -36,6 +36,10 @@ var (
 	responseUpdateDiscovery []byte
 	//go:embed json_data/responseGetDiscoveryByGroupID.json
 	responseGetDiscoveryByGroupID []byte
+	//go:embed json_data/responseGetAllDeviceInventory.json
+	responseGetAllDeviceInventory []byte
+	//go:embed json_data/responseGetSingleDeviceInventory.json
+	responseGetSingleDeviceInventory []byte
 )
 
 func createNewTLSServer(t *testing.T) *httptest.Server {
@@ -81,7 +85,7 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 			return
 		}
 
-		shouldReturn7 := mockDiscoveryAPIs(r, w)
+		shouldReturn7 := mockDiscoveryAPIs(r, w) || mockDeviceInventoryAPIs(r, w)
 		if shouldReturn7 {
 			return
 		}
@@ -324,6 +328,67 @@ func buildJobResponse(id int, msg string) string {
 		}
 	}`
 	return s
+}
+
+func mockDeviceInventoryAPIs(r *http.Request, w http.ResponseWriter) bool {
+	if !strings.Contains(r.URL.Path, "/api/DeviceService/Devices") &&
+		!strings.Contains(r.URL.Path, "/InventoryDetails") {
+		return false
+	}
+
+	if r.Method == "GET" {
+		if strings.Contains(r.URL.Path, "123000") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CTEM1027",
+							"RelatedProperties": [],
+							"Message": "No device with ID 123000 exists.",
+							"Severity": "Error",
+						}
+					]
+				}
+			}`))
+			return true
+		}
+
+		if strings.Contains(r.URL.Path, "123456") {
+
+			if strings.Contains(r.URL.Path, "('serverDeviceCards')") {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte(responseGetSingleDeviceInventory))
+				return true
+			}
+			if strings.Contains(r.URL.Path, "('unknown')") {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte(`{
+					"error": {
+						"code": "Base.1.0.GeneralError",
+						"message": "A general error has occurred. See ExtendedInfo for more information.",
+						"@Message.ExtendedInfo": [
+							{
+								"MessageId": "CTEM1027",
+								"RelatedProperties": [],
+								"Message": "No inventory with type 'unknown' exists.",
+								"Severity": "Error",
+							}
+						]
+					}
+				}`))
+				return true
+			}
+
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(responseGetAllDeviceInventory))
+			return true
+		}
+	}
+
+	return false
 }
 
 func mockDeviceAPIs(r *http.Request, w http.ResponseWriter) bool {
