@@ -1,0 +1,697 @@
+{
+    "@odata.context": "/api/$metadata#Collection(DeviceService.Device)",
+    "@odata.count": 5,
+    "value": [
+        {
+            "@odata.type": "#DeviceService.Device",
+            "@odata.id": "/api/DeviceService/Devices(123450)",
+            "Id": 123450,
+            "Type": 1000,
+            "Identifier": "MX84002",
+            "DeviceServiceTag": "MX84002",
+            "ChassisServiceTag": "MXLAAS1",
+            "Model": "PowerEdge MX840c",
+            "PowerState": 18,
+            "ManagedState": 3000,
+            "Status": 1000,
+            "ConnectionState": true,
+            "AssetTag": null,
+            "SystemId": 1894,
+            "DeviceName": "server_a",
+            "LastInventoryTime": "2023-07-02 18:30:20.810",
+            "LastStatusTime": "2023-07-03 03:00:03.187",
+            "DeviceSubscription": null,
+            "DeviceCapabilities": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                207,
+                16,
+                208,
+                17,
+                209,
+                18,
+                210,
+                211,
+                212,
+                213,
+                30,
+                31,
+                41,
+                1001,
+                1009,
+                50,
+                1012,
+                1015,
+                1016
+            ],
+            "SlotConfiguration": {
+                "ChassisName": null
+            },
+            "DeviceManagement": [
+                {
+                    "ManagementId": 5006,
+                    "NetworkAddress": "192.35.0.1",
+                    "MacAddress": "d0:94:66:2d:b9:b2",
+                    "ManagementType": 2,
+                    "InstrumentationName": "server_a",
+                    "DnsName": "idrac-MX84002",
+                    "ManagementProfile": [
+                        {
+                            "ManagementProfileId": 5009,
+                            "ProfileId": "",
+                            "ManagementId": 5006,
+                            "AgentName": "iDRAC",
+                            "Version": "7.00.00.00",
+                            "ManagementURL": "https://192.35.0.1:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-03-02 07:36:07.042"
+                        },
+                        {
+                            "ManagementProfileId": 5007,
+                            "ProfileId": "",
+                            "ManagementId": 5006,
+                            "AgentName": "iDRAC",
+                            "Version": "6.10.80.00",
+                            "ManagementURL": "https://192.35.0.1:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-03-02 07:36:06.849"
+                        }
+                    ]
+                }
+            ],
+            "Enabled": true,
+            "Actions": null,
+            "ConnectionStateReason": 101,
+            "ChassisIp": "100.68.168.51",
+            "DiscoveryConfigurationJobInformation": [
+                {
+                    "GroupId": "8",
+                    "CreatedBy": "admin",
+                    "DiscoveryJobName": "Discovery-202303021320011"
+                }
+            ],
+            "SensorHealth@odata.navigationLink": "/api/DeviceService/Devices(123450)/SensorHealth",
+            "VirtualSession": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/VirtualSession"
+            },
+            "Baselines": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/Baselines"
+            },
+            "InventoryDetails@odata.navigationLink": "/api/DeviceService/Devices(123450)/InventoryDetails",
+            "HardwareLogs@odata.navigationLink": "/api/DeviceService/Devices(123450)/HardwareLogs",
+            "SubSystemHealth@odata.navigationLink": "/api/DeviceService/Devices(123450)/SubSystemHealth",
+            "RecentActivity@odata.navigationLink": "/api/DeviceService/Devices(123450)/RecentActivity",
+            "InventoryTypes": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/InventoryTypes"
+            },
+            "LogSeverities": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/LogSeverities"
+            },
+            "Settings@odata.navigationLink": "/api/DeviceService/Devices(123450)/Settings",
+            "Temperature": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/Temperature"
+            },
+            "Power": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/Power"
+            },
+            "SystemUpTime": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/SystemUpTime"
+            },
+            "BlinkStatus": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/BlinkStatus"
+            },
+            "PowerUsageByDevice@odata.navigationLink": "/api/DeviceService/Devices(123450)/PowerUsageByDevice",
+            "DeviceBladeSlots@odata.navigationLink": "/api/DeviceService/Devices(123450)/DeviceBladeSlots",
+            "GraphicInfo": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/GraphicInfo"
+            },
+            "DeployRequired": {
+                "@odata.id": "/api/DeviceService/Devices(123450)/DeployRequired"
+            }
+        },
+        {
+            "@odata.type": "#DeviceService.Device",
+            "@odata.id": "/api/DeviceService/Devices(123456)",
+            "Id": 123456,
+            "Type": 1000,
+            "Identifier": "CZMC1T2",
+            "DeviceServiceTag": "CZMC1T2",
+            "ChassisServiceTag": "CZMC1T2",
+            "Model": "PowerEdge R640",
+            "PowerState": 17,
+            "ManagedState": 3000,
+            "Status": 1000,
+            "ConnectionState": true,
+            "AssetTag": null,
+            "SystemId": 1814,
+            "DeviceName": "1.2.3.4",
+            "LastInventoryTime": "2023-07-02 18:30:29.000",
+            "LastStatusTime": "2023-07-03 03:00:03.320",
+            "DeviceSubscription": null,
+            "DeviceCapabilities": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                11,
+                12,
+                13,
+                14,
+                15,
+                207,
+                16,
+                208,
+                17,
+                209,
+                18,
+                210,
+                211,
+                212,
+                213,
+                30,
+                31,
+                33,
+                41,
+                1001,
+                1009,
+                50,
+                1012,
+                1015,
+                1016
+            ],
+            "SlotConfiguration": {
+                "ChassisName": null
+            },
+            "DeviceManagement": [
+                {
+                    "ManagementId": 5000,
+                    "NetworkAddress": "1.2.3.4",
+                    "MacAddress": "4c:d9:8f:22:d7:cc",
+                    "ManagementType": 2,
+                    "InstrumentationName": "",
+                    "DnsName": "iDRAC-CZMC1T2",
+                    "ManagementProfile": [
+                        {
+                            "ManagementProfileId": 5002,
+                            "ProfileId": "",
+                            "ManagementId": 5000,
+                            "AgentName": "iDRAC",
+                            "Version": "6.10.80.00",
+                            "ManagementURL": "https://1.2.3.4:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-02-28 14:10:59.244"
+                        },
+                        {
+                            "ManagementProfileId": 5000,
+                            "ProfileId": "",
+                            "ManagementId": 5000,
+                            "AgentName": "iDRAC",
+                            "Version": "6.10.00.00",
+                            "ManagementURL": "https://1.2.3.4:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-02-28 14:10:58.934"
+                        }
+                    ]
+                }
+            ],
+            "Enabled": true,
+            "Actions": null,
+            "ConnectionStateReason": 101,
+            "ChassisIp": "",
+            "DiscoveryConfigurationJobInformation": [
+                {
+                    "GroupId": "12",
+                    "CreatedBy": "admin",
+                    "DiscoveryJobName": "Discovery-2023030601332121"
+                },
+                {
+                    "GroupId": "7",
+                    "CreatedBy": "admin",
+                    "DiscoveryJobName": "Discovery-202302280925066"
+                }
+            ],
+            "SensorHealth@odata.navigationLink": "/api/DeviceService/Devices(123456)/SensorHealth",
+            "VirtualSession": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/VirtualSession"
+            },
+            "Baselines": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/Baselines"
+            },
+            "InventoryDetails@odata.navigationLink": "/api/DeviceService/Devices(123456)/InventoryDetails",
+            "HardwareLogs@odata.navigationLink": "/api/DeviceService/Devices(123456)/HardwareLogs",
+            "SubSystemHealth@odata.navigationLink": "/api/DeviceService/Devices(123456)/SubSystemHealth",
+            "RecentActivity@odata.navigationLink": "/api/DeviceService/Devices(123456)/RecentActivity",
+            "InventoryTypes": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/InventoryTypes"
+            },
+            "LogSeverities": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/LogSeverities"
+            },
+            "Settings@odata.navigationLink": "/api/DeviceService/Devices(123456)/Settings",
+            "Temperature": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/Temperature"
+            },
+            "Power": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/Power"
+            },
+            "SystemUpTime": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/SystemUpTime"
+            },
+            "BlinkStatus": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/BlinkStatus"
+            },
+            "PowerUsageByDevice@odata.navigationLink": "/api/DeviceService/Devices(123456)/PowerUsageByDevice",
+            "DeviceBladeSlots@odata.navigationLink": "/api/DeviceService/Devices(123456)/DeviceBladeSlots",
+            "GraphicInfo": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/GraphicInfo"
+            },
+            "DeployRequired": {
+                "@odata.id": "/api/DeviceService/Devices(123456)/DeployRequired"
+            }
+        },
+        {
+            "@odata.type": "#DeviceService.Device",
+            "@odata.id": "/api/DeviceService/Devices(123458)",
+            "Id": 123458,
+            "Type": 1000,
+            "Identifier": "4111H63",
+            "DeviceServiceTag": "4111H63",
+            "ChassisServiceTag": "4112H63",
+            "Model": "PowerEdge MX840c",
+            "PowerState": 17,
+            "ManagedState": 3000,
+            "Status": 4000,
+            "ConnectionState": true,
+            "AssetTag": null,
+            "SystemId": 1894,
+            "DeviceName": "WIN-OMIH8SUERNL",
+            "LastInventoryTime": "2023-07-02 18:31:12.143",
+            "LastStatusTime": "2023-07-03 03:00:03.451",
+            "DeviceSubscription": null,
+            "DeviceCapabilities": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                207,
+                16,
+                208,
+                17,
+                18,
+                210,
+                211,
+                212,
+                213,
+                30,
+                31,
+                33,
+                41,
+                1001,
+                1006,
+                1009,
+                50,
+                1012,
+                1015,
+                1016
+            ],
+            "SlotConfiguration": {
+                "ChassisName": null
+            },
+            "DeviceManagement": [
+                {
+                    "ManagementId": 5010,
+                    "NetworkAddress": "fe80::ffff:ffff:ffff:1111",
+                    "MacAddress": "2c:ea:7f:58:f4:06",
+                    "ManagementType": 2,
+                    "InstrumentationName": "WIN-OMIH8SUERNL",
+                    "DnsName": "idrac-4111H63",
+                    "ManagementProfile": [
+                        {
+                            "ManagementProfileId": 5012,
+                            "ProfileId": "",
+                            "ManagementId": 5010,
+                            "AgentName": "iDRAC",
+                            "Version": "6.10.80.00",
+                            "ManagementURL": "https://fe80::ffff:ffff:ffff:1111:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-03-02 07:38:25.611"
+                        }
+                    ]
+                }
+            ],
+            "Enabled": true,
+            "Actions": null,
+            "ConnectionStateReason": 101,
+            "ChassisIp": "100.71.93.69",
+            "DiscoveryConfigurationJobInformation": [
+                {
+                    "GroupId": "9",
+                    "CreatedBy": "admin",
+                    "DiscoveryJobName": "Discovery-2023030213215757"
+                }
+            ],
+            "SensorHealth@odata.navigationLink": "/api/DeviceService/Devices(123458)/SensorHealth",
+            "VirtualSession": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/VirtualSession"
+            },
+            "Baselines": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/Baselines"
+            },
+            "InventoryDetails@odata.navigationLink": "/api/DeviceService/Devices(123458)/InventoryDetails",
+            "HardwareLogs@odata.navigationLink": "/api/DeviceService/Devices(123458)/HardwareLogs",
+            "SubSystemHealth@odata.navigationLink": "/api/DeviceService/Devices(123458)/SubSystemHealth",
+            "RecentActivity@odata.navigationLink": "/api/DeviceService/Devices(123458)/RecentActivity",
+            "InventoryTypes": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/InventoryTypes"
+            },
+            "LogSeverities": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/LogSeverities"
+            },
+            "Settings@odata.navigationLink": "/api/DeviceService/Devices(123458)/Settings",
+            "Temperature": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/Temperature"
+            },
+            "Power": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/Power"
+            },
+            "SystemUpTime": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/SystemUpTime"
+            },
+            "BlinkStatus": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/BlinkStatus"
+            },
+            "PowerUsageByDevice@odata.navigationLink": "/api/DeviceService/Devices(123458)/PowerUsageByDevice",
+            "DeviceBladeSlots@odata.navigationLink": "/api/DeviceService/Devices(123458)/DeviceBladeSlots",
+            "GraphicInfo": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/GraphicInfo"
+            },
+            "DeployRequired": {
+                "@odata.id": "/api/DeviceService/Devices(123458)/DeployRequired"
+            }
+        },
+        {
+            "@odata.type": "#DeviceService.Device",
+            "@odata.id": "/api/DeviceService/Devices(123459)",
+            "Id": 123459,
+            "Type": 1000,
+            "Identifier": "541K903",
+            "DeviceServiceTag": "541K903",
+            "ChassisServiceTag": "FZNDSZ2",
+            "Model": "PowerEdge MX840c",
+            "PowerState": 17,
+            "ManagedState": 3000,
+            "Status": 3000,
+            "ConnectionState": true,
+            "AssetTag": null,
+            "SystemId": 1894,
+            "DeviceName": "192.39.0.5",
+            "LastInventoryTime": "2023-07-02 18:30:42.385",
+            "LastStatusTime": "2023-07-03 03:00:03.531",
+            "DeviceSubscription": null,
+            "DeviceCapabilities": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                203,
+                12,
+                204,
+                13,
+                205,
+                14,
+                15,
+                207,
+                208,
+                16,
+                17,
+                209,
+                210,
+                18,
+                211,
+                212,
+                213,
+                30,
+                31,
+                33,
+                41,
+                1001,
+                1006,
+                1009,
+                50,
+                1012,
+                1015,
+                1016
+            ],
+            "SlotConfiguration": {
+                "ChassisName": null
+            },
+            "DeviceManagement": [
+                {
+                    "ManagementId": 5013,
+                    "NetworkAddress": "192.39.0.5",
+                    "MacAddress": "4c:d9:8f:94:91:19",
+                    "ManagementType": 2,
+                    "InstrumentationName": "localhost.localdomain",
+                    "DnsName": "idrac-541K903",
+                    "ManagementProfile": [
+                        {
+                            "ManagementProfileId": 5017,
+                            "ProfileId": "",
+                            "ManagementId": 5013,
+                            "AgentName": "iDRAC",
+                            "Version": "7.00.00.00",
+                            "ManagementURL": "https://192.39.0.5:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-03-02 07:40:32.268"
+                        },
+                        {
+                            "ManagementProfileId": 5015,
+                            "ProfileId": "",
+                            "ManagementId": 5013,
+                            "AgentName": "iDRAC",
+                            "Version": "6.00.00.00",
+                            "ManagementURL": "https://192.39.0.5:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-03-02 07:40:32.064"
+                        }
+                    ]
+                }
+            ],
+            "Enabled": true,
+            "Actions": null,
+            "ConnectionStateReason": 101,
+            "ChassisIp": "100.68.120.200",
+            "DiscoveryConfigurationJobInformation": [
+                {
+                    "GroupId": "10",
+                    "CreatedBy": "admin",
+                    "DiscoveryJobName": "Discovery-2023030213243636"
+                }
+            ],
+            "SensorHealth@odata.navigationLink": "/api/DeviceService/Devices(123459)/SensorHealth",
+            "VirtualSession": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/VirtualSession"
+            },
+            "Baselines": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/Baselines"
+            },
+            "InventoryDetails@odata.navigationLink": "/api/DeviceService/Devices(123459)/InventoryDetails",
+            "HardwareLogs@odata.navigationLink": "/api/DeviceService/Devices(123459)/HardwareLogs",
+            "SubSystemHealth@odata.navigationLink": "/api/DeviceService/Devices(123459)/SubSystemHealth",
+            "RecentActivity@odata.navigationLink": "/api/DeviceService/Devices(123459)/RecentActivity",
+            "InventoryTypes": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/InventoryTypes"
+            },
+            "LogSeverities": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/LogSeverities"
+            },
+            "Settings@odata.navigationLink": "/api/DeviceService/Devices(123459)/Settings",
+            "Temperature": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/Temperature"
+            },
+            "Power": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/Power"
+            },
+            "SystemUpTime": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/SystemUpTime"
+            },
+            "BlinkStatus": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/BlinkStatus"
+            },
+            "PowerUsageByDevice@odata.navigationLink": "/api/DeviceService/Devices(123459)/PowerUsageByDevice",
+            "DeviceBladeSlots@odata.navigationLink": "/api/DeviceService/Devices(123459)/DeviceBladeSlots",
+            "GraphicInfo": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/GraphicInfo"
+            },
+            "DeployRequired": {
+                "@odata.id": "/api/DeviceService/Devices(123459)/DeployRequired"
+            }
+        },
+        {
+            "@odata.type": "#DeviceService.Device",
+            "@odata.id": "/api/DeviceService/Devices(123460)",
+            "Id": 123460,
+            "Type": 1000,
+            "Identifier": "J368DH2",
+            "DeviceServiceTag": "J368DH2",
+            "ChassisServiceTag": "J368DH2",
+            "Model": "PowerEdge R730xd",
+            "PowerState": 17,
+            "ManagedState": 3000,
+            "Status": 1000,
+            "ConnectionState": true,
+            "AssetTag": null,
+            "SystemId": 1575,
+            "DeviceName": "fe80::ffff:192.0.2.11",
+            "LastInventoryTime": "2023-07-02 18:31:18.709",
+            "LastStatusTime": "2023-07-03 03:00:07.304",
+            "DeviceSubscription": null,
+            "DeviceCapabilities": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                12,
+                13,
+                14,
+                207,
+                15,
+                208,
+                18,
+                30,
+                31,
+                33,
+                41,
+                1001,
+                1009,
+                50,
+                1012,
+                1015,
+                1016
+            ],
+            "SlotConfiguration": {
+                "ChassisName": null
+            },
+            "DeviceManagement": [
+                {
+                    "ManagementId": 5474,
+                    "NetworkAddress": "fe80::ffff:192.0.2.11",
+                    "MacAddress": "18:66:da:88:2d:7a",
+                    "ManagementType": 2,
+                    "InstrumentationName": "localhost",
+                    "DnsName": "iDRAC-J368DH2",
+                    "ManagementProfile": [
+                        {
+                            "ManagementProfileId": 5477,
+                            "ProfileId": "",
+                            "ManagementId": 5474,
+                            "AgentName": "iDRAC",
+                            "Version": "2.84.84.84",
+                            "ManagementURL": "https://fe80::ffff:192.0.2.11:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-06-22 12:48:19.339"
+                        }
+                    ]
+                }
+            ],
+            "Enabled": true,
+            "Actions": null,
+            "ConnectionStateReason": 101,
+            "ChassisIp": "",
+            "DiscoveryConfigurationJobInformation": [
+                {
+                    "GroupId": "30",
+                    "CreatedBy": "admin",
+                    "DiscoveryJobName": "Discovery-202306220848099"
+                }
+            ],
+            "SensorHealth@odata.navigationLink": "/api/DeviceService/Devices(123460)/SensorHealth",
+            "VirtualSession": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/VirtualSession"
+            },
+            "Baselines": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/Baselines"
+            },
+            "InventoryDetails@odata.navigationLink": "/api/DeviceService/Devices(123460)/InventoryDetails",
+            "HardwareLogs@odata.navigationLink": "/api/DeviceService/Devices(123460)/HardwareLogs",
+            "SubSystemHealth@odata.navigationLink": "/api/DeviceService/Devices(123460)/SubSystemHealth",
+            "RecentActivity@odata.navigationLink": "/api/DeviceService/Devices(123460)/RecentActivity",
+            "InventoryTypes": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/InventoryTypes"
+            },
+            "LogSeverities": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/LogSeverities"
+            },
+            "Settings@odata.navigationLink": "/api/DeviceService/Devices(123460)/Settings",
+            "Temperature": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/Temperature"
+            },
+            "Power": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/Power"
+            },
+            "SystemUpTime": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/SystemUpTime"
+            },
+            "BlinkStatus": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/BlinkStatus"
+            },
+            "PowerUsageByDevice@odata.navigationLink": "/api/DeviceService/Devices(123460)/PowerUsageByDevice",
+            "DeviceBladeSlots@odata.navigationLink": "/api/DeviceService/Devices(123460)/DeviceBladeSlots",
+            "GraphicInfo": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/GraphicInfo"
+            },
+            "DeployRequired": {
+                "@odata.id": "/api/DeviceService/Devices(123460)/DeployRequired"
+            }
+        }
+    ]
+}

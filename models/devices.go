@@ -27,10 +27,29 @@ type Devices struct {
 
 // Device - embedded device response from the Devices
 type Device struct {
-	ID                 int64              `json:"Id"`
-	DeviceServiceTag   string             `json:"DeviceServiceTag"`
-	DeviceCapabilities []int64            `json:"DeviceCapabilities,omitempty"`
-	DeviceManagement   []DeviceManagement `json:"DeviceManagement"`
+	ID                            int64                       `json:"Id"`
+	Type                          int64                       `json:"Type"`
+	Identifier                    string                      `json:"Identifier"`
+	DeviceServiceTag              string                      `json:"DeviceServiceTag"`
+	ChassisServiceTag             string                      `json:"ChassisServiceTag"`
+	Model                         string                      `json:"Model"`
+	PowerState                    int64                       `json:"PowerState"`
+	ManagedState                  int64                       `json:"ManagedState"`
+	Status                        int64                       `json:"Status"`
+	ConnectionState               bool                        `json:"ConnectionState"`
+	AssetTag                      *string                     `json:"AssetTag"`
+	SystemID                      int64                       `json:"SystemId"`
+	DeviceName                    string                      `json:"DeviceName"`
+	LastInventoryTime             string                      `json:"LastInventoryTime"`
+	LastStatusTime                string                      `json:"LastStatusTime"`
+	DeviceSubscription            *string                     `json:"DeviceSubscription"`
+	DeviceCapabilities            []int64                     `json:"DeviceCapabilities"`
+	SlotConfiguration             SlotConfiguration           `json:"SlotConfiguration"`
+	DeviceManagement              []DeviceManagement          `json:"DeviceManagement"`
+	Enabled                       bool                        `json:"Enabled"`
+	ConnectionStateReason         int64                       `json:"ConnectionStateReason"`
+	ChassisIP                     string                      `json:"ChassisIp"`
+	DiscoveryConfigurationJobInfo []DiscoveryConfigurationJob `json:"DiscoveryConfigurationJobInformation"`
 }
 
 // BelongsToPool - method to check if a device belongs to that ip pool
@@ -43,7 +62,35 @@ func (d *Device) BelongsToPool(pool iprange.Pool) bool {
 	return false
 }
 
+type DiscoveryConfigurationJob struct {
+	GroupID          string `json:"GroupId"`
+	CreatedBy        string `json:"CreatedBy"`
+	DiscoveryJobName string `json:"DiscoveryJobName"`
+}
+
+type SlotConfiguration struct {
+	ChassisName *string `json:"ChassisName"`
+}
+
 // DeviceManagement - embedded device management response from the Devices
 type DeviceManagement struct {
-	NetworkAddress net.IP `json:"NetworkAddress"`
+	ManagementID        int64               `json:"ManagementId"`
+	NetworkAddress      net.IP              `json:"NetworkAddress"`
+	MacAddress          string              `json:"MacAddress"`
+	ManagementType      int64               `json:"ManagementType"`
+	InstrumentationName string              `json:"InstrumentationName"`
+	DNSName             string              `json:"DnsName"`
+	ManagementProfile   []ManagementProfile `json:"ManagementProfile"`
+}
+
+type ManagementProfile struct {
+	ManagementProfileID int64  `json:"ManagementProfileId"`
+	ProfileID           string `json:"ProfileId"`
+	ManagementID        int64  `json:"ManagementId"`
+	AgentName           string `json:"AgentName"`
+	Version             string `json:"Version"`
+	ManagementURL       string `json:"ManagementURL"`
+	HasCreds            int64  `json:"HasCreds"`
+	Status              int64  `json:"Status"`
+	StatusDateTime      string `json:"StatusDateTime"`
 }

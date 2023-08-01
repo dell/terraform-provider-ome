@@ -40,6 +40,8 @@ var (
 	responseGetAllDeviceInventory []byte
 	//go:embed json_data/responseGetSingleDeviceInventory.json
 	responseGetSingleDeviceInventory []byte
+	//go:embed json_data/responseGetAllDevices.json
+	responseGetAllDevices []byte
 )
 
 func createNewTLSServer(t *testing.T) *httptest.Server {
@@ -459,50 +461,7 @@ func mockDeviceAPIs(r *http.Request, w http.ResponseWriter) bool {
 			return true
 		}
 
-		w.Write([]byte(`{
-			"value": [				
-				{
-					"Id": 123450,
-					"DeviceManagement": [
-						{
-							"NetworkAddress": "192.35.0.1"
-						}
-					]
-				},
-				{
-					"Id": 123456,
-					"DeviceManagement": [
-						{
-							"NetworkAddress": "1.2.3.4"
-						}
-					]
-				},
-				{
-					"Id": 123458,
-					"DeviceManagement": [
-						{
-							"NetworkAddress": "fe80::ffff:ffff:ffff:1111"
-						}
-					]
-				},
-				{
-					"Id": 123459,
-					"DeviceManagement": [
-						{
-							"NetworkAddress": "192.39.0.5"
-						}
-					]
-				},
-				{
-					"Id": 123460,
-					"DeviceManagement": [
-						{
-							"NetworkAddress": "fe80::ffff:192.0.2.11"
-						}
-					]
-				}
-			]
-		}`))
+		w.Write(responseGetAllDevices)
 		return true
 	}
 

@@ -37,19 +37,14 @@ func (c *Client) GetDevice(serviceTag string, devID int64) (models.Device, error
 	}
 
 	response, err := c.Get(DeviceAPI, nil, map[string]string{"$filter": fmt.Sprintf("%s eq %s", key, val)})
+	if err != nil {
+		return device, err
+	}
 
-	if err == nil {
-		devices := models.Devices{}
-		bodyData, _ := c.GetBodyData(response.Body)
-		err = c.JSONUnMarshal(bodyData, &devices)
-		if err == nil {
-			if len(devices.Value) > 0 {
-				device = devices.Value[0]
-				err = nil
-			} else {
-				err = fmt.Errorf(ErrInvalidDeviceIdentifiers+" %s", val)
-			}
-		}
+	bodyData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshalSingleValue(bodyData, &device)
+	if err != nil {
+		err = fmt.Errorf(ErrInvalidDeviceIdentifiers+" %s: %w", val, err)
 	}
 	return device, err
 }
@@ -176,15 +171,13 @@ func (c *Client) GetUniqueDevicesIdsAndServiceTags(devices []models.Device) ([]m
 }
 
 // GetDeviceByIps - method to get device using ips in OME
-func (c *Client) GetDeviceByIps(networks []string) (models.Devices, error) {
+func (c *Client) GetDeviceByIps(networks []string) ([]models.Device, error) {
 	var (
 		err     error
 		pool    iprange.Pool
 		devices models.Devices
 	)
-	ret := models.Devices{
-		Value: make([]models.Device, 0),
-	}
+	ret := make([]models.Device, 0)
 	pool, err = ParseNetworks(networks)
 	if err != nil {
 		return ret, err
@@ -195,24 +188,18 @@ func (c *Client) GetDeviceByIps(networks []string) (models.Devices, error) {
 	}
 	for _, v := range devices.Value {
 		if v.BelongsToPool(pool) {
-			ret.Value = append(ret.Value, v)
+			ret = append(ret, v)
 		}
 	}
 	return ret, err
 }
 
-// GetAllDevices - method to gfetch all devices filtered by input queries
+// GetAllDevices - method to fetch all devices filtered by input queries
 func (c *Client) GetAllDevices(queries map[string]string) (models.Devices, error) {
 	devices := models.Devices{}
-	response, err := c.Get(DeviceAPI, nil, queries)
-	if err != nil {
-		return devices, err
-	}
-	// devices := models.Devices{}
-	bodyData, _ := c.GetBodyData(response.Body)
-	err = c.JSONUnMarshal(bodyData, &devices)
-	if err != nil {
-		return devices, err
-	}
+	err := c.GetValueWithPagination(RequestOptions{
+		Url:         DeviceAPI,
+		QueryParams: queries,
+	}, &devices.Value)
 	return devices, err
 }

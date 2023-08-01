@@ -256,3 +256,37 @@ func (c *Client) GetPaginatedDataWithQueryParam(url string, queryParams map[stri
 
 	return nil
 }
+
+type RequestOptions struct {
+	Headers     map[string]string
+	QueryParams map[string]string
+	Url         string
+}
+
+// GetValueWithPagination - returns all the paginated data with options
+func (c *Client) GetValueWithPagination(opt RequestOptions, in interface{}) error {
+	var allData []json.RawMessage
+	type paginatedResponse struct {
+		Value    []json.RawMessage `json:"value"`
+		NextLink string            `json:"@odata.nextLink"`
+	}
+	pd := paginatedResponse{
+		NextLink: opt.Url,
+	}
+	for pd.NextLink != "" {
+		response, err := c.Get(pd.NextLink, opt.Headers, opt.QueryParams)
+		if err != nil {
+			return err
+		}
+		pd = paginatedResponse{}
+		bodyData, _ := c.GetBodyData(response.Body)
+		err = c.JSONUnMarshal(bodyData, &pd)
+		if err != nil {
+			return err
+		}
+		allData = append(allData, pd.Value...)
+	}
+
+	jsonString, _ := json.Marshal(allData)
+	return json.Unmarshal(jsonString, &in)
+}
