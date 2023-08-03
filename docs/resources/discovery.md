@@ -40,25 +40,18 @@ Resource for managing discovery on OpenManage Enterprise.
 
 ### Optional
 
-- `community_types_string` (Boolean) - Enable the use of SNMP community strings to receive SNMP traps using Application Settings in OpenManage Enterprise. 
+- `community_string` (Boolean) - Enable the use of SNMP community strings to receive SNMP traps using Application Settings in OpenManage Enterprise. 
 				- This option is available only for the discovered iDRAC servers and MX7000 chassis.
 - `cron` (String) Provide a cron expression based on Quartz cron format
 - `email_recipient` (String) - Enter the email address to which notifications are to be sent about the discovery job status.
 				- Configure the SMTP settings to allow sending notifications to an email address.
-- `ignore_partial_failure` (Boolean) - Provides the option to ignore partial failures. 
-				- Partial failures occur when there is a combination of both discovered and undiscovered IPs.
-      			- If ignore_partial_failur is set to false, then the partial failure is not ignored, and the resource will error out.
-      			- If ignore_partial_failur is set to true, then the partial failure is ignored.
-      			- This option is only applicable if "job_wait" is set to true.
-- `job_wait` (Boolean) Provides the option to wait for job completion
-- `job_wait_timeout` (Number) The maximum wait time of job_wait in seconds. The job is tracked only for this duration.
 - `schedule` (String) Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.
 - `trap_destination` (Boolean) - Enable OpenManage Enterprise to receive the incoming SNMP traps from the discovered devices. 
 				- This is effective only for servers discovered by using their iDRAC interface.
 
 ### Read-Only
 
-- `id` (Number) ID of the discovery configuration group
+- `id` (String) ID of the discovery configuration group
 
 <a id="nestedatt--discovery_config_targets"></a>
 ### Nested Schema for `discovery_config_targets`
@@ -107,9 +100,7 @@ Required:
 Optional:
 
 - `ca_check` (Boolean) Enable the Certificate Authority (CA) check.
-- `certificate_data` (String) Provide certificate data for the CA check.
 - `cn_check` (Boolean) Enable the Common Name (CN) check.
-- `domain` (String) Provide a domain for the protocol.
 - `port` (Number) Enter the port number that the job must use to discover the devices.
 - `retries` (Number) Enter the number of repeated attempts required to discover a device
 - `timeout` (Number) Enter the time in seconds after which a job must stop running.

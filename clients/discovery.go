@@ -23,7 +23,7 @@ func (c *Client) CreateDiscoveryJob(discoveryJob models.DiscoveryJob) (models.Di
 // UpdateDiscoveryJob - update a discovery job in OME.
 func (c *Client) UpdateDiscoveryJob(discoveryJob models.DiscoveryJob) (models.DiscoveryJob, error) {
 	data, _ := c.JSONMarshal(discoveryJob)
-	queryParams :=  map[string]string{
+	queryParams := map[string]string{
 		"groupId": strconv.Itoa(discoveryJob.DiscoveryConfigGroupID),
 	}
 	response, err := c.Do(http.MethodPost, DiscoveryJobAPI, nil, queryParams, data)

@@ -214,7 +214,6 @@ func RedfishSchema() map[string]schema.Attribute {
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
 			},
-			
 		},
 
 		"port": schema.Int64Attribute{

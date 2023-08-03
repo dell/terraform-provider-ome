@@ -326,7 +326,7 @@ func getConnectionProfile(ctx context.Context, plan *models.OmeDiscoveryConfigTa
 		protocolSNMP.Credential = snmp
 		connections.Credentials = append(connections.Credentials, protocolSNMP)
 	}
-	
+
 	if plan.SSH != nil {
 		protocolSSH := models.Protocols{
 			ID:       0,
@@ -381,9 +381,9 @@ func discoveryState(ctx context.Context, resp models.DiscoveryJob, plan models.O
 	return
 }
 
-func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConfigModels, plan models.OmeDiscoveryConfigTargets) (models.OmeDiscoveryConfigTargets) {
+func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConfigModels, plan models.OmeDiscoveryConfigTargets) models.OmeDiscoveryConfigTargets {
 	connectionProfiles := models.ConnectionProfiles{}
-	state :=  models.OmeDiscoveryConfigTargets{}
+	state := models.OmeDiscoveryConfigTargets{}
 	deviceMap := map[int]string{
 		1000: "SERVER",
 		7000: "NETWORK SWITCH",
@@ -430,7 +430,7 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 				state.SNMP.Port = types.Int64Value(int64(cred.Port))
 				state.SNMP.Retries = types.Int64Value(int64(cred.Retries))
 				state.SNMP.Timeout = types.Int64Value(int64(cred.Timeout))
-			} else if creds.Type == "SSH" && plan.SSH != nil{
+			} else if creds.Type == "SSH" && plan.SSH != nil {
 				cred := models.CredSSH{}
 				state.SSH = &models.OmeSSH{}
 				err := mapstructure.Decode(credMap, &cred)

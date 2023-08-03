@@ -92,7 +92,7 @@ func TestDiscoveryTwo(t *testing.T) {
 		cron = "0 * */10 * * ? *"
 		discovery_config_targets = [{
 		  device_type = [ "SERVER" ]
-		  network_address_detail = [ "`+ DeviceIP1 + `","` + DeviceIP2+ `","` + DeviceIP3 + `"]
+		  network_address_detail = [ "` + DeviceIP1 + `","` + DeviceIP2 + `","` + DeviceIP3 + `"]
 		  # redfish = {
 		  #  username = "root"
 		  #  password = "calvin" 
@@ -143,4 +143,3 @@ func TestDiscoveryTwo(t *testing.T) {
 	})
 
 }
-

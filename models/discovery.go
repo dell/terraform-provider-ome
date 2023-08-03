@@ -81,9 +81,9 @@ type DiscoveryConfigVendorPlatforms struct {
 
 // ConnectionProfiles to get the credentials for different protocols
 type ConnectionProfiles struct {
-	ProfileName        string        `json:"profileName"`
-	ProfileDescription string        `json:"profileDescription"`
-	Type               string        `json:"type"`
+	ProfileName        string      `json:"profileName"`
+	ProfileDescription string      `json:"profileDescription"`
+	Type               string      `json:"type"`
 	Credentials        []Protocols `json:"credentials"`
 }
 
@@ -122,7 +122,7 @@ type CredREDFISH struct {
 	KeepAlive bool   `json:"keepAlive"`
 }
 
-// Credentials to branch out the different protocol based on credentials attribute with interface{} type.
+// Protocols to branch out the different protocol based on credentials attribute with interface{} type.
 type Protocols struct {
 	ID         int         `json:"id"`
 	Type       string      `json:"type"`
@@ -149,9 +149,9 @@ type OmeDiscoveryJob struct {
 type OmeDiscoveryConfigTargets struct {
 	NetworkAddressDetail []types.String `tfsdk:"network_address_detail"`
 	DeviceType           []types.String `tfsdk:"device_type"`
-	Redfish              *OmeRedfish     `tfsdk:"redfish"`
-	SNMP                 *OmeSNMP        `tfsdk:"snmp"`
-	SSH                  *OmeSSH         `tfsdk:"ssh"`
+	Redfish              *OmeRedfish    `tfsdk:"redfish"`
+	SNMP                 *OmeSNMP       `tfsdk:"snmp"`
+	SSH                  *OmeSSH        `tfsdk:"ssh"`
 }
 
 // OmeRedfish for discovery configuration target REDFISH protocol.
