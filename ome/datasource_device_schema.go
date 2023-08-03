@@ -20,10 +20,35 @@ import (
 
 func OmeDeviceDataSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
-		"id": schema.Int64Attribute{
-			MarkdownDescription: "ID",
-			Description:         "ID",
-			Required:            true,
+		"filters": schema.SingleNestedAttribute{
+			MarkdownDescription: "Filters to apply while fetching devices.",
+			Description:         "Filters to apply while fetching devices.",
+			Optional:            true,
+			Attributes: map[string]schema.Attribute{
+				"ids": schema.ListAttribute{
+					MarkdownDescription: "ID of the device.",
+					Description:         "ID of the device.",
+					Optional:            true,
+					ElementType:         types.Int64Type,
+				},
+				"device_service_tags": schema.ListAttribute{
+					MarkdownDescription: "ID of the device.",
+					Description:         "ID of the device.",
+					Optional:            true,
+					ElementType:         types.StringType,
+				},
+				"ip_expressions": schema.ListAttribute{
+					MarkdownDescription: "ID of the device.",
+					Description:         "ID of the device.",
+					Optional:            true,
+					ElementType:         types.StringType,
+				},
+				"filter_expression": schema.StringAttribute{
+					MarkdownDescription: "ID of the device.",
+					Description:         "ID of the device.",
+					Optional:            true,
+				},
+			},
 		},
 		"devices": schema.ListNestedAttribute{
 			MarkdownDescription: "Devices",

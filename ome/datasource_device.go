@@ -16,11 +16,17 @@ package ome
 import (
 	"context"
 	"fmt"
+	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+)
+
+const (
+	numOfDevicesForInv = 1
 )
 
 var (
@@ -74,34 +80,81 @@ func (g *deviceDatasource) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 	defer omeClient.RemoveSession()
 
-	id := plan.ID.ValueInt64()
-
-	devs, err := omeClient.GetDevices(nil, []int64{id}, nil)
+	devs, err := g.ReadDevices(ctx, omeClient, plan.Filters) //omeClient.GetDevices(nil, []int64{id}, nil)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			fmt.Sprintf("Error device by id: %d", id),
+			"Error fetching devices",
 			err.Error(),
 		)
 		return
 	}
-	inv, err2 := omeClient.GetDeviceInventory(id)
-	if err2 != nil {
-		resp.Diagnostics.AddError(
-			fmt.Sprintf("Error getting inv by id: %d", id),
-			err.Error(),
-		)
-		return
-	}
-	tflog.Info(ctx, fmt.Sprint(inv))
-	state := plan
+
 	vals := make([]models.OmeSingleDeviceData, 0)
 	for _, dev := range devs {
 		val := models.NewSingleOmeDeviceData(dev)
-		val.Inventory = models.NewOmeDeviceInventory(inv)
 		vals = append(vals, val)
 	}
-	state.Devices = vals
 
-	diags = resp.State.Set(ctx, &state)
+	if len(devs) <= numOfDevicesForInv {
+		for i, dev := range devs {
+			id := dev.ID
+			inv, err2 := omeClient.GetDeviceInventory(id)
+			if err2 != nil {
+				resp.Diagnostics.AddError(
+					fmt.Sprintf("Error getting detailed inventory by id: %d", id),
+					err.Error(),
+				)
+				return
+			}
+			tflog.Info(ctx, fmt.Sprint(inv))
+			vals[i].Inventory = models.NewOmeDeviceInventory(inv)
+		}
+	}
+
+	resp.State.SetAttribute(ctx, path.Root("devices"), &vals)
 	resp.Diagnostics.Append(diags...)
+}
+
+// Read implements datasource.DataSource
+func (g *deviceDatasource) ReadDevices(ctx context.Context, client *clients.Client,
+	filters *models.OmeDeviceDataFilters) ([]models.Device, error) {
+
+	var (
+		err error
+		ret []models.Device
+	)
+	getAll := true
+	if filters != nil {
+		getAll = false
+		if !filters.FilterExpr.IsNull() {
+			devs, err2 := client.GetAllDevices(map[string]string{
+				"$filter": filters.FilterExpr.ValueString(),
+			})
+			ret, err = devs.Value, err2
+		} else if !filters.IDs.IsNull() {
+			inputs := make([]int64, 0)
+			_ = filters.IDs.ElementsAs(ctx, &inputs, false)
+			ret, err = client.GetDevices(nil, inputs, nil)
+		} else if !filters.SvcTags.IsNull() {
+			inputs := make([]string, 0)
+			_ = filters.SvcTags.ElementsAs(ctx, &inputs, false)
+			ret, err = client.GetDevices(inputs, nil, nil)
+		} else {
+			getAll = true
+		}
+	} else if getAll {
+		devs, err2 := client.GetAllDevices(nil)
+		ret, err = devs.Value, err2
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	if filters != nil && !filters.IPExprs.IsNull() {
+		inputs := make([]string, 0)
+		_ = filters.IPExprs.ElementsAs(ctx, &inputs, false)
+		return clients.FilterDeviceByIps(ret, inputs)
+	}
+	return ret, err
 }

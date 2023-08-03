@@ -98,10 +98,19 @@ type ManagementProfile struct {
 
 // ######## tfsdk models
 
-// OmeDeviceData - schema for group info in data source groupdevices
+// OmeDeviceData - schema for device data source
 type OmeDeviceData struct {
-	ID      types.Int64           `tfsdk:"id"`
+	// ID      types.Int64           `tfsdk:"id"`
+	Filters *OmeDeviceDataFilters `tfsdk:"filters"`
 	Devices []OmeSingleDeviceData `tfsdk:"devices"`
+}
+
+// OmeDeviceDataFilter - schema for device data source filters
+type OmeDeviceDataFilters struct {
+	IDs        types.List   `tfsdk:"ids"`
+	SvcTags    types.List   `tfsdk:"device_service_tags"`
+	IPExprs    types.List   `tfsdk:"ip_expressions"`
+	FilterExpr types.String `tfsdk:"filter_expression"`
 }
 
 // OmeSingleDeviceData is the tfsdk version of Device

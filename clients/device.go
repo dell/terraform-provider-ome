@@ -16,8 +16,6 @@ package clients
 import (
 	"fmt"
 	"terraform-provider-ome/models"
-
-	"github.com/netdata/go.d.plugin/pkg/iprange"
 )
 
 // GetDevice is used to get device using serviceTag or devID in OME
@@ -172,21 +170,21 @@ func (c *Client) GetUniqueDevicesIdsAndServiceTags(devices []models.Device) ([]m
 
 // GetDeviceByIps - method to get device using ips in OME
 func (c *Client) GetDeviceByIps(networks []string) ([]models.Device, error) {
-	var (
-		err     error
-		pool    iprange.Pool
-		devices models.Devices
-	)
+	devices, err := c.GetAllDevices(nil)
+	if err != nil {
+		return make([]models.Device, 0), err
+	}
+	return FilterDeviceByIps(devices.Value, networks)
+}
+
+// FilterDeviceByIps - method to filter device using ips
+func FilterDeviceByIps(devices []models.Device, networks []string) ([]models.Device, error) {
 	ret := make([]models.Device, 0)
-	pool, err = ParseNetworks(networks)
+	pool, err := ParseNetworks(networks)
 	if err != nil {
 		return ret, err
 	}
-	devices, err = c.GetAllDevices(nil)
-	if err != nil {
-		return ret, err
-	}
-	for _, v := range devices.Value {
+	for _, v := range devices {
 		if v.BelongsToPool(pool) {
 			ret = append(ret, v)
 		}
