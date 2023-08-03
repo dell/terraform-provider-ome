@@ -16,6 +16,7 @@ package models
 import (
 	"net"
 
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/netdata/go.d.plugin/pkg/iprange"
 )
 
@@ -93,4 +94,173 @@ type ManagementProfile struct {
 	HasCreds            int64  `json:"HasCreds"`
 	Status              int64  `json:"Status"`
 	StatusDateTime      string `json:"StatusDateTime"`
+}
+
+// ######## tfsdk models
+
+// OmeDeviceData - schema for group info in data source groupdevices
+type OmeDeviceData struct {
+	ID      types.Int64           `tfsdk:"id"`
+	Devices []OmeSingleDeviceData `tfsdk:"devices"`
+}
+
+// OmeSingleDeviceData is the tfsdk version of Device
+type OmeSingleDeviceData struct {
+	ID                            types.Int64                        `tfsdk:"id"`
+	Type                          types.Int64                        `tfsdk:"type"`
+	Identifier                    types.String                       `tfsdk:"identifier"`
+	DeviceServiceTag              types.String                       `tfsdk:"device_service_tag"`
+	ChassisServiceTag             types.String                       `tfsdk:"chassis_service_tag"`
+	Model                         types.String                       `tfsdk:"model"`
+	PowerState                    types.Int64                        `tfsdk:"power_state"`
+	ManagedState                  types.Int64                        `tfsdk:"managed_state"`
+	Status                        types.Int64                        `tfsdk:"status"`
+	ConnectionState               types.Bool                         `tfsdk:"connection_state"`
+	AssetTag                      types.String                       `tfsdk:"asset_tag"`
+	SystemID                      types.Int64                        `tfsdk:"system_id"`
+	DeviceName                    types.String                       `tfsdk:"device_name"`
+	LastInventoryTime             types.String                       `tfsdk:"last_inventory_time"`
+	LastStatusTime                types.String                       `tfsdk:"last_status_time"`
+	DeviceSubscription            types.String                       `tfsdk:"device_subscription"`
+	DeviceCapabilities            types.List                         `tfsdk:"device_capabilities"`
+	SlotConfiguration             OmeSlotConfigurationData           `tfsdk:"slot_configuration"`
+	DeviceManagement              []OmeDeviceManagementData          `tfsdk:"device_management"`
+	Enabled                       types.Bool                         `tfsdk:"enabled"`
+	ConnectionStateReason         types.Int64                        `tfsdk:"connection_state_reason"`
+	ChassisIP                     types.String                       `tfsdk:"chassis_ip"`
+	DiscoveryConfigurationJobInfo []OmeDiscoveryConfigurationJobData `tfsdk:"discovery_configuration_job_information"`
+	Inventory                     OmeDeviceInventory                 `tfsdk:"detailed_inventory"`
+}
+
+// OmeDiscoveryConfigurationJobData is the tfsdk version of DiscoveryConfigurationJob
+type OmeDiscoveryConfigurationJobData struct {
+	GroupID          types.String `tfsdk:"group_id"`
+	CreatedBy        types.String `tfsdk:"created_by"`
+	DiscoveryJobName types.String `tfsdk:"discovery_job_name"`
+}
+
+// OmeSlotConfigurationData is the tfsdk version of SlotConfiguration
+type OmeSlotConfigurationData struct {
+	ChassisName types.String `tfsdk:"chassis_name"`
+}
+
+// OmeDeviceManagementData is the tfsdk version of DeviceManagement
+type OmeDeviceManagementData struct {
+	ManagementID        types.Int64                `tfsdk:"management_id"`
+	NetworkAddress      types.String               `tfsdk:"network_address"`
+	MacAddress          types.String               `tfsdk:"mac_address"`
+	ManagementType      types.Int64                `tfsdk:"management_type"`
+	InstrumentationName types.String               `tfsdk:"instrumentation_name"`
+	DNSName             types.String               `tfsdk:"dns_name"`
+	ManagementProfile   []OmeManagementProfileData `tfsdk:"management_profile"`
+}
+
+// OmeManagementProfileData is the tfsdk version of ManagementProfile
+type OmeManagementProfileData struct {
+	ManagementProfileID types.Int64  `tfsdk:"management_profile_id"`
+	ProfileID           types.String `tfsdk:"profile_id"`
+	ManagementID        types.Int64  `tfsdk:"management_id"`
+	AgentName           types.String `tfsdk:"agent_name"`
+	Version             types.String `tfsdk:"version"`
+	ManagementURL       types.String `tfsdk:"management_url"`
+	HasCreds            types.Int64  `tfsdk:"has_creds"`
+	Status              types.Int64  `tfsdk:"status"`
+	StatusDateTime      types.String `tfsdk:"status_date_time"`
+}
+
+// ################### tfsdk converters
+
+// NewOmeSingleDeviceData converts DeviceData to OmeDeviceData
+func NewSingleOmeDeviceData(input Device) OmeSingleDeviceData {
+	return OmeSingleDeviceData{
+		ID:                            types.Int64Value(input.ID),
+		Type:                          types.Int64Value(input.Type),
+		Identifier:                    types.StringValue(input.Identifier),
+		DeviceServiceTag:              types.StringValue(input.DeviceServiceTag),
+		ChassisServiceTag:             types.StringValue(input.ChassisServiceTag),
+		Model:                         types.StringValue(input.Model),
+		PowerState:                    types.Int64Value(input.PowerState),
+		ManagedState:                  types.Int64Value(input.ManagedState),
+		Status:                        types.Int64Value(input.Status),
+		ConnectionState:               types.BoolValue(input.ConnectionState),
+		AssetTag:                      stringPointerValue(input.AssetTag),
+		SystemID:                      types.Int64Value(input.SystemID),
+		DeviceName:                    types.StringValue(input.DeviceName),
+		LastInventoryTime:             types.StringValue(input.LastInventoryTime),
+		LastStatusTime:                types.StringValue(input.LastStatusTime),
+		DeviceSubscription:            stringPointerValue(input.DeviceSubscription),
+		DeviceCapabilities:            int64ListValue(input.DeviceCapabilities),
+		SlotConfiguration:             newOmeSlotConfigurationData(input.SlotConfiguration),
+		DeviceManagement:              newDeviceManagementList(input.DeviceManagement),
+		Enabled:                       types.BoolValue(input.Enabled),
+		ConnectionStateReason:         types.Int64Value(input.ConnectionStateReason),
+		ChassisIP:                     types.StringValue(input.ChassisIP),
+		DiscoveryConfigurationJobInfo: newDiscoveryConfigurationJobList(input.DiscoveryConfigurationJobInfo),
+		// Inventory: NewOmeDeviceInventory(input.),
+	}
+}
+
+func newDeviceManagementList(inputs []DeviceManagement) []OmeDeviceManagementData {
+	ret := make([]OmeDeviceManagementData, 0)
+	for _, input := range inputs {
+		ret = append(ret, newOmeDeviceManagementData(input))
+	}
+	return ret
+}
+
+func newDiscoveryConfigurationJobList(inputs []DiscoveryConfigurationJob) []OmeDiscoveryConfigurationJobData {
+	ret := make([]OmeDiscoveryConfigurationJobData, 0)
+	for _, input := range inputs {
+		ret = append(ret, newOmeDiscoveryConfigurationJobData(input))
+	}
+	return ret
+}
+
+// newOmeDiscoveryConfigurationJobData converts DiscoveryConfigurationJobData to OmeDiscoveryConfigurationJobData
+func newOmeDiscoveryConfigurationJobData(input DiscoveryConfigurationJob) OmeDiscoveryConfigurationJobData {
+	return OmeDiscoveryConfigurationJobData{
+		GroupID:          types.StringValue(input.GroupID),
+		CreatedBy:        types.StringValue(input.CreatedBy),
+		DiscoveryJobName: types.StringValue(input.DiscoveryJobName),
+	}
+}
+
+// newOmeSlotConfigurationData converts SlotConfigurationData to OmeSlotConfigurationData
+func newOmeSlotConfigurationData(input SlotConfiguration) OmeSlotConfigurationData {
+	return OmeSlotConfigurationData{
+		ChassisName: stringPointerValue(input.ChassisName),
+	}
+}
+
+// newOmeDeviceManagementData converts DeviceManagementData to OmeDeviceManagementData
+func newOmeDeviceManagementData(input DeviceManagement) OmeDeviceManagementData {
+	a := OmeDeviceManagementData{
+		ManagementID:        types.Int64Value(input.ManagementID),
+		NetworkAddress:      types.StringValue(input.NetworkAddress.String()),
+		MacAddress:          types.StringValue(input.MacAddress),
+		ManagementType:      types.Int64Value(input.ManagementType),
+		InstrumentationName: types.StringValue(input.InstrumentationName),
+		DNSName:             types.StringValue(input.DNSName),
+	}
+	mProfs := make([]OmeManagementProfileData, 0)
+	for _, mProf := range input.ManagementProfile {
+		mProfs = append(mProfs, newOmeManagementProfileData(mProf))
+	}
+	a.ManagementProfile = mProfs
+	return a
+}
+
+// newOmeManagementProfileData converts ManagementProfileData to OmeManagementProfileData
+func newOmeManagementProfileData(input ManagementProfile) OmeManagementProfileData {
+	return OmeManagementProfileData{
+		ManagementProfileID: types.Int64Value(input.ManagementProfileID),
+		ProfileID:           types.StringValue(input.ProfileID),
+		ManagementID:        types.Int64Value(input.ManagementID),
+		AgentName:           types.StringValue(input.AgentName),
+		Version:             types.StringValue(input.Version),
+		ManagementURL:       types.StringValue(input.ManagementURL),
+		HasCreds:            types.Int64Value(input.HasCreds),
+		Status:              types.Int64Value(input.Status),
+		StatusDateTime:      types.StringValue(input.StatusDateTime),
+	}
 }
