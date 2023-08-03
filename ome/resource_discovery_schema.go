@@ -51,26 +51,6 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			NestedObject: schema.NestedAttributeObject{Attributes: DiscoveryConfigTargetsSchema()},
 		},
 
-		"job_wait": schema.BoolAttribute{
-			MarkdownDescription: "Provides the option to wait for job completion",
-			Description:         "Provides the option to wait for job completion",
-			Optional:            true,
-			Computed:            true,
-			PlanModifiers: []planmodifier.Bool{
-				BoolDefaultValue(types.BoolValue(true)),
-			},
-		},
-
-		"job_wait_timeout": schema.Int64Attribute{
-			MarkdownDescription: "The maximum wait time of job_wait in seconds. The job is tracked only for this duration.",
-			Description:         "The maximum wait time of job_wait in seconds. The job is tracked only for this duration.",
-			Optional:            true,
-			Computed:            true,
-			PlanModifiers: []planmodifier.Int64{
-				Int64DefaultValue(types.Int64Value(1200)),
-			},
-		},
-
 		"schedule": schema.StringAttribute{
 			MarkdownDescription: "Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.",
 			Description:         "Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.",
@@ -92,28 +72,6 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			Computed:            true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
-			},
-		},
-
-		"ignore_partial_failure": schema.BoolAttribute{
-			MarkdownDescription: `
-				- Provides the option to ignore partial failures. 
-				- Partial failures occur when there is a combination of both discovered and undiscovered IPs.
-      			- If ignore_partial_failur is set to false, then the partial failure is not ignored, and the resource will error out.
-      			- If ignore_partial_failur is set to true, then the partial failure is ignored.
-      			- This option is only applicable if "job_wait" is set to true.
-				`,
-			Description: `
-				- Provides the option to ignore partial failures. 
-				- Partial failures occur when there is a combination of both discovered and undiscovered IPs.
-      			- If ignore_partial_failur is set to false, then the partial failure is not ignored, and the resource will error out.
-      			- If ignore_partial_failur is set to true, then the partial failure is ignored.
-      			- This option is only applicable if "job_wait" is set to true.
-				`,
-			Optional: true,
-			Computed: true,
-			PlanModifiers: []planmodifier.Bool{
-				BoolDefaultValue(types.BoolValue(false)),
 			},
 		},
 
@@ -188,13 +146,6 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
          		- NOTE: Both IPv6 and IPv6 CIDR formats are supported.`,
 			Required:    true,
 			ElementType: types.StringType,
-			// Validators: []validator.List{
-			// 	// Validate this List must contain List elements
-			// 	// which have at least 1 String element.
-			// 	listvalidator.ValueListsAre(listvalidator.SizeAtLeast(1)),
-			// 	// Validate this List must contain string values which are at least 3 characters.
-			// 	listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-			// },
 		},
 
 		"device_type": schema.ListAttribute{
@@ -218,27 +169,12 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			- STORAGE - "snmp".`,
 			Required:    true,
 			ElementType: types.StringType,
-			// Validators: []validator.List{
-			// 	// Validate this List must contain List elements
-			// 	// which have at least 1 String element.
-			// 	listvalidator.ValueListsAre(listvalidator.SizeAtLeast(1)),
-			// 	// Validate this List must contain string values which are at least 3 characters.
-			// 	listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-			// 	// Validate this List must contain string values which are SERVER, CHASSIS, NETWORK SWITCH and STORAGE
-			// 	listvalidator.ValueStringsAre(stringvalidator.OneOf(
-			// 		"SERVER",
-			// 		"CHASSIS",
-			// 		"NETWORK SWITCH",
-			// 		"STORAGE",
-			// 	)),
-			// },
 		},
 
 		"redfish": schema.SingleNestedAttribute{
 			MarkdownDescription: "REDFISH protocol",
 			Description:         "REDFISH protocol",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          RedfishSchema(),
 		},
 
@@ -246,7 +182,6 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Simple Network Management Protocol (SNMP)",
 			Description:         "Simple Network Management Protocol (SNMP)",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          SNMPSchema(),
 		},
 
@@ -254,7 +189,6 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Secure Shell (SSH)",
 			Description:         "Secure Shell (SSH)",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          SSHSchema(),
 		},
 	}
@@ -280,6 +214,7 @@ func RedfishSchema() map[string]schema.Attribute {
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
 			},
+			
 		},
 
 		"port": schema.Int64Attribute{

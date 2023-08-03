@@ -3,6 +3,7 @@ package ome
 import (
 	"context"
 	"encoding/json"
+	"reflect"
 	"strconv"
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
@@ -79,7 +80,7 @@ func (r *discoveryResource) Create(ctx context.Context, req resource.CreateReque
 	}
 	defer omeClient.RemoveSession()
 
-	discoveryPayload := getDiscoveryPayload(ctx, &plan)
+	discoveryPayload := getDiscoveryPayload(ctx, &plan, nil)
 
 	tflog.Debug(ctx, "resource_discovery create Creating Discovery Job", map[string]interface{}{
 		"Create Discovery Request": discoveryPayload,
@@ -95,7 +96,7 @@ func (r *discoveryResource) Create(ctx context.Context, req resource.CreateReque
 
 	tflog.Trace(ctx, "resource_discovery : create Finished creating discovery")
 	tflog.Trace(ctx, "resource_discovery : create Fetching discovery id for a discovery")
-	state = discoveryState(ctx, cDiscovery, state)
+	state = discoveryState(ctx, cDiscovery, plan)
 	// Save into State
 	diags = resp.State.Set(ctx, &state)
 	tflog.Trace(ctx, "resource_discovery create: updating state finished, saving ...")
@@ -118,9 +119,8 @@ func (r *discoveryResource) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 	defer omeClient.RemoveSession()
-
-	did, _ := strconv.Atoi(state.DiscoveryJobID.ValueString())
-	respDiscovery, err := omeClient.GetDiscoveryJobByGroupID(int64(did))
+	id, _ := strconv.Atoi(state.DiscoveryJobID.ValueString())
+	respDiscovery, err := omeClient.GetDiscoveryJobByGroupID(int64(id))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrGnrReadDiscovery, err.Error(),
@@ -153,6 +153,29 @@ func (r *discoveryResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
+	if !reflect.DeepEqual(state, plan) {
+		//Create Session and differ the remove session
+		omeClient, d := r.p.createOMESession(ctx, "resource_discovery Update")
+		resp.Diagnostics.Append(d...)
+		if d.HasError() {
+			return
+		}
+		defer omeClient.RemoveSession()
+		discoveryPayload := getDiscoveryPayload(ctx, &plan, &state)
+		tflog.Trace(ctx, "resource_discovery update Discovery")
+		tflog.Debug(ctx, "resource_discovery update Discovery", map[string]interface{}{
+			"Create Discovery Request": discoveryPayload,
+		})
+		respDiscovery, err := omeClient.UpdateDiscoveryJob(discoveryPayload)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				clients.ErrGnrUpdateDiscovery, err.Error(),
+			)
+			return
+		}
+		state = discoveryState(ctx, respDiscovery, plan)
+	}
+
 	tflog.Trace(ctx, "resource_discovery update: finished state update")
 	//Save into State
 	diags = resp.State.Set(ctx, &state)
@@ -178,11 +201,9 @@ func (r *discoveryResource) Delete(ctx context.Context, req resource.DeleteReque
 		return
 	}
 	defer omeClient.RemoveSession()
-	did, _ := strconv.Atoi(state.DiscoveryJobID.ValueString())
+	id, _ := strconv.Atoi(state.DiscoveryJobID.ValueString())
 	ddj := models.DiscoveryJobDeletePayload{
-		DiscoveryGroupIds: []int{
-			did,
-		},
+		DiscoveryGroupIds: []int{id},
 	}
 	tflog.Debug(ctx, "delete group id :", map[string]interface{}{"ids": ddj})
 	status, err := omeClient.DeleteDiscoveryJob(ddj)
@@ -202,47 +223,167 @@ func (r *discoveryResource) ImportState(ctx context.Context, req resource.Import
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
-func getDiscoveryPayload(ctx context.Context, plan *models.OmeDiscoveryJob) (payload models.DiscoveryJobPayload) {
+func getDiscoveryPayload(ctx context.Context, plan *models.OmeDiscoveryJob, state *models.OmeDiscoveryJob) (payload models.DiscoveryJob) {
+	var id int
+	if state != nil {
+		id, _ = strconv.Atoi(state.DiscoveryJobID.ValueString())
+	}
+	payload = models.DiscoveryJob{
+		CommunityString:               plan.CommunityString.ValueBool(),
+		DiscoveryConfigGroupID:        id,
+		DiscoveryConfigGroupName:      plan.DiscoveryJobName.ValueString(),
+		DiscoveryStatusEmailRecipient: plan.EmailRecipient.ValueString(),
+		TrapDestination:               plan.TrapDestination.ValueBool(),
+	}
+
+	if plan.Schedule.ValueString() == "RunLater" {
+		payload.Schedule = models.ScheduleJob{
+			RunNow:    false,
+			RunLater:  true,
+			Cron:      plan.Cron.ValueString(),
+			StartTime: "",
+			EndTime:   "",
+		}
+	} else {
+		payload.Schedule = models.ScheduleJob{
+			RunNow:    true,
+			RunLater:  false,
+			Cron:      "startnow",
+			StartTime: "",
+			EndTime:   "",
+		}
+	}
+	if len(plan.DiscoveryConfigTargets) > 0 {
+		for _, dct := range plan.DiscoveryConfigTargets {
+			var dcm models.DiscoveryConfigModels
+			for _, dt := range dct.DeviceType {
+				deviceMap := map[string]int{
+					"SERVER":         1000,
+					"NETWORK SWITCH": 7000,
+					"CHASSIS":        2000,
+					"STORAGE":        5000,
+				}
+				dcm.DeviceType = append(dcm.DeviceType, deviceMap[dt.ValueString()])
+			}
+			for _, networkAddress := range dct.NetworkAddressDetail {
+				network := models.DiscoveryConfigTargets{
+					NetworkAddressDetail: networkAddress.ValueString(),
+					AddressType:          30,
+					Disabled:             false,
+					Exclude:              false,
+				}
+				dcm.DiscoveryConfigTargets = append(dcm.DiscoveryConfigTargets, network)
+			}
+			dcm.ConnectionProfile = getConnectionProfile(ctx, &dct)
+			payload.DiscoveryConfigModels = append(payload.DiscoveryConfigModels, dcm)
+		}
+	}
 	return payload
+}
+
+func getConnectionProfile(ctx context.Context, plan *models.OmeDiscoveryConfigTargets) (connectionProfile string) {
+	connections := models.ConnectionProfiles{
+		ProfileName:        "",
+		ProfileDescription: "",
+		Type:               "DISCOVERY",
+	}
+	if plan.Redfish != nil {
+		protocolRedfish := models.Protocols{
+			ID:       0,
+			Type:     "REDFISH",
+			AuthType: "Basic",
+			Modified: false,
+		}
+		redfish := models.CredREDFISH{
+			Username:  plan.Redfish.Username.ValueString(),
+			Password:  plan.Redfish.Password.ValueString(),
+			CaCheck:   plan.Redfish.CaCheck.ValueBool(),
+			CnCheck:   plan.Redfish.CnCheck.ValueBool(),
+			Port:      int(plan.Redfish.Port.ValueInt64()),
+			Retries:   int(plan.Redfish.Retries.ValueInt64()),
+			Timeout:   int(plan.Redfish.Timeout.ValueInt64()),
+			IsHTTP:    false,
+			KeepAlive: true,
+		}
+		protocolRedfish.Credential = redfish
+		connections.Credentials = append(connections.Credentials, protocolRedfish)
+	}
+	if plan.SNMP != nil {
+		protocolSNMP := models.Protocols{
+			ID:       0,
+			Type:     "SNMP",
+			AuthType: "Basic",
+			Modified: false,
+		}
+		snmp := models.CredSNMP{
+			Community:  plan.SNMP.Community.ValueString(),
+			EnableV1V2: true,
+			EnableV3:   false,
+			Port:       int(plan.SNMP.Port.ValueInt64()),
+			Retries:    int(plan.SNMP.Retries.ValueInt64()),
+			Timeout:    int(plan.SNMP.Timeout.ValueInt64()),
+		}
+		protocolSNMP.Credential = snmp
+		connections.Credentials = append(connections.Credentials, protocolSNMP)
+	}
+	
+	if plan.SSH != nil {
+		protocolSSH := models.Protocols{
+			ID:       0,
+			Type:     "SSH",
+			AuthType: "Basic",
+			Modified: false,
+		}
+		ssh := models.CredSSH{
+			Username:        plan.SSH.Username.ValueString(),
+			IsSudoUser:      plan.SSH.IsSudoUser.ValueBool(),
+			Password:        plan.SSH.Password.ValueString(),
+			Port:            int(plan.SSH.Port.ValueInt64()),
+			UseKey:          false,
+			Retries:         int(plan.SSH.Retries.ValueInt64()),
+			Timeout:         int(plan.SSH.Timeout.ValueInt64()),
+			CheckKnownHosts: plan.SSH.CheckKnownHosts.ValueBool(),
+		}
+		protocolSSH.Credential = ssh
+		connections.Credentials = append(connections.Credentials, protocolSSH)
+	}
+
+	jsonData, err := json.Marshal(connections)
+	if err != nil {
+		tflog.Debug(ctx, "Error marshaling JSON: "+err.Error())
+		return
+	}
+	// connectionProfile = strings.ReplaceAll(string(jsonData), `"`, `\"`)
+	connectionProfile = string(jsonData)
+	tflog.Debug(ctx, "connection profile constructed string: "+connectionProfile)
+	return
 }
 
 func discoveryState(ctx context.Context, resp models.DiscoveryJob, plan models.OmeDiscoveryJob) (state models.OmeDiscoveryJob) {
 	state = models.OmeDiscoveryJob{
 		DiscoveryJobID:   types.StringValue(strconv.Itoa(resp.DiscoveryConfigGroupID)),
 		DiscoveryJobName: types.StringValue(resp.DiscoveryConfigGroupName),
-		EmailRecipient:   types.StringValue(resp.DiscoveryStatusEmailRecipient),
 		TrapDestination:  types.BoolValue(resp.TrapDestination),
 		CommunityString:  types.BoolValue(resp.CommunityString),
 	}
+	if resp.DiscoveryStatusEmailRecipient != "" {
+		state.EmailRecipient = types.StringValue(resp.DiscoveryStatusEmailRecipient)
+	}
 	if plan.Schedule.ValueString() == "RunNow" || resp.Schedule.RunNow || resp.Schedule.Cron == "startnow" {
 		state.Schedule = types.StringValue("RunNow")
-		if !plan.JobWait.IsNull() {
-			state.JobWait = types.BoolValue(plan.JobWait.ValueBool())
-		} else {
-			state.JobWait = types.BoolValue(true)
-		}
-		if !plan.JobWaitTimeout.IsNull() {
-			state.JobWaitTimeout = types.Int64Value(plan.JobWaitTimeout.ValueInt64())
-		} else {
-			state.JobWaitTimeout = types.Int64Value(1200)
-		}
-		if !plan.IgnorePartialFailure.IsNull() {
-			state.IgnorePartialFailure = types.BoolValue(plan.IgnorePartialFailure.ValueBool())
-		} else {
-			state.IgnorePartialFailure = types.BoolValue(false)
-		}
 	} else if plan.Schedule.ValueString() == "RunLater" || resp.Schedule.RunLater || len(resp.Schedule.Cron) > 0 {
 		state.Schedule = types.StringValue("RunLater")
 		state.Cron = types.StringValue(resp.Schedule.Cron)
 	}
-	for _, dct := range resp.DiscoveryConfigModels {
-		state.DiscoveryConfigTargets = append(state.DiscoveryConfigTargets, getOmeDiscoveryConfigTargets(ctx, dct))
+	for idx, dct := range resp.DiscoveryConfigModels {
+		state.DiscoveryConfigTargets = append(state.DiscoveryConfigTargets, getOmeDiscoveryConfigTargets(ctx, dct, plan.DiscoveryConfigTargets[idx]))
 	}
 	return
 }
 
-func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConfigModels) (state models.OmeDiscoveryConfigTargets) {
-	var connectionProfiles models.ConnectionProfiles
+func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConfigModels, plan models.OmeDiscoveryConfigTargets) (models.OmeDiscoveryConfigTargets) {
+	connectionProfiles := models.ConnectionProfiles{}
+	state :=  models.OmeDiscoveryConfigTargets{}
 	deviceMap := map[int]string{
 		1000: "SERVER",
 		7000: "NETWORK SWITCH",
@@ -260,41 +401,44 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 	err := json.Unmarshal([]byte(resp.ConnectionProfile), &connectionProfiles)
 	if err != nil {
 		tflog.Debug(ctx, "Error unmarshaling JSON: "+err.Error())
-		return
+		return models.OmeDiscoveryConfigTargets{}
 	}
 	for _, creds := range connectionProfiles.Credentials {
 		if credMap, ok := creds.Credential.(map[string]interface{}); ok {
-			if creds.Type == "REDFISH" {
-				var cred models.CredREDFISH
-				err := mapstructure.Decode(credMap,&cred)
-				if err != nil{
+			if creds.Type == "REDFISH" && plan.Redfish != nil {
+				cred := models.CredREDFISH{}
+				state.Redfish = &models.OmeRedfish{}
+				err := mapstructure.Decode(credMap, &cred)
+				if err != nil {
 					continue
 				}
 				state.Redfish.Username = types.StringValue(cred.Username)
-				state.Redfish.Password = types.StringValue(cred.Password)
+				state.Redfish.Password = plan.Redfish.Password
 				state.Redfish.Port = types.Int64Value(int64(cred.Port))
 				state.Redfish.Retries = types.Int64Value(int64(cred.Retries))
 				state.Redfish.Timeout = types.Int64Value(int64(cred.Timeout))
 				state.Redfish.CaCheck = types.BoolValue(cred.CaCheck)
 				state.Redfish.CnCheck = types.BoolValue(cred.CnCheck)
 			} else if creds.Type == "SNMP" {
-				var cred models.CredSNMP
-				err := mapstructure.Decode(credMap,&cred)
-				if err != nil{
+				cred := models.CredSNMP{}
+				state.SNMP = &models.OmeSNMP{}
+				err := mapstructure.Decode(credMap, &cred)
+				if err != nil {
 					continue
 				}
 				state.SNMP.Community = types.StringValue(cred.Community)
 				state.SNMP.Port = types.Int64Value(int64(cred.Port))
 				state.SNMP.Retries = types.Int64Value(int64(cred.Retries))
 				state.SNMP.Timeout = types.Int64Value(int64(cred.Timeout))
-			} else if creds.Type == "SSH" {
-				var cred models.CredSSH
-				err := mapstructure.Decode(credMap,&cred)
-				if err != nil{
+			} else if creds.Type == "SSH" && plan.SSH != nil{
+				cred := models.CredSSH{}
+				state.SSH = &models.OmeSSH{}
+				err := mapstructure.Decode(credMap, &cred)
+				if err != nil {
 					continue
 				}
 				state.SSH.Username = types.StringValue(cred.Username)
-				state.SSH.Password = types.StringValue(cred.Password)
+				state.SSH.Password = plan.SSH.Password
 				state.SSH.Port = types.Int64Value(int64(cred.Port))
 				state.SSH.Retries = types.Int64Value(int64(cred.Retries))
 				state.SSH.Timeout = types.Int64Value(int64(cred.Timeout))
@@ -303,5 +447,5 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 			}
 		}
 	}
-	return
+	return state
 }

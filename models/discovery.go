@@ -2,24 +2,6 @@ package models
 
 import "github.com/hashicorp/terraform-plugin-framework/types"
 
-// DiscoveryJobPayload will be used in create and update functionality
-type DiscoveryJobPayload struct {
-	ChassisIdentifier               string                     `json:"ChassisIdentifier,omitempty"`
-	CommunityString                 bool                       `json:"CommunityString,omitempty"`
-	CreateGroup                     bool                       `json:"CreateGroup,omitempty"`
-	DiscoveryConfigGroupDescription string                     `json:"DiscoveryConfigGroupDescription,omitempty"`
-	DiscoveryConfigGroupID          int                        `json:"DiscoveryConfigGroupId,omitempty"`
-	DiscoveryConfigGroupName        string                     `json:"DiscoveryConfigGroupName,omitempty"`
-	DiscoveryConfigModels           []DiscoveryConfigModels    `json:"DiscoveryConfigModels,omitempty"`
-	DiscoveryConfigParentGroupID    int                        `json:"DiscoveryConfigParentGroupId,omitempty"`
-	DiscoveryConfigTaskParam        []DiscoveryConfigTaskParam `json:"DiscoveryConfigTaskParam,omitempty"`
-	DiscoveryConfigTasks            []DiscoveryConfigTasks     `json:"DiscoveryConfigTasks,omitempty"`
-	DiscoveryStatusEmailRecipient   string                     `json:"DiscoveryStatusEmailRecipient,omitempty"`
-	Schedule                        ScheduleJob                `json:"Schedule,omitempty"`
-	TrapDestination                 bool                       `json:"TrapDestination,omitempty"`
-	UseAllProfiles                  bool                       `json:"UseAllProfiles,omitempty"`
-}
-
 // DiscoveryJobDeletePayload for delete functionality
 type DiscoveryJobDeletePayload struct {
 	DiscoveryGroupIds []int `json:"DiscoveryGroupIds,omitempty"`
@@ -32,36 +14,36 @@ type DiscoveryJob struct {
 	DiscoveryConfigGroupDescription string                     `json:"DiscoveryConfigGroupDescription,omitempty"`
 	DiscoveryStatusEmailRecipient   string                     `json:"DiscoveryStatusEmailRecipient,omitempty"`
 	DiscoveryConfigParentGroupID    int                        `json:"DiscoveryConfigParentGroupId,omitempty"`
-	CreateGroup                     bool                       `json:"CreateGroup,omitempty"`
+	CreateGroup                     bool                       `json:"CreateGroup"`
 	DiscoveryConfigModels           []DiscoveryConfigModels    `json:"DiscoveryConfigModels,omitempty"`
 	DiscoveryConfigTaskParam        []DiscoveryConfigTaskParam `json:"DiscoveryConfigTaskParam,omitempty"`
 	DiscoveryConfigTasks            []DiscoveryConfigTasks     `json:"DiscoveryConfigTasks,omitempty"`
 	Schedule                        ScheduleJob                `json:"Schedule,omitempty"`
-	TrapDestination                 bool                       `json:"TrapDestination,omitempty"`
-	CommunityString                 bool                       `json:"CommunityString,omitempty"`
+	TrapDestination                 bool                       `json:"TrapDestination"`
+	CommunityString                 bool                       `json:"CommunityString"`
 	ChassisIdentifier               string                     `json:"ChassisIdentifier,omitempty"`
-	UseAllProfiles                  bool                       `json:"UseAllProfiles,omitempty"`
+	UseAllProfiles                  bool                       `json:"UseAllProfiles"`
 }
 
 // DiscoveryConfigTargets for adding device details
 type DiscoveryConfigTargets struct {
-	DiscoveryConfigTargetID int    `json:"DiscoveryConfigTargetId,omitempty"`
-	NetworkAddressDetail    string `json:"NetworkAddressDetail,omitempty"`
-	SubnetMask              string `json:"SubnetMask,omitempty"`
-	AddressType             int    `json:"AddressType,omitempty"`
-	Disabled                bool   `json:"Disabled,omitempty"`
-	Exclude                 bool   `json:"Exclude,omitempty"`
+	DiscoveryConfigTargetID int    `json:"DiscoveryConfigTargetId"`
+	NetworkAddressDetail    string `json:"NetworkAddressDetail"`
+	SubnetMask              string `json:"SubnetMask"`
+	AddressType             int    `json:"AddressType"`
+	Disabled                bool   `json:"Disabled"`
+	Exclude                 bool   `json:"Exclude"`
 }
 
 // DiscoveryConfigModels for discovery configuration
 type DiscoveryConfigModels struct {
-	DiscoveryConfigID              int                              `json:"DiscoveryConfigId,omitempty"`
-	DiscoveryConfigDescription     string                           `json:"DiscoveryConfigDescription,omitempty"`
-	DiscoveryConfigStatus          string                           `json:"DiscoveryConfigStatus,omitempty"`
-	DiscoveryConfigTargets         []DiscoveryConfigTargets         `json:"DiscoveryConfigTargets,omitempty"`
-	ConnectionProfileID            int                              `json:"ConnectionProfileId,omitempty"`
-	ConnectionProfile              string                           `json:"ConnectionProfile,omitempty"`
-	DeviceType                     []int                            `json:"DeviceType,omitempty"`
+	DiscoveryConfigID              int                              `json:"DiscoveryConfigId"`
+	DiscoveryConfigDescription     string                           `json:"DiscoveryConfigDescription"`
+	DiscoveryConfigStatus          string                           `json:"DiscoveryConfigStatus"`
+	DiscoveryConfigTargets         []DiscoveryConfigTargets         `json:"DiscoveryConfigTargets"`
+	ConnectionProfileID            int                              `json:"ConnectionProfileId"`
+	ConnectionProfile              string                           `json:"ConnectionProfile"`
+	DeviceType                     []int                            `json:"DeviceType"`
 	DiscoveryConfigVendorPlatforms []DiscoveryConfigVendorPlatforms `json:"DiscoveryConfigVendorPlatforms,omitempty"`
 }
 
@@ -74,11 +56,11 @@ type DiscoveryConfigTaskParam struct {
 
 // ScheduleJob Schedule of job execution.
 type ScheduleJob struct {
-	RunNow    bool   `json:"RunNow,omitempty"`
-	RunLater  bool   `json:"RunLater,omitempty"`
-	Cron      string `json:"Cron,omitempty"`
-	StartTime string `json:"StartTime,omitempty"`
-	EndTime   string `json:"EndTime,omitempty"`
+	RunNow    bool   `json:"RunNow"`
+	RunLater  bool   `json:"RunLater"`
+	Cron      string `json:"Cron"`
+	StartTime string `json:"StartTime"`
+	EndTime   string `json:"EndTime"`
 }
 
 // DiscoveryConfigTasks to configure discovery task
@@ -102,13 +84,14 @@ type ConnectionProfiles struct {
 	ProfileName        string        `json:"profileName"`
 	ProfileDescription string        `json:"profileDescription"`
 	Type               string        `json:"type"`
-	Credentials        []Credentials `json:"credentials"`
+	Credentials        []Protocols `json:"credentials"`
 }
 
 // CredSNMP to get the credential of the SNMP protocol.
 type CredSNMP struct {
 	Community  string `json:"community"`
 	EnableV1V2 bool   `json:"enableV1V2"`
+	EnableV3   bool   `json:"enableV3"`
 	Port       int    `json:"port"`
 	Retries    int    `json:"retries"`
 	Timeout    int    `json:"timeout"`
@@ -140,11 +123,11 @@ type CredREDFISH struct {
 }
 
 // Credentials to branch out the different protocol based on credentials attribute with interface{} type.
-type Credentials struct {
-	ID          int         `json:"id"`
-	Type        string      `json:"type"`
-	AuthType    string      `json:"authType"`
-	Modified    bool        `json:"modified"`
+type Protocols struct {
+	ID         int         `json:"id"`
+	Type       string      `json:"type"`
+	AuthType   string      `json:"authType"`
+	Modified   bool        `json:"modified"`
 	Credential interface{} `json:"credentials,omitempty"`
 }
 
@@ -156,11 +139,8 @@ type OmeDiscoveryJob struct {
 	DiscoveryJobName       types.String                `tfsdk:"name"`
 	EmailRecipient         types.String                `tfsdk:"email_recipient"`
 	DiscoveryConfigTargets []OmeDiscoveryConfigTargets `tfsdk:"discovery_config_targets"`
-	JobWait                types.Bool                  `tfsdk:"job_wait"`
-	JobWaitTimeout         types.Int64                 `tfsdk:"job_wait_timeout"`
 	Schedule               types.String                `tfsdk:"schedule"`
 	Cron                   types.String                `tfsdk:"cron"`
-	IgnorePartialFailure   types.Bool                  `tfsdk:"ignore_partial_failure"`
 	TrapDestination        types.Bool                  `tfsdk:"trap_destination"`
 	CommunityString        types.Bool                  `tfsdk:"community_string"`
 }
@@ -169,20 +149,20 @@ type OmeDiscoveryJob struct {
 type OmeDiscoveryConfigTargets struct {
 	NetworkAddressDetail []types.String `tfsdk:"network_address_detail"`
 	DeviceType           []types.String `tfsdk:"device_type"`
-	Redfish              OmeRedfish     `tfsdk:"redfish"`
-	SNMP                 OmeSNMP        `tfsdk:"snmp"`
-	SSH                  OmeSSH         `tfsdk:"ssh"`
+	Redfish              *OmeRedfish     `tfsdk:"redfish"`
+	SNMP                 *OmeSNMP        `tfsdk:"snmp"`
+	SSH                  *OmeSSH         `tfsdk:"ssh"`
 }
 
 // OmeRedfish for discovery configuration target REDFISH protocol.
 type OmeRedfish struct {
-	Username        types.String `tfsdk:"username"`
-	Password        types.String `tfsdk:"password"`
-	Port            types.Int64  `tfsdk:"port"`
-	Retries         types.Int64  `tfsdk:"retries"`
-	Timeout         types.Int64  `tfsdk:"timeout"`
-	CnCheck         types.Bool   `tfsdk:"cn_check"`
-	CaCheck         types.Bool   `tfsdk:"ca_check"`
+	Username types.String `tfsdk:"username"`
+	Password types.String `tfsdk:"password"`
+	Port     types.Int64  `tfsdk:"port"`
+	Retries  types.Int64  `tfsdk:"retries"`
+	Timeout  types.Int64  `tfsdk:"timeout"`
+	CnCheck  types.Bool   `tfsdk:"cn_check"`
+	CaCheck  types.Bool   `tfsdk:"ca_check"`
 	// Domain          types.String `tfsdk:"domain"`
 	// CertificateData types.String `tfsdk:"certificate_data"`
 }
