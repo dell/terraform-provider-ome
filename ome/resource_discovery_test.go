@@ -202,15 +202,15 @@ func TestDiscoveryThree(t *testing.T) {
 				ExpectError: regexp.MustCompile(`.*Atleast one of protocol should be configured for the discovery targets*.`),
 			},
 			{
-				Config: invalidDiscoveryConfigtwo,
+				Config:      invalidDiscoveryConfigtwo,
 				ExpectError: regexp.MustCompile(`.*Define at least one discovery configuration target in the list.*.`),
 			},
 			{
-				Config: invalidDiscoveryConfigThree,
+				Config:      invalidDiscoveryConfigThree,
 				ExpectError: regexp.MustCompile(`.*Atleast one of device type should be configured*.`),
 			},
 			{
-				Config: invalidDiscoveryConfigThree,
+				Config:      invalidDiscoveryConfigThree,
 				ExpectError: regexp.MustCompile(`.*Atleast one of network address detail should be configured*.`),
 			},
 		},

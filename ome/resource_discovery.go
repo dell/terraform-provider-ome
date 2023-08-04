@@ -71,35 +71,35 @@ func (r *discoveryResource) ValidateConfig(ctx context.Context, req resource.Val
 	}
 
 	if len(data.DiscoveryConfigTargets) > 0 {
-		for idx, dct := range data.DiscoveryConfigTargets{
-			idx_error := "Inappropriate value for attribute `discovery_config_targets`: element: " + strconv.Itoa(idx) + "\n"
+		for idx, dct := range data.DiscoveryConfigTargets {
+			idxError := "Inappropriate value for attribute `discovery_config_targets`: element: " + strconv.Itoa(idx) + "\n"
 			if dct.Redfish == nil && dct.SNMP == nil && dct.SSH == nil && dct.WSMAN == nil {
 				resp.Diagnostics.AddAttributeError(
 					path.Root("discovery_config_targets").AtListIndex(idx),
 					"Attribute Error",
-					idx_error + "Atleast one of protocol should be configured for the discovery targets.",)
+					idxError+"Atleast one of protocol should be configured for the discovery targets.")
 			}
 			if len(dct.DeviceType) > 0 {
 				for idx, dt := range dct.DeviceType {
 					currDT := dt.ValueString()
-					if !isDeviceType(currDT){
+					if !isDeviceType(currDT) {
 						resp.Diagnostics.AddAttributeError(
-						path.Root("discovery_config_targets").AtListIndex(idx).AtName("device_type"),
-						"Attribute Error",
-						idx_error + "The device type list should contain the following values: `SERVER`, `CHASSIS`, `NETWORK SWITCH`, and `STORAGE`." ,)
+							path.Root("discovery_config_targets").AtListIndex(idx).AtName("device_type"),
+							"Attribute Error",
+							idxError+"The device type list should contain the following values: `SERVER`, `CHASSIS`, `NETWORK SWITCH`, and `STORAGE`.")
 					}
 				}
 			} else {
 				resp.Diagnostics.AddAttributeError(
 					path.Root("discovery_config_targets").AtListIndex(idx).AtName("device_type"),
 					"Attribute Error",
-					idx_error + "Atleast one of device type should be configured. ",)
+					idxError+"Atleast one of device type should be configured. ")
 			}
 			if len(dct.NetworkAddressDetail) == 0 {
 				resp.Diagnostics.AddAttributeError(
 					path.Root("discovery_config_targets").AtListIndex(idx).AtName("network_address_detail"),
 					"Attribute Error",
-					idx_error + "Atleast one of network address detail should be configured. ",)
+					idxError+"Atleast one of network address detail should be configured. ")
 			}
 		}
 	} else {
@@ -111,9 +111,8 @@ func (r *discoveryResource) ValidateConfig(ctx context.Context, req resource.Val
 	}
 }
 
-
 func isDeviceType(str string) bool {
-	list := []string{"SERVER","CHASSIS","NETWORK SWITCH","STORAGE"}
+	list := []string{"SERVER", "CHASSIS", "NETWORK SWITCH", "STORAGE"}
 	for _, v := range list {
 		if v == str {
 			return true
