@@ -65,10 +65,61 @@ func (r *discoveryResource) ValidateConfig(ctx context.Context, req resource.Val
 			resp.Diagnostics.AddAttributeError(
 				path.Root("cron"),
 				"Attribute Error",
-				"With Schedule as RunNow, cron can't be set",
+				"With Schedule as RunNow, CRON can't be set.",
 			)
 		}
 	}
+
+	if len(data.DiscoveryConfigTargets) > 0 {
+		for idx, dct := range data.DiscoveryConfigTargets{
+			idx_error := "Inappropriate value for attribute `discovery_config_targets`: element: " + strconv.Itoa(idx) + "\n"
+			if dct.Redfish == nil && dct.SNMP == nil && dct.SSH == nil && dct.WSMAN == nil {
+				resp.Diagnostics.AddAttributeError(
+					path.Root("discovery_config_targets").AtListIndex(idx),
+					"Attribute Error",
+					idx_error + "Atleast one of protocol should be configured for the discovery targets.",)
+			}
+			if len(dct.DeviceType) > 0 {
+				for idx, dt := range dct.DeviceType {
+					currDT := dt.ValueString()
+					if !isDeviceType(currDT){
+						resp.Diagnostics.AddAttributeError(
+						path.Root("discovery_config_targets").AtListIndex(idx).AtName("device_type"),
+						"Attribute Error",
+						idx_error + "The device type list should contain the following values: `SERVER`, `CHASSIS`, `NETWORK SWITCH`, and `STORAGE`." ,)
+					}
+				}
+			} else {
+				resp.Diagnostics.AddAttributeError(
+					path.Root("discovery_config_targets").AtListIndex(idx).AtName("device_type"),
+					"Attribute Error",
+					idx_error + "Atleast one of device type should be configured. ",)
+			}
+			if len(dct.NetworkAddressDetail) == 0 {
+				resp.Diagnostics.AddAttributeError(
+					path.Root("discovery_config_targets").AtListIndex(idx).AtName("network_address_detail"),
+					"Attribute Error",
+					idx_error + "Atleast one of network address detail should be configured. ",)
+			}
+		}
+	} else {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("discovery_config_targets"),
+			"Attribute Error",
+			"Define at least one discovery configuration target in the list.",
+		)
+	}
+}
+
+
+func isDeviceType(str string) bool {
+	list := []string{"SERVER","CHASSIS","NETWORK SWITCH","STORAGE"}
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
 
 // Create creates the resource and sets the initial Terraform state.
