@@ -59,6 +59,16 @@ func (r *discoveryResource) ValidateConfig(ctx context.Context, req resource.Val
 	if resp.Diagnostics.HasError() {
 		return
 	}
+
+	if data.Schedule.ValueString() == "RunNow" {
+		if !data.Cron.IsNull() {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("cron"),
+				"Attribute Error",
+				"With Schedule as RunNow, cron can't be set",
+			)
+		}
+	}
 }
 
 // Create creates the resource and sets the initial Terraform state.
@@ -274,14 +284,14 @@ func getDiscoveryPayload(ctx context.Context, plan *models.OmeDiscoveryJob, stat
 				}
 				dcm.DiscoveryConfigTargets = append(dcm.DiscoveryConfigTargets, network)
 			}
-			dcm.ConnectionProfile = getConnectionProfile(ctx, &dct)
+			dcm.ConnectionProfile = getConnectionProfile(ctx, dct)
 			payload.DiscoveryConfigModels = append(payload.DiscoveryConfigModels, dcm)
 		}
 	}
 	return payload
 }
 
-func getConnectionProfile(ctx context.Context, plan *models.OmeDiscoveryConfigTargets) (connectionProfile string) {
+func getConnectionProfile(ctx context.Context, plan models.OmeDiscoveryConfigTargets) (connectionProfile string) {
 	connections := models.ConnectionProfiles{
 		ProfileName:        "",
 		ProfileDescription: "",
@@ -303,10 +313,31 @@ func getConnectionProfile(ctx context.Context, plan *models.OmeDiscoveryConfigTa
 			Retries:   int(plan.Redfish.Retries.ValueInt64()),
 			Timeout:   int(plan.Redfish.Timeout.ValueInt64()),
 			IsHTTP:    false,
-			KeepAlive: true,
+			KeepAlive: false,
 		}
 		protocolRedfish.Credential = redfish
 		connections.Credentials = append(connections.Credentials, protocolRedfish)
+	}
+	if plan.WSMAN != nil {
+		protocolWsman := models.Protocols{
+			ID:       0,
+			Type:     "WSMAN",
+			AuthType: "Basic",
+			Modified: false,
+		}
+		wsman := models.CredWSMAN{
+			Username:  plan.WSMAN.Username.ValueString(),
+			Password:  plan.WSMAN.Password.ValueString(),
+			CaCheck:   plan.WSMAN.CaCheck.ValueBool(),
+			CnCheck:   plan.WSMAN.CnCheck.ValueBool(),
+			Port:      int(plan.WSMAN.Port.ValueInt64()),
+			Retries:   int(plan.WSMAN.Retries.ValueInt64()),
+			Timeout:   int(plan.WSMAN.Timeout.ValueInt64()),
+			IsHTTP:    false,
+			KeepAlive: false,
+		}
+		protocolWsman.Credential = wsman
+		connections.Credentials = append(connections.Credentials, protocolWsman)
 	}
 	if plan.SNMP != nil {
 		protocolSNMP := models.Protocols{
@@ -353,7 +384,6 @@ func getConnectionProfile(ctx context.Context, plan *models.OmeDiscoveryConfigTa
 		tflog.Debug(ctx, "Error marshaling JSON: "+err.Error())
 		return
 	}
-	// connectionProfile = strings.ReplaceAll(string(jsonData), `"`, `\"`)
 	connectionProfile = string(jsonData)
 	tflog.Debug(ctx, "connection profile constructed string: "+connectionProfile)
 	return
@@ -377,6 +407,9 @@ func discoveryState(ctx context.Context, resp models.DiscoveryJob, plan models.O
 	}
 	for idx, dct := range resp.DiscoveryConfigModels {
 		state.DiscoveryConfigTargets = append(state.DiscoveryConfigTargets, getOmeDiscoveryConfigTargets(ctx, dct, plan.DiscoveryConfigTargets[idx]))
+	}
+	if len(resp.DiscoveryConfigTaskParam) == 1 {
+		state.JobID = types.Int64Value(int64(resp.DiscoveryConfigTaskParam[0].TaskID))
 	}
 	return
 }
@@ -419,6 +452,20 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 				state.Redfish.Timeout = types.Int64Value(int64(cred.Timeout))
 				state.Redfish.CaCheck = types.BoolValue(cred.CaCheck)
 				state.Redfish.CnCheck = types.BoolValue(cred.CnCheck)
+			} else if creds.Type == "WSMAN" && plan.WSMAN != nil {
+				cred := models.CredWSMAN{}
+				state.WSMAN = &models.OmeWSMAN{}
+				err := mapstructure.Decode(credMap, &cred)
+				if err != nil {
+					continue
+				}
+				state.WSMAN.Username = types.StringValue(cred.Username)
+				state.WSMAN.Password = plan.WSMAN.Password
+				state.WSMAN.Port = types.Int64Value(int64(cred.Port))
+				state.WSMAN.Retries = types.Int64Value(int64(cred.Retries))
+				state.WSMAN.Timeout = types.Int64Value(int64(cred.Timeout))
+				state.WSMAN.CaCheck = types.BoolValue(cred.CaCheck)
+				state.WSMAN.CnCheck = types.BoolValue(cred.CnCheck)
 			} else if creds.Type == "SNMP" {
 				cred := models.CredSNMP{}
 				state.SNMP = &models.OmeSNMP{}

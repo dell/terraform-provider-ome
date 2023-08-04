@@ -102,6 +102,11 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 				BoolDefaultValue(types.BoolValue(false)),
 			},
 		},
+		"job_id" :  schema.Int64Attribute{
+			MarkdownDescription: "Discovery Job ID.",
+			Description: "Discovery Job ID.",
+			Computed: true,
+		},
 	}
 }
 
@@ -176,6 +181,13 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			Description:         "REDFISH protocol",
 			Optional:            true,
 			Attributes:          RedfishSchema(),
+		},
+
+		"wsman" : schema.SingleNestedAttribute{
+			MarkdownDescription: "WSMAN protocol",
+			Description:         "WSMAN protocol",
+			Optional:            true,
+			Attributes:          WSMANSchema(),
 		},
 
 		"snmp": schema.SingleNestedAttribute{
@@ -287,6 +299,101 @@ func RedfishSchema() map[string]schema.Attribute {
 		// },
 	}
 }
+
+// WSMANSchema for wsman protocol schema
+func WSMANSchema() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+
+		"username": schema.StringAttribute{
+			MarkdownDescription: "Provide a username for the protocol.",
+			Description:         "Provide a username for the protocol.",
+			Required:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
+		},
+
+		"password": schema.StringAttribute{
+			MarkdownDescription: "Provide a password for the protocol.",
+			Description:         "Provide a password for the protocol.",
+			Required:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
+		},
+
+		"port": schema.Int64Attribute{
+			MarkdownDescription: "Enter the port number that the job must use to discover the devices.",
+			Description:         "Enter the port number that the job must use to discover the devices.",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Int64{
+				Int64DefaultValue(types.Int64Value(443)),
+			},
+		},
+
+		"retries": schema.Int64Attribute{
+			MarkdownDescription: "Enter the number of repeated attempts required to discover a device",
+			Description:         "Enter the number of repeated attempts required to discover a device",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Int64{
+				Int64DefaultValue(types.Int64Value(3)),
+			},
+		},
+
+		"timeout": schema.Int64Attribute{
+			MarkdownDescription: "Enter the time in seconds after which a job must stop running.",
+			Description:         "Enter the time in seconds after which a job must stop running.",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Int64{
+				Int64DefaultValue(types.Int64Value(60)),
+			},
+		},
+
+		"cn_check": schema.BoolAttribute{
+			MarkdownDescription: "Enable the Common Name (CN) check.",
+			Description:         "Enable the Common Name (CN) check.",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(false)),
+			},
+		},
+
+		"ca_check": schema.BoolAttribute{
+			MarkdownDescription: "Enable the Certificate Authority (CA) check.",
+			Description:         "Enable the Certificate Authority (CA) check.",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(false)),
+			},
+		},
+
+		// "domain": schema.StringAttribute{
+		// 	MarkdownDescription: "Provide a domain for the protocol.",
+		// 	Description:         "Provide a domain for the protocol.",
+		// 	Optional:            true,
+		// 	Computed:            true,
+		// 	Validators: []validator.String{
+		// 		stringvalidator.LengthAtLeast(1),
+		// 	},
+		// },
+
+		// "certificate_data": schema.StringAttribute{
+		// 	MarkdownDescription: "Provide certificate data for the CA check.",
+		// 	Description:         "Provide certificate data for the CA check.",
+		// 	Optional:            true,
+		// 	Computed:            true,
+		// 	Validators: []validator.String{
+		// 		stringvalidator.LengthAtLeast(1),
+		// 	},
+		// },
+	}
+}
+
 
 // SNMPSchema for SNMP protocol schema
 func SNMPSchema() map[string]schema.Attribute {

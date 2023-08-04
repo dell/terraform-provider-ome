@@ -122,6 +122,19 @@ type CredREDFISH struct {
 	KeepAlive bool   `json:"keepAlive"`
 }
 
+// CredWSMAN to get the credential of the WSMAN protocol.
+type CredWSMAN struct {
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	CaCheck   bool   `json:"caCheck"`
+	CnCheck   bool   `json:"cnCheck"`
+	Port      int    `json:"port"`
+	Retries   int    `json:"retries"`
+	Timeout   int    `json:"timeout"`
+	IsHTTP    bool   `json:"isHttp"`
+	KeepAlive bool   `json:"keepAlive"`
+}
+
 // Protocols to branch out the different protocol based on credentials attribute with interface{} type.
 type Protocols struct {
 	ID         int         `json:"id"`
@@ -143,6 +156,7 @@ type OmeDiscoveryJob struct {
 	Cron                   types.String                `tfsdk:"cron"`
 	TrapDestination        types.Bool                  `tfsdk:"trap_destination"`
 	CommunityString        types.Bool                  `tfsdk:"community_string"`
+	JobID                  types.Int64                 `tfsdk:"job_id"`
 }
 
 // OmeDiscoveryConfigTargets for discovery configuration
@@ -152,6 +166,7 @@ type OmeDiscoveryConfigTargets struct {
 	Redfish              *OmeRedfish    `tfsdk:"redfish"`
 	SNMP                 *OmeSNMP       `tfsdk:"snmp"`
 	SSH                  *OmeSSH        `tfsdk:"ssh"`
+	WSMAN                *OmeWSMAN      `tfsdk:"wsman"`
 }
 
 // OmeRedfish for discovery configuration target REDFISH protocol.
@@ -165,6 +180,17 @@ type OmeRedfish struct {
 	CaCheck  types.Bool   `tfsdk:"ca_check"`
 	// Domain          types.String `tfsdk:"domain"`
 	// CertificateData types.String `tfsdk:"certificate_data"`
+}
+
+// OmeWSMAN for discovery configuration target WSMAN protocol.
+type OmeWSMAN struct {
+	Username types.String `tfsdk:"username"`
+	Password types.String `tfsdk:"password"`
+	Port     types.Int64  `tfsdk:"port"`
+	Retries  types.Int64  `tfsdk:"retries"`
+	Timeout  types.Int64  `tfsdk:"timeout"`
+	CnCheck  types.Bool   `tfsdk:"cn_check"`
+	CaCheck  types.Bool   `tfsdk:"ca_check"`
 }
 
 // OmeSNMP for discovery configuration target REDFISH protocol.
