@@ -52,6 +52,7 @@ Resource for managing discovery on OpenManage Enterprise.
 ### Read-Only
 
 - `id` (String) ID of the discovery configuration group
+- `job_id` (Number) Discovery Job ID.
 
 <a id="nestedatt--discovery_config_targets"></a>
 ### Nested Schema for `discovery_config_targets`
@@ -88,6 +89,7 @@ Optional:
 - `redfish` (Attributes) REDFISH protocol (see [below for nested schema](#nestedatt--discovery_config_targets--redfish))
 - `snmp` (Attributes) Simple Network Management Protocol (SNMP) (see [below for nested schema](#nestedatt--discovery_config_targets--snmp))
 - `ssh` (Attributes) Secure Shell (SSH) (see [below for nested schema](#nestedatt--discovery_config_targets--ssh))
+- `wsman` (Attributes) WSMAN protocol (see [below for nested schema](#nestedatt--discovery_config_targets--wsman))
 
 <a id="nestedatt--discovery_config_targets--redfish"></a>
 ### Nested Schema for `discovery_config_targets.redfish`
@@ -134,5 +136,22 @@ Optional:
 - `is_sudo_user` (Boolean) Use the SUDO option
 - `port` (Number) Enter the port number that the job must use to discover the devices.
 - `retries` (Number) Enter the number of repeated attempts required to discover a device.
+- `timeout` (Number) Enter the time in seconds after which a job must stop running.
+
+
+<a id="nestedatt--discovery_config_targets--wsman"></a>
+### Nested Schema for `discovery_config_targets.wsman`
+
+Required:
+
+- `password` (String) Provide a password for the protocol.
+- `username` (String) Provide a username for the protocol.
+
+Optional:
+
+- `ca_check` (Boolean) Enable the Certificate Authority (CA) check.
+- `cn_check` (Boolean) Enable the Common Name (CN) check.
+- `port` (Number) Enter the port number that the job must use to discover the devices.
+- `retries` (Number) Enter the number of repeated attempts required to discover a device
 - `timeout` (Number) Enter the time in seconds after which a job must stop running.
 

@@ -102,10 +102,10 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 				BoolDefaultValue(types.BoolValue(false)),
 			},
 		},
-		"job_id" :  schema.Int64Attribute{
+		"job_id": schema.Int64Attribute{
 			MarkdownDescription: "Discovery Job ID.",
-			Description: "Discovery Job ID.",
-			Computed: true,
+			Description:         "Discovery Job ID.",
+			Computed:            true,
 		},
 	}
 }
@@ -183,7 +183,7 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			Attributes:          RedfishSchema(),
 		},
 
-		"wsman" : schema.SingleNestedAttribute{
+		"wsman": schema.SingleNestedAttribute{
 			MarkdownDescription: "WSMAN protocol",
 			Description:         "WSMAN protocol",
 			Optional:            true,
@@ -393,7 +393,6 @@ func WSMANSchema() map[string]schema.Attribute {
 		// },
 	}
 }
-
 
 // SNMPSchema for SNMP protocol schema
 func SNMPSchema() map[string]schema.Attribute {
