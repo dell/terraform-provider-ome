@@ -21,7 +21,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -69,6 +70,13 @@ func (g *deviceDatasource) Read(ctx context.Context, req datasource.ReadRequest,
 	var plan models.OmeDeviceData
 	diags := req.Config.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
+	var filters models.OmeDeviceDataFilters
+	diags = plan.Filters.As(ctx, &filters, basetypes.ObjectAsOptions{
+		UnhandledNullAsEmpty: true,
+	})
+	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -80,7 +88,7 @@ func (g *deviceDatasource) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 	defer omeClient.RemoveSession()
 
-	devs, err := g.ReadDevices(ctx, omeClient, plan.Filters) //omeClient.GetDevices(nil, []int64{id}, nil)
+	devs, err := g.ReadDevices(ctx, omeClient, filters)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error fetching devices",
@@ -98,7 +106,7 @@ func (g *deviceDatasource) Read(ctx context.Context, req datasource.ReadRequest,
 	if len(devs) <= numOfDevicesForInv {
 		for i, dev := range devs {
 			id := dev.ID
-			inv, err2 := omeClient.GetDeviceInventory(id)
+			inv, err2 := g.ReadDeviceInventory(ctx, omeClient, id, plan.InventoryTypes)
 			if err2 != nil {
 				resp.Diagnostics.AddError(
 					fmt.Sprintf("Error getting detailed inventory by id: %d", id),
@@ -107,42 +115,47 @@ func (g *deviceDatasource) Read(ctx context.Context, req datasource.ReadRequest,
 				return
 			}
 			tflog.Info(ctx, fmt.Sprint(inv))
-			vals[i].Inventory = models.NewOmeDeviceInventory(inv)
+			vals[i].Inventory = inv
 		}
 	}
+	g.WriteState(ctx, plan, vals, resp)
+}
 
-	resp.State.SetAttribute(ctx, path.Root("devices"), &vals)
+// Read implements datasource.DataSource
+func (g *deviceDatasource) WriteState(ctx context.Context, plan models.OmeDeviceData,
+	vals []models.OmeSingleDeviceData, resp *datasource.ReadResponse) {
+
+	// needed for acceptance testing - setting the id and then writing plan to state
+	if plan.ID.IsNull() {
+		plan.ID = types.Int64Value(0)
+	}
+	plan.Devices = vals
+	diags := resp.State.Set(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 }
 
 // Read implements datasource.DataSource
 func (g *deviceDatasource) ReadDevices(ctx context.Context, client *clients.Client,
-	filters *models.OmeDeviceDataFilters) ([]models.Device, error) {
+	filters models.OmeDeviceDataFilters) ([]models.Device, error) {
 
 	var (
 		err error
 		ret []models.Device
 	)
-	getAll := true
-	if filters != nil {
-		getAll = false
-		if !filters.FilterExpr.IsNull() {
-			devs, err2 := client.GetAllDevices(map[string]string{
-				"$filter": filters.FilterExpr.ValueString(),
-			})
-			ret, err = devs.Value, err2
-		} else if !filters.IDs.IsNull() {
-			inputs := make([]int64, 0)
-			_ = filters.IDs.ElementsAs(ctx, &inputs, false)
-			ret, err = client.GetDevices(nil, inputs, nil)
-		} else if !filters.SvcTags.IsNull() {
-			inputs := make([]string, 0)
-			_ = filters.SvcTags.ElementsAs(ctx, &inputs, false)
-			ret, err = client.GetDevices(inputs, nil, nil)
-		} else {
-			getAll = true
-		}
-	} else if getAll {
+	if !filters.FilterExpr.IsNull() {
+		devs, err2 := client.GetAllDevices(map[string]string{
+			"$filter": filters.FilterExpr.ValueString(),
+		})
+		ret, err = devs.Value, err2
+	} else if !filters.IDs.IsNull() {
+		inputs := make([]int64, 0)
+		_ = filters.IDs.ElementsAs(ctx, &inputs, false)
+		ret, err = client.GetDevices(nil, inputs, nil)
+	} else if !filters.SvcTags.IsNull() {
+		inputs := make([]string, 0)
+		_ = filters.SvcTags.ElementsAs(ctx, &inputs, false)
+		ret, err = client.GetDevices(inputs, nil, nil)
+	} else {
 		devs, err2 := client.GetAllDevices(nil)
 		ret, err = devs.Value, err2
 	}
@@ -151,10 +164,32 @@ func (g *deviceDatasource) ReadDevices(ctx context.Context, client *clients.Clie
 		return nil, err
 	}
 
-	if filters != nil && !filters.IPExprs.IsNull() {
+	if !filters.IPExprs.IsNull() {
 		inputs := make([]string, 0)
 		_ = filters.IPExprs.ElementsAs(ctx, &inputs, false)
 		return clients.FilterDeviceByIps(ret, inputs)
 	}
 	return ret, err
+}
+
+// Read implements datasource.DataSource
+func (g *deviceDatasource) ReadDeviceInventory(ctx context.Context, client *clients.Client,
+	id int64, itypes []string) (models.OmeDeviceInventory, error) {
+
+	var err error
+	retv := models.NewDeviceInventory()
+
+	if itypes == nil {
+		retv, err = client.GetDeviceInventory(id)
+	} else {
+		for _, t := range itypes {
+			reta, err2 := client.GetDeviceInventoryByType(id, t)
+			if err2 != nil {
+				return models.NewOmeDeviceInventory(retv), err2
+			}
+			retv.AddInventory(reta)
+		}
+	}
+
+	return models.NewOmeDeviceInventory(retv), err
 }

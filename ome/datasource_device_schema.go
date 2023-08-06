@@ -14,11 +14,36 @@ limitations under the License.
 package ome
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func OmeDeviceDataSchema() map[string]schema.Attribute {
+	acceptedInventoryTypes := []string{
+		"serverDeviceCards",
+		"serverProcessors",
+		"serverDellVideos",
+		"serverNetworkInterfaces",
+		"serverFcCards",
+		"serverOperatingSystems",
+		"serverVirtualFlashes",
+		"serverPowerSupplies",
+		"serverArrayDisks",
+		"serverRaidControllers",
+		"serverMemoryDevices",
+		"serverStorageEnclosures",
+		"serverSupportedPowerStates",
+		"deviceLicense",
+		"deviceCapabilities",
+		"deviceFru",
+		"deviceManagement",
+		"deviceSoftware",
+		"subsystemRollupStatus",
+		"deviceInventory",
+	}
 	return map[string]schema.Attribute{
 		"filters": schema.SingleNestedAttribute{
 			MarkdownDescription: "Filters to apply while fetching devices.",
@@ -55,6 +80,22 @@ func OmeDeviceDataSchema() map[string]schema.Attribute {
 			Description:         "Devices",
 			Computed:            true,
 			NestedObject:        schema.NestedAttributeObject{Attributes: OmeSingleDeviceDataSchema()},
+		},
+		"id": schema.Int64Attribute{
+			MarkdownDescription: "Dummy ID of the resource.",
+			Description:         "Dummy ID of the resource.",
+			Computed:            true,
+		},
+		"inventory_types": schema.ListAttribute{
+			MarkdownDescription: "The types of inventory to fetch.",
+			Description:         "The types of inventory to fetch.",
+			Optional:            true,
+			ElementType:         types.StringType,
+			Validators: []validator.List{
+				listvalidator.ValueStringsAre(
+					stringvalidator.OneOf(acceptedInventoryTypes...),
+				),
+			},
 		},
 	}
 }

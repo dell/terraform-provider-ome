@@ -136,6 +136,27 @@ func NewDeviceInventory() DeviceInventory {
 	}
 }
 
+func (d *DeviceInventory) AddInventory(dd DeviceInventory) {
+	d.ServerDeviceCards = append(d.ServerDeviceCards, dd.ServerDeviceCards...)
+	d.CPUInfo = append(d.CPUInfo, dd.CPUInfo...)
+	d.NICInfo = append(d.NICInfo, dd.NICInfo...)
+	d.FCInfo = append(d.FCInfo, dd.FCInfo...)
+	d.OSInfo = append(d.OSInfo, dd.OSInfo...)
+	d.PowerSupplyInfo = append(d.PowerSupplyInfo, dd.PowerSupplyInfo...)
+	d.DiskInfo = append(d.DiskInfo, dd.DiskInfo...)
+	d.RAIDControllerInfo = append(d.RAIDControllerInfo, dd.RAIDControllerInfo...)
+	d.MemoryInfo = append(d.MemoryInfo, dd.MemoryInfo...)
+	d.StorageEnclosureInfo = append(d.StorageEnclosureInfo, dd.StorageEnclosureInfo...)
+	d.ServerPowerStates = append(d.ServerPowerStates, dd.ServerPowerStates...)
+	d.DeviceLicenses = append(d.DeviceLicenses, dd.DeviceLicenses...)
+	d.DeviceCapabilities = append(d.DeviceCapabilities, dd.DeviceCapabilities...)
+	d.DeviceFrus = append(d.DeviceFrus, dd.DeviceFrus...)
+	d.DeviceLocations = append(d.DeviceLocations, dd.DeviceLocations...)
+	d.DeviceManagement = append(d.DeviceManagement, dd.DeviceManagement...)
+	d.DeviceSoftwares = append(d.DeviceSoftwares, dd.DeviceSoftwares...)
+	d.SubSystemRollupStatus = append(d.SubSystemRollupStatus, dd.SubSystemRollupStatus...)
+}
+
 type SubSystemRollupStatus struct {
 	ID            int64  `json:"Id"`
 	Status        int64  `json:"Status"`

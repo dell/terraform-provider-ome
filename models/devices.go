@@ -100,9 +100,10 @@ type ManagementProfile struct {
 
 // OmeDeviceData - schema for device data source
 type OmeDeviceData struct {
-	// ID      types.Int64           `tfsdk:"id"`
-	Filters *OmeDeviceDataFilters `tfsdk:"filters"`
-	Devices []OmeSingleDeviceData `tfsdk:"devices"`
+	ID             types.Int64           `tfsdk:"id"`
+	Filters        types.Object          `tfsdk:"filters"`
+	Devices        []OmeSingleDeviceData `tfsdk:"devices"`
+	InventoryTypes []string              `tfsdk:"inventory_types"`
 }
 
 // OmeDeviceDataFilter - schema for device data source filters
