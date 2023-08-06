@@ -14,9 +14,12 @@ limitations under the License.
 package ome
 
 import (
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -46,55 +49,71 @@ func OmeDeviceDataSchema() map[string]schema.Attribute {
 	}
 	return map[string]schema.Attribute{
 		"filters": schema.SingleNestedAttribute{
-			MarkdownDescription: "Filters to apply while fetching devices.",
-			Description:         "Filters to apply while fetching devices.",
-			Optional:            true,
+			MarkdownDescription: "Filters to apply while fetching devices." +
+				" Only one among `filter_expression`, `ids` and `device_service_tags` can be configured.",
+			Description: "Filters to apply while fetching devices." +
+				" Only one among 'filter_expression', 'ids' and 'device_service_tags' can be configured.",
+			Optional: true,
 			Attributes: map[string]schema.Attribute{
 				"ids": schema.ListAttribute{
-					MarkdownDescription: "ID of the device.",
-					Description:         "ID of the device.",
+					MarkdownDescription: "IDs of the devices to fetch.",
+					Description:         "IDs of the devices to fetch.",
 					Optional:            true,
 					ElementType:         types.Int64Type,
 				},
 				"device_service_tags": schema.ListAttribute{
-					MarkdownDescription: "ID of the device.",
-					Description:         "ID of the device.",
+					MarkdownDescription: "Service tags of the devices to fetch.",
+					Description:         "Service tags of the devices to fetch.",
 					Optional:            true,
 					ElementType:         types.StringType,
+					Validators: []validator.List{
+						listvalidator.ConflictsWith(path.MatchRelative().AtName("ids")),
+					},
 				},
 				"ip_expressions": schema.ListAttribute{
-					MarkdownDescription: "ID of the device.",
-					Description:         "ID of the device.",
-					Optional:            true,
-					ElementType:         types.StringType,
+					MarkdownDescription: "IP expressions of the devices to fetch." +
+						" Supported expressions are IPv4, IPv6, CIDRs and IP ranges.",
+					Description: "IP expressions of the devices to fetch." +
+						" Supported expressions are IPv4, IPv6, CIDRs and IP ranges.",
+					Optional:    true,
+					ElementType: types.StringType,
 				},
 				"filter_expression": schema.StringAttribute{
-					MarkdownDescription: "ID of the device.",
-					Description:         "ID of the device.",
+					MarkdownDescription: "OData `$filter` compatible expression to be used for querying devices.",
+					Description:         "OData '$filter' compatible expression to be used for querying devices.",
 					Optional:            true,
+					Validators: []validator.String{
+						stringvalidator.ConflictsWith(path.MatchRelative().AtName("ids")),
+						stringvalidator.ConflictsWith(path.MatchRelative().AtName("device_service_tags")),
+					},
 				},
 			},
 		},
 		"devices": schema.ListNestedAttribute{
-			MarkdownDescription: "Devices",
-			Description:         "Devices",
+			MarkdownDescription: "Devices fetched.",
+			Description:         "Devices fetched.",
 			Computed:            true,
 			NestedObject:        schema.NestedAttributeObject{Attributes: OmeSingleDeviceDataSchema()},
 		},
 		"id": schema.Int64Attribute{
-			MarkdownDescription: "Dummy ID of the resource.",
-			Description:         "Dummy ID of the resource.",
+			MarkdownDescription: "Dummy ID of the datasource.",
+			Description:         "Dummy ID of the datasource.",
 			Computed:            true,
 		},
 		"inventory_types": schema.ListAttribute{
-			MarkdownDescription: "The types of inventory to fetch.",
-			Description:         "The types of inventory to fetch.",
-			Optional:            true,
-			ElementType:         types.StringType,
+			MarkdownDescription: "The types of inventory types to fetch." +
+				" Accepted values are " + strings.Join(acceptedInventoryTypes, ", ") + "." +
+				" If not configured, all inventory types are fetched.",
+			Description: "The types of inventory to fetch." +
+				" Accepted values are " + strings.Join(acceptedInventoryTypes, ", ") + "." +
+				" If not configured, all inventory types are fetched.",
+			Optional:    true,
+			ElementType: types.StringType,
 			Validators: []validator.List{
 				listvalidator.ValueStringsAre(
 					stringvalidator.OneOf(acceptedInventoryTypes...),
 				),
+				listvalidator.UniqueValues(),
 			},
 		},
 	}
@@ -222,10 +241,12 @@ func OmeSingleDeviceDataSchema() map[string]schema.Attribute {
 			NestedObject:        schema.NestedAttributeObject{Attributes: OmeDiscoveryConfigurationJobDataSchema()},
 		},
 		"detailed_inventory": schema.SingleNestedAttribute{
-			MarkdownDescription: "Detailed inventory of the device.",
-			Description:         "Detailed inventory of the device.",
-			Computed:            true,
-			Attributes:          OmeDeviceInventorySchema(),
+			MarkdownDescription: "Detailed inventory of the device." +
+				" Detailed inventory is only fetched if only a single device is fetched by this datasource.",
+			Description: "Detailed inventory of the device." +
+				" Detailed inventory is only fetched if only a single device is fetched by this datasource.",
+			Computed:   true,
+			Attributes: OmeDeviceInventorySchema(),
 		},
 	}
 }

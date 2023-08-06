@@ -29,10 +29,7 @@ func (c *Client) GetDeviceInventory(deviceID int64) (models.DeviceInventory, err
 	}
 	bodyData, _ := c.GetBodyData(response.Body)
 	err = c.JSONUnMarshalValue(bodyData, &inv)
-	if err != nil {
-		return inv, err
-	}
-	return inv, nil
+	return inv, err
 }
 
 // GetDeviceInventory returns the inventory of a device of a particular type

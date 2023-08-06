@@ -15,6 +15,7 @@ package ome
 
 import (
 	"os"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -30,9 +31,17 @@ func TestDataSource_ReadDevice(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
+				Config:      testGetDevicesWithInvalidInventory,
+				ExpectError: regexp.MustCompile(".*Invalid Attribute Value Match.*"),
+				// PlanOnly:    true,
+			},
+			{
+				Config:      testGetInvalidDevices,
+				ExpectError: regexp.MustCompile(".*Error fetching devices.*"),
+			},
+			{
 				Config: testGetAllDevicesWithoutFilters + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
-					// resource.TestCheckResourceAttrSet("data.ome_device.devs", "devices"),
 					resource.TestCheckOutput("fetched_any", "true"),
 					resource.TestCheckOutput("fetched_multiple", "true"),
 					resource.TestCheckOutput("fetched_inventory", "false"),
@@ -41,7 +50,6 @@ func TestDataSource_ReadDevice(t *testing.T) {
 			{
 				Config: testGetAllDevices + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
-					// resource.TestCheckResourceAttrSet("data.ome_device.devs", "devices"),
 					resource.TestCheckOutput("fetched_any", "true"),
 					resource.TestCheckOutput("fetched_multiple", "true"),
 					resource.TestCheckOutput("fetched_inventory", "false"),
@@ -50,7 +58,6 @@ func TestDataSource_ReadDevice(t *testing.T) {
 			{
 				Config: testGetDevicesWithIDs + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
-					// resource.TestCheckResourceAttrSet("data.ome_device.devs", "devices"),
 					resource.TestCheckOutput("fetched_any", "true"),
 					resource.TestCheckOutput("fetched_multiple", "true"),
 					resource.TestCheckOutput("fetched_inventory", "false"),
@@ -59,7 +66,6 @@ func TestDataSource_ReadDevice(t *testing.T) {
 			{
 				Config: testGetDevicesWithSTags + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
-					// resource.TestCheckResourceAttrSet("data.ome_device.devs", "devices"),
 					resource.TestCheckOutput("fetched_any", "true"),
 					resource.TestCheckOutput("fetched_multiple", "true"),
 					resource.TestCheckOutput("fetched_inventory", "false"),
@@ -68,7 +74,6 @@ func TestDataSource_ReadDevice(t *testing.T) {
 			{
 				Config: testGetDevicesWithIPs + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
-					// resource.TestCheckResourceAttrSet("data.ome_device.devs", "devices"),
 					resource.TestCheckOutput("fetched_any", "true"),
 					resource.TestCheckOutput("fetched_multiple", "false"),
 					resource.TestCheckOutput("fetched_inventory", "true"),
@@ -77,10 +82,18 @@ func TestDataSource_ReadDevice(t *testing.T) {
 			{
 				Config: testGetDevicesWithFilterExp + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
-					// resource.TestCheckResourceAttrSet("data.ome_device.devs", "devices"),
 					resource.TestCheckOutput("fetched_any", "true"),
 					resource.TestCheckOutput("fetched_multiple", "true"),
 					resource.TestCheckOutput("fetched_inventory", "false"),
+				),
+			},
+			{
+				Config: testGetDevicesWithIPAndInvType + devDataOut,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckOutput("fetched_any", "true"),
+					resource.TestCheckOutput("fetched_multiple", "false"),
+					resource.TestCheckOutput("fetched_inventory", "true"),
+					resource.TestCheckOutput("fetched_selected_inventory", "true"),
 				),
 			},
 		},
@@ -120,106 +133,94 @@ output "fetched_inventory" {
 }
 `
 
-var old = `
-output "omitted_inventory" {
-	value = anytrue([for dev in data.ome_device.devs.devices: 
-		dev.detailed_inventory.server_device_cards == null &&
-		dev.detailed_inventory.cpus == null &&
-		dev.detailed_inventory.nics == null &&
-		dev.detailed_inventory.fcis == null &&
-		dev.detailed_inventory.os == null &&
-		dev.detailed_inventory.power_supply == null &&
-		dev.detailed_inventory.disks == null &&
-		dev.detailed_inventory.raid_controllers == null &&
-		dev.detailed_inventory.memory == null &&
-		dev.detailed_inventory.storage_enclosures == null &&
-		dev.detailed_inventory.power_state == null &&
-		dev.detailed_inventory.licenses == null &&
-		dev.detailed_inventory.capabilities == null &&
-		dev.detailed_inventory.frus == null &&
-		dev.detailed_inventory.locations == null &&
-		dev.detailed_inventory.management_info == null &&
-		dev.detailed_inventory.softwares == null &&
-		dev.detailed_inventory.subsytem_rollup_status  == null
-		])
-}
-`
-
-var testGetAllDevices = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testGetAllDevices = testProvider + `
 data "ome_device" "devs" {
 	filters = {}
 }
 `
 
-var testGetAllDevicesWithoutFilters = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testGetAllDevicesWithoutFilters = testProvider + `
 data "ome_device" "devs" {
 }
 `
 
-var testGetDevicesWithIDs = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testGetDevicesWithIDs = testProvider + `
 data "ome_device" "devs" {
 	filters = {
-		ids = [10112, 13528]
+		ids = [` + DeviceID1 + `, ` + DeviceID2 + `]
 	}
 }
 `
 
-var testGetDevicesWithSTags = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testGetDevicesWithInvalidInventory = testProvider + `
 data "ome_device" "devs" {
 	filters = {
-		device_service_tags = ["CZNF1T2", "CZMC1T2"]
+		device_service_tags = ["` + DeviceSvcTag1 + `", "` + DeviceSvcTag2 + `"]
+	}	
+	inventory_types = ["invalid"]
+}
+`
+
+var testGetDevicesWithSTags = testProvider + `
+data "ome_device" "devs" {
+	filters = {
+		device_service_tags = ["` + DeviceSvcTag1 + `", "` + DeviceSvcTag2 + `"]
 	}
 }
 `
 
-var testGetDevicesWithIPs = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testGetInvalidDevices = testProvider + `
 data "ome_device" "devs" {
 	filters = {
-		ip_expressions = ["10.226.197.113"]
+		device_service_tags = ["invalid"]
 	}
 }
 `
 
-var testGetDevicesWithFilterExp = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
+var testGetDevicesWithIPs = testProvider + `
+data "ome_device" "devs" {
+	filters = {
+		ip_expressions = ["` + DeviceIP1 + `"]
+	}
 }
+`
+
+var testGetDevicesWithFilterExp = testProvider + `
 data "ome_device" "devs" {
 	filters = {
 		filter_expression = "Model eq 'PowerEdge MX840c'"
 	}
+}
+`
+var testGetDevicesWithIPAndInvType = testProvider + `
+data "ome_device" "devs" {
+	filters = {
+		ip_expressions = ["` + DeviceIP1 + `"]
+	}
+	inventory_types = ["serverNetworkInterfaces","serverArrayDisks"]
+}
+output "fetched_selected_inventory" {
+	value = alltrue(flatten([for dev in data.ome_device.devs.devices: 
+		[
+			dev.detailed_inventory.server_device_cards == null,
+			dev.detailed_inventory.cpus == null,
+			dev.detailed_inventory.nics != null,
+			dev.detailed_inventory.fcis == null,
+			dev.detailed_inventory.os == null,
+			dev.detailed_inventory.power_supply == null,
+			dev.detailed_inventory.disks != null,
+			dev.detailed_inventory.raid_controllers == null,
+			dev.detailed_inventory.memory == null,
+			dev.detailed_inventory.storage_enclosures == null,
+			dev.detailed_inventory.power_state == null,
+			dev.detailed_inventory.licenses == null,
+			dev.detailed_inventory.capabilities == null,
+			dev.detailed_inventory.frus == null,
+			dev.detailed_inventory.locations == null,
+			dev.detailed_inventory.management_info == null,
+			dev.detailed_inventory.softwares == null,
+			dev.detailed_inventory.subsytem_rollup_status  == null
+		]
+	]))
 }
 `
