@@ -377,7 +377,7 @@ type OmeDeviceLicense struct {
 	EvalTimeRemaining  types.Int64    `tfsdk:"eval_time_remaining"`
 	AssignedDevices    types.String   `tfsdk:"assigned_devices"`
 	LicenseStatus      types.Int64    `tfsdk:"license_status"`
-	EntitlementId      types.String   `tfsdk:"entitlement_id"`
+	EntitlementID      types.String   `tfsdk:"entitlement_id"`
 	LicenseDescription types.String   `tfsdk:"license_description"`
 	LicenseType        OmeLicenseType `tfsdk:"license_type"`
 }

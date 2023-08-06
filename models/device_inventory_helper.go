@@ -672,7 +672,7 @@ func newOmeDeviceLicense(input DeviceLicense) OmeDeviceLicense {
 		EvalTimeRemaining:  types.Int64Value(input.EvalTimeRemaining),
 		AssignedDevices:    types.StringValue(input.AssignedDevices),
 		LicenseStatus:      types.Int64Value(input.LicenseStatus),
-		EntitlementId:      types.StringValue(input.EntitlementId),
+		EntitlementID:      types.StringValue(input.EntitlementID),
 		LicenseDescription: types.StringValue(input.LicenseDescription),
 		LicenseType:        newOmeLicenseType(input.LicenseType),
 	}

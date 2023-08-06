@@ -32,7 +32,7 @@ func (c *Client) GetDeviceInventory(deviceID int64) (models.DeviceInventory, err
 	return inv, err
 }
 
-// GetDeviceInventory returns the inventory of a device of a particular type
+// GetDeviceInventoryByType returns the inventory of a device of a particular type
 func (c *Client) GetDeviceInventoryByType(deviceID int64, inventoryType string) (models.DeviceInventory, error) {
 	inv := models.NewDeviceInventory()
 	path := fmt.Sprintf(DeviceInventorySingleAPI, deviceID, inventoryType)

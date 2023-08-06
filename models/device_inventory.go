@@ -479,7 +479,7 @@ type DeviceLicense struct {
 	EvalTimeRemaining  int64       `json:"EvalTimeRemaining"`
 	AssignedDevices    string      `json:"AssignedDevices"`
 	LicenseStatus      int64       `json:"LicenseStatus"`
-	EntitlementId      string      `json:"EntitlementId"`
+	EntitlementID      string      `json:"EntitlementId"`
 	LicenseDescription string      `json:"LicenseDescription"`
 	LicenseType        LicenseType `json:"LicenseType"`
 }

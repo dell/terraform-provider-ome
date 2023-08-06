@@ -63,12 +63,14 @@ func (d *Device) BelongsToPool(pool iprange.Pool) bool {
 	return false
 }
 
+// DiscoveryConfigurationJob - DiscoveryConfigurationJob
 type DiscoveryConfigurationJob struct {
 	GroupID          string `json:"GroupId"`
 	CreatedBy        string `json:"CreatedBy"`
 	DiscoveryJobName string `json:"DiscoveryJobName"`
 }
 
+// SlotConfiguration - SlotConfiguration
 type SlotConfiguration struct {
 	ChassisName *string `json:"ChassisName"`
 }
@@ -84,6 +86,7 @@ type DeviceManagement struct {
 	ManagementProfile   []ManagementProfile `json:"ManagementProfile"`
 }
 
+// ManagementProfile - ManagementProfile
 type ManagementProfile struct {
 	ManagementProfileID int64  `json:"ManagementProfileId"`
 	ProfileID           string `json:"ProfileId"`
@@ -106,7 +109,7 @@ type OmeDeviceData struct {
 	InventoryTypes []string              `tfsdk:"inventory_types"`
 }
 
-// OmeDeviceDataFilter - schema for device data source filters
+// OmeDeviceDataFilters - schema for device data source filters
 type OmeDeviceDataFilters struct {
 	IDs        types.List   `tfsdk:"ids"`
 	SvcTags    types.List   `tfsdk:"device_service_tags"`
@@ -180,7 +183,7 @@ type OmeManagementProfileData struct {
 
 // ################### tfsdk converters
 
-// NewOmeSingleDeviceData converts DeviceData to OmeDeviceData
+// NewSingleOmeDeviceData converts DeviceData to OmeDeviceData
 func NewSingleOmeDeviceData(input Device) OmeSingleDeviceData {
 	return OmeSingleDeviceData{
 		ID:                            types.Int64Value(input.ID),
