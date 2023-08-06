@@ -682,6 +682,6 @@ func newOmeDeviceLicense(input DeviceLicense) OmeDeviceLicense {
 func newOmeLicenseType(input LicenseType) OmeLicenseType {
 	return OmeLicenseType{
 		Name:      types.StringValue(input.Name),
-		LicenseId: types.Int64Value(input.LicenseId),
+		LicenseID: types.Int64Value(input.LicenseID),
 	}
 }

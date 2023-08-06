@@ -17,6 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+// OmeDeviceInventory - OmeDeviceInventory
 type OmeDeviceInventory struct {
 	ServerDeviceCards     []OmeServerDeviceCardInfo  `tfsdk:"server_device_cards"`
 	CPUInfo               []OmeCPUInfo               `tfsdk:"cpus"`
@@ -38,12 +39,14 @@ type OmeDeviceInventory struct {
 	SubSystemRollupStatus []OmeSubSystemRollupStatus `tfsdk:"subsytem_rollup_status"`
 }
 
+// OmeSubSystemRollupStatus - OmeSubSystemRollupStatus
 type OmeSubSystemRollupStatus struct {
 	ID            types.Int64  `tfsdk:"id"`
 	Status        types.Int64  `tfsdk:"status"`
 	SubsystemName types.String `tfsdk:"subsystem_name"`
 }
 
+// OmeDeviceSoftware - OmeDeviceSoftware
 type OmeDeviceSoftware struct {
 	Version           types.String `tfsdk:"version"`
 	InstallationDate  types.String `tfsdk:"installation_date"`
@@ -58,6 +61,7 @@ type OmeDeviceSoftware struct {
 	InstanceID        types.String `tfsdk:"instance_id"`
 }
 
+// OmeDeviceManagementInfo - OmeDeviceManagementInfo
 type OmeDeviceManagementInfo struct {
 	ManagementID        types.Int64        `tfsdk:"management_id"`
 	IPAddress           types.String       `tfsdk:"ip_address"`
@@ -68,12 +72,14 @@ type OmeDeviceManagementInfo struct {
 	EndPointAgents      []OmeEndPointAgent `tfsdk:"end_point_agents"`
 }
 
+// OmeManagementType - OmeManagementType
 type OmeManagementType struct {
 	ManagementType types.Int64  `tfsdk:"management_type"`
 	Name           types.String `tfsdk:"name"`
 	Description    types.String `tfsdk:"description"`
 }
 
+// OmeEndPointAgent - OmeEndPointAgent
 type OmeEndPointAgent struct {
 	ManagementProfileID types.Int64  `tfsdk:"management_profile_id"`
 	ProfileID           types.String `tfsdk:"profile_id"`
@@ -85,6 +91,7 @@ type OmeEndPointAgent struct {
 	StatusDateTime      types.String `tfsdk:"status_date_time"`
 }
 
+// OmeDeviceLocation - OmeDeviceLocation
 type OmeDeviceLocation struct {
 	ID                   types.Int64  `tfsdk:"id"`
 	Room                 types.String `tfsdk:"room"`
@@ -95,6 +102,7 @@ type OmeDeviceLocation struct {
 	ManagementSystemUnit types.Int64  `tfsdk:"management_system_unit"`
 }
 
+// OmeDeviceFru - OmeDeviceFru
 type OmeDeviceFru struct {
 	Revision     types.String `tfsdk:"revision"`
 	ID           types.Int64  `tfsdk:"id"`
@@ -104,11 +112,13 @@ type OmeDeviceFru struct {
 	SerialNumber types.String `tfsdk:"serial_number"`
 }
 
+// OmeDeviceCapability - OmeDeviceCapability
 type OmeDeviceCapability struct {
 	ID             types.Int64             `tfsdk:"id"`
 	CapabilityType OmeDeviceCapabilityType `tfsdk:"capability_type"`
 }
 
+// OmeDeviceCapabilityType - OmeDeviceCapabilityType
 type OmeDeviceCapabilityType struct {
 	CapabilityID types.Int64  `tfsdk:"capability_id"`
 	Name         types.String `tfsdk:"name"`
@@ -116,6 +126,7 @@ type OmeDeviceCapabilityType struct {
 	IDOwner      types.Int64  `tfsdk:"id_owner"`
 }
 
+// OmeServerDeviceCardInfo - OmeServerDeviceCardInfo
 type OmeServerDeviceCardInfo struct {
 	ID           types.Int64  `tfsdk:"id"`
 	SlotNumber   types.String `tfsdk:"slot_number"`
@@ -126,6 +137,7 @@ type OmeServerDeviceCardInfo struct {
 	SlotType     types.String `tfsdk:"slot_type"`
 }
 
+// OmeCPUInfo - OmeCPUInfo
 type OmeCPUInfo struct {
 	ID                   types.Int64  `tfsdk:"id"`
 	Family               types.String `tfsdk:"family"`
@@ -141,6 +153,7 @@ type OmeCPUInfo struct {
 	Voltage              types.String `tfsdk:"voltage"`
 }
 
+// NewOmeCPUInfo - NewOmeCPUInfo
 func NewOmeCPUInfo(input CPUInfo) OmeCPUInfo {
 	return OmeCPUInfo{
 		ID:                   types.Int64Value(input.ID),
@@ -158,6 +171,7 @@ func NewOmeCPUInfo(input CPUInfo) OmeCPUInfo {
 	}
 }
 
+// OmePartition - OmePartition
 type OmePartition struct {
 	Fqdd                     types.String `tfsdk:"fqdd"`
 	CurrentMacAddress        types.String `tfsdk:"current_mac_address"`
@@ -176,6 +190,7 @@ type OmePartition struct {
 	MaxBandwidth             types.Int64  `tfsdk:"max_bandwidth"`
 }
 
+// OmePort - OmePort
 type OmePort struct {
 	PortID      types.String   `tfsdk:"port_id"`
 	ProductName types.String   `tfsdk:"product_name"`
@@ -184,12 +199,14 @@ type OmePort struct {
 	Partitions  []OmePartition `tfsdk:"partitions"`
 }
 
+// OmeNICInfo - OmeNICInfo
 type OmeNICInfo struct {
 	NicID      types.String `tfsdk:"nic_id"`
 	VendorName types.String `tfsdk:"vendor_name"`
 	Ports      []OmePort    `tfsdk:"ports"`
 }
 
+// OmeFCInfo - OmeFCInfo
 type OmeFCInfo struct {
 	ID                 types.Int64  `tfsdk:"id"`
 	Fqdd               types.String `tfsdk:"fqdd"`
@@ -209,6 +226,7 @@ type OmeFCInfo struct {
 	VirtualWwpn        types.String `tfsdk:"virtual_wwpn"`
 }
 
+// OmeOSInfo - OmeOSInfo
 type OmeOSInfo struct {
 	ID        types.Int64  `tfsdk:"id"`
 	OsName    types.String `tfsdk:"os_name"`
@@ -216,6 +234,7 @@ type OmeOSInfo struct {
 	Hostname  types.String `tfsdk:"hostname"`
 }
 
+// OmePowerSupplyInfo - OmePowerSupplyInfo
 type OmePowerSupplyInfo struct {
 	ID                                  types.Int64  `tfsdk:"id"`
 	Name                                types.String `tfsdk:"name"`
@@ -242,6 +261,7 @@ type OmePowerSupplyInfo struct {
 	SwitchingSupply                     types.Bool   `tfsdk:"switching_supply"`
 }
 
+// OmeDiskInfo - OmeDiskInfo
 type OmeDiskInfo struct {
 	ID                          types.Int64  `tfsdk:"id"`
 	DiskNumber                  types.String `tfsdk:"disk_number"`
@@ -272,6 +292,7 @@ type OmeDiskInfo struct {
 	RaidStatus                  types.String `tfsdk:"raid_status"`
 }
 
+// OmeServerVirtualDisk - OmeServerVirtualDisk
 type OmeServerVirtualDisk struct {
 	ID               types.Int64  `tfsdk:"id"`
 	RaidControllerID types.Int64  `tfsdk:"raid_controller_id"`
@@ -292,6 +313,7 @@ type OmeServerVirtualDisk struct {
 	LockStatus       types.String `tfsdk:"lock_status"`
 }
 
+// OmeRAIDControllerInfo - OmeRAIDControllerInfo
 type OmeRAIDControllerInfo struct {
 	ID                       types.Int64            `tfsdk:"id"`
 	Name                     types.String           `tfsdk:"name"`
@@ -309,6 +331,7 @@ type OmeRAIDControllerInfo struct {
 	ServerVirtualDisks       []OmeServerVirtualDisk `tfsdk:"server_virtual_disks"`
 }
 
+// OmeMemoryInfo - OmeMemoryInfo
 type OmeMemoryInfo struct {
 	ID                    types.Int64  `tfsdk:"id"`
 	Name                  types.String `tfsdk:"name"`
@@ -327,6 +350,7 @@ type OmeMemoryInfo struct {
 	DeviceDescription     types.String `tfsdk:"device_description"`
 }
 
+// OmeStorageEnclosureInfo - OmeStorageEnclosureInfo
 type OmeStorageEnclosureInfo struct {
 	ID               types.Int64  `tfsdk:"id"`
 	Name             types.String `tfsdk:"name"`
@@ -340,11 +364,13 @@ type OmeStorageEnclosureInfo struct {
 	SlotCount        types.Int64  `tfsdk:"slot_count"`
 }
 
+// OmeServerPowerState - OmeServerPowerState
 type OmeServerPowerState struct {
 	ID         types.Int64 `tfsdk:"id"`
 	PowerState types.Int64 `tfsdk:"power_state"`
 }
 
+// OmeDeviceLicense - OmeDeviceLicense
 type OmeDeviceLicense struct {
 	SoldDate           types.String   `tfsdk:"sold_date"`
 	LicenseBound       types.Int64    `tfsdk:"license_bound"`
@@ -356,7 +382,8 @@ type OmeDeviceLicense struct {
 	LicenseType        OmeLicenseType `tfsdk:"license_type"`
 }
 
+// OmeLicenseType - OmeLicenseType
 type OmeLicenseType struct {
 	Name      types.String `tfsdk:"name"`
-	LicenseId types.Int64  `tfsdk:"license_id"`
+	LicenseID types.Int64  `tfsdk:"license_id"`
 }

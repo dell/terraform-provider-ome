@@ -113,6 +113,7 @@ func (d *DeviceInventory) AddInfo(inv DeviceInventoryInfo) error {
 	return err
 }
 
+// NewDeviceInventory - Creates blank inventory struct
 func NewDeviceInventory() DeviceInventory {
 	return DeviceInventory{
 		ServerDeviceCards:     make([]ServerDeviceCardInfo, 0),
@@ -136,6 +137,7 @@ func NewDeviceInventory() DeviceInventory {
 	}
 }
 
+// AddInventory - Merges given inventory to self
 func (d *DeviceInventory) AddInventory(dd DeviceInventory) {
 	d.ServerDeviceCards = append(d.ServerDeviceCards, dd.ServerDeviceCards...)
 	d.CPUInfo = append(d.CPUInfo, dd.CPUInfo...)
@@ -157,12 +159,14 @@ func (d *DeviceInventory) AddInventory(dd DeviceInventory) {
 	d.SubSystemRollupStatus = append(d.SubSystemRollupStatus, dd.SubSystemRollupStatus...)
 }
 
+// SubSystemRollupStatus - SubSystemRollupStatus
 type SubSystemRollupStatus struct {
 	ID            int64  `json:"Id"`
 	Status        int64  `json:"Status"`
 	SubsystemName string `json:"SubsystemName"`
 }
 
+// DeviceSoftware - DeviceSoftware
 type DeviceSoftware struct {
 	Version           string `json:"Version"`
 	InstallationDate  string `json:"InstallationDate"`
@@ -177,6 +181,7 @@ type DeviceSoftware struct {
 	InstanceID        string `json:"InstanceId"`
 }
 
+// DeviceManagementInfo - DeviceManagementInfo
 type DeviceManagementInfo struct {
 	ManagementID        int64           `json:"ManagementId"`
 	IPAddress           string          `json:"IpAddress"`
@@ -187,12 +192,14 @@ type DeviceManagementInfo struct {
 	EndPointAgents      []EndPointAgent `json:"EndPointAgents"`
 }
 
+// ManagementType - ManagementType
 type ManagementType struct {
 	ManagementType int64  `json:"ManagementType"`
 	Name           string `json:"Name"`
 	Description    string `json:"Description"`
 }
 
+// EndPointAgent - EndPointAgent
 type EndPointAgent struct {
 	ManagementProfileID int64  `json:"ManagementProfileId"`
 	ProfileID           string `json:"ProfileId"`
@@ -204,6 +211,7 @@ type EndPointAgent struct {
 	StatusDateTime      string `json:"StatusDateTime"`
 }
 
+// DeviceLocation - DeviceLocation
 type DeviceLocation struct {
 	ID                   int64  `json:"Id"`
 	Room                 string `json:"Room"`
@@ -214,6 +222,7 @@ type DeviceLocation struct {
 	ManagementSystemUnit int64  `json:"ManagementSystemUnit"`
 }
 
+// DeviceFru - Device FRU
 type DeviceFru struct {
 	Revision     string `json:"Revision"`
 	ID           int64  `json:"Id"`
@@ -223,11 +232,13 @@ type DeviceFru struct {
 	SerialNumber string `json:"SerialNumber"`
 }
 
+// DeviceCapability - Device Capability
 type DeviceCapability struct {
 	ID             int64                `json:"Id"`
 	CapabilityType DeviceCapabilityType `json:"CapabilityType"`
 }
 
+// DeviceCapabilityType - Device Capability Type
 type DeviceCapabilityType struct {
 	CapabilityID int64  `json:"CapabilityId"`
 	Name         string `json:"Name"`
@@ -235,6 +246,7 @@ type DeviceCapabilityType struct {
 	IDOwner      int64  `json:"IdOwner"`
 }
 
+// ServerDeviceCardInfo - Server Device Card Info
 type ServerDeviceCardInfo struct {
 	ID           int64  `json:"Id"`
 	SlotNumber   string `json:"SlotNumber"`
@@ -245,6 +257,7 @@ type ServerDeviceCardInfo struct {
 	SlotType     string `json:"SlotType"`
 }
 
+// CPUInfo - CPU Info
 type CPUInfo struct {
 	ID                   int64  `json:"Id"`
 	Family               string `json:"Family"`
@@ -260,6 +273,7 @@ type CPUInfo struct {
 	Voltage              string `json:"Voltage"`
 }
 
+// Partition - Partition
 type Partition struct {
 	Fqdd                     string `json:"Fqdd"`
 	CurrentMacAddress        string `json:"CurrentMacAddress"`
@@ -278,6 +292,7 @@ type Partition struct {
 	MaxBandwidth             int64  `json:"MaxBandwidth"`
 }
 
+// Port - Port
 type Port struct {
 	PortID      string      `json:"PortId"`
 	ProductName string      `json:"ProductName"`
@@ -286,12 +301,14 @@ type Port struct {
 	Partitions  []Partition `json:"Partitions"`
 }
 
+// NICInfo - NIC Info
 type NICInfo struct {
 	NicID      string `json:"NicId"`
 	VendorName string `json:"VendorName"`
 	Ports      []Port `json:"Ports"`
 }
 
+// FCInfo - FC Info
 type FCInfo struct {
 	ID                 int64  `json:"Id"`
 	Fqdd               string `json:"Fqdd"`
@@ -311,6 +328,7 @@ type FCInfo struct {
 	VirtualWwpn        string `json:"VirtualWwpn"`
 }
 
+// OSInfo - OS Info
 type OSInfo struct {
 	ID        int64  `json:"Id"`
 	OsName    string `json:"OsName"`
@@ -318,6 +336,7 @@ type OSInfo struct {
 	Hostname  string `json:"Hostname"`
 }
 
+// PowerSupplyInfo - Power Supply Info
 type PowerSupplyInfo struct {
 	ID                                  int64  `json:"Id"`
 	Name                                string `json:"Name"`
@@ -344,6 +363,7 @@ type PowerSupplyInfo struct {
 	SwitchingSupply                     bool   `json:"SwitchingSupply"`
 }
 
+// DiskInfo - Disk Info
 type DiskInfo struct {
 	ID                          int64  `json:"Id"`
 	DiskNumber                  string `json:"DiskNumber"`
@@ -374,6 +394,7 @@ type DiskInfo struct {
 	RaidStatus                  string `json:"RaidStatus"`
 }
 
+// ServerVirtualDisk - ServerVirtualDisk
 type ServerVirtualDisk struct {
 	ID               int64  `json:"Id"`
 	RaidControllerID int64  `json:"RaidControllerId"`
@@ -394,6 +415,7 @@ type ServerVirtualDisk struct {
 	LockStatus       string `json:"LockStatus"`
 }
 
+// RAIDControllerInfo - RAID Controller Info
 type RAIDControllerInfo struct {
 	ID                       int64               `json:"Id"`
 	Name                     string              `json:"Name"`
@@ -411,6 +433,7 @@ type RAIDControllerInfo struct {
 	ServerVirtualDisks       []ServerVirtualDisk `json:"ServerVirtualDisks"`
 }
 
+// MemoryInfo - Memory Info
 type MemoryInfo struct {
 	ID                    int64  `json:"Id"`
 	Name                  string `json:"Name"`
@@ -429,6 +452,7 @@ type MemoryInfo struct {
 	DeviceDescription     string `json:"DeviceDescription"`
 }
 
+// StorageEnclosureInfo - Storage Enclosure Info
 type StorageEnclosureInfo struct {
 	ID               int64  `json:"Id"`
 	Name             string `json:"Name"`
@@ -442,11 +466,13 @@ type StorageEnclosureInfo struct {
 	SlotCount        int64  `json:"SlotCount"`
 }
 
+// ServerPowerState - ServerPowerState
 type ServerPowerState struct {
 	ID         int64 `json:"Id"`
 	PowerState int64 `json:"PowerState"`
 }
 
+// DeviceLicense - Device License
 type DeviceLicense struct {
 	SoldDate           string      `json:"SoldDate"`
 	LicenseBound       int64       `json:"LicenseBound"`
@@ -458,7 +484,8 @@ type DeviceLicense struct {
 	LicenseType        LicenseType `json:"LicenseType"`
 }
 
+// LicenseType - License Type
 type LicenseType struct {
 	Name      string `json:"Name"`
-	LicenseId int64  `json:"LicenseId"`
+	LicenseID int64  `json:"LicenseId"`
 }

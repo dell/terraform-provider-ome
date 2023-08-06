@@ -257,10 +257,11 @@ func (c *Client) GetPaginatedDataWithQueryParam(url string, queryParams map[stri
 	return nil
 }
 
+// RequestOptions - Options struct for any http request
 type RequestOptions struct {
 	Headers     map[string]string
 	QueryParams map[string]string
-	Url         string
+	URL         string
 }
 
 // GetValueWithPagination - returns all the paginated data with options
@@ -271,7 +272,7 @@ func (c *Client) GetValueWithPagination(opt RequestOptions, in interface{}) erro
 		NextLink string            `json:"@odata.nextLink"`
 	}
 	pd := paginatedResponse{
-		NextLink: opt.Url,
+		NextLink: opt.URL,
 	}
 	for pd.NextLink != "" {
 		response, err := c.Get(pd.NextLink, opt.Headers, opt.QueryParams)

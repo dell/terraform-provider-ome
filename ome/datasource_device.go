@@ -61,7 +61,7 @@ func (*deviceDatasource) Metadata(ctx context.Context, req datasource.MetadataRe
 func (*deviceDatasource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Data source to list devices from OpenManage Enterprise.",
-		Attributes:          OmeDeviceDataSchema(),
+		Attributes:          omeDeviceDataSchema(),
 	}
 }
 

@@ -196,7 +196,7 @@ func FilterDeviceByIps(devices []models.Device, networks []string) ([]models.Dev
 func (c *Client) GetAllDevices(queries map[string]string) (models.Devices, error) {
 	devices := models.Devices{}
 	err := c.GetValueWithPagination(RequestOptions{
-		Url:         DeviceAPI,
+		URL:         DeviceAPI,
 		QueryParams: queries,
 	}, &devices.Value)
 	return devices, err

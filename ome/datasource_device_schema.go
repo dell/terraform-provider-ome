@@ -22,7 +22,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func OmeDeviceDataSchema() map[string]schema.Attribute {
+func omeDeviceDataSchema() map[string]schema.Attribute {
 	acceptedInventoryTypes := []string{
 		"serverDeviceCards",
 		"serverProcessors",
@@ -91,7 +91,7 @@ func OmeDeviceDataSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Devices fetched.",
 			Description:         "Devices fetched.",
 			Computed:            true,
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeSingleDeviceDataSchema()},
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeSingleDeviceDataSchema()},
 		},
 		"id": schema.Int64Attribute{
 			MarkdownDescription: "Dummy ID of the datasource.",
@@ -117,7 +117,7 @@ func OmeDeviceDataSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeSingleDeviceDataSchema() map[string]schema.Attribute {
+func omeSingleDeviceDataSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"id": schema.Int64Attribute{
 			MarkdownDescription: "ID of the device.",
@@ -209,13 +209,13 @@ func OmeSingleDeviceDataSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Slot Configuration of the device.",
 			Description:         "Slot Configuration of the device.",
 			Computed:            true,
-			Attributes:          OmeSlotConfigurationDataSchema(),
+			Attributes:          omeSlotConfigurationDataSchema(),
 		},
 		"device_management": schema.ListNestedAttribute{
 			MarkdownDescription: "Device Management of the device.",
 			Description:         "Device Management of the device.",
 			Computed:            true,
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeDeviceManagementDataSchema()},
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeDeviceManagementDataSchema()},
 		},
 		"enabled": schema.BoolAttribute{
 			MarkdownDescription: "Whether the device is enabled or not.",
@@ -236,7 +236,7 @@ func OmeSingleDeviceDataSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Discovery Configuration Job Info of the device.",
 			Description:         "Discovery Configuration Job Info of the device.",
 			Computed:            true,
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeDiscoveryConfigurationJobDataSchema()},
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeDiscoveryConfigurationJobDataSchema()},
 		},
 		"detailed_inventory": schema.SingleNestedAttribute{
 			MarkdownDescription: "Detailed inventory of the device." +
@@ -244,12 +244,12 @@ func OmeSingleDeviceDataSchema() map[string]schema.Attribute {
 			Description: "Detailed inventory of the device." +
 				" Detailed inventory is only fetched if only a single device is fetched by this datasource.",
 			Computed:   true,
-			Attributes: OmeDeviceInventorySchema(),
+			Attributes: omeDeviceInventorySchema(),
 		},
 	}
 }
 
-func OmeDiscoveryConfigurationJobDataSchema() map[string]schema.Attribute {
+func omeDiscoveryConfigurationJobDataSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"group_id": schema.StringAttribute{
 			MarkdownDescription: "Group ID",
@@ -269,7 +269,7 @@ func OmeDiscoveryConfigurationJobDataSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeSlotConfigurationDataSchema() map[string]schema.Attribute {
+func omeSlotConfigurationDataSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"chassis_name": schema.StringAttribute{
 			MarkdownDescription: "Chassis Name",
@@ -279,7 +279,7 @@ func OmeSlotConfigurationDataSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeDeviceManagementDataSchema() map[string]schema.Attribute {
+func omeDeviceManagementDataSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"management_id": schema.Int64Attribute{
 			MarkdownDescription: "Management ID",
@@ -315,12 +315,12 @@ func OmeDeviceManagementDataSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Management Profile",
 			Description:         "Management Profile",
 			Computed:            true,
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeManagementProfileDataSchema()},
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeManagementProfileDataSchema()},
 		},
 	}
 }
 
-func OmeManagementProfileDataSchema() map[string]schema.Attribute {
+func omeManagementProfileDataSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"management_profile_id": schema.Int64Attribute{
 			MarkdownDescription: "Management Profile ID",
@@ -372,19 +372,19 @@ func OmeManagementProfileDataSchema() map[string]schema.Attribute {
 
 // ################## Inventory Schema
 
-func OmeDeviceInventorySchema() map[string]schema.Attribute {
+func omeDeviceInventorySchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"server_device_cards": schema.ListNestedAttribute{
 			MarkdownDescription: "Server Device Cards.",
 			Description:         "Server Device Cards.",
 			Computed:            true,
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeServerDeviceCardInfoSchema()},
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeServerDeviceCardInfoSchema()},
 		},
 		"cpus": schema.ListNestedAttribute{
 			MarkdownDescription: "CPU related Information.",
 			Description:         "CPU related Information.",
 			Computed:            true,
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeCPUInfoSchema()},
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeCPUInfoSchema()},
 		},
 
 		"nics": schema.ListNestedAttribute{
@@ -392,7 +392,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "NIC related Information.",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeNICInfoSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeNICInfoSchema()},
 		},
 
 		"fcis": schema.ListNestedAttribute{
@@ -400,7 +400,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "FCI related Information.",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeFCInfoSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeFCInfoSchema()},
 		},
 
 		"os": schema.ListNestedAttribute{
@@ -408,7 +408,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "OS related Information.",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeOSInfoSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeOSInfoSchema()},
 		},
 
 		"power_supply": schema.ListNestedAttribute{
@@ -416,7 +416,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Power Supply related Information.",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmePowerSupplyInfoSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omePowerSupplyInfoSchema()},
 		},
 
 		"disks": schema.ListNestedAttribute{
@@ -424,27 +424,27 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Disk related Information.",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeDiskInfoSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeDiskInfoSchema()},
 		},
 
 		"raid_controllers": schema.ListNestedAttribute{
 			MarkdownDescription: "RAIDController Information.",
 			Description:         "RAIDController Information.",
 			Computed:            true,
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeRAIDControllerInfoSchema()},
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeRAIDControllerInfoSchema()},
 		},
 
 		"memory": schema.ListNestedAttribute{
 			MarkdownDescription: "Memory Information.",
 			Description:         "Memory Information.",
 			Computed:            true,
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeMemoryInfoSchema()},
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeMemoryInfoSchema()},
 		},
 		"storage_enclosures": schema.ListNestedAttribute{
 			MarkdownDescription: "Storage Enclosure Information.",
 			Description:         "Storage Enclosure Information.",
 			Computed:            true,
-			NestedObject:        schema.NestedAttributeObject{Attributes: OmeStorageEnclosureInfoSchema()},
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeStorageEnclosureInfoSchema()},
 		},
 
 		"power_state": schema.ListNestedAttribute{
@@ -452,7 +452,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Server Power States",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeServerPowerStateSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeServerPowerStateSchema()},
 		},
 
 		"licenses": schema.ListNestedAttribute{
@@ -460,7 +460,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Device Licenses",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeDeviceLicenseSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeDeviceLicenseSchema()},
 		},
 
 		"capabilities": schema.ListNestedAttribute{
@@ -468,7 +468,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Device Capabilities",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeDeviceCapabilitySchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeDeviceCapabilitySchema()},
 		},
 
 		"frus": schema.ListNestedAttribute{
@@ -476,7 +476,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Device FRUs",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeDeviceFruSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeDeviceFruSchema()},
 		},
 
 		"locations": schema.ListNestedAttribute{
@@ -484,7 +484,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Device Locations",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeDeviceLocationSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeDeviceLocationSchema()},
 		},
 
 		"management_info": schema.ListNestedAttribute{
@@ -492,7 +492,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Device Management",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeDeviceManagementInfoSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeDeviceManagementInfoSchema()},
 		},
 
 		"softwares": schema.ListNestedAttribute{
@@ -500,7 +500,7 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Device Softwares",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeDeviceSoftwareSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeDeviceSoftwareSchema()},
 		},
 
 		"subsytem_rollup_status": schema.ListNestedAttribute{
@@ -508,12 +508,12 @@ func OmeDeviceInventorySchema() map[string]schema.Attribute {
 			Description:         "Sub System Rollup Status",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeSubSystemRollupStatusSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeSubSystemRollupStatusSchema()},
 		},
 	}
 }
 
-func OmeSubSystemRollupStatusSchema() map[string]schema.Attribute {
+func omeSubSystemRollupStatusSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -539,7 +539,7 @@ func OmeSubSystemRollupStatusSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeDeviceSoftwareSchema() map[string]schema.Attribute {
+func omeDeviceSoftwareSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"version": schema.StringAttribute{
@@ -621,7 +621,7 @@ func OmeDeviceSoftwareSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeDeviceManagementInfoSchema() map[string]schema.Attribute {
+func omeDeviceManagementInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"management_id": schema.Int64Attribute{
@@ -664,7 +664,7 @@ func OmeDeviceManagementInfoSchema() map[string]schema.Attribute {
 			Description:         "Management Type",
 
 			Computed:   true,
-			Attributes: OmeManagementTypeSchema(),
+			Attributes: omeManagementTypeSchema(),
 		},
 
 		"end_point_agents": schema.ListNestedAttribute{
@@ -672,12 +672,12 @@ func OmeDeviceManagementInfoSchema() map[string]schema.Attribute {
 			Description:         "End Point Agents",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeEndPointAgentSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeEndPointAgentSchema()},
 		},
 	}
 }
 
-func OmeManagementTypeSchema() map[string]schema.Attribute {
+func omeManagementTypeSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"management_type": schema.Int64Attribute{
@@ -703,7 +703,7 @@ func OmeManagementTypeSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeEndPointAgentSchema() map[string]schema.Attribute {
+func omeEndPointAgentSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"management_profile_id": schema.Int64Attribute{
@@ -764,7 +764,7 @@ func OmeEndPointAgentSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeDeviceLocationSchema() map[string]schema.Attribute {
+func omeDeviceLocationSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 		"id": schema.Int64Attribute{
 			MarkdownDescription: "ID",
@@ -804,7 +804,7 @@ func OmeDeviceLocationSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeDeviceFruSchema() map[string]schema.Attribute {
+func omeDeviceFruSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"revision": schema.StringAttribute{
@@ -851,7 +851,7 @@ func OmeDeviceFruSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeDeviceCapabilitySchema() map[string]schema.Attribute {
+func omeDeviceCapabilitySchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -866,12 +866,12 @@ func OmeDeviceCapabilitySchema() map[string]schema.Attribute {
 			Description:         "Capability Type",
 
 			Computed:   true,
-			Attributes: OmeDeviceCapabilityTypeSchema(),
+			Attributes: omeDeviceCapabilityTypeSchema(),
 		},
 	}
 }
 
-func OmeDeviceCapabilityTypeSchema() map[string]schema.Attribute {
+func omeDeviceCapabilityTypeSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"capability_id": schema.Int64Attribute{
@@ -904,7 +904,7 @@ func OmeDeviceCapabilityTypeSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeServerDeviceCardInfoSchema() map[string]schema.Attribute {
+func omeServerDeviceCardInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -958,7 +958,7 @@ func OmeServerDeviceCardInfoSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeCPUInfoSchema() map[string]schema.Attribute {
+func omeCPUInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -1047,7 +1047,7 @@ func OmeCPUInfoSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmePartitionSchema() map[string]schema.Attribute {
+func omePartitionSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"fqdd": schema.StringAttribute{
@@ -1157,7 +1157,7 @@ func OmePartitionSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmePortSchema() map[string]schema.Attribute {
+func omePortSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"port_id": schema.StringAttribute{
@@ -1193,12 +1193,12 @@ func OmePortSchema() map[string]schema.Attribute {
 			Description:         "Partitions",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmePartitionSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omePartitionSchema()},
 		},
 	}
 }
 
-func OmeNICInfoSchema() map[string]schema.Attribute {
+func omeNICInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"nic_id": schema.StringAttribute{
@@ -1220,12 +1220,12 @@ func OmeNICInfoSchema() map[string]schema.Attribute {
 			Description:         "Ports",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmePortSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omePortSchema()},
 		},
 	}
 }
 
-func OmeFCInfoSchema() map[string]schema.Attribute {
+func omeFCInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -1342,7 +1342,7 @@ func OmeFCInfoSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeOSInfoSchema() map[string]schema.Attribute {
+func omeOSInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -1375,7 +1375,7 @@ func OmeOSInfoSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmePowerSupplyInfoSchema() map[string]schema.Attribute {
+func omePowerSupplyInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -1541,7 +1541,7 @@ func OmePowerSupplyInfoSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeDiskInfoSchema() map[string]schema.Attribute {
+func omeDiskInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -1735,7 +1735,7 @@ func OmeDiskInfoSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeServerVirtualDiskSchema() map[string]schema.Attribute {
+func omeServerVirtualDiskSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -1859,7 +1859,7 @@ func OmeServerVirtualDiskSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeRAIDControllerInfoSchema() map[string]schema.Attribute {
+func omeRAIDControllerInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -1958,12 +1958,12 @@ func OmeRAIDControllerInfoSchema() map[string]schema.Attribute {
 			Description:         "Server Virtual Disks",
 
 			Computed:     true,
-			NestedObject: schema.NestedAttributeObject{Attributes: OmeServerVirtualDiskSchema()},
+			NestedObject: schema.NestedAttributeObject{Attributes: omeServerVirtualDiskSchema()},
 		},
 	}
 }
 
-func OmeMemoryInfoSchema() map[string]schema.Attribute {
+func omeMemoryInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -2073,7 +2073,7 @@ func OmeMemoryInfoSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeStorageEnclosureInfoSchema() map[string]schema.Attribute {
+func omeStorageEnclosureInfoSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -2148,7 +2148,7 @@ func OmeStorageEnclosureInfoSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeServerPowerStateSchema() map[string]schema.Attribute {
+func omeServerPowerStateSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"id": schema.Int64Attribute{
@@ -2167,7 +2167,7 @@ func OmeServerPowerStateSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeDeviceLicenseSchema() map[string]schema.Attribute {
+func omeDeviceLicenseSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"sold_date": schema.StringAttribute{
@@ -2224,12 +2224,12 @@ func OmeDeviceLicenseSchema() map[string]schema.Attribute {
 			Description:         "License Type",
 
 			Computed:   true,
-			Attributes: OmeLicenseTypeSchema(),
+			Attributes: omeLicenseTypeSchema(),
 		},
 	}
 }
 
-func OmeLicenseTypeSchema() map[string]schema.Attribute {
+func omeLicenseTypeSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"name": schema.StringAttribute{
