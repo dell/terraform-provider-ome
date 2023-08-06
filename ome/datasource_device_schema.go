@@ -14,8 +14,6 @@ limitations under the License.
 package ome
 
 import (
-	"strings"
-
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -102,10 +100,10 @@ func OmeDeviceDataSchema() map[string]schema.Attribute {
 		},
 		"inventory_types": schema.ListAttribute{
 			MarkdownDescription: "The types of inventory types to fetch." +
-				" Accepted values are " + strings.Join(acceptedInventoryTypes, ", ") + "." +
+				makeSchemaAcceptedValues(acceptedInventoryTypes, "`") +
 				" If not configured, all inventory types are fetched.",
 			Description: "The types of inventory to fetch." +
-				" Accepted values are " + strings.Join(acceptedInventoryTypes, ", ") + "." +
+				makeSchemaAcceptedValues(acceptedInventoryTypes, "'") +
 				" If not configured, all inventory types are fetched.",
 			Optional:    true,
 			ElementType: types.StringType,

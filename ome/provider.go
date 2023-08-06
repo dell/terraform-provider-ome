@@ -16,6 +16,7 @@ package ome
 import (
 	"context"
 	"fmt"
+	"strings"
 	"terraform-provider-ome/clients"
 	"time"
 
@@ -265,43 +266,11 @@ func (p *omeProvider) Schema(ctx context.Context, _ provider.SchemaRequest, resp
 	}
 }
 
-// New method is used to create a new provider via a RPC call or from main
-/* func New(version string) func() tfsdk.Provider {
-	return func() tfsdk.Provider {
-		return &provider{
-			version: version,
-		}
+// helper for schema generation of accepted values
+func makeSchemaAcceptedValues(inputs []string, quote string) string {
+	inQuote := make([]string, 0)
+	for _, in := range inputs {
+		inQuote = append(inQuote, fmt.Sprintf("%s%s%s", quote, in, quote))
 	}
-} */
-
-/* // convertProviderType is a helper function for NewResource and NewDataSource
-// implementations to associate the concrete provider type. Alternatively,
-// this helper can be skipped and the provider type can be directly type
-// asserted (e.g. provider: in.(*provider)), however using this can prevent
-// potential panics.
-//
-//lint:ignore U1000 used by the internal provider, to be checked
-func convertProviderType(in tfsdk.Provider) (provider, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	p, ok := in.(*provider)
-
-	if !ok {
-		diags.AddError(
-			"Unexpected Provider Instance Type",
-			fmt.Sprintf("While creating the data source or resource, an unexpected provider type (%T) was received. This is always a bug in the provider code and should be reported to the provider developers.", p),
-		)
-		return provider{}, diags
-	}
-
-	if p == nil {
-		diags.AddError(
-			"Unexpected Provider Instance Type",
-			"While creating the data source or resource, an unexpected empty provider instance was received. This is always a bug in the provider code and should be reported to the provider developers.",
-		)
-		return provider{}, diags
-	}
-
-	return *p, diags
+	return fmt.Sprintf(" Accepted values are %s.", strings.Join(inQuote, ", "))
 }
-*/
