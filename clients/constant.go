@@ -103,6 +103,12 @@ const (
 	DiscoveryJobRemoveAPI = "/api/DiscoveryConfigService/Actions/DiscoveryConfigService.RemoveDiscoveryGroup"
 	// DiscoveryJobByIDAP - api to get info of discovery job
 	DiscoveryJobByGroupIDAPI = "/api/DiscoveryConfigService/DiscoveryConfigGroups(%d)"
+	// CSRGenAPI - API to generate CSR
+	CSRGenAPI = "/api/ApplicationService/Actions/ApplicationService.GenerateCSR"
+	// CertUploadAPI - API to upload certificate
+	CertUploadAPI = "/api/ApplicationService/Actions/ApplicationService.UploadCertificate"
+	// CertGetAPI - API to get certificate info
+	CertGetAPI = "/api/ApplicationService/Certificate"
 )
 
 // Messages constants
