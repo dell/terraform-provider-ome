@@ -18,12 +18,11 @@ import (
 	"terraform-provider-ome/models"
 )
 
-
 const (
 	GetJobAPI = "/api/JobService/Jobs(%d)"
 )
 
-func (c *Client) GetJobByID(id int) (models.Job, error){ 
+func (c *Client) GetJobByID(id int) (models.Job, error) {
 	path := fmt.Sprintf(GetJobAPI, id)
 	response, err := c.Get(path, nil, nil)
 	if err != nil {

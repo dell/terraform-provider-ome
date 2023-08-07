@@ -1,5 +1,6 @@
 package models
 
+import "github.com/hashicorp/terraform-plugin-framework/types"
 
 type NetworkAdapterSetting struct {
 	OdataContext      string            `json:"@odata.context"`
@@ -16,6 +17,7 @@ type NetworkAdapterSetting struct {
 	Delay             int               `json:"Delay"`
 	PrimaryInterface  bool              `json:"PrimaryInterface"`
 }
+
 type Ipv4Configuration struct {
 	Enable                   bool   `json:"Enable"`
 	EnableDHCP               bool   `json:"EnableDHCP"`
@@ -26,6 +28,7 @@ type Ipv4Configuration struct {
 	StaticPreferredDNSServer string `json:"StaticPreferredDNSServer"`
 	StaticAlternateDNSServer string `json:"StaticAlternateDNSServer"`
 }
+
 type Ipv6Configuration struct {
 	Enable                   bool   `json:"Enable"`
 	EnableAutoConfiguration  bool   `json:"EnableAutoConfiguration"`
@@ -79,7 +82,6 @@ type CurrentSettings struct {
 	DNSSetting   DNSSetting   `json:"DnsSetting"`
 }
 
-
 type UpdateNetworkAdapterSetting struct {
 	InterfaceName     string            `json:"InterfaceName"`
 	ProfileName       string            `json:"ProfileName"`
@@ -92,8 +94,8 @@ type UpdateNetworkAdapterSetting struct {
 }
 
 type NetworkSessions struct {
-	OdataContext string  `json:"@odata.context"`
-	OdataCount   int     `json:"@odata.count"`
+	OdataContext string        `json:"@odata.context"`
+	OdataCount   int           `json:"@odata.count"`
 	Value        []SessionInfo `json:"value"`
 }
 type SessionInfo struct {
@@ -132,8 +134,8 @@ type TimeConfiguration struct {
 }
 
 type TimeZones struct {
-	OdataContext string  `json:"@odata.context"`
-	OdataCount   int     `json:"@odata.count"`
+	OdataContext string     `json:"@odata.context"`
+	OdataCount   int        `json:"@odata.count"`
 	Value        []TimeZone `json:"value"`
 }
 type TimeZone struct {
@@ -184,4 +186,88 @@ type PayloadProxyConfiguration struct {
 	EnableProxy          bool   `json:"EnableProxy"`
 	Username             string `json:"Username"`
 	Password             string `json:"Password"`
+}
+
+// tfsdk struct definition
+type OmeNetworkSetting struct {
+	OmeAdapterSetting OmeAdapterSetting `tfsdk:"adapter_setting"`
+	OmeSessionSetting OmeSessionSetting `tfsdk:"session_setting"`
+	OmeTimeSetting    OmeTimeSetting    `tfsdk:"time_setting"`
+	OmeProxySetting   OmeProxySetting   `tfsdk:"proxy_setting"`
+}
+
+type OmeAdapterSetting struct {
+	EnableNic      types.Bool        `tfsdk:"enable_nic"`
+	InterfaceName  types.String      `tfsdk:"interface_name"`
+	IPV4Config     OmeIPv4Config     `tfsdk:"ipv4_configuration"`
+	IPV6Config     OmeIPv6Config     `tfsdk:"ipv6_configuration"`
+	ManagementVLAN OmeManagementVLAN `tfsdk:"management_vlan"`
+	DNSConfig      OmeDNSConfig      `tfsdk:"dns_configuration"`
+	RebootDelay    types.Int64       `tfsdk:"reboot_delay"`
+	JobID          types.Int64       `tfsdk:"job_id"`
+}
+
+type OmeIPv4Config struct {
+	EnableIPv4               types.Bool   `tfsdk:"enable_ipv4"`
+	EnableDHCP               types.Bool   `tfsdk:"enable_dhcp"`
+	StaticIPAddress          types.String `tfsdk:"static_ip_address"`
+	StaticSubnetMask         types.String `tfsdk:"static_subnet_mask"`
+	StaticGateway            types.String `tfsdk:"static_gateway"`
+	UseDHCPforDNSServerNames types.Bool   `tfsdk:"use_dhcp_for_dns_server_names"`
+	StaticPreferredDNSServer types.String `tfsdk:"static_preferred_dns_server"`
+	StaticAlternateDNSServer types.String `tfsdk:"static_alternate_dns_server"`
+}
+
+type OmeIPv6Config struct {
+	EnableIPv6               types.Bool   `tfsdk:"enable_ipv6"`
+	EnableAutoConfiguration  types.Bool   `tfsdk:"enable_auto_configuration"`
+	StaticIPAddress          types.String `tfsdk:"static_ip_address"`
+	StaticPrefixLength       types.Int64  `tfsdk:"static_prefix_length"`
+	StaticGateway            types.String `tfsdk:"static_gateway"`
+	UseDHCPforDNSServerNames types.Bool   `tfsdk:"use_dhcp_for_dns_server_names"`
+	StaticPreferredDNSServer types.String `tfsdk:"static_preferred_dns_server"`
+	StaticAlternateDNSServer types.String `tfsdk:"static_alternate_dns_server"`
+}
+
+type OmeManagementVLAN struct {
+	EnableVLAN types.Bool  `tfsdk:"enable_vlan"`
+	ID         types.Int64 `tfsdk:"id"`
+}
+
+type OmeDNSConfig struct {
+	RegisterWithDNS          types.Bool   `tfsdk:"register_with_dns"`
+	UseDHCPforDNSServerNames types.Bool   `tfsdk:"use_dhcp_for_dns_server_names"`
+	DNSName                  types.String `tfsdk:"dns_name"`
+	DNSDomainName            types.String `tfsdk:"dns_domain_name"`
+}
+
+type OmeSessionSetting struct {
+	EnableUniversalTimeout types.Bool    `tfsdk:"enable_universal_timeout"`
+	UnversalTimeout        types.Float64 `tfsdk:"universal_timeout"`
+	APITimeout             types.Float64 `tfsdk:"api_timeout"`
+	APISession             types.Int64   `tfsdk:"api_session"`
+	GUITimeout             types.Float64 `tfsdk:"gui_timeout"`
+	GUISession             types.Int64   `tfsdk:"gui_session"`
+	SSHTimeout             types.Float64 `tfsdk:"ssh_timeout"`
+	SSHSession             types.Int64   `tfsdk:"ssh_session"`
+	SerialTimeout          types.Float64 `tfsdk:"serial_timeout"`
+	SerialSession          types.Int64   `tfsdk:"serial_session"`
+}
+
+type OmeTimeSetting struct {
+	EnableNTP            types.Bool   `tfsdk:"enable_ntp"`
+	SystemTime           types.String `tfsdk:"system_time"`
+	TimeZone             types.String `tfsdk:"time_zone"`
+	PrimaryNTPAddress    types.String `tfsdk:"primary_ntp_address"`
+	SecondaryNTPAddress1 types.String `tfsdk:"secondary_ntp_address1"`
+	SecondaryNTPAddress2 types.String `tfsdk:"secondary_ntp_address2"`
+}
+
+type OmeProxySetting struct {
+	EnableProxy          types.Bool   `tfsdk:"enable_proxy"`
+	IPAddress            types.String `tfsdk:"ip_address"`
+	ProxyPort            types.Int64  `tfsdk:"proxy_port"`
+	EnableAuthentication types.Bool   `tfsdk:"enable_authentication"`
+	Username             types.String `tfsdk:"Username"`
+	Password             types.String `tfsdk:"Password"`
 }
