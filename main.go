@@ -6,6 +6,7 @@ import (
 	"log"
 	"terraform-provider-ome/ome"
 
+	_ "github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 
