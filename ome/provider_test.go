@@ -43,6 +43,18 @@ var DeviceID3 = os.Getenv("DEVICEID3") // Not capable for deployment
 var ShareUser = os.Getenv("SHAREUSERNAME")
 var SharePassword = os.Getenv("SHAREPASSWORD")
 var ShareIP = os.Getenv("SHAREIP")
+var DeviceIP1 = os.Getenv("DEVICEIP1")
+var DeviceIP2 = os.Getenv("DEVICEIP2")
+var DeviceIP3 = os.Getenv("DEVICEIP3")
+
+var testProvider = `
+provider "ome" {
+	username = "` + omeUserName + `"
+	password = "` + omePassword + `"
+	host = "` + omeHost + `"
+	skipssl = true
+}
+`
 
 func init() {
 	// testAccProtoV6ProviderFactories are used to instantiate a provider during

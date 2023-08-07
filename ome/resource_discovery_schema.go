@@ -2,6 +2,7 @@ package ome
 
 import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -13,7 +14,7 @@ import (
 func DiscoveryJobSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
-		"id": schema.Int64Attribute{
+		"id": schema.StringAttribute{
 			MarkdownDescription: "ID of the discovery configuration group",
 			Description:         "ID of the discovery configuration group",
 			Computed:            true,
@@ -50,25 +51,8 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
       			- Each discovery target is a set of "network_address_detail", "device_types", and one or more protocol credentials.`,
 			Required:     true,
 			NestedObject: schema.NestedAttributeObject{Attributes: DiscoveryConfigTargetsSchema()},
-		},
-
-		"job_wait": schema.BoolAttribute{
-			MarkdownDescription: "Provides the option to wait for job completion",
-			Description:         "Provides the option to wait for job completion",
-			Optional:            true,
-			Computed:            true,
-			PlanModifiers: []planmodifier.Bool{
-				BoolDefaultValue(types.BoolValue(true)),
-			},
-		},
-
-		"job_wait_timeout": schema.Int64Attribute{
-			MarkdownDescription: "The maximum wait time of job_wait in seconds. The job is tracked only for this duration.",
-			Description:         "The maximum wait time of job_wait in seconds. The job is tracked only for this duration.",
-			Optional:            true,
-			Computed:            true,
-			PlanModifiers: []planmodifier.Int64{
-				Int64DefaultValue(types.Int64Value(1200)),
+			Validators: []validator.Set{
+				setvalidator.SizeAtLeast(1),
 			},
 		},
 
@@ -96,28 +80,6 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			},
 		},
 
-		"ignore_partial_failure": schema.BoolAttribute{
-			MarkdownDescription: `
-				- Provides the option to ignore partial failures. 
-				- Partial failures occur when there is a combination of both discovered and undiscovered IPs.
-      			- If ignore_partial_failur is set to false, then the partial failure is not ignored, and the resource will error out.
-      			- If ignore_partial_failur is set to true, then the partial failure is ignored.
-      			- This option is only applicable if "job_wait" is set to true.
-				`,
-			Description: `
-				- Provides the option to ignore partial failures. 
-				- Partial failures occur when there is a combination of both discovered and undiscovered IPs.
-      			- If ignore_partial_failur is set to false, then the partial failure is not ignored, and the resource will error out.
-      			- If ignore_partial_failur is set to true, then the partial failure is ignored.
-      			- This option is only applicable if "job_wait" is set to true.
-				`,
-			Optional: true,
-			Computed: true,
-			PlanModifiers: []planmodifier.Bool{
-				BoolDefaultValue(types.BoolValue(false)),
-			},
-		},
-
 		"trap_destination": schema.BoolAttribute{
 			MarkdownDescription: `
 				- Enable OpenManage Enterprise to receive the incoming SNMP traps from the discovered devices. 
@@ -132,7 +94,7 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			},
 		},
 
-		"community_types_string": schema.BoolAttribute{
+		"enable_community_strings": schema.BoolAttribute{
 			MarkdownDescription: `
 				- Enable the use of SNMP community strings to receive SNMP traps using Application Settings in OpenManage Enterprise. 
 				- This option is available only for the discovered iDRAC servers and MX7000 chassis.`,
@@ -144,6 +106,11 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			PlanModifiers: []planmodifier.Bool{
 				BoolDefaultValue(types.BoolValue(false)),
 			},
+		},
+		"job_id": schema.Int64Attribute{
+			MarkdownDescription: "Discovery Job ID.",
+			Description:         "Discovery Job ID.",
+			Computed:            true,
 		},
 	}
 }
@@ -190,11 +157,7 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			Required:    true,
 			ElementType: types.StringType,
 			Validators: []validator.List{
-				// Validate this List must contain List elements
-				// which have at least 1 String element.
-				listvalidator.ValueListsAre(listvalidator.SizeAtLeast(1)),
-				// Validate this List must contain string values which are at least 3 characters.
-				listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
+				listvalidator.SizeAtLeast(1),
 			},
 		},
 
@@ -220,18 +183,11 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			Required:    true,
 			ElementType: types.StringType,
 			Validators: []validator.List{
-				// Validate this List must contain List elements
-				// which have at least 1 String element.
-				listvalidator.ValueListsAre(listvalidator.SizeAtLeast(1)),
-				// Validate this List must contain string values which are at least 3 characters.
-				listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-				// Validate this List must contain string values which are SERVER, CHASSIS, NETWORK SWITCH and STORAGE
-				listvalidator.ValueStringsAre(stringvalidator.OneOf(
-					"SERVER",
-					"CHASSIS",
-					"NETWORK SWITCH",
-					"STORAGE",
-				)),
+				listvalidator.SizeAtLeast(1),
+				listvalidator.ValueStringsAre(
+					stringvalidator.OneOf("SERVER", "CHASSIS", "NETWORK SWITCH", "STORAGE"),
+				),
+				listvalidator.UniqueValues(),
 			},
 		},
 
@@ -239,15 +195,20 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			MarkdownDescription: "REDFISH protocol",
 			Description:         "REDFISH protocol",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          RedfishSchema(),
+		},
+
+		"wsman": schema.SingleNestedAttribute{
+			MarkdownDescription: "WSMAN protocol",
+			Description:         "WSMAN protocol",
+			Optional:            true,
+			Attributes:          WSMANSchema(),
 		},
 
 		"snmp": schema.SingleNestedAttribute{
 			MarkdownDescription: "Simple Network Management Protocol (SNMP)",
 			Description:         "Simple Network Management Protocol (SNMP)",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          SNMPSchema(),
 		},
 
@@ -255,7 +216,6 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Secure Shell (SSH)",
 			Description:         "Secure Shell (SSH)",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          SSHSchema(),
 		},
 	}
@@ -278,16 +238,6 @@ func RedfishSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Provide a password for the protocol.",
 			Description:         "Provide a password for the protocol.",
 			Required:            true,
-			Validators: []validator.String{
-				stringvalidator.LengthAtLeast(1),
-			},
-		},
-
-		"domain": schema.StringAttribute{
-			MarkdownDescription: "Provide a domain for the protocol.",
-			Description:         "Provide a domain for the protocol.",
-			Optional:            true,
-			Computed:            true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
 			},
@@ -343,15 +293,119 @@ func RedfishSchema() map[string]schema.Attribute {
 			},
 		},
 
-		"certificate_data": schema.StringAttribute{
-			MarkdownDescription: "Provide certificate data for the CA check.",
-			Description:         "Provide certificate data for the CA check.",
-			Optional:            true,
-			Computed:            true,
+		// "domain": schema.StringAttribute{
+		// 	MarkdownDescription: "Provide a domain for the protocol.",
+		// 	Description:         "Provide a domain for the protocol.",
+		// 	Optional:            true,
+		// 	Computed:            true,
+		// 	Validators: []validator.String{
+		// 		stringvalidator.LengthAtLeast(1),
+		// 	},
+		// },
+
+		// "certificate_data": schema.StringAttribute{
+		// 	MarkdownDescription: "Provide certificate data for the CA check.",
+		// 	Description:         "Provide certificate data for the CA check.",
+		// 	Optional:            true,
+		// 	Computed:            true,
+		// 	Validators: []validator.String{
+		// 		stringvalidator.LengthAtLeast(1),
+		// 	},
+		// },
+	}
+}
+
+// WSMANSchema for wsman protocol schema
+func WSMANSchema() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+
+		"username": schema.StringAttribute{
+			MarkdownDescription: "Provide a username for the protocol.",
+			Description:         "Provide a username for the protocol.",
+			Required:            true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
 			},
 		},
+
+		"password": schema.StringAttribute{
+			MarkdownDescription: "Provide a password for the protocol.",
+			Description:         "Provide a password for the protocol.",
+			Required:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
+		},
+
+		"port": schema.Int64Attribute{
+			MarkdownDescription: "Enter the port number that the job must use to discover the devices.",
+			Description:         "Enter the port number that the job must use to discover the devices.",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Int64{
+				Int64DefaultValue(types.Int64Value(443)),
+			},
+		},
+
+		"retries": schema.Int64Attribute{
+			MarkdownDescription: "Enter the number of repeated attempts required to discover a device",
+			Description:         "Enter the number of repeated attempts required to discover a device",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Int64{
+				Int64DefaultValue(types.Int64Value(3)),
+			},
+		},
+
+		"timeout": schema.Int64Attribute{
+			MarkdownDescription: "Enter the time in seconds after which a job must stop running.",
+			Description:         "Enter the time in seconds after which a job must stop running.",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Int64{
+				Int64DefaultValue(types.Int64Value(60)),
+			},
+		},
+
+		"cn_check": schema.BoolAttribute{
+			MarkdownDescription: "Enable the Common Name (CN) check.",
+			Description:         "Enable the Common Name (CN) check.",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(false)),
+			},
+		},
+
+		"ca_check": schema.BoolAttribute{
+			MarkdownDescription: "Enable the Certificate Authority (CA) check.",
+			Description:         "Enable the Certificate Authority (CA) check.",
+			Optional:            true,
+			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(false)),
+			},
+		},
+
+		// "domain": schema.StringAttribute{
+		// 	MarkdownDescription: "Provide a domain for the protocol.",
+		// 	Description:         "Provide a domain for the protocol.",
+		// 	Optional:            true,
+		// 	Computed:            true,
+		// 	Validators: []validator.String{
+		// 		stringvalidator.LengthAtLeast(1),
+		// 	},
+		// },
+
+		// "certificate_data": schema.StringAttribute{
+		// 	MarkdownDescription: "Provide certificate data for the CA check.",
+		// 	Description:         "Provide certificate data for the CA check.",
+		// 	Optional:            true,
+		// 	Computed:            true,
+		// 	Validators: []validator.String{
+		// 		stringvalidator.LengthAtLeast(1),
+		// 	},
+		// },
 	}
 }
 

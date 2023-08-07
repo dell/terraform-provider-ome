@@ -101,7 +101,7 @@ func TestClient_GetDeviceByIP(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				for i, id := range tt.args.ids {
-					assert.Equal(t, id, response.Value[i].ID)
+					assert.Equal(t, id, response[i].ID)
 				}
 			} else {
 				assert.NotNil(t, err)

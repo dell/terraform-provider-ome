@@ -59,6 +59,10 @@ const (
 	LastExecDetailAPI = "/api/JobService/Jobs(%d)/LastExecutionDetail"
 	//DeviceAPI - api for managing devices
 	DeviceAPI = "/api/DeviceService/Devices"
+	//DeviceInventoryAPI - api for getting device inventory
+	DeviceInventoryAPI = DeviceAPI + "(%d)/InventoryDetails"
+	//DeviceInventoryAPI - api for getting device inventory of a single type
+	DeviceInventorySingleAPI = DeviceInventoryAPI + "('%s')"
 	// TemplateViewTypeAPI - api to get view type
 	TemplateViewTypeAPI = "/api/TemplateService/TemplateViewTypes"
 	// TemplateDeviceTypeAPI - api to get view type

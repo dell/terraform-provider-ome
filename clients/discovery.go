@@ -2,12 +2,13 @@ package clients
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 	"terraform-provider-ome/models"
 )
 
 // CreateDiscoveryJob - create a discovery job in OME.
-func (c *Client) CreateDiscoveryJob(discoveryJob models.DiscoveryJobPayload) (models.DiscoveryJob, error) {
+func (c *Client) CreateDiscoveryJob(discoveryJob models.DiscoveryJob) (models.DiscoveryJob, error) {
 	data, _ := c.JSONMarshal(discoveryJob)
 	response, err := c.Post(DiscoveryJobAPI, nil, data)
 	if err != nil {
@@ -22,9 +23,10 @@ func (c *Client) CreateDiscoveryJob(discoveryJob models.DiscoveryJobPayload) (mo
 // UpdateDiscoveryJob - update a discovery job in OME.
 func (c *Client) UpdateDiscoveryJob(discoveryJob models.DiscoveryJob) (models.DiscoveryJob, error) {
 	data, _ := c.JSONMarshal(discoveryJob)
-	response, err := c.Post(DiscoveryJobAPI, map[string]string{
+	queryParams := map[string]string{
 		"groupId": strconv.Itoa(discoveryJob.DiscoveryConfigGroupID),
-	}, data)
+	}
+	response, err := c.Do(http.MethodPost, DiscoveryJobAPI, nil, queryParams, data)
 	if err != nil {
 		return models.DiscoveryJob{}, err
 	}

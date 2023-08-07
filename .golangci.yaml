@@ -5,3 +5,23 @@ linters-settings:
     exclude-functions:
       - (*terraform-provider-ome/clients.Client).RemoveSession
       - (net/http.ResponseWriter).Write
+  revive:
+    rules:
+      - name: unused-parameter
+        severity: warning
+        disabled: true
+      - name: var-declaration
+        severity: warning
+        disabled: true
+      - name: exported
+        disabled: false
+
+# enable revive linter
+linters:
+  enable:
+    - revive
+
+issues:
+  include:
+    - EXC0012  # EXC0012 revive: Annoying issue about not having a comment. The rare codebase has such comments
+    - EXC0014  # EXC0014 revive: Annoying issue about not having a comment. The rare codebase has such comments
