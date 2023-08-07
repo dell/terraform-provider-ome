@@ -38,7 +38,6 @@ var DeviceSvcTag1 = os.Getenv("DEVICESVCTAG1")
 var DeviceSvcTag2 = os.Getenv("DEVICESVCTAG2")
 var GroupID1 = os.Getenv("GROUPID1")
 var DeviceID1 = os.Getenv("DEVICEID1")
-var DeviceIP1 = os.Getenv("DEVICEIP1")
 var DeviceID2 = os.Getenv("DEVICEID2")
 var DeviceID3 = os.Getenv("DEVICEID3") // Not capable for deployment
 var ShareUser = os.Getenv("SHAREUSERNAME")
