@@ -24,7 +24,7 @@ func TestClient_DiscoveryCreateJob(t *testing.T) {
 	opts := initOptions(ts)
 
 	c, _ := NewClient(opts)
-	var createDiscoveryJobPayloadSuccess models.DiscoveryJobPayload
+	var createDiscoveryJobPayloadSuccess models.DiscoveryJob
 
 	err := c.JSONUnMarshal(payloadCreateDiscovery, &createDiscoveryJobPayloadSuccess)
 	if err != nil {
@@ -33,10 +33,10 @@ func TestClient_DiscoveryCreateJob(t *testing.T) {
 	t.Log(createDiscoveryJobPayloadSuccess.CreateGroup)
 	tests := []struct {
 		name string
-		args models.DiscoveryJobPayload
+		args models.DiscoveryJob
 	}{
 		{"Create Discovery Job Successfully", createDiscoveryJobPayloadSuccess},
-		{"Create Discovery Job Failed", models.DiscoveryJobPayload{DiscoveryConfigGroupName: "invalid-create"}},
+		{"Create Discovery Job Failed", models.DiscoveryJob{DiscoveryConfigGroupName: "invalid-create"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
