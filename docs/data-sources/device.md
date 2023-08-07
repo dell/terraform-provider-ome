@@ -53,7 +53,7 @@ data "ome_device" "devi" {
 data "ome_device" "devn" {
   filters = {
     ip_expressions = [
-      "10.226.197.136",
+      "10.10.10.10",
       "10.36.0.0-192.36.0.255",
       "fe80::ffff:ffff:ffff:ffff",
       "fe80::ffff:192.0.2.0/125",
@@ -76,11 +76,11 @@ data "ome_device" "devf" {
   }
 }
 
-# get all devices in the CIDR "10.226.197.136/26" with model PowerEdge MX840c
+# get all devices in the CIDR "10.10.10.10/26" with model PowerEdge MX840c
 
 data "ome_device" "devs" {
   filters = {
-    ip_expressions    = ["10.226.197.136/26"]
+    ip_expressions    = ["10.10.10.10/26"]
     filter_expression = "Model eq 'PowerEdge MX840c'"
   }
 }
@@ -90,13 +90,13 @@ data "ome_device" "devs" {
 
 data "ome_device" "dev_invent_full" {
   filters = {
-    ip_expressions = ["10.226.197.136"]
+    ip_expressions = ["10.10.10.10"]
   }
 }
 
 data "ome_device" "dev_invent" {
   filters = {
-    ip_expressions = ["10.226.197.136"]
+    ip_expressions = ["10.10.10.10"]
   }
   inventory_types = ["serverNetworkInterfaces", "serverArrayDisks"]
 }
