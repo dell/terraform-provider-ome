@@ -13,6 +13,7 @@ limitations under the License.
 
 package models
 
+// CSRConfig - CSR generation form
 type CSRConfig struct {
 	DistinguishedName string `json:"DistinguishedName"`
 	DepartmentName    string `json:"DepartmentName"`
@@ -24,6 +25,7 @@ type CSRConfig struct {
 	Sans              string `json:"San,omitempty"`
 }
 
+// CertInfo - Certificate Information received from OME
 type CertInfo struct {
 	IssuedTo  CSRConfig `json:"IssuedTo"`
 	IssuedBy  CSRConfig `json:"IssuedBy"`

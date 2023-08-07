@@ -248,7 +248,7 @@ func (c *Client) DoRequest(request *http.Request) (*http.Response, error) {
 	return response, err
 }
 
-// Do sends an HTTP request using the given method to the API.
+// PostFile sends an HTTP request with a reader interface as its body
 func (c *Client) PostFile(
 	path string,
 	headers map[string]string,
