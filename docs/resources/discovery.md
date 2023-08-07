@@ -40,11 +40,11 @@ Resource for managing discovery on OpenManage Enterprise.
 
 ### Optional
 
-- `community_string` (Boolean) - Enable the use of SNMP community strings to receive SNMP traps using Application Settings in OpenManage Enterprise. 
-				- This option is available only for the discovered iDRAC servers and MX7000 chassis.
 - `cron` (String) Provide a cron expression based on Quartz cron format
 - `email_recipient` (String) - Enter the email address to which notifications are to be sent about the discovery job status.
 				- Configure the SMTP settings to allow sending notifications to an email address.
+- `enable_community_strings` (Boolean) - Enable the use of SNMP community strings to receive SNMP traps using Application Settings in OpenManage Enterprise. 
+				- This option is available only for the discovered iDRAC servers and MX7000 chassis.
 - `schedule` (String) Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.
 - `trap_destination` (Boolean) - Enable OpenManage Enterprise to receive the incoming SNMP traps from the discovered devices. 
 				- This is effective only for servers discovered by using their iDRAC interface.

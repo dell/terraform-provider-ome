@@ -112,7 +112,7 @@ func TestDiscoveryTwo(t *testing.T) {
 	resource "ome_discovery" "code_1" {
 		name = "kashi-ganga"
 		schedule = "RunLater"
-		cron = "0 * */10 * * ? *"
+		cron = "0 * */12 * * ? *"
 		discovery_config_targets = [{
 		  device_type = [ "SERVER" ]
 		  network_address_detail = ["` + DeviceIP3 + `"]
@@ -136,9 +136,17 @@ func TestDiscoveryTwo(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCreateDiscoveryDebug,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_discovery.code_1", "name", "shiva-ganga"),
+					resource.TestCheckResourceAttr("ome_discovery.code_1", "cron", "0 * */10 * * ? *"),
+				),
 			},
 			{
 				Config: testAccUpdateDiscoveryDebug,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_discovery.code_1", "name", "kashi-ganga"),
+					resource.TestCheckResourceAttr("ome_discovery.code_1", "cron", "0 * */12 * * ? *"),
+				),
 			},
 		},
 	})
@@ -191,7 +199,7 @@ func TestDiscoveryThree(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      invalidDiscoveryConfigOne,
-				ExpectError: regexp.MustCompile(`.*The device type list should contain the following values*.`),
+				ExpectError: regexp.MustCompile(`.*value must be one of:*.`),
 			},
 			{
 				Config:      invalidDiscoveryConfigOne,
@@ -203,15 +211,11 @@ func TestDiscoveryThree(t *testing.T) {
 			},
 			{
 				Config:      invalidDiscoveryConfigtwo,
-				ExpectError: regexp.MustCompile(`.*Define at least one discovery configuration target in the list.*.`),
+				ExpectError: regexp.MustCompile(`.*Attribute discovery_config_targets set must contain at least 1 elements*.`),
 			},
 			{
 				Config:      invalidDiscoveryConfigThree,
-				ExpectError: regexp.MustCompile(`.*Atleast one of device type should be configured*.`),
-			},
-			{
-				Config:      invalidDiscoveryConfigThree,
-				ExpectError: regexp.MustCompile(`.*Atleast one of network address detail should be configured*.`),
+				ExpectError: regexp.MustCompile(`.*list must contain at least 1 elements*.`),
 			},
 		},
 	})

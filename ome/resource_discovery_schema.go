@@ -1,6 +1,8 @@
 package ome
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -49,6 +51,9 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
       			- Each discovery target is a set of "network_address_detail", "device_types", and one or more protocol credentials.`,
 			Required:     true,
 			NestedObject: schema.NestedAttributeObject{Attributes: DiscoveryConfigTargetsSchema()},
+			Validators: []validator.Set{
+				setvalidator.SizeAtLeast(1),
+			},
 		},
 
 		"schedule": schema.StringAttribute{
@@ -89,7 +94,7 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			},
 		},
 
-		"community_string": schema.BoolAttribute{
+		"enable_community_strings": schema.BoolAttribute{
 			MarkdownDescription: `
 				- Enable the use of SNMP community strings to receive SNMP traps using Application Settings in OpenManage Enterprise. 
 				- This option is available only for the discovered iDRAC servers and MX7000 chassis.`,
@@ -151,6 +156,9 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
          		- NOTE: Both IPv6 and IPv6 CIDR formats are supported.`,
 			Required:    true,
 			ElementType: types.StringType,
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+			},
 		},
 
 		"device_type": schema.ListAttribute{
@@ -174,6 +182,13 @@ func DiscoveryConfigTargetsSchema() map[string]schema.Attribute {
 			- STORAGE - "snmp".`,
 			Required:    true,
 			ElementType: types.StringType,
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+				listvalidator.ValueStringsAre(
+					stringvalidator.OneOf("SERVER", "CHASSIS", "NETWORK SWITCH", "STORAGE"),
+				),
+				listvalidator.UniqueValues(),
+			},
 		},
 
 		"redfish": schema.SingleNestedAttribute{

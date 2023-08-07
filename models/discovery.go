@@ -155,7 +155,7 @@ type OmeDiscoveryJob struct {
 	Schedule               types.String                `tfsdk:"schedule"`
 	Cron                   types.String                `tfsdk:"cron"`
 	TrapDestination        types.Bool                  `tfsdk:"trap_destination"`
-	CommunityString        types.Bool                  `tfsdk:"community_string"`
+	CommunityString        types.Bool                  `tfsdk:"enable_community_strings"`
 	JobID                  types.Int64                 `tfsdk:"job_id"`
 }
 

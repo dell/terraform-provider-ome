@@ -3,7 +3,6 @@ package ome
 import (
 	"context"
 	"encoding/json"
-	"reflect"
 	"strconv"
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
@@ -72,53 +71,15 @@ func (r *discoveryResource) ValidateConfig(ctx context.Context, req resource.Val
 
 	if len(data.DiscoveryConfigTargets) > 0 {
 		for idx, dct := range data.DiscoveryConfigTargets {
-			idxError := "Inappropriate value for attribute `discovery_config_targets`: element: " + strconv.Itoa(idx) + "\n"
+			idxError := "Inappropriate value for attribute \"discovery_config_targets\": element: " + strconv.Itoa(idx) + "\n"
 			if dct.Redfish == nil && dct.SNMP == nil && dct.SSH == nil && dct.WSMAN == nil {
 				resp.Diagnostics.AddAttributeError(
 					path.Root("discovery_config_targets").AtListIndex(idx),
 					"Attribute Error",
 					idxError+"Atleast one of protocol should be configured for the discovery targets.")
 			}
-			if len(dct.DeviceType) > 0 {
-				for idx, dt := range dct.DeviceType {
-					currDT := dt.ValueString()
-					if !isDeviceType(currDT) {
-						resp.Diagnostics.AddAttributeError(
-							path.Root("discovery_config_targets").AtListIndex(idx).AtName("device_type"),
-							"Attribute Error",
-							idxError+"The device type list should contain the following values: `SERVER`, `CHASSIS`, `NETWORK SWITCH`, and `STORAGE`.")
-					}
-				}
-			} else {
-				resp.Diagnostics.AddAttributeError(
-					path.Root("discovery_config_targets").AtListIndex(idx).AtName("device_type"),
-					"Attribute Error",
-					idxError+"Atleast one of device type should be configured. ")
-			}
-			if len(dct.NetworkAddressDetail) == 0 {
-				resp.Diagnostics.AddAttributeError(
-					path.Root("discovery_config_targets").AtListIndex(idx).AtName("network_address_detail"),
-					"Attribute Error",
-					idxError+"Atleast one of network address detail should be configured. ")
-			}
-		}
-	} else {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("discovery_config_targets"),
-			"Attribute Error",
-			"Define at least one discovery configuration target in the list.",
-		)
-	}
-}
-
-func isDeviceType(str string) bool {
-	list := []string{"SERVER", "CHASSIS", "NETWORK SWITCH", "STORAGE"}
-	for _, v := range list {
-		if v == str {
-			return true
 		}
 	}
-	return false
 }
 
 // Create creates the resource and sets the initial Terraform state.
@@ -213,28 +174,28 @@ func (r *discoveryResource) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	if !reflect.DeepEqual(state, plan) {
-		//Create Session and differ the remove session
-		omeClient, d := r.p.createOMESession(ctx, "resource_discovery Update")
-		resp.Diagnostics.Append(d...)
-		if d.HasError() {
-			return
-		}
-		defer omeClient.RemoveSession()
-		discoveryPayload := getDiscoveryPayload(ctx, &plan, &state)
-		tflog.Trace(ctx, "resource_discovery update Discovery")
-		tflog.Debug(ctx, "resource_discovery update Discovery", map[string]interface{}{
-			"Create Discovery Request": discoveryPayload,
-		})
-		respDiscovery, err := omeClient.UpdateDiscoveryJob(discoveryPayload)
-		if err != nil {
-			resp.Diagnostics.AddError(
-				clients.ErrGnrUpdateDiscovery, err.Error(),
-			)
-			return
-		}
-		state = discoveryState(ctx, respDiscovery, plan)
+	// if !reflect.DeepEqual(state, plan) {
+	//Create Session and differ the remove session
+	omeClient, d := r.p.createOMESession(ctx, "resource_discovery Update")
+	resp.Diagnostics.Append(d...)
+	if d.HasError() {
+		return
 	}
+	defer omeClient.RemoveSession()
+	discoveryPayload := getDiscoveryPayload(ctx, &plan, &state)
+	tflog.Trace(ctx, "resource_discovery update Discovery")
+	tflog.Debug(ctx, "resource_discovery update Discovery", map[string]interface{}{
+		"Create Discovery Request": discoveryPayload,
+	})
+	respDiscovery, err := omeClient.UpdateDiscoveryJob(discoveryPayload)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrGnrUpdateDiscovery, err.Error(),
+		)
+		return
+	}
+	state = discoveryState(ctx, respDiscovery, plan)
+	// }
 
 	tflog.Trace(ctx, "resource_discovery update: finished state update")
 	//Save into State
