@@ -47,6 +47,15 @@ var DeviceIP1 = os.Getenv("DEVICEIP1")
 var DeviceIP2 = os.Getenv("DEVICEIP2")
 var DeviceIP3 = os.Getenv("DEVICEIP3")
 
+var testProvider = `
+provider "ome" {
+	username = "` + omeUserName + `"
+	password = "` + omePassword + `"
+	host = "` + omeHost + `"
+	skipssl = true
+}
+`
+
 func init() {
 	// testAccProtoV6ProviderFactories are used to instantiate a provider during
 	// acceptance testing. The factory function will be invoked for every Terraform

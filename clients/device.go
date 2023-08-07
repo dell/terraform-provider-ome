@@ -16,8 +16,6 @@ package clients
 import (
 	"fmt"
 	"terraform-provider-ome/models"
-
-	"github.com/netdata/go.d.plugin/pkg/iprange"
 )
 
 // GetDevice is used to get device using serviceTag or devID in OME
@@ -37,19 +35,14 @@ func (c *Client) GetDevice(serviceTag string, devID int64) (models.Device, error
 	}
 
 	response, err := c.Get(DeviceAPI, nil, map[string]string{"$filter": fmt.Sprintf("%s eq %s", key, val)})
+	if err != nil {
+		return device, err
+	}
 
-	if err == nil {
-		devices := models.Devices{}
-		bodyData, _ := c.GetBodyData(response.Body)
-		err = c.JSONUnMarshal(bodyData, &devices)
-		if err == nil {
-			if len(devices.Value) > 0 {
-				device = devices.Value[0]
-				err = nil
-			} else {
-				err = fmt.Errorf(ErrInvalidDeviceIdentifiers+" %s", val)
-			}
-		}
+	bodyData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshalSingleValue(bodyData, &device)
+	if err != nil {
+		err = fmt.Errorf(ErrInvalidDeviceIdentifiers+" %s: %w", val, err)
 	}
 	return device, err
 }
@@ -176,43 +169,35 @@ func (c *Client) GetUniqueDevicesIdsAndServiceTags(devices []models.Device) ([]m
 }
 
 // GetDeviceByIps - method to get device using ips in OME
-func (c *Client) GetDeviceByIps(networks []string) (models.Devices, error) {
-	var (
-		err     error
-		pool    iprange.Pool
-		devices models.Devices
-	)
-	ret := models.Devices{
-		Value: make([]models.Device, 0),
+func (c *Client) GetDeviceByIps(networks []string) ([]models.Device, error) {
+	devices, err := c.GetAllDevices(nil)
+	if err != nil {
+		return make([]models.Device, 0), err
 	}
-	pool, err = ParseNetworks(networks)
+	return FilterDeviceByIps(devices.Value, networks)
+}
+
+// FilterDeviceByIps - method to filter device using ips
+func FilterDeviceByIps(devices []models.Device, networks []string) ([]models.Device, error) {
+	ret := make([]models.Device, 0)
+	pool, err := ParseNetworks(networks)
 	if err != nil {
 		return ret, err
 	}
-	devices, err = c.GetAllDevices(nil)
-	if err != nil {
-		return ret, err
-	}
-	for _, v := range devices.Value {
+	for _, v := range devices {
 		if v.BelongsToPool(pool) {
-			ret.Value = append(ret.Value, v)
+			ret = append(ret, v)
 		}
 	}
 	return ret, err
 }
 
-// GetAllDevices - method to gfetch all devices filtered by input queries
+// GetAllDevices - method to fetch all devices filtered by input queries
 func (c *Client) GetAllDevices(queries map[string]string) (models.Devices, error) {
 	devices := models.Devices{}
-	response, err := c.Get(DeviceAPI, nil, queries)
-	if err != nil {
-		return devices, err
-	}
-	// devices := models.Devices{}
-	bodyData, _ := c.GetBodyData(response.Body)
-	err = c.JSONUnMarshal(bodyData, &devices)
-	if err != nil {
-		return devices, err
-	}
+	err := c.GetValueWithPagination(RequestOptions{
+		URL:         DeviceAPI,
+		QueryParams: queries,
+	}, &devices.Value)
 	return devices, err
 }

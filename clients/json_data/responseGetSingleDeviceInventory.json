@@ -1,0 +1,143 @@
+{
+    "@odata.context": "/api/$metadata#DeviceService.InventoryDetail",
+    "@odata.type": "#DeviceService.InventoryDetail",
+    "@odata.id": "/api/DeviceService/Devices(13528)/InventoryDetails('serverDeviceCards')",
+    "InventoryType": "serverDeviceCards",
+    "InventoryInfo": [
+        {
+            "Id": 5987,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "C620 Series Chipset Family SMBus",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5988,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "C620 Series Chipset Family SATA Controller [AHCI mode]",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5989,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "C620 Series Chipset Family PCI Express Root Port #5",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5990,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "C620 Series Chipset Family SSATA Controller [AHCI mode]",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5991,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "C621 Series Chipset LPC/eSPI Controller",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5992,
+            "SlotNumber": "",
+            "Manufacturer": "Matrox Electronics Systems Ltd.",
+            "Description": "Integrated Matrox G200eW3 Graphics Controller",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5993,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "Sky Lake-E DMI3 Registers",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5994,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "C620 Series Chipset Family PCI Express Root Port #1",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5995,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "Ethernet 10G 4P X520/I350 rNDC",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5996,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "I350 Gigabit Network Connection",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5997,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "I350 Gigabit Network Connection",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5998,
+            "SlotNumber": "",
+            "Manufacturer": "Broadcom / LSI",
+            "Description": "PERC H730P Mini",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 5999,
+            "SlotNumber": "",
+            "Manufacturer": "Intel Corporation",
+            "Description": "Ethernet 10G 4P X520/I350 rNDC",
+            "DatabusWidth": "Unknown",
+            "SlotLength": "Unknown",
+            "SlotType": "Unknown"
+        },
+        {
+            "Id": 6000,
+            "SlotNumber": "",
+            "Manufacturer": "QLogic Corp.",
+            "Description": "QLE2692 Dual Port 16Gb FC to PCIe Gen3 x8 Adapter",
+            "DatabusWidth": "16x or x16",
+            "SlotLength": "Short Length",
+            "SlotType": "PCI Express Gen 3"
+        },
+        {
+            "Id": 6001,
+            "SlotNumber": "",
+            "Manufacturer": "QLogic Corp.",
+            "Description": "QLE2692 Dual Port 16Gb FC to PCIe Gen3 x8 Adapter",
+            "DatabusWidth": "16x or x16",
+            "SlotLength": "Short Length",
+            "SlotType": "PCI Express Gen 3"
+        }
+    ]
+}

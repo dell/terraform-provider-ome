@@ -1,0 +1,2271 @@
+{
+    "@odata.context": "/api/$metadata#Collection(DeviceService.InventoryDetail)",
+    "@odata.count": 20,
+    "value": [
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverDeviceCards')",
+            "InventoryType": "serverDeviceCards",
+            "InventoryInfo": [
+                {
+                    "Id": 533,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "C620 Series Chipset Family SMBus",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 534,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "C620 Series Chipset Family SATA Controller [AHCI mode]",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 535,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "C620 Series Chipset Family PCI Express Root Port #5",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 536,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "C620 Series Chipset Family SSATA Controller [AHCI mode]",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 537,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "C621 Series Chipset LPC/eSPI Controller",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 538,
+                    "SlotNumber": "",
+                    "Manufacturer": "Matrox Electronics Systems Ltd.",
+                    "Description": "Integrated Matrox G200eW3 Graphics Controller",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 539,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "Sky Lake-E DMI3 Registers",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 540,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "C620 Series Chipset Family PCI Express Root Port #1",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 541,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "Ethernet 10G 4P X520/I350 rNDC",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 542,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "I350 Gigabit Network Connection",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 543,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "I350 Gigabit Network Connection",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 544,
+                    "SlotNumber": "",
+                    "Manufacturer": "Broadcom / LSI",
+                    "Description": "PERC H730P Mini",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 545,
+                    "SlotNumber": "",
+                    "Manufacturer": "Intel Corporation",
+                    "Description": "Ethernet 10G 4P X520/I350 rNDC",
+                    "DatabusWidth": "Unknown",
+                    "SlotLength": "Unknown",
+                    "SlotType": "Unknown"
+                },
+                {
+                    "Id": 546,
+                    "SlotNumber": "",
+                    "Manufacturer": "QLogic Corp.",
+                    "Description": "QLE2692 Dual Port 16Gb FC to PCIe Gen3 x8 Adapter",
+                    "DatabusWidth": "16x or x16",
+                    "SlotLength": "Short Length",
+                    "SlotType": "PCI Express Gen 3"
+                },
+                {
+                    "Id": 547,
+                    "SlotNumber": "",
+                    "Manufacturer": "QLogic Corp.",
+                    "Description": "QLE2692 Dual Port 16Gb FC to PCIe Gen3 x8 Adapter",
+                    "DatabusWidth": "16x or x16",
+                    "SlotLength": "Short Length",
+                    "SlotType": "PCI Express Gen 3"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverProcessors')",
+            "InventoryType": "serverProcessors",
+            "InventoryInfo": [
+                {
+                    "Id": 71,
+                    "Family": "Intel(R) Xeon(TM)",
+                    "MaxSpeed": 4000,
+                    "CurrentSpeed": 2200,
+                    "SlotNumber": "CPU.Socket.1",
+                    "Status": 1000,
+                    "NumberOfCores": 10,
+                    "NumberOfEnabledCores": 10,
+                    "BrandName": "Intel",
+                    "ModelName": "Intel(R) Xeon(R) Silver 4114 CPU @ 2.20GHz",
+                    "InstanceId": "CPU.Socket.1",
+                    "Voltage": "1.8"
+                },
+                {
+                    "Id": 72,
+                    "Family": "Intel(R) Xeon(TM)",
+                    "MaxSpeed": 4000,
+                    "CurrentSpeed": 2200,
+                    "SlotNumber": "CPU.Socket.2",
+                    "Status": 1000,
+                    "NumberOfCores": 10,
+                    "NumberOfEnabledCores": 10,
+                    "BrandName": "Intel",
+                    "ModelName": "Intel(R) Xeon(R) Silver 4114 CPU @ 2.20GHz",
+                    "InstanceId": "CPU.Socket.2",
+                    "Voltage": "1.8"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverDellVideos')",
+            "InventoryType": "serverDellVideos",
+            "InventoryInfo": []
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverNetworkInterfaces')",
+            "InventoryType": "serverNetworkInterfaces",
+            "InventoryInfo": [
+                {
+                    "NicId": "NIC.Integrated.1",
+                    "VendorName": "Intel Corp",
+                    "Ports": [
+                        {
+                            "PortId": "NIC.Integrated.1-1",
+                            "ProductName": "Intel(R) Ethernet 10G 4P X520/I350 rNDC - E4:43:4B:17:E0:A8",
+                            "LinkStatus": "Up",
+                            "LinkSpeed": 10000,
+                            "Partitions": [
+                                {
+                                    "Fqdd": "NIC.Integrated.1-1-1",
+                                    "CurrentMacAddress": "E4:43:4B:17:E0:A8",
+                                    "PermanentMacAddress": "E4:43:4B:17:E0:A8",
+                                    "PermanentIscsiMacAddress": "",
+                                    "PermanentFcoeMacAddress": "",
+                                    "Wwn": "",
+                                    "Wwpn": "",
+                                    "VirtualWwn": "",
+                                    "VirtualWwpn": "",
+                                    "VirtualMacAddress": "00:00:00:00:00:00",
+                                    "NicMode": "Unknown",
+                                    "FcoeMode": "Unknown",
+                                    "IscsiMode": "Unknown",
+                                    "MinBandwidth": 0,
+                                    "MaxBandwidth": 0
+                                }
+                            ]
+                        },
+                        {
+                            "PortId": "NIC.Integrated.1-2",
+                            "ProductName": "Intel(R) Ethernet 10G 4P X520/I350 rNDC - E4:43:4B:17:E0:AA",
+                            "LinkStatus": "Up",
+                            "LinkSpeed": 10000,
+                            "Partitions": [
+                                {
+                                    "Fqdd": "NIC.Integrated.1-2-1",
+                                    "CurrentMacAddress": "E4:43:4B:17:E0:AA",
+                                    "PermanentMacAddress": "E4:43:4B:17:E0:AA",
+                                    "PermanentIscsiMacAddress": "",
+                                    "PermanentFcoeMacAddress": "",
+                                    "Wwn": "",
+                                    "Wwpn": "",
+                                    "VirtualWwn": "",
+                                    "VirtualWwpn": "",
+                                    "VirtualMacAddress": "00:00:00:00:00:00",
+                                    "NicMode": "Unknown",
+                                    "FcoeMode": "Unknown",
+                                    "IscsiMode": "Unknown",
+                                    "MinBandwidth": 0,
+                                    "MaxBandwidth": 0
+                                }
+                            ]
+                        },
+                        {
+                            "PortId": "NIC.Integrated.1-3",
+                            "ProductName": "Intel(R) Gigabit 4P X520/I350 rNDC - E4:43:4B:17:E0:AC",
+                            "LinkStatus": "Down",
+                            "LinkSpeed": 0,
+                            "Partitions": [
+                                {
+                                    "Fqdd": "NIC.Integrated.1-3-1",
+                                    "CurrentMacAddress": "E4:43:4B:17:E0:AC",
+                                    "PermanentMacAddress": "E4:43:4B:17:E0:AC",
+                                    "PermanentIscsiMacAddress": "",
+                                    "PermanentFcoeMacAddress": "",
+                                    "Wwn": "",
+                                    "Wwpn": "",
+                                    "VirtualWwn": "",
+                                    "VirtualWwpn": "",
+                                    "VirtualMacAddress": "00:00:00:00:00:00",
+                                    "NicMode": "Unknown",
+                                    "FcoeMode": "Unknown",
+                                    "IscsiMode": "Unknown",
+                                    "MinBandwidth": 0,
+                                    "MaxBandwidth": 0
+                                }
+                            ]
+                        },
+                        {
+                            "PortId": "NIC.Integrated.1-4",
+                            "ProductName": "Intel(R) Gigabit 4P X520/I350 rNDC - E4:43:4B:17:E0:AD",
+                            "LinkStatus": "Down",
+                            "LinkSpeed": 0,
+                            "Partitions": [
+                                {
+                                    "Fqdd": "NIC.Integrated.1-4-1",
+                                    "CurrentMacAddress": "E4:43:4B:17:E0:AD",
+                                    "PermanentMacAddress": "E4:43:4B:17:E0:AD",
+                                    "PermanentIscsiMacAddress": "",
+                                    "PermanentFcoeMacAddress": "",
+                                    "Wwn": "",
+                                    "Wwpn": "",
+                                    "VirtualWwn": "",
+                                    "VirtualWwpn": "",
+                                    "VirtualMacAddress": "00:00:00:00:00:00",
+                                    "NicMode": "Unknown",
+                                    "FcoeMode": "Unknown",
+                                    "IscsiMode": "Unknown",
+                                    "MinBandwidth": 0,
+                                    "MaxBandwidth": 0
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverFcCards')",
+            "InventoryType": "serverFcCards",
+            "InventoryInfo": [
+                {
+                    "Id": 17,
+                    "Fqdd": "FC.Slot.1-1",
+                    "DeviceDescription": "Fibre Channel in Slot 1 Port 1",
+                    "DeviceName": "QLogic QLE2692 16Gbps Dual Port Fibre Channel Controller",
+                    "FirstFctargetLun": "0",
+                    "FirstFctargetWwpn": "00:00:00:00:00:00:00:00",
+                    "PortNumber": 1,
+                    "PortSpeed": "Unknown",
+                    "SecondFctargetLun": "0",
+                    "SecondFctargetWwpn": "00:00:00:00:00:00:00:00",
+                    "VendorName": "QLogic Corp.",
+                    "Wwn": "20:00:F4:E9:D4:56:10:BE",
+                    "Wwpn": "21:00:F4:E9:D4:56:10:BE",
+                    "LinkStatus": "Down",
+                    "VirtualWwn": "20:00:F4:E9:D4:56:10:BE",
+                    "VirtualWwpn": "21:00:F4:E9:D4:56:10:BE"
+                },
+                {
+                    "Id": 18,
+                    "Fqdd": "FC.Slot.1-2",
+                    "DeviceDescription": "Fibre Channel in Slot 1 Port 2",
+                    "DeviceName": "QLogic QLE2692 16Gbps Dual Port Fibre Channel Controller",
+                    "FirstFctargetLun": "0",
+                    "FirstFctargetWwpn": "00:00:00:00:00:00:00:00",
+                    "PortNumber": 2,
+                    "PortSpeed": "Unknown",
+                    "SecondFctargetLun": "0",
+                    "SecondFctargetWwpn": "00:00:00:00:00:00:00:00",
+                    "VendorName": "QLogic Corp.",
+                    "Wwn": "20:00:F4:E9:D4:56:10:BF",
+                    "Wwpn": "21:00:F4:E9:D4:56:10:BF",
+                    "LinkStatus": "Down",
+                    "VirtualWwn": "20:00:F4:E9:D4:56:10:BF",
+                    "VirtualWwpn": "21:00:F4:E9:D4:56:10:BF"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverOperatingSystems')",
+            "InventoryType": "serverOperatingSystems",
+            "InventoryInfo": [
+                {
+                    "Id": 44,
+                    "OsName": "DellEMC-VMware ESXi",
+                    "OsVersion": "7.0 Update 2 Build-17867351 (A04)",
+                    "Hostname": ""
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverVirtualFlashes')",
+            "InventoryType": "serverVirtualFlashes",
+            "InventoryInfo": []
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverPowerSupplies')",
+            "InventoryType": "serverPowerSupplies",
+            "InventoryInfo": [
+                {
+                    "Id": 857,
+                    "Name": "Power Supply 1",
+                    "PowerSupplyType": 0,
+                    "OutputWatts": 750,
+                    "Location": "PSU.Slot.1",
+                    "RedundancyState": "2",
+                    "Status": 1000,
+                    "State": "Presence Detected",
+                    "FirmwareVersion": "00.23.32",
+                    "InputVoltage": 208,
+                    "Model": "PWR SPLY,750W,RDNT,LTON",
+                    "Manufacturer": "DELL",
+                    "Range1MaxInputPowerWatts": 900,
+                    "SerialNumber": "CNLOD0088T367A",
+                    "ActiveInputVoltage": "Unknown",
+                    "InputPowerUnits": "Watts",
+                    "OperationalStatus": "OK",
+                    "Range1MaxInputVoltageHighMilliVolts": 264,
+                    "RatedMaxOutputPower": 0,
+                    "RequestedState": 0,
+                    "AcInput": true,
+                    "AcOutput": false,
+                    "SwitchingSupply": true
+                },
+                {
+                    "Id": 858,
+                    "Name": "Power Supply 2",
+                    "PowerSupplyType": 0,
+                    "OutputWatts": 750,
+                    "Location": "PSU.Slot.2",
+                    "RedundancyState": "2",
+                    "Status": 1000,
+                    "State": "Presence Detected",
+                    "FirmwareVersion": "00.23.32",
+                    "InputVoltage": 212,
+                    "Model": "PWR SPLY,750W,RDNT,LTON",
+                    "Manufacturer": "DELL",
+                    "Range1MaxInputPowerWatts": 900,
+                    "SerialNumber": "CNLOD0088T35AD",
+                    "ActiveInputVoltage": "Unknown",
+                    "InputPowerUnits": "Watts",
+                    "OperationalStatus": "OK",
+                    "Range1MaxInputVoltageHighMilliVolts": 264,
+                    "RatedMaxOutputPower": 0,
+                    "RequestedState": 0,
+                    "AcInput": true,
+                    "AcOutput": false,
+                    "SwitchingSupply": true
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverArrayDisks')",
+            "InventoryType": "serverArrayDisks",
+            "InventoryInfo": [
+                {
+                    "Id": 121,
+                    "DiskNumber": "Disk 0 in Backplane 1 of Integrated RAID Controller 1",
+                    "VendorName": "SEAGATE",
+                    "Status": 1000,
+                    "StatusString": "OK",
+                    "ModelNumber": "ST1000NX0443",
+                    "SerialNumber": "W471ZWG2",
+                    "SasAddress": "4433221104000000",
+                    "Revision": "NB33",
+                    "ManufacturedDay": 0,
+                    "ManufacturedWeek": 0,
+                    "ManufacturedYear": 0,
+                    "EncryptionAbility": false,
+                    "FormFactor": "2500",
+                    "PartNumber": "CN-08DN1Y-SGW00-87L-00AK-A01",
+                    "PredictiveFailureState": "No",
+                    "EnclosureId": "Disk.Bay.0:Enclosure.Internal.0-1:RAID.Integrated.1-1",
+                    "Channel": 0,
+                    "Size": "931",
+                    "FreeSpace": "0",
+                    "UsedSpace": "931",
+                    "BusType": "SATA",
+                    "SlotNumber": 0,
+                    "MediaType": "Hard Disk Drive",
+                    "RemainingReadWriteEndurance": "",
+                    "SecurityState": "Unencrypted",
+                    "RaidStatus": "Online"
+                },
+                {
+                    "Id": 122,
+                    "DiskNumber": "Disk 1 in Backplane 1 of Integrated RAID Controller 1",
+                    "VendorName": "SEAGATE",
+                    "Status": 1000,
+                    "StatusString": "OK",
+                    "ModelNumber": "ST1000NX0443",
+                    "SerialNumber": "W471ZWV4",
+                    "SasAddress": "4433221100000000",
+                    "Revision": "NB33",
+                    "ManufacturedDay": 0,
+                    "ManufacturedWeek": 0,
+                    "ManufacturedYear": 0,
+                    "EncryptionAbility": false,
+                    "FormFactor": "2500",
+                    "PartNumber": "CN-08DN1Y-SGW00-87L-00DR-A01",
+                    "PredictiveFailureState": "No",
+                    "EnclosureId": "Disk.Bay.1:Enclosure.Internal.0-1:RAID.Integrated.1-1",
+                    "Channel": 0,
+                    "Size": "931",
+                    "FreeSpace": "0",
+                    "UsedSpace": "931",
+                    "BusType": "SATA",
+                    "SlotNumber": 1,
+                    "MediaType": "Hard Disk Drive",
+                    "RemainingReadWriteEndurance": "",
+                    "SecurityState": "Unencrypted",
+                    "RaidStatus": "Online"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverRaidControllers')",
+            "InventoryType": "serverRaidControllers",
+            "InventoryInfo": [
+                {
+                    "Id": 126,
+                    "Name": "PERC H730P Mini",
+                    "Fqdd": "RAID.Integrated.1-1",
+                    "DeviceDescription": "Integrated RAID Controller 1",
+                    "Status": 1000,
+                    "StatusTypeString": "NORMAL",
+                    "RollupStatus": 1000,
+                    "RollupStatusString": "NORMAL",
+                    "FirmwareVersion": "25.5.9.0001",
+                    "CacheSizeInMb": 2048,
+                    "PciSlot": "Not Applicable",
+                    "DriverVersion": "7.716.03.00",
+                    "StorageAssignmentAllowed": "0",
+                    "ServerVirtualDisks": [
+                        {
+                            "Id": 54,
+                            "RaidControllerId": 126,
+                            "DeviceId": 0,
+                            "Fqdd": "Disk.Virtual.0:RAID.Integrated.1-1",
+                            "State": "Online",
+                            "RollupStatus": 1000,
+                            "Status": 1000,
+                            "Layout": "RAID-1",
+                            "MediaType": "HardDiskDrive",
+                            "Name": "Virtual Disk 0",
+                            "ReadPolicy": "Read Ahead",
+                            "WritePolicy": "Write Back",
+                            "CachePolicy": "Default",
+                            "StripeSize": "64 KB",
+                            "Size": "931",
+                            "TargetId": 0,
+                            "LockStatus": "Unlocked"
+                        }
+                    ]
+                },
+                {
+                    "Id": 127,
+                    "Name": "C620 Series Chipset Family SATA Controller [AHCI mode]",
+                    "Fqdd": "AHCI.Embedded.2-1",
+                    "DeviceDescription": "Embedded AHCI 2",
+                    "Status": 2000,
+                    "StatusTypeString": "UNKNOWN",
+                    "RollupStatus": 2000,
+                    "RollupStatusString": "UNKNOWN",
+                    "FirmwareVersion": "",
+                    "CacheSizeInMb": 0,
+                    "PciSlot": "Not Applicable",
+                    "DriverVersion": "",
+                    "StorageAssignmentAllowed": "0"
+                },
+                {
+                    "Id": 128,
+                    "Name": "C620 Series Chipset Family SSATA Controller [AHCI mode]",
+                    "Fqdd": "AHCI.Embedded.1-1",
+                    "DeviceDescription": "Embedded AHCI 1",
+                    "Status": 2000,
+                    "StatusTypeString": "UNKNOWN",
+                    "RollupStatus": 2000,
+                    "RollupStatusString": "UNKNOWN",
+                    "FirmwareVersion": "",
+                    "CacheSizeInMb": 0,
+                    "PciSlot": "Not Applicable",
+                    "DriverVersion": "",
+                    "StorageAssignmentAllowed": "0"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverMemoryDevices')",
+            "InventoryType": "serverMemoryDevices",
+            "InventoryInfo": [
+                {
+                    "Id": 475,
+                    "Name": "DIMM.Socket.A2",
+                    "BankName": "A",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5CC",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.A2",
+                    "DeviceDescription": "DIMM A2"
+                },
+                {
+                    "Id": 476,
+                    "Name": "DIMM.Socket.B11",
+                    "BankName": "B",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "8261276B",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.B11",
+                    "DeviceDescription": "DIMM B11"
+                },
+                {
+                    "Id": 477,
+                    "Name": "DIMM.Socket.A4",
+                    "BankName": "A",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5D7",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.A4",
+                    "DeviceDescription": "DIMM A4"
+                },
+                {
+                    "Id": 478,
+                    "Name": "DIMM.Socket.B8",
+                    "BankName": "B",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612774",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.B8",
+                    "DeviceDescription": "DIMM B8"
+                },
+                {
+                    "Id": 479,
+                    "Name": "DIMM.Socket.B6",
+                    "BankName": "B",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F57C",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.B6",
+                    "DeviceDescription": "DIMM B6"
+                },
+                {
+                    "Id": 480,
+                    "Name": "DIMM.Socket.B4",
+                    "BankName": "B",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5DE",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.B4",
+                    "DeviceDescription": "DIMM B4"
+                },
+                {
+                    "Id": 481,
+                    "Name": "DIMM.Socket.B5",
+                    "BankName": "B",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5D9",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.B5",
+                    "DeviceDescription": "DIMM B5"
+                },
+                {
+                    "Id": 482,
+                    "Name": "DIMM.Socket.B9",
+                    "BankName": "B",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612776",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.B9",
+                    "DeviceDescription": "DIMM B9"
+                },
+                {
+                    "Id": 483,
+                    "Name": "DIMM.Socket.A8",
+                    "BankName": "A",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612764",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.A8",
+                    "DeviceDescription": "DIMM A8"
+                },
+                {
+                    "Id": 484,
+                    "Name": "DIMM.Socket.A6",
+                    "BankName": "A",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F529",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.A6",
+                    "DeviceDescription": "DIMM A6"
+                },
+                {
+                    "Id": 485,
+                    "Name": "DIMM.Socket.B3",
+                    "BankName": "B",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5E9",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.B3",
+                    "DeviceDescription": "DIMM B3"
+                },
+                {
+                    "Id": 486,
+                    "Name": "DIMM.Socket.A9",
+                    "BankName": "A",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612763",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.A9",
+                    "DeviceDescription": "DIMM A9"
+                },
+                {
+                    "Id": 487,
+                    "Name": "DIMM.Socket.B1",
+                    "BankName": "B",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5E1",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.B1",
+                    "DeviceDescription": "DIMM B1"
+                },
+                {
+                    "Id": 488,
+                    "Name": "DIMM.Socket.B7",
+                    "BankName": "B",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612773",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.B7",
+                    "DeviceDescription": "DIMM B7"
+                },
+                {
+                    "Id": 489,
+                    "Name": "DIMM.Socket.A3",
+                    "BankName": "A",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5C8",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.A3",
+                    "DeviceDescription": "DIMM A3"
+                },
+                {
+                    "Id": 490,
+                    "Name": "DIMM.Socket.A5",
+                    "BankName": "A",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5DB",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.A5",
+                    "DeviceDescription": "DIMM A5"
+                },
+                {
+                    "Id": 491,
+                    "Name": "DIMM.Socket.B12",
+                    "BankName": "B",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "8261276A",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.B12",
+                    "DeviceDescription": "DIMM B12"
+                },
+                {
+                    "Id": 492,
+                    "Name": "DIMM.Socket.A12",
+                    "BankName": "A",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "8261275A",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.A12",
+                    "DeviceDescription": "DIMM A12"
+                },
+                {
+                    "Id": 493,
+                    "Name": "DIMM.Socket.A11",
+                    "BankName": "A",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612759",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.A11",
+                    "DeviceDescription": "DIMM A11"
+                },
+                {
+                    "Id": 494,
+                    "Name": "DIMM.Socket.A1",
+                    "BankName": "A",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5D5",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.A1",
+                    "DeviceDescription": "DIMM A1"
+                },
+                {
+                    "Id": 495,
+                    "Name": "DIMM.Socket.B2",
+                    "BankName": "B",
+                    "Size": 32768,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5D1",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Nov 12 06:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Double Rank",
+                    "InstanceId": "DIMM.Socket.B2",
+                    "DeviceDescription": "DIMM B2"
+                },
+                {
+                    "Id": 496,
+                    "Name": "DIMM.Socket.B10",
+                    "BankName": "B",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612828",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.B10",
+                    "DeviceDescription": "DIMM B10"
+                },
+                {
+                    "Id": 497,
+                    "Name": "DIMM.Socket.A10",
+                    "BankName": "A",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612762",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.A10",
+                    "DeviceDescription": "DIMM A10"
+                },
+                {
+                    "Id": 498,
+                    "Name": "DIMM.Socket.A7",
+                    "BankName": "A",
+                    "Size": 8192,
+                    "Status": 1000,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612761",
+                    "TypeDetails": "DDR4",
+                    "ManufacturerDate": "Mon Oct 15 07:00:00 2018 UTC",
+                    "Speed": 2666,
+                    "CurrentOperatingSpeed": 2400,
+                    "Rank": "Single Rank",
+                    "InstanceId": "DIMM.Socket.A7",
+                    "DeviceDescription": "DIMM A7"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverStorageEnclosures')",
+            "InventoryType": "serverStorageEnclosures",
+            "InventoryInfo": [
+                {
+                    "Id": 33,
+                    "Name": "BP14G+ 0:1",
+                    "Status": 1000,
+                    "StatusTypeString": "OK",
+                    "ChannelNumber": "0",
+                    "BackplanePartNum": "1",
+                    "NumberOfFanPacks": 0,
+                    "Version": "4.35",
+                    "RollupStatus": 1000,
+                    "SlotCount": 8
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('serverSupportedPowerStates')",
+            "InventoryType": "serverSupportedPowerStates",
+            "InventoryInfo": [
+                {
+                    "Id": 145,
+                    "PowerState": 2
+                },
+                {
+                    "Id": 146,
+                    "PowerState": 5
+                },
+                {
+                    "Id": 147,
+                    "PowerState": 8
+                },
+                {
+                    "Id": 148,
+                    "PowerState": 10
+                },
+                {
+                    "Id": 149,
+                    "PowerState": 11
+                },
+                {
+                    "Id": 150,
+                    "PowerState": 12
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('deviceLicense')",
+            "InventoryType": "deviceLicense",
+            "InventoryInfo": [
+                {
+                    "SoldDate": "2019-01-03 12:56:26.000",
+                    "LicenseBound": 4,
+                    "EvalTimeRemaining": 0,
+                    "AssignedDevices": "iDRAC.Embedded.1",
+                    "LicenseStatus": 1000,
+                    "EntitlementId": "FD00000013411708",
+                    "LicenseDescription": "OME Server Configuration Management",
+                    "LicenseType": {
+                        "Name": "Perpetual",
+                        "LicenseId": 1
+                    }
+                },
+                {
+                    "SoldDate": "2019-01-03 12:56:26.000",
+                    "LicenseBound": 4,
+                    "EvalTimeRemaining": 0,
+                    "AssignedDevices": "iDRAC.Embedded.1",
+                    "LicenseStatus": 1000,
+                    "EntitlementId": "FD00000013411706",
+                    "LicenseDescription": "iDRAC9 Enterprise License",
+                    "LicenseType": {
+                        "Name": "Perpetual",
+                        "LicenseId": 1
+                    }
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('deviceCapabilities')",
+            "InventoryType": "deviceCapabilities",
+            "InventoryInfo": [
+                {
+                    "Id": 9674,
+                    "CapabilityType": {
+                        "CapabilityId": 1016,
+                        "Name": "POWER_STATISTICS_RESET_CAPABLE",
+                        "Description": "Indicates that the device is capable of resetting power statistics",
+                        "IdOwner": 30
+                    }
+                },
+                {
+                    "Id": 5372,
+                    "CapabilityType": {
+                        "CapabilityId": 213,
+                        "Name": "REDFISH_CAPABILITY_EXTENSION_III",
+                        "Description": "Capability to indicate device is supporting Phase III feature integrations e.g. profiles, deployments, subscriptions etc using Redfish protocol.",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9675,
+                    "CapabilityType": {
+                        "CapabilityId": 1012,
+                        "Name": "BASIC_METRICS",
+                        "Description": "Indicates the capability to retrieve basic metrics",
+                        "IdOwner": 30
+                    }
+                },
+                {
+                    "Id": 5374,
+                    "CapabilityType": {
+                        "CapabilityId": 211,
+                        "Name": "TSR_HTTPS_CAPABLE",
+                        "Description": "Capability to indicate that device is supporting TSR using HTTPS Share.",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9676,
+                    "CapabilityType": {
+                        "CapabilityId": 50,
+                        "Name": "ONBOARDING",
+                        "Description": "Ability to do on-boarding",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5377,
+                    "CapabilityType": {
+                        "CapabilityId": 17,
+                        "Name": "FEATURES_14G",
+                        "Description": "14G specific features",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9672,
+                    "CapabilityType": {
+                        "CapabilityId": 209,
+                        "Name": "REDFISH_CAPABLE",
+                        "Description": "Capability to indicate that device is discovered via Redfish protocol.",
+                        "IdOwner": 10
+                    },
+                    "IdOwner": 30
+                },
+                {
+                    "Id": 5380,
+                    "CapabilityType": {
+                        "CapabilityId": 15,
+                        "Name": "TEMP_HISTORY",
+                        "Description": "Retrieve historical temperature data",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9677,
+                    "CapabilityType": {
+                        "CapabilityId": 207,
+                        "Name": "COMPLIANCE_ELIGIBLE",
+                        "Description": "Capability to indicate that device is eligible for compliance report.",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5382,
+                    "CapabilityType": {
+                        "CapabilityId": 13,
+                        "Name": "TSR",
+                        "Description": "Tech Support Report",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5384,
+                    "CapabilityType": {
+                        "CapabilityId": 11,
+                        "Name": "HW_LOGS ",
+                        "Description": "System Hardware logs",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5385,
+                    "CapabilityType": {
+                        "CapabilityId": 9,
+                        "Name": "BLINK",
+                        "Description": "Identify function on a device",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5388,
+                    "CapabilityType": {
+                        "CapabilityId": 7,
+                        "Name": "CONFIGURE",
+                        "Description": "Set attributes on the system",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9678,
+                    "CapabilityType": {
+                        "CapabilityId": 5,
+                        "Name": "POWER_MONITOR",
+                        "Description": "Power statistics retrieval",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5390,
+                    "CapabilityType": {
+                        "CapabilityId": 3,
+                        "Name": "POWER_CONTROL_RESET",
+                        "Description": "Power reset hard/graceful",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5392,
+                    "CapabilityType": {
+                        "CapabilityId": 1,
+                        "Name": "POWER_CONTROL_ON",
+                        "Description": "Power up",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5394,
+                    "CapabilityType": {
+                        "CapabilityId": 30,
+                        "Name": "REMOTE_RACADM",
+                        "Description": "Ability to execute RACADM tasks",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9679,
+                    "CapabilityType": {
+                        "CapabilityId": 1015,
+                        "Name": "WARRANTY_MANAGEMENT_CAPABLE",
+                        "Description": "Indicates that device is capable of warranty management",
+                        "IdOwner": 30
+                    }
+                },
+                {
+                    "Id": 5373,
+                    "CapabilityType": {
+                        "CapabilityId": 212,
+                        "Name": "DIAGNOSTICS_HTTPS_CAPABLE",
+                        "Description": "Capability to indicate that device is supporting Diagnostics using HTTPS Share.",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5375,
+                    "CapabilityType": {
+                        "CapabilityId": 18,
+                        "Name": "DEVICE_ALERT",
+                        "Description": "Device capable of sending alerts.",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5376,
+                    "CapabilityType": {
+                        "CapabilityId": 210,
+                        "Name": "REDFISH_CAPABILITY_EXTENSION",
+                        "Description": "Capability to indicate that device is supporting firmware update, realtime power and thermal read, reset etc using Redfish protocol.",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9680,
+                    "CapabilityType": {
+                        "CapabilityId": 1009,
+                        "Name": "BLINK_ON_OFF_ONLY",
+                        "Description": "Identify function on server ON indefinitely or OFF only",
+                        "IdOwner": 30
+                    }
+                },
+                {
+                    "Id": 5378,
+                    "CapabilityType": {
+                        "CapabilityId": 16,
+                        "Name": "VIRTUAL_CONSOLE",
+                        "Description": "Ability to execute RACADM tasks",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5379,
+                    "CapabilityType": {
+                        "CapabilityId": 208,
+                        "Name": "HTTPS_CAPABLE",
+                        "Description": "Capability to indicate that device is HTTPS support capable.",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5381,
+                    "CapabilityType": {
+                        "CapabilityId": 14,
+                        "Name": "POWER_HISTORY",
+                        "Description": "Retrieve historical power data",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5383,
+                    "CapabilityType": {
+                        "CapabilityId": 12,
+                        "Name": "DIAGS",
+                        "Description": "Diagnostics",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5386,
+                    "CapabilityType": {
+                        "CapabilityId": 41,
+                        "Name": "SHARED_STORAGE_ALLLOWED",
+                        "Description": "Capability to share externally assigned Storage",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9673,
+                    "CapabilityType": {
+                        "CapabilityId": 1001,
+                        "Name": "VIRTUAL_CONSOLE_SESSION",
+                        "Description": "Ability to create a virtual console session",
+                        "IdOwner": 30
+                    },
+                    "IdOwner": 30
+                },
+                {
+                    "Id": 5387,
+                    "CapabilityType": {
+                        "CapabilityId": 8,
+                        "Name": "FW_UPDATE",
+                        "Description": "Remote Firmware update capability. ",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9681,
+                    "CapabilityType": {
+                        "CapabilityId": 6,
+                        "Name": "TEMPERATURE_MONITOR",
+                        "Description": "Temp statistics retrieval",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5389,
+                    "CapabilityType": {
+                        "CapabilityId": 4,
+                        "Name": "SENSOR_DETAILS",
+                        "Description": "Get Sensor Info, sub system health details",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5391,
+                    "CapabilityType": {
+                        "CapabilityId": 2,
+                        "Name": "POWER_CONTROL_OFF",
+                        "Description": "Power Down hard/graceful",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 9682,
+                    "CapabilityType": {
+                        "CapabilityId": 33,
+                        "Name": "DEPLOY",
+                        "Description": "Ability to deploy on a device",
+                        "IdOwner": 10
+                    }
+                },
+                {
+                    "Id": 5393,
+                    "CapabilityType": {
+                        "CapabilityId": 31,
+                        "Name": "REMOTE_IPMI",
+                        "Description": "Ability to execute IPMI tasks",
+                        "IdOwner": 10
+                    }
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('deviceFru')",
+            "InventoryType": "deviceFru",
+            "InventoryInfo": [
+                {
+                    "Revision": "",
+                    "Id": 607,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612764"
+                },
+                {
+                    "Revision": "",
+                    "Id": 623,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5D5"
+                },
+                {
+                    "Revision": "",
+                    "Id": 611,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5DE"
+                },
+                {
+                    "Revision": "",
+                    "Id": 627,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5DB"
+                },
+                {
+                    "Revision": "",
+                    "Id": 610,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F57C"
+                },
+                {
+                    "Revision": "",
+                    "Id": 621,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "8261276B"
+                },
+                {
+                    "Revision": "",
+                    "Id": 615,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5D1"
+                },
+                {
+                    "Revision": "",
+                    "Id": 635,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5CC"
+                },
+                {
+                    "Revision": "",
+                    "Id": 619,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612759"
+                },
+                {
+                    "Revision": "",
+                    "Id": 631,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5D7"
+                },
+                {
+                    "Revision": "",
+                    "Id": 624,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5E9"
+                },
+                {
+                    "Revision": "A00",
+                    "Id": 616,
+                    "Manufacturer": "Dell",
+                    "Name": "QLogic FC16 2P QLE2692 Adapter",
+                    "PartNumber": "0WVT0T",
+                    "SerialNumber": "MY135548CE57Y0"
+                },
+                {
+                    "Revision": "A01",
+                    "Id": 612,
+                    "Manufacturer": "Dell",
+                    "Name": "Intel(R) 2P X520/2P I350 rNDC",
+                    "PartNumber": "0C63DV",
+                    "SerialNumber": "MYFLMIT87N05Q7"
+                },
+                {
+                    "Revision": "A01",
+                    "Id": 617,
+                    "Manufacturer": "DELL",
+                    "Name": "PWR SPLY,750W,RDNT,LTON",
+                    "PartNumber": "0W8R3C",
+                    "SerialNumber": "CNLOD0088T367A"
+                },
+                {
+                    "Revision": "",
+                    "Id": 636,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612828"
+                },
+                {
+                    "Revision": "A09",
+                    "Id": 609,
+                    "Manufacturer": "Dell",
+                    "Name": "Dell Storage Cntlr. H730P-Mini",
+                    "PartNumber": "07H4CN",
+                    "SerialNumber": "CNFCP008C701LY"
+                },
+                {
+                    "Revision": "",
+                    "Id": 632,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5D9"
+                },
+                {
+                    "Revision": "",
+                    "Id": 633,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "8261275A"
+                },
+                {
+                    "Revision": "",
+                    "Id": 634,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612762"
+                },
+                {
+                    "Revision": "",
+                    "Id": 618,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612773"
+                },
+                {
+                    "Revision": "A04",
+                    "Id": 608,
+                    "Manufacturer": "Dell",
+                    "Name": "DRIVE BACKPLANE",
+                    "PartNumber": "094J5V",
+                    "SerialNumber": "CNIVC008C41967"
+                },
+                {
+                    "Revision": "A01",
+                    "Id": 620,
+                    "Manufacturer": "DELL",
+                    "Name": "PWR SPLY,750W,RDNT,LTON",
+                    "PartNumber": "0W8R3C",
+                    "SerialNumber": "CNLOD0088T35AD"
+                },
+                {
+                    "Revision": "",
+                    "Id": 613,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612761"
+                },
+                {
+                    "Revision": "",
+                    "Id": 629,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612776"
+                },
+                {
+                    "Revision": "",
+                    "Id": 622,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "8261276A"
+                },
+                {
+                    "Revision": "",
+                    "Id": 626,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612763"
+                },
+                {
+                    "Revision": "",
+                    "Id": 630,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5C8"
+                },
+                {
+                    "Revision": "",
+                    "Id": 606,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA81GR7AFR8N-VK",
+                    "SerialNumber": "82612774"
+                },
+                {
+                    "Revision": "A00",
+                    "Id": 628,
+                    "Manufacturer": "Dell Inc.",
+                    "Name": "SystemPlanar",
+                    "PartNumber": "0PHYDR",
+                    "SerialNumber": "CNIVC008CH0077"
+                },
+                {
+                    "Revision": "",
+                    "Id": 614,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F529"
+                },
+                {
+                    "Revision": "",
+                    "Id": 625,
+                    "Manufacturer": "Hynix Semiconductor",
+                    "Name": "DDR4 DIMM",
+                    "PartNumber": "HMA84GR7JJR4N-VK",
+                    "SerialNumber": "7276F5E1"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('deviceLocation')",
+            "InventoryType": "deviceLocation",
+            "InventoryInfo": [
+                {
+                    "Id": 53,
+                    "Room": "",
+                    "Rack": "",
+                    "Aisle": "",
+                    "Datacenter": "",
+                    "Rackslot": "0",
+                    "ManagementSystemUnit": 1
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('deviceManagement')",
+            "InventoryType": "deviceManagement",
+            "InventoryInfo": [
+                {
+                    "ManagementId": 5803,
+                    "IpAddress": "10.226.197.128",
+                    "MacAddress": "4c:d9:8f:22:7c:fa",
+                    "InstrumentationName": "",
+                    "DnsName": "iDRAC-CZNF1T2",
+                    "ManagementType": {
+                        "ManagementType": 2,
+                        "Name": "PUBLIC",
+                        "Description": "Public Management Interface"
+                    },
+                    "EndPointAgents": [
+                        {
+                            "ManagementProfileId": 5807,
+                            "ProfileId": "",
+                            "AgentName": "iDRAC",
+                            "Version": "6.10.80.00",
+                            "ManagementURL": "https://10.226.197.128:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-07-03 17:23:43.911"
+                        },
+                        {
+                            "ManagementProfileId": 5809,
+                            "ProfileId": "",
+                            "AgentName": "iDRAC",
+                            "Version": "6.10.80.00",
+                            "ManagementURL": "https://10.226.197.128:443",
+                            "HasCreds": 1,
+                            "Status": 1000,
+                            "StatusDateTime": "2023-07-03 17:23:44.112"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('deviceSoftware')",
+            "InventoryType": "deviceSoftware",
+            "InventoryInfo": [
+                {
+                    "Version": "4.35",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "103999",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Backplane 1",
+                    "InstanceId": "DCIM:CURRENT#314_C_RAID.Backplane.Firmware.1"
+                },
+                {
+                    "Version": "6.10.00.00",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "25227",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Integrated Dell Remote Access Controller",
+                    "InstanceId": "DCIM:PREVIOUS#iDRAC.Embedded.1-1#IDRACinfo"
+                },
+                {
+                    "Version": "22.0.9",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F72",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "10FB",
+                    "DeviceDescription": "Intel(R) Ethernet 10G 4P X520/I350 rNDC - E4:43:4B:17:E0:AA",
+                    "InstanceId": "DCIM:CURRENT#701__NIC.Integrated.1-2-1"
+                },
+                {
+                    "Version": "22.0.9",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F72",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "10FB",
+                    "DeviceDescription": "Intel(R) Ethernet 10G 4P X520/I350 rNDC - E4:43:4B:17:E0:A8",
+                    "InstanceId": "DCIM:CURRENT#701__NIC.Integrated.1-1-1"
+                },
+                {
+                    "Version": "16.10.04",
+                    "InstallationDate": "2023-06-01 18:28:44.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "1077",
+                    "SubDeviceId": "02A8",
+                    "SubVendorId": "1077",
+                    "ComponentId": "104483",
+                    "PciDeviceId": "2261",
+                    "DeviceDescription": "QLogic QLE2692 16Gbps Dual Port Fibre Channel Controller",
+                    "InstanceId": "DCIM:INSTALLED#721__FC.Slot.1-1"
+                },
+                {
+                    "Version": "25.5.9.0001",
+                    "InstallationDate": "2023-01-18 17:55:48.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "1000",
+                    "SubDeviceId": "1F47",
+                    "SubVendorId": "1028",
+                    "ComponentId": "101560",
+                    "PciDeviceId": "005D",
+                    "DeviceDescription": "PERC H730P Mini",
+                    "InstanceId": "DCIM:INSTALLED#301_C_RAID.Integrated.1-1"
+                },
+                {
+                    "Version": "4301A73",
+                    "InstallationDate": "2023-01-18 18:02:17.000",
+                    "Status": "Installed",
+                    "SoftwareType": "APAC",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "25806",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Dell 64 Bit uEFI Diagnostics, version 4301, 4301A73, 4301.74",
+                    "InstanceId": "DCIM:INSTALLED#802__Diagnostics.Embedded.1:LC.Embedded.1"
+                },
+                {
+                    "Version": "22.0.9",
+                    "InstallationDate": "2023-06-01 18:28:46.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F72",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "10FB",
+                    "DeviceDescription": "Intel(R) Ethernet 10G 4P X520/I350 rNDC - E4:43:4B:17:E0:AA",
+                    "InstanceId": "DCIM:INSTALLED#701__NIC.Integrated.1-2-1"
+                },
+                {
+                    "Version": "16.00.15",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "1077",
+                    "SubDeviceId": "02A8",
+                    "SubVendorId": "1077",
+                    "ComponentId": "104483",
+                    "PciDeviceId": "2261",
+                    "DeviceDescription": "QLogic QLE2692 16Gbps Dual Port Fibre Channel Controller",
+                    "InstanceId": "DCIM:PREVIOUS#721__FC.Slot.1-2"
+                },
+                {
+                    "Version": "2.18.1",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "BIOS",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "159",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "BIOS",
+                    "InstanceId": "DCIM:CURRENT#741__BIOS.Setup.1-1"
+                },
+                {
+                    "Version": "21.5.9",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F73",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "1521",
+                    "DeviceDescription": "Intel(R) Gigabit 4P X520/I350 rNDC - E4:43:4B:17:E0:AD",
+                    "InstanceId": "DCIM:PREVIOUS#701__NIC.Integrated.1-4-1"
+                },
+                {
+                    "Version": "1.0.2",
+                    "InstallationDate": "2019-01-06 07:27:17.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "27763",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "System CPLD",
+                    "InstanceId": "DCIM:INSTALLED#803__CPLD.Embedded.1"
+                },
+                {
+                    "Version": "5.1.0.0",
+                    "InstallationDate": "2023-06-01 17:59:27.000",
+                    "Status": "Installed",
+                    "SoftwareType": "APAC",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "104684",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Dell EMC iDRAC Service Module Embedded Package v5.1.0.0, A00",
+                    "InstanceId": "DCIM:INSTALLED#802__ServiceModule.Embedded.1"
+                },
+                {
+                    "Version": "22.12.06",
+                    "InstallationDate": "2023-06-01 18:00:50.000",
+                    "Status": "Installed",
+                    "SoftwareType": "APAC",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "18981",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Dell OS Driver Pack, 22.12.06, A00",
+                    "InstanceId": "DCIM:INSTALLED#802__DriverPack.Embedded.1:LC.Embedded.1"
+                },
+                {
+                    "Version": "6.0",
+                    "InstallationDate": "2021-04-05 22:56:04.000",
+                    "Status": "Installed",
+                    "SoftwareType": "APAC",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "101734",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "OS COLLECTOR, v6.0, A00",
+                    "InstanceId": "DCIM:INSTALLED#802__OSCollector.Embedded.1"
+                },
+                {
+                    "Version": "16.10.04",
+                    "InstallationDate": "2023-06-01 18:28:45.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "1077",
+                    "SubDeviceId": "02A8",
+                    "SubVendorId": "1077",
+                    "ComponentId": "104483",
+                    "PciDeviceId": "2261",
+                    "DeviceDescription": "QLogic QLE2692 16Gbps Dual Port Fibre Channel Controller",
+                    "InstanceId": "DCIM:INSTALLED#721__FC.Slot.1-2"
+                },
+                {
+                    "Version": "16.10.04",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "1077",
+                    "SubDeviceId": "02A8",
+                    "SubVendorId": "1077",
+                    "ComponentId": "104483",
+                    "PciDeviceId": "2261",
+                    "DeviceDescription": "QLogic QLE2692 16Gbps Dual Port Fibre Channel Controller",
+                    "InstanceId": "DCIM:CURRENT#721__FC.Slot.1-2"
+                },
+                {
+                    "Version": "25.5.9.0001",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "1000",
+                    "SubDeviceId": "1F47",
+                    "SubVendorId": "1028",
+                    "ComponentId": "101560",
+                    "PciDeviceId": "005D",
+                    "DeviceDescription": "PERC H730P Mini",
+                    "InstanceId": "DCIM:CURRENT#301_C_RAID.Integrated.1-1"
+                },
+                {
+                    "Version": "2.0",
+                    "InstallationDate": "2023-01-18 18:24:07.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "103710",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Internal Dual SD Module",
+                    "InstanceId": "DCIM:INSTALLED#0x55__internal.dualsdmodule.1"
+                },
+                {
+                    "Version": "2.0",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "103710",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Internal Dual SD Module",
+                    "InstanceId": "DCIM:CURRENT#0x55__internal.dualsdmodule.1"
+                },
+                {
+                    "Version": "21.5.9",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F72",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "10FB",
+                    "DeviceDescription": "Intel(R) Ethernet 10G 4P X520/I350 rNDC - E4:43:4B:17:E0:AA",
+                    "InstanceId": "DCIM:PREVIOUS#701__NIC.Integrated.1-2-1"
+                },
+                {
+                    "Version": "00.23.32",
+                    "InstallationDate": "2019-01-06 07:27:08.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "104731",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Power Supply.Slot.1",
+                    "InstanceId": "DCIM:INSTALLED#0x15__PSU.Slot.1"
+                },
+                {
+                    "Version": "6.10.80.00",
+                    "InstallationDate": "2023-06-01 18:40:22.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "25227",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Integrated Dell Remote Access Controller",
+                    "InstanceId": "DCIM:INSTALLED#iDRAC.Embedded.1-1#IDRACinfo"
+                },
+                {
+                    "Version": "16.10.04",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "1077",
+                    "SubDeviceId": "02A8",
+                    "SubVendorId": "1077",
+                    "ComponentId": "104483",
+                    "PciDeviceId": "2261",
+                    "DeviceDescription": "QLogic QLE2692 16Gbps Dual Port Fibre Channel Controller",
+                    "InstanceId": "DCIM:CURRENT#721__FC.Slot.1-1"
+                },
+                {
+                    "Version": "21.5.9",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F73",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "1521",
+                    "DeviceDescription": "Intel(R) Gigabit 4P X520/I350 rNDC - E4:43:4B:17:E0:AC",
+                    "InstanceId": "DCIM:PREVIOUS#701__NIC.Integrated.1-3-1"
+                },
+                {
+                    "Version": "25.5.8.0001",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "1000",
+                    "SubDeviceId": "1F47",
+                    "SubVendorId": "1028",
+                    "ComponentId": "101560",
+                    "PciDeviceId": "005D",
+                    "DeviceDescription": "PERC H730P Mini",
+                    "InstanceId": "DCIM:PREVIOUS#301_C_RAID.Integrated.1-1"
+                },
+                {
+                    "Version": "6.10.80.00",
+                    "InstallationDate": "2023-06-01 18:40:27.000",
+                    "Status": "Installed",
+                    "SoftwareType": "APAC",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "28897",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Lifecycle Controller",
+                    "InstanceId": "DCIM:INSTALLED#802__USC.Embedded.1:LC.Embedded.1"
+                },
+                {
+                    "Version": "16.00.15",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "1077",
+                    "SubDeviceId": "02A8",
+                    "SubVendorId": "1077",
+                    "ComponentId": "104483",
+                    "PciDeviceId": "2261",
+                    "DeviceDescription": "QLogic QLE2692 16Gbps Dual Port Fibre Channel Controller",
+                    "InstanceId": "DCIM:PREVIOUS#721__FC.Slot.1-1"
+                },
+                {
+                    "Version": "NB33",
+                    "InstallationDate": "2019-01-06 07:30:16.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "105688",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Disk 1 in Backplane 1 of Integrated RAID Controller 1",
+                    "InstanceId": "DCIM:INSTALLED#304_C_Disk.Bay.1:Enclosure.Internal.0-1:RAID.Integrated.1-1"
+                },
+                {
+                    "Version": "00.23.32",
+                    "InstallationDate": "2019-01-06 07:27:08.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "104731",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Power Supply.Slot.2",
+                    "InstanceId": "DCIM:INSTALLED#0x15__PSU.Slot.2"
+                },
+                {
+                    "Version": "22.0.9",
+                    "InstallationDate": "2023-06-01 18:28:44.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F73",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "1521",
+                    "DeviceDescription": "Intel(R) Gigabit 4P X520/I350 rNDC - E4:43:4B:17:E0:AC",
+                    "InstanceId": "DCIM:INSTALLED#701__NIC.Integrated.1-3-1"
+                },
+                {
+                    "Version": "22.0.9",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F73",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "1521",
+                    "DeviceDescription": "Intel(R) Gigabit 4P X520/I350 rNDC - E4:43:4B:17:E0:AD",
+                    "InstanceId": "DCIM:CURRENT#701__NIC.Integrated.1-4-1"
+                },
+                {
+                    "Version": "4.27",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "103999",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Backplane 1",
+                    "InstanceId": "DCIM:PREVIOUS#314_C_RAID.Backplane.Firmware.1"
+                },
+                {
+                    "Version": "NB33",
+                    "InstallationDate": "2019-01-06 07:30:14.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "105688",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Disk 0 in Backplane 1 of Integrated RAID Controller 1",
+                    "InstanceId": "DCIM:INSTALLED#304_C_Disk.Bay.0:Enclosure.Internal.0-1:RAID.Integrated.1-1"
+                },
+                {
+                    "Version": "2.18.1",
+                    "InstallationDate": "2023-06-01 18:28:44.000",
+                    "Status": "Installed",
+                    "SoftwareType": "BIOS",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "159",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "BIOS",
+                    "InstanceId": "DCIM:INSTALLED#741__BIOS.Setup.1-1"
+                },
+                {
+                    "Version": "4.35",
+                    "InstallationDate": "2020-11-30 23:26:42.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "103999",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "Backplane 1",
+                    "InstanceId": "DCIM:INSTALLED#314_C_RAID.Backplane.Firmware.1"
+                },
+                {
+                    "Version": "22.0.9",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F73",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "1521",
+                    "DeviceDescription": "Intel(R) Gigabit 4P X520/I350 rNDC - E4:43:4B:17:E0:AC",
+                    "InstanceId": "DCIM:CURRENT#701__NIC.Integrated.1-3-1"
+                },
+                {
+                    "Version": "21.5.9",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F72",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "10FB",
+                    "DeviceDescription": "Intel(R) Ethernet 10G 4P X520/I350 rNDC - E4:43:4B:17:E0:A8",
+                    "InstanceId": "DCIM:PREVIOUS#701__NIC.Integrated.1-1-1"
+                },
+                {
+                    "Version": "22.0.9",
+                    "InstallationDate": "2023-06-01 18:28:44.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F73",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "1521",
+                    "DeviceDescription": "Intel(R) Gigabit 4P X520/I350 rNDC - E4:43:4B:17:E0:AD",
+                    "InstanceId": "DCIM:INSTALLED#701__NIC.Integrated.1-4-1"
+                },
+                {
+                    "Version": "2.16.1",
+                    "InstallationDate": "NA",
+                    "Status": "Available",
+                    "SoftwareType": "BIOS",
+                    "VendorId": "",
+                    "SubDeviceId": "",
+                    "SubVendorId": "",
+                    "ComponentId": "159",
+                    "PciDeviceId": "",
+                    "DeviceDescription": "BIOS",
+                    "InstanceId": "DCIM:PREVIOUS#741__BIOS.Setup.1-1"
+                },
+                {
+                    "Version": "22.0.9",
+                    "InstallationDate": "2023-06-01 18:28:45.000",
+                    "Status": "Installed",
+                    "SoftwareType": "FRMW",
+                    "VendorId": "8086",
+                    "SubDeviceId": "1F72",
+                    "SubVendorId": "1028",
+                    "ComponentId": "100170",
+                    "PciDeviceId": "10FB",
+                    "DeviceDescription": "Intel(R) Ethernet 10G 4P X520/I350 rNDC - E4:43:4B:17:E0:A8",
+                    "InstanceId": "DCIM:INSTALLED#701__NIC.Integrated.1-1-1"
+                }
+            ]
+        },
+        {
+            "@odata.type": "#DeviceService.InventoryDetail",
+            "@odata.id": "/api/DeviceService/Devices(12795)/InventoryDetails('subsystemRollupStatus')",
+            "InventoryType": "subsystemRollupStatus",
+            "InventoryInfo": [
+                {
+                    "Id": 385,
+                    "Status": 1000,
+                    "SubsystemName": "cpuRollupStatus"
+                },
+                {
+                    "Id": 386,
+                    "Status": 1000,
+                    "SubsystemName": "sysMemPrimaryStatus"
+                },
+                {
+                    "Id": 387,
+                    "Status": 1000,
+                    "SubsystemName": "voltRollupStatus"
+                },
+                {
+                    "Id": 388,
+                    "Status": 1000,
+                    "SubsystemName": "batteryRollupStatus"
+                },
+                {
+                    "Id": 389,
+                    "Status": 1000,
+                    "SubsystemName": "licensingRollupStatus"
+                },
+                {
+                    "Id": 390,
+                    "Status": 1000,
+                    "SubsystemName": "storageRollupStatus"
+                },
+                {
+                    "Id": 391,
+                    "Status": 1000,
+                    "SubsystemName": "tempRollupStatus"
+                },
+                {
+                    "Id": 392,
+                    "Status": 1000,
+                    "SubsystemName": "intrusionRollupStatus"
+                }
+            ]
+        }
+    ]
+}
