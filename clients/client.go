@@ -213,6 +213,12 @@ func (c *Client) Do(
 	//Add Request query params if any
 	c.addQueryParams(request, queryParams)
 
+	return c.DoRequest(request)
+}
+
+// DoRequest sends an HTTP request using the given method to the API.
+func (c *Client) DoRequest(request *http.Request) (*http.Response, error) {
+
 	var response *http.Response
 	var err error
 
@@ -240,6 +246,27 @@ func (c *Client) Do(
 	}
 
 	return response, err
+}
+
+// PostFile sends an HTTP request with a reader interface as its body
+func (c *Client) PostFile(
+	path string,
+	headers map[string]string,
+	body io.Reader) (*http.Response, error) {
+
+	pathURL := c.url + path
+
+	request, errr := http.NewRequest(http.MethodPost, pathURL, body)
+	if errr != nil {
+		return nil, errr
+	}
+
+	//Add Request Header if any
+	for k, value := range headers {
+		request.Header.Set(k, value)
+	}
+
+	return c.DoRequest(request)
 }
 
 // addHeaders to add header to the request
