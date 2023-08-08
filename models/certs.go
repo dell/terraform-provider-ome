@@ -13,6 +13,8 @@ limitations under the License.
 
 package models
 
+import "github.com/hashicorp/terraform-plugin-framework/types"
+
 // CSRConfig - CSR generation form
 type CSRConfig struct {
 	DistinguishedName string `json:"DistinguishedName"`
@@ -31,4 +33,50 @@ type CertInfo struct {
 	IssuedBy  CSRConfig `json:"IssuedBy"`
 	ValidTo   string    `json:"ValidTo"`
 	ValidFrom string    `json:"ValidFrom"`
+}
+
+// tfsdk structs
+
+// CSRConfigModel - CSR generation tfsdk form
+type CSRConfigModel struct {
+	DistinguishedName types.String `tfsdk:"distinguished_name"`
+	DepartmentName    types.String `tfsdk:"department_name"`
+	BusinessName      types.String `tfsdk:"business_name"`
+	Locality          types.String `tfsdk:"locality"`
+	State             types.String `tfsdk:"state"`
+	Country           types.String `tfsdk:"country"`
+	Email             types.String `tfsdk:"email"`
+	Sans              types.String `tfsdk:"subject_alternate_names"`
+}
+
+// CertInfoModel - Certificate Information tfsdk received from OME
+type CertInfoModel struct {
+	ID        types.String   `tfsdk:"id"`
+	IssuedTo  CSRConfigModel `tfsdk:"issued_to"`
+	IssuedBy  CSRConfigModel `tfsdk:"issued_by"`
+	ValidTo   types.String   `tfsdk:"valid_to"`
+	ValidFrom types.String   `tfsdk:"valid_from"`
+}
+
+func NewCSRConfigModel(input CSRConfig) CSRConfigModel {
+	return CSRConfigModel{
+		DistinguishedName: types.StringValue(input.DistinguishedName),
+		DepartmentName:    types.StringValue(input.DepartmentName),
+		BusinessName:      types.StringValue(input.BusinessName),
+		Locality:          types.StringValue(input.Locality),
+		State:             types.StringValue(input.State),
+		Country:           types.StringValue(input.Country),
+		Email:             types.StringValue(input.Email),
+		Sans:              types.StringValue(input.Sans),
+	}
+}
+
+func NewCertInfoModel(info CertInfo) CertInfoModel {
+	return CertInfoModel{
+		ID:        types.StringValue("dummy"),
+		IssuedTo:  NewCSRConfigModel(info.IssuedBy),
+		IssuedBy:  NewCSRConfigModel(info.IssuedTo),
+		ValidTo:   types.StringValue(info.ValidTo),
+		ValidFrom: types.StringValue(info.ValidFrom),
+	}
 }
