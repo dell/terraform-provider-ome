@@ -87,7 +87,7 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 			return
 		}
 
-		shouldReturn7 := mockDiscoveryAPIs(r, w) || mockDeviceInventoryAPIs(r, w)
+		shouldReturn7 := mockDiscoveryAPIs(r, w) || mockDeviceInventoryAPIs(r, w) || mockCertAPIs(r, w)
 		if shouldReturn7 {
 			return
 		}
@@ -462,6 +462,109 @@ func mockDeviceAPIs(r *http.Request, w http.ResponseWriter) bool {
 		}
 
 		w.Write(responseGetAllDevices)
+		return true
+	}
+
+	return false
+}
+
+func mockCertAPIs(r *http.Request, w http.ResponseWriter) bool {
+
+	if r.URL.Path == CSRGenAPI && r.Method == "POST" {
+		bodyBytes, _ := io.ReadAll(r.Body)
+		req := make(map[string]string)
+		json.Unmarshal(bodyBytes, &req)
+		if req["DistinguishedName"] == "valid" {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{
+				"CertificateData": "-----BEGIN CERTIFICATE REQUEST-----xxxxxxxxxxxxxxxxxxx-----END CERTIFICATE REQUEST-----"
+			}`))
+		} else {
+			w.WriteHeader(500)
+			w.Write([]byte(`{
+				"error": {
+					"code":"Base.1.0.GeneralError",
+					"message":"A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId":"CGEN1004",
+							"RelatedProperties":["San"],
+							"Message":"Unable to complete the operation because the value provided for Either payload syntax or property values are invalid is invalid.",
+							"MessageArgs":["Either payload syntax or property values are invalid"],
+							"Severity":"Critical",
+							"Resolution":"Enter a valid value and retry the operation."
+						}
+					]
+				}
+			}`))
+		}
+		return true
+	}
+
+	if r.URL.Path == CertUploadAPI && r.Method == "POST" {
+		bodyBytes, _ := io.ReadAll(r.Body)
+		body := string(bodyBytes)
+		if strings.Contains(body, "valid") {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(500)
+			w.Write([]byte(`{
+				"error": {
+					"code":"Base.1.0.GeneralError",
+					"message":"A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo":[
+						{
+							"MessageId":"CSEC9002",
+							"RelatedProperties":[],
+							"Message":"Unable to upload the certificate because the certificate file provided is invalid.",
+							"MessageArgs":[],
+							"Severity":"Critical",
+							"Resolution":"Make sure the CA certificate and private key are correct and retry the operation."
+						}
+					]
+				}
+			}`))
+		}
+		return true
+	}
+
+	if r.URL.Path == CertGetAPI && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{
+			"@odata.context": "/api/$metadata#Collection(ApplicationService.CertInfo)",
+			"@odata.count": 1,
+			"value": [
+				{
+					"@odata.type": "#ApplicationService.CertInfo",
+					"ValidFrom": "2023-08-07T15:41:39Z",
+					"ValidTo": "2024-08-06T15:41:39Z",
+					"IssuedBy": {
+						"@odata.type": "#ApplicationService.CertDetail",
+						"DistinguishedName": "dummy",
+						"DepartmentName": "dummyD",
+						"BusinessName": "TerraformDell",
+						"Locality": "RedRock",
+						"State": "TX",
+						"Country": "US",
+						"Email":"dummy.dummyy@dell.com",
+						"KeySize": null,
+						"San": null
+					},
+					"IssuedTo": {
+						"@odata.type": "#ApplicationService.CertDetail",
+						"DistinguishedName": "ome.dell.com",
+						"DepartmentName": "Terraform Server Solutions",
+						"BusinessName": "Dell Inc.",
+						"Locality": "Round Rock",
+						"State": "TX",
+						"Country": "US",
+						"Email": "support@dell.com",
+						"KeySize": null,
+						"San": null
+					}
+				}
+			]
+		}`))
 		return true
 	}
 
