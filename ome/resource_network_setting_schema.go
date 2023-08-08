@@ -1,6 +1,10 @@
 package ome
 
-import "github.com/hashicorp/terraform-plugin-framework/resource/schema"
+import (
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+)
 
 func OmeNetworkSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
@@ -39,60 +43,58 @@ func OmeAdapterSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_nic": schema.BoolAttribute{
-			MarkdownDescription: "Enable Nic",
-			Description:         "Enable Nic",
+			MarkdownDescription: "Enable or disable Network Interface Card (NIC) configuration",
+			Description:         "Enable or disable Network Interface Card (NIC) configuration",
 			Optional:            true,
-			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(true)),
+			},
 		},
 
 		"interface_name": schema.StringAttribute{
-			MarkdownDescription: "Interface Name",
-			Description:         "Interface Name",
+			MarkdownDescription: "If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.If this option is not specified, Primary interface is chosen by default.",
+			Description:         "If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.If this option is not specified, Primary interface is chosen by default.Interface Name",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"ipv4_configuration": schema.SingleNestedAttribute{
-			MarkdownDescription: "IPV4Config",
-			Description:         "IPV4Config",
+			MarkdownDescription: "IPv4 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv4 address",
+			Description:         "IPv4 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv4 address",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          OmeIPv4ConfigSchema(),
 		},
 
 		"ipv6_configuration": schema.SingleNestedAttribute{
-			MarkdownDescription: "IPV6Config",
-			Description:         "IPV6Config",
+			MarkdownDescription: "IPv6 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv6 address",
+			Description:         "IPv6 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv6 address",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          OmeIPv6ConfigSchema(),
 		},
 
 		"management_vlan": schema.SingleNestedAttribute{
-			MarkdownDescription: "Management VLAN",
-			Description:         "Management VLAN",
+			MarkdownDescription: "vLAN configuration. settings are applicable for OpenManage Enterprise Modular",
+			Description:         "vLAN configuration. settings are applicable for OpenManage Enterprise Modular",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          OmeManagementVLANSchema(),
 		},
 
 		"dns_configuration": schema.SingleNestedAttribute{
-			MarkdownDescription: "DNSConfig",
-			Description:         "DNSConfig",
+			MarkdownDescription: "Domain Name System(DNS) settings",
+			Description:         "Domain Name System(DNS) settings",
 			Optional:            true,
-			Computed:            true,
 			Attributes:          OmeDNSConfigSchema(),
 		},
 
 		"reboot_delay": schema.Int64Attribute{
-			MarkdownDescription: "Reboot Delay",
-			Description:         "Reboot Delay",
+			MarkdownDescription: "The time in seconds, after which settings are applied",
+			Description:         "The time in seconds, after which settings are applied",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"job_id": schema.Int64Attribute{
-			MarkdownDescription: "Job ID",
+			MarkdownDescription: "Job ID ",
 			Description:         "Job ID",
 			Optional:            true,
 			Computed:            true,
@@ -104,57 +106,56 @@ func OmeIPv4ConfigSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_ipv4": schema.BoolAttribute{
-			MarkdownDescription: "Enable IPv4",
-			Description:         "Enable IPv4",
-			Optional:            true,
-			Computed:            true,
+			MarkdownDescription: "Enable or disable access to the network using IPv4.",
+			Description:         "Enable or disable access to the network using IPv4.",
+			Required: true,
 		},
 
 		"enable_dhcp": schema.BoolAttribute{
-			MarkdownDescription: "Enable DHCP",
-			Description:         "Enable DHCP",
+			MarkdownDescription: "Enable or disable the automatic request to get an IPv4 address from the IPv4 Dynamic Host Configuration Protocol (DHCP) server. If enable_dhcp option is true, OpenManage Enterprise retrieves the IP configuration—IPv4 address, subnet mask, and gateway from a DHCP server on the existing network.",
+			Description:         "Enable or disable the automatic request to get an IPv4 address from the IPv4 Dynamic Host Configuration Protocol (DHCP) server. If enable_dhcp option is true, OpenManage Enterprise retrieves the IP configuration—IPv4 address, subnet mask, and gateway from a DHCP server on the existing network.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_ip_address": schema.StringAttribute{
-			MarkdownDescription: "Static IPAddress",
-			Description:         "Static IPAddress",
+			MarkdownDescription: "Static IPv4 address. This option is applicable when \"enable_dhcp\" is false.",
+			Description:         "Static IPv4 address. This option is applicable when \"enable_dhcp\" is false.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_subnet_mask": schema.StringAttribute{
-			MarkdownDescription: "Static Subnet Mask",
-			Description:         "Static Subnet Mask",
+			MarkdownDescription: "Static IPv4 subnet mask address. This option is applicable when \"enable_dhcp\" is false.",
+			Description:         "Static IPv4 subnet mask address.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_gateway": schema.StringAttribute{
-			MarkdownDescription: "Static Gateway",
-			Description:         "Static Gateway",
+			MarkdownDescription: "Static IPv4 gateway address. This option is applicable when \"enable_dhcp\" is false.",
+			Description:         "Static IPv4 gateway address. This option is applicable when \"enable_dhcp\" is false.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"use_dhcp_for_dns_server_names": schema.BoolAttribute{
-			MarkdownDescription: "Use DHCPfor DNSServer Names",
-			Description:         "Use DHCPfor DNSServer Names",
+			MarkdownDescription: "This option allows to automatically request and obtain a DNS server IPv4 address from the DHCP server. This option is applicable when \"enable_dhcp\" is true.",
+			Description:         "This option allows to automatically request and obtain a DNS server IPv4 address from the DHCP server. This option is applicable when \"enable_dhcp\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_preferred_dns_server": schema.StringAttribute{
-			MarkdownDescription: "Static Preferred DNSServer",
-			Description:         "Static Preferred DNSServer",
+			MarkdownDescription: "Static IPv4 DNS preferred server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
+			Description:         "Static IPv4 DNS preferred server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_alternate_dns_server": schema.StringAttribute{
-			MarkdownDescription: "Static Alternate DNSServer",
-			Description:         "Static Alternate DNSServer",
+			MarkdownDescription: "Static IPv4 DNS alternate server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
+			Description:         "Static IPv4 DNS alternate server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
 			Optional:            true,
 			Computed:            true,
 		},
@@ -165,57 +166,56 @@ func OmeIPv6ConfigSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_ipv6": schema.BoolAttribute{
-			MarkdownDescription: "Enable IPv6",
-			Description:         "Enable IPv6",
-			Optional:            true,
-			Computed:            true,
+			MarkdownDescription: "Enable or disable access to the network using the IPv6.",
+			Description:         "Enable or disable access to the network using the IPv6.",
+			Required: true,
 		},
 
 		"enable_auto_configuration": schema.BoolAttribute{
-			MarkdownDescription: "Enable Auto Configuration",
-			Description:         "Enable Auto Configuration",
+			MarkdownDescription: "Enable or disable the automatic request to get an IPv6 address from the IPv6 DHCP server or router advertisements(RA). If \"enable_auto_configuration\" is true, OME retrieves IP configuration-IPv6 address, prefix, and gateway, from a DHCPv6 server on the existing network",
+			Description:        "Enable or disable the automatic request to get an IPv6 address from the IPv6 DHCP server or router advertisements(RA). If \"enable_auto_configuration\" is true, OME retrieves IP configuration-IPv6 address, prefix, and gateway, from a DHCPv6 server on the existing network",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_ip_address": schema.StringAttribute{
-			MarkdownDescription: "Static IPAddress",
-			Description:         "Static IPAddress",
-			Optional:            true,
-			Computed:            true,
+			MarkdownDescription: "Static IPv6 address. This option is applicable when \"enable_auto_configuration\" is false.",
+			Description: "Static IPv6 address. This option is applicable when \"enable_auto_configuration\" is false.",
+			Optional: true,
+			Computed: true,
 		},
 
 		"static_prefix_length": schema.Int64Attribute{
-			MarkdownDescription: "Static Prefix Length",
-			Description:         "Static Prefix Length",
+			MarkdownDescription: "Static IPv6 prefix length. This option is applicable when \"enable_auto_configuration\" is false.",
+			Description:         "Static IPv6 prefix length. This option is applicable when \"enable_auto_configuration\" is false.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_gateway": schema.StringAttribute{
-			MarkdownDescription: "Static Gateway",
-			Description:         "Static Gateway",
+			MarkdownDescription: "Static IPv6 gateway address. This option is applicable when \"enable_auto_configuration\" is false.",
+			Description:         "Static IPv6 gateway address. This option is applicable when \"enable_auto_configuration\" is false.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"use_dhcp_for_dns_server_names": schema.BoolAttribute{
-			MarkdownDescription: "Use DHCPfor DNSServer Names",
-			Description:         "Use DHCPfor DNSServer Names",
+			MarkdownDescription: "This option allows to automatically request and obtain a DNS server IPv6 address from the DHCP server. This option is applicable when \"enable_auto_configuration\" is true.",
+			Description:         "This option allows to automatically request and obtain a DNS server IPv6 address from the DHCP server. This option is applicable when \"enable_auto_configuration\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_preferred_dns_server": schema.StringAttribute{
-			MarkdownDescription: "Static Preferred DNSServer",
-			Description:         "Static Preferred DNSServer",
+			MarkdownDescription: "Static IPv6 DNS preferred server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
+			Description:         "Static IPv6 DNS preferred server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_alternate_dns_server": schema.StringAttribute{
-			MarkdownDescription: "Static Alternate DNSServer",
-			Description:         "Static Alternate DNSServer",
+			MarkdownDescription: "Static IPv6 DNS alternate server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
+			Description:         "Static IPv6 DNS alternate server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
 			Optional:            true,
 			Computed:            true,
 		},
@@ -226,15 +226,15 @@ func OmeManagementVLANSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_vlan": schema.BoolAttribute{
-			MarkdownDescription: "Enable VLAN",
-			Description:         "Enable VLAN",
+			MarkdownDescription: "Enable or disable vLAN for management.The vLAN configuration cannot be updated if the \"register_with_dns\" field under \"dns_configuration\" is true. WARNING: Ensure that the network cable is plugged to the correct port after the vLAN configurationchanges have been made. If not, the configuration change may not be effective.",
+			Description:         "Enable or disable vLAN for management.The vLAN configuration cannot be updated if the \"register_with_dns\" field under \"dns_configuration\" is true. WARNING: Ensure that the network cable is plugged to the correct port after the vLAN configurationchanges have been made. If not, the configuration change may not be effective.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"id": schema.Int64Attribute{
-			MarkdownDescription: "ID",
-			Description:         "ID",
+			MarkdownDescription: "vLAN ID. This option is applicable when \"enable_vlan\" is true.",
+			Description:         "vLAN ID. This option is applicable when \"enable_vlan\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},
