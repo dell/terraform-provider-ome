@@ -4,9 +4,6 @@ import "github.com/hashicorp/terraform-plugin-framework/types"
 
 // NetworkAdapterSetting for network adapter setting
 type NetworkAdapterSetting struct {
-	// OdataContext      string            `json:"@odata.context"`
-	// OdataType         string            `json:"@odata.type"`
-	// OdataID           string            `json:"@odata.id"`
 	InterfaceName     string            `json:"InterfaceName"`
 	ProfileName       string            `json:"ProfileName"`
 	EnableNIC         bool              `json:"EnableNIC"`
