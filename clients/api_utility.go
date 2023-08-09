@@ -56,6 +56,19 @@ type JobResp struct {
 	LastRunStatus  JobStatus `json:"LastRunStatus"`
 	JobType        JobStatus `json:"JobType"`
 	JobStatus      JobStatus `json:"JobStatus"`
+	Params         []Params  `json:"Params"`
+	Visible        bool      `json:"Visible"`
+	Editable       bool      `json:"Editable"`
+	Builtin        bool      `json:"Builtin"`
+	UserGenerated  bool      `json:"UserGenerated"`
+	IDUserOwner    int       `json:"IdUserOwner"`
+}
+
+// Params for getting job params.
+type Params struct {
+	JobID int    `json:"JobId"`
+	Key   string `json:"Key"`
+	Value string `json:"Value"`
 }
 
 // LastExecutionDetail is response returned by LastExecutionDetail job API

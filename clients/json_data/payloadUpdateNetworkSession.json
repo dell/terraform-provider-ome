@@ -1,0 +1,17 @@
+[
+    {
+    "SessionType": "GUI",
+    "MaxSessions": 20,
+    "SessionTimeout": 1800000
+    },
+    {
+    "SessionType": "API",
+    "MaxSessions": 20,
+    "SessionTimeout": 1800000
+    },
+    {
+    "SessionType": "UniversalTimeout",
+    "MaxSessions": 0,
+    "SessionTimeout": 1800000
+    }
+]

@@ -1,0 +1,74 @@
+{
+    "@odata.context": "/api/$metadata#Network.AdapterConfigurations",
+    "@odata.type": "#Network.AdapterConfigurations",
+    "@odata.id": "/api/ApplicationService/Network/AdapterConfigurations('ens160')",
+    "InterfaceName": "ens160",
+    "ProfileName": "ens160",
+    "EnableNIC": true,
+    "Ipv4Configuration": {
+        "Enable": true,
+        "EnableDHCP": false,
+        "StaticIPAddress": "x.x.x.x",
+        "StaticSubnetMask": "x.x.x.x",
+        "StaticGateway": "x.x.x.x",
+        "UseDHCPForDNSServerNames": false,
+        "StaticPreferredDNSServer": "x.x.x.x",
+        "StaticAlternateDNSServer": "x.x.x.x"
+    },
+    "Ipv6Configuration": {
+        "Enable": true,
+        "EnableAutoConfiguration": false,
+        "StaticIPAddress": "x:x:x:x",
+        "StaticPrefixLength": 64,
+        "StaticGateway": "",
+        "UseDHCPForDNSServerNames": false,
+        "StaticPreferredDNSServer": "",
+        "StaticAlternateDNSServer": ""
+    },
+    "ManagementVLAN": {
+        "EnableVLAN": false,
+        "Id": 0
+    },
+    "DnsConfiguration": {
+        "RegisterWithDNS": false,
+        "DnsName": "",
+        "UseDHCPForDNSDomainName": false,
+        "DnsDomainName": "",
+        "FqdndomainName": "",
+        "Ipv4CurrentPreferredDNSServer": "",
+        "Ipv4CurrentAlternateDNSServer": "",
+        "Ipv6CurrentPreferredDNSServer": "",
+        "Ipv6CurrentAlternateDNSServer": ""
+    },
+    "CurrentSettings": {
+        "Ipv4Settings": {
+            "Enable": true,
+            "EnableDhcp": false,
+            "CurrentIPAddress": [
+                "x.x.x.x"
+            ],
+            "CurrentSubnetMask": "x.x.x.x",
+            "CurrentGateway": "x.x.x.x",
+            "UseDHCPForDNSServerNames": false,
+            "Ipv4Dns": [
+                "x.x.x.x",
+                "x.x.x.x"
+            ]
+        },
+        "Ipv6Settings": {
+            "Enable": true,
+            "EnableAutoConfiguration": false,
+            "CurrentIPAddress": [],
+            "CurrentGateway": "",
+            "CurrentLinkLocalAddress": "x::x:x:x:x/64",
+            "UseDHCPForDNSServerNames": false,
+            "Ipv6Dns": []
+        },
+        "DnsSetting": {
+            "DnsFQDName": "",
+            "DnsDomainName": ""
+        }
+    },
+    "Delay": 0,
+    "PrimaryInterface": true
+}
