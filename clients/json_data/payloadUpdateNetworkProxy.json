@@ -1,0 +1,9 @@
+{
+    "IpAddress": "x.x.x.x",
+    "PortNumber": 8080,
+    "EnableAuthentication": true,
+    "EnableProxy": true,
+    "Username": "admin",
+    "Password": ""
+   }
+   

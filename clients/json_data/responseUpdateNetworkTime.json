@@ -1,0 +1,13 @@
+{
+    "TimeZone": "TZ_ID_65",
+    "TimeZoneIdLinux": null,
+    "TimeZoneIdWindows": null,
+    "EnableNTP": false,
+    "PrimaryNTPAddress": null,
+    "SecondaryNTPAddress1": null,
+    "SecondaryNTPAddress2": null,
+    "SystemTime": null,
+    "TimeSource": "Local Clock",
+    "UtcTime": null,
+    "JobId": null
+}

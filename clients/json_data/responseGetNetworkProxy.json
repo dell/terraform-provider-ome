@@ -1,0 +1,10 @@
+{
+    "IpAddress": null,
+    "PortNumber": 0,
+    "EnableAuthentication": false,
+    "EnableProxy": false,
+    "Username": null,
+    "Password": null,
+    "SslCheckDisabled": false,
+    "ProxyExclusionList": null
+}

@@ -3,17 +3,17 @@ package models
 import "github.com/hashicorp/terraform-plugin-framework/types"
 
 type NetworkAdapterSetting struct {
-	OdataContext      string            `json:"@odata.context"`
-	OdataType         string            `json:"@odata.type"`
-	OdataID           string            `json:"@odata.id"`
+	// OdataContext      string            `json:"@odata.context"`
+	// OdataType         string            `json:"@odata.type"`
+	// OdataID           string            `json:"@odata.id"`
 	InterfaceName     string            `json:"InterfaceName"`
 	ProfileName       string            `json:"ProfileName"`
 	EnableNIC         bool              `json:"EnableNIC"`
-	Ipv4Configuration Ipv4Configuration `json:"Ipv4Configuration"`
-	Ipv6Configuration Ipv6Configuration `json:"Ipv6Configuration"`
-	ManagementVLAN    ManagementVLAN    `json:"ManagementVLAN"`
-	DNSConfiguration  DNSConfiguration  `json:"DnsConfiguration"`
-	CurrentSettings   CurrentSettings   `json:"CurrentSettings"`
+	Ipv4Configuration Ipv4Configuration `json:"Ipv4Configuration,omitempty"`
+	Ipv6Configuration Ipv6Configuration `json:"Ipv6Configuration,omitempty"`
+	ManagementVLAN    ManagementVLAN    `json:"ManagementVLAN,omitempty"`
+	DNSConfiguration  DNSConfiguration  `json:"DnsConfiguration,omitempty"`
+	CurrentSettings   CurrentSettings   `json:"CurrentSettings,omitempty"`
 	Delay             int               `json:"Delay"`
 	PrimaryInterface  bool              `json:"PrimaryInterface"`
 }

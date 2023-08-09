@@ -108,7 +108,7 @@ func OmeIPv4ConfigSchema() map[string]schema.Attribute {
 		"enable_ipv4": schema.BoolAttribute{
 			MarkdownDescription: "Enable or disable access to the network using IPv4.",
 			Description:         "Enable or disable access to the network using IPv4.",
-			Required: true,
+			Required:            true,
 		},
 
 		"enable_dhcp": schema.BoolAttribute{
@@ -168,21 +168,21 @@ func OmeIPv6ConfigSchema() map[string]schema.Attribute {
 		"enable_ipv6": schema.BoolAttribute{
 			MarkdownDescription: "Enable or disable access to the network using the IPv6.",
 			Description:         "Enable or disable access to the network using the IPv6.",
-			Required: true,
+			Required:            true,
 		},
 
 		"enable_auto_configuration": schema.BoolAttribute{
 			MarkdownDescription: "Enable or disable the automatic request to get an IPv6 address from the IPv6 DHCP server or router advertisements(RA). If \"enable_auto_configuration\" is true, OME retrieves IP configuration-IPv6 address, prefix, and gateway, from a DHCPv6 server on the existing network",
-			Description:        "Enable or disable the automatic request to get an IPv6 address from the IPv6 DHCP server or router advertisements(RA). If \"enable_auto_configuration\" is true, OME retrieves IP configuration-IPv6 address, prefix, and gateway, from a DHCPv6 server on the existing network",
+			Description:         "Enable or disable the automatic request to get an IPv6 address from the IPv6 DHCP server or router advertisements(RA). If \"enable_auto_configuration\" is true, OME retrieves IP configuration-IPv6 address, prefix, and gateway, from a DHCPv6 server on the existing network",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"static_ip_address": schema.StringAttribute{
 			MarkdownDescription: "Static IPv6 address. This option is applicable when \"enable_auto_configuration\" is false.",
-			Description: "Static IPv6 address. This option is applicable when \"enable_auto_configuration\" is false.",
-			Optional: true,
-			Computed: true,
+			Description:         "Static IPv6 address. This option is applicable when \"enable_auto_configuration\" is false.",
+			Optional:            true,
+			Computed:            true,
 		},
 
 		"static_prefix_length": schema.Int64Attribute{
@@ -245,29 +245,29 @@ func OmeDNSConfigSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"register_with_dns": schema.BoolAttribute{
-			MarkdownDescription: "Register With DNS",
-			Description:         "Register With DNS",
+			MarkdownDescription: "Register/Unregister I(dns_name) on the DNS Server.This option cannot be updated if vLAN configuration changes.",
+			Description:         "Register/Unregister I(dns_name) on the DNS Server.This option cannot be updated if vLAN configuration changes.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"use_dhcp_for_dns_server_names": schema.BoolAttribute{
-			MarkdownDescription: "Use DHCPfor DNSServer Names",
-			Description:         "Use DHCPfor DNSServer Names",
+			MarkdownDescription: "Get the \"dns_domain_name\" using a DHCP server.",
+			Description:         "Get the \"dns_domain_name\" using a DHCP server.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"dns_name": schema.StringAttribute{
-			MarkdownDescription: "DNSName",
-			Description:         "DNSName",
+			MarkdownDescription: "DNS name for \"hostname\". This is applicable when \"register_with_dns\" is true.",
+			Description:         "DNS name for \"hostname\". This is applicable when \"register_with_dns\" is true.DNSName",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"dns_domain_name": schema.StringAttribute{
-			MarkdownDescription: "DNSDomain Name",
-			Description:         "DNSDomain Name",
+			MarkdownDescription: "Static DNS domain name. This is applicable when \"use_dhcp_for_dns_domain_name\" is false.",
+			Description:         "Static DNS domain name. This is applicable when \"use_dhcp_for_dns_domain_name\" is false.",
 			Optional:            true,
 			Computed:            true,
 		},
@@ -278,71 +278,71 @@ func OmeSessionSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_universal_timeout": schema.BoolAttribute{
-			MarkdownDescription: "Enable Universal Timeout",
-			Description:         "Enable Universal Timeout",
+			MarkdownDescription: "Enable or disable the universal inactivity timeout.",
+			Description:         "Enable or disable the universal inactivity timeout.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"universal_timeout": schema.Float64Attribute{
-			MarkdownDescription: "Unversal Timeout",
-			Description:         "Unversal Timeout",
+			MarkdownDescription: "Duration of inactivity in minutes after which all sessions end. This is applicable when \"enable_universal_timeout\" is true. This is mutually exclusive with \"api_timeout\", \"gui_timeout\", \"ssh_timeout\" and \"serial_timeout\".",
+			Description:         "Duration of inactivity in minutes after which all sessions end. This is applicable when \"enable_universal_timeout\" is true. This is mutually exclusive with \"api_timeout\", \"gui_timeout\", \"ssh_timeout\" and \"serial_timeout\".",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"api_timeout": schema.Float64Attribute{
-			MarkdownDescription: "APITimeout",
-			Description:         "APITimeout",
+			MarkdownDescription: "Duration of inactivity in minutes after which the API session ends. This is mutually exclusive with \"universal_timeout\".",
+			Description:         "Duration of inactivity in minutes after which the API session ends. This is mutually exclusive with \"universal_timeout\".",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"api_session": schema.Int64Attribute{
-			MarkdownDescription: "APISession",
-			Description:         "APISession",
+			MarkdownDescription: "The maximum number of API sessions to be allowed.",
+			Description:         "The maximum number of API sessions to be allowed.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"gui_timeout": schema.Float64Attribute{
-			MarkdownDescription: "GUITimeout",
-			Description:         "GUITimeout",
+			MarkdownDescription: "Duration of inactivity in minutes after which the web interface of Graphical User Interface (GUI) session ends. This is mutually exclusive with \"universal_timeout\".",
+			Description:         "Duration of inactivity in minutes after which the web interface of Graphical User Interface (GUI) session ends. This is mutually exclusive with \"universal_timeout\".",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"gui_session": schema.Int64Attribute{
-			MarkdownDescription: "GUISession",
-			Description:         "GUISession",
+			MarkdownDescription: "The maximum number of GUI sessions to be allowed.",
+			Description:         "The maximum number of GUI sessions to be allowed.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"ssh_timeout": schema.Float64Attribute{
-			MarkdownDescription: "SSHTimeout",
-			Description:         "SSHTimeout",
+			MarkdownDescription: "Duration of inactivity in minutes after which the SSH session ends. This is applicable only for OpenManage Enterprise Modular. This is mutually exclusive with \"universal_timeout\".",
+			Description:         "Duration of inactivity in minutes after which the SSH session ends. This is applicable only for OpenManage Enterprise Modular. This is mutually exclusive with \"universal_timeout\".",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"ssh_session": schema.Int64Attribute{
-			MarkdownDescription: "SSHSession",
-			Description:         "SSHSession",
+			MarkdownDescription: "The maximum number of SSH sessions to be allowed. This is applicable to OME-M only.",
+			Description:         "The maximum number of SSH sessions to be allowed. This is applicable to OME-M only.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"serial_timeout": schema.Float64Attribute{
-			MarkdownDescription: "Serial Timeout",
-			Description:         "Serial Timeout",
+			MarkdownDescription: "Duration of inactivity in minutes after which the serial console session ends.This is applicable only for OpenManage Enterprise Modular. This is mutually exclusive with \"universal_timeout\".",
+			Description:         "Duration of inactivity in minutes after which the serial console session ends.This is applicable only for OpenManage Enterprise Modular. This is mutually exclusive with \"universal_timeout\"",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"serial_session": schema.Int64Attribute{
-			MarkdownDescription: "Serial Session",
-			Description:         "Serial Session",
+			MarkdownDescription: "The maximum number of serial console sessions to be allowed. This is applicable only for OpenManage Enterprise Modular.",
+			Description:         "The maximum number of serial console sessions to be allowed. This is applicable only for OpenManage Enterprise Modular.",
 			Optional:            true,
 			Computed:            true,
 		},
@@ -353,43 +353,43 @@ func OmeTimeSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_ntp": schema.BoolAttribute{
-			MarkdownDescription: "Enable NTP",
-			Description:         "Enable NTP",
+			MarkdownDescription: "Enables or disables Network Time Protocol(NTP).If \"enable_ntp\" is false, then the NTP addresses reset to their default values.",
+			Description:         "Enables or disables Network Time Protocol(NTP).If \"enable_ntp\" is false, then the NTP addresses reset to their default values.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"system_time": schema.StringAttribute{
-			MarkdownDescription: "System Time",
-			Description:         "System Time",
+			MarkdownDescription: "Time in the current system. This option is only applicable when \"enable_ntp\" is false. This option must be provided in following format 'yyyy-mm-dd hh:mm:ss'.",
+			Description:         "Time in the current system. This option is only applicable when \"enable_ntp\" is false. This option must be provided in following format 'yyyy-mm-dd hh:mm:ss'.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"time_zone": schema.StringAttribute{
-			MarkdownDescription: "Time Zone",
-			Description:         "Time Zone",
+			MarkdownDescription: "The valid timezone ID to be used. This option is applicable for both system time and NTP time synchronization.",
+			Description:         "The valid timezone ID to be used. This option is applicable for both system time and NTP time synchronization.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"primary_ntp_address": schema.StringAttribute{
-			MarkdownDescription: "Primary NTPAddress",
-			Description:         "Primary NTPAddress",
+			MarkdownDescription: "The primary NTP address. This option is applicable when \"enable_ntp\" is true.",
+			Description:         "The primary NTP address. This option is applicable when \"enable_ntp\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"secondary_ntp_address1": schema.StringAttribute{
-			MarkdownDescription: "Secondary NTPAddress1",
-			Description:         "Secondary NTPAddress1",
+			MarkdownDescription: "The first secondary NTP address. This option is applicable when \"enable_ntp\" is true.",
+			Description:         "The first secondary NTP address. This option is applicable when \"enable_ntp\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"secondary_ntp_address2": schema.StringAttribute{
-			MarkdownDescription: "Secondary NTPAddress2",
-			Description:         "Secondary NTPAddress2",
+			MarkdownDescription: "The second secondary NTP address. This option is applicable when \"enable_ntp\" is true.",
+			Description:         "The second secondary NTP address. This option is applicable when \"enable_ntp\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},

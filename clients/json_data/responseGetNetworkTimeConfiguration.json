@@ -1,0 +1,15 @@
+{
+    "@odata.context": "/api/$metadata#Network.TimeConfiguration",
+    "@odata.type": "#Network.TimeConfiguration",
+    "@odata.id": "/api/ApplicationService/Network/TimeConfiguration",
+    "TimeZone": "TZ_ID_33",
+    "TimeZoneIdLinux": "Etc/GMT",
+    "TimeZoneIdWindows": "UTC",
+    "EnableNTP": false,
+    "PrimaryNTPAddress": null,
+    "SecondaryNTPAddress1": null,
+    "SecondaryNTPAddress2": null,
+    "SystemTime": "2023-08-05 09:51:38.518",
+    "TimeSource": "Local Clock",
+    "UtcTime": "2023-08-05 09:51:38.518"
+}

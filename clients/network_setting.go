@@ -36,14 +36,15 @@ func (c *Client) GetNetworkAdapterConfigByInterface(interfaceName string) (model
 		return models.NetworkAdapterSetting{}, err
 	}
 
-	bodyData, _ := c.GetBodyData(response.Body)
-
-	networkAdapterSetting := models.NetworkAdapterSetting{}
-	err = c.JSONUnMarshal(bodyData, &networkAdapterSetting)
+	bodyData, err := c.GetBodyData(response.Body)
 	if err != nil {
 		return models.NetworkAdapterSetting{}, err
 	}
-	return networkAdapterSetting, nil
+	networkAdapterSetting := models.NetworkAdapterSetting{}
+	alpha := string(bodyData)
+	fmt.Println(alpha)
+	err = c.JSONUnMarshal(bodyData, &networkAdapterSetting)
+	return networkAdapterSetting, err
 }
 
 func (c *Client) UpdateNetworkAdapterConfig(networkAdapter models.UpdateNetworkAdapterSetting) (models.Job, error) {
@@ -55,7 +56,7 @@ func (c *Client) UpdateNetworkAdapterConfig(networkAdapter models.UpdateNetworkA
 	respData, _ := c.GetBodyData(response.Body)
 	jobResponse := models.Job{}
 	err = c.JSONUnMarshal(respData, &jobResponse)
-	fmt.Println(string(respData))
+	fmt.Println(jobResponse)
 	return jobResponse, err
 }
 
@@ -69,10 +70,7 @@ func (c *Client) GetNetworkSessions() (models.NetworkSessions, error) {
 
 	networkSessions := models.NetworkSessions{}
 	err = c.JSONUnMarshal(bodyData, &networkSessions)
-	if err != nil {
-		return models.NetworkSessions{}, err
-	}
-	return networkSessions, nil
+	return networkSessions, err
 }
 
 func (c *Client) UpdateNetworkSessions(sessionPayload models.UpdateNetworkSessions) ([]models.SessionInfo, error) {
@@ -98,10 +96,7 @@ func (c *Client) GetTimeConfiguration() (models.TimeConfiguration, error) {
 
 	timeConfig := models.TimeConfiguration{}
 	err = c.JSONUnMarshal(bodyData, &timeConfig)
-	if err != nil {
-		return models.TimeConfiguration{}, err
-	}
-	return timeConfig, nil
+	return timeConfig, err
 }
 
 func (c *Client) UpdateTimeConfiguration(payloadTC models.TimeConfigPayload) (models.TimeConfigResponse, error) {
@@ -114,10 +109,7 @@ func (c *Client) UpdateTimeConfiguration(payloadTC models.TimeConfigPayload) (mo
 	bodyData, _ := c.GetBodyData(response.Body)
 	timeConfig := models.TimeConfigResponse{}
 	err = c.JSONUnMarshal(bodyData, &timeConfig)
-	if err != nil {
-		return models.TimeConfigResponse{}, err
-	}
-	return timeConfig, nil
+	return timeConfig, err
 }
 
 func (c *Client) GetTimeZone() (models.TimeZones, error) {
@@ -130,10 +122,7 @@ func (c *Client) GetTimeZone() (models.TimeZones, error) {
 
 	timeZones := models.TimeZones{}
 	err = c.JSONUnMarshal(bodyData, &timeZones)
-	if err != nil {
-		return models.TimeZones{}, err
-	}
-	return timeZones, nil
+	return timeZones, err
 }
 
 func (c *Client) GetProxyConfig() (models.ProxyConfiguration, error) {
@@ -146,10 +135,7 @@ func (c *Client) GetProxyConfig() (models.ProxyConfiguration, error) {
 
 	proxyConfig := models.ProxyConfiguration{}
 	err = c.JSONUnMarshal(bodyData, &proxyConfig)
-	if err != nil {
-		return models.ProxyConfiguration{}, err
-	}
-	return proxyConfig, nil
+	return proxyConfig, err
 }
 
 func (c *Client) UpdateProxyConfig(payloadProxy models.PayloadProxyConfiguration) (models.ProxyConfiguration, error) {
@@ -162,8 +148,5 @@ func (c *Client) UpdateProxyConfig(payloadProxy models.PayloadProxyConfiguration
 	bodyData, _ := c.GetBodyData(response.Body)
 	proxyConfig := models.ProxyConfiguration{}
 	err = c.JSONUnMarshal(bodyData, &proxyConfig)
-	if err != nil {
-		return models.ProxyConfiguration{}, err
-	}
-	return proxyConfig, nil
+	return proxyConfig, err
 }
