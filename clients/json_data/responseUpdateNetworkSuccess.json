@@ -1,0 +1,27 @@
+{
+  "Id": 13879,
+  "JobName": "OMERealtime_Task",
+  "JobDescription": "Generic OME runtime task",
+  "Schedule": "startnow",
+  "State": "Enabled",
+  "CreatedBy": "system",
+  "LastRunStatus": {
+      "Id": 2080,
+      "Name": "New"
+  },
+  "JobType": {
+      "Id": 207,
+      "Name": "OMERealtime_Task",
+      "Internal": true,
+      "IsShareUsageActive": false
+  },
+  "JobStatus": {
+      "Id": 2080,
+      "Name": "New"
+  },
+  "Visible": true,
+  "Editable": true,
+  "Builtin": false,
+  "UserGenerated": false,
+  "IdUserOwner": 10078
+}

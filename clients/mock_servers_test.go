@@ -92,6 +92,11 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 			return
 		}
 
+		shouldReturn8 := mockNetworkSettingAPIs(r, w)
+		if shouldReturn8 {
+			return
+		}
+
 		mockGeneralAPIs(r, w)
 	}))
 
@@ -473,7 +478,10 @@ func mockCertAPIs(r *http.Request, w http.ResponseWriter) bool {
 	if r.URL.Path == CSRGenAPI && r.Method == "POST" {
 		bodyBytes, _ := io.ReadAll(r.Body)
 		req := make(map[string]string)
-		json.Unmarshal(bodyBytes, &req)
+		err := json.Unmarshal(bodyBytes, &req)
+		if err != nil {
+			return false
+		}
 		if req["DistinguishedName"] == "valid" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{
@@ -2956,6 +2964,90 @@ func mockDiscoveryAPIs(r *http.Request, w http.ResponseWriter) bool {
 	if r.URL.Path == fmt.Sprintf(DiscoveryJobByGroupIDAPI, -1) && r.Method == "GET" {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(`invalid discovery get`))
+	}
+	return false
+}
+
+var (
+	//go:embed json_data/responseUpdateNetworkSuccess.json
+	responseUpdateNetworkSuccess []byte
+	//go:embed json_data/responseGetNetworkAdapterConfig.json
+	responseGetNetworkAdapterConfig []byte
+	//go:embed json_data/responseGetNetworkSession.json
+	responseGetNetworkSession []byte
+	//go:embed json_data/responseGetNetworkTimeConfiguration.json
+	responseGetNetworkTimeConfiguration []byte
+	//go:embed json_data/responseUpdateNetworkTime.json
+	responseUpdateNetworkTime []byte
+	//go:embed json_data/responseGetTimeZone.json
+	responseGetTimeZone []byte
+	//go:embed json_data/responseGetNetworkProxy.json
+	responseGetNetworkProxy []byte
+	//go:embed json_data/responseUpdateNetworkProxy.json
+	responseUpdateNetworkProxy []byte
+)
+
+func mockNetworkSettingAPIs(r *http.Request, w http.ResponseWriter) bool {
+
+	if r.URL.Path == fmt.Sprintf(GetNetworkAdapterAPI, "ens160") && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write(responseGetNetworkAdapterConfig)
+	}
+	if r.URL.Path == UpdateNetworkAdapterAPI && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "ens160") {
+			w.WriteHeader(http.StatusOK)
+			w.Write(responseUpdateNetworkSuccess)
+		} else if strings.Contains(string(body), "invalid") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid network update`))
+		}
+	}
+	if r.URL.Path == GetNetworkSessions && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write(responseGetNetworkSession)
+	}
+	if r.URL.Path == UpdateNetworkSessions && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "GUI") {
+			w.WriteHeader(http.StatusOK)
+			w.Write(responseUpdateNetworkSuccess)
+		} else if strings.Contains(string(body), "invalid") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid network session update`))
+		}
+	}
+	if r.URL.Path == TimeConfigurationAPI && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write(responseGetNetworkTimeConfiguration)
+	}
+	if r.URL.Path == TimeConfigurationAPI && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "TZ_ID_65") {
+			w.WriteHeader(http.StatusOK)
+			w.Write(responseUpdateNetworkTime)
+		} else if strings.Contains(string(body), "invalid") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid network time update`))
+		}
+	}
+	if r.URL.Path == GetTimeZone && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write(responseGetTimeZone)
+	}
+	if r.URL.Path == ProxyConfigurationAPI && r.Method == "GET" {
+		w.WriteHeader(http.StatusOK)
+		w.Write(responseGetNetworkProxy)
+	}
+	if r.URL.Path == ProxyConfigurationAPI && r.Method == "POST" {
+		body, _ := io.ReadAll(r.Body)
+		if strings.Contains(string(body), "admin") {
+			w.WriteHeader(http.StatusOK)
+			w.Write(responseUpdateNetworkProxy)
+		} else if strings.Contains(string(body), "invalid") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`invalid network prxoy update`))
+		}
 	}
 	return false
 }

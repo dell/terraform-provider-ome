@@ -1,0 +1,38 @@
+{
+    "InterfaceName": "ens160",
+    "ProfileName": "ens160",
+    "EnableNIC": true,
+    "Ipv4Configuration": {
+        "Enable": true,
+        "EnableDHCP": false,
+        "StaticIPAddress": "x.x.x.x",
+        "StaticSubnetMask": "x.x.x.x",
+        "StaticGateway": "x.x.x.x",
+        "UseDHCPForDNSServerNames": false,
+        "StaticPreferredDNSServer": "x.x.x.x",
+        "StaticAlternateDNSServer": "x.x.x.x"
+    },
+    "Ipv6Configuration": {
+        "Enable": true,
+        "EnableAutoConfiguration": false,
+        "StaticIPAddress": "x:x:x:x",
+        "StaticPrefixLength": 64,
+        "StaticGateway": "",
+        "UseDHCPForDNSServerNames": false,
+        "StaticPreferredDNSServer": "",
+        "StaticAlternateDNSServer": ""
+    },
+    "DnsConfiguration": {
+        "RegisterWithDNS": false,
+        "DnsName": "",
+        "UseDHCPForDNSDomainName": false,
+        "DnsDomainName": "OME DNS",
+        "FqdndomainName": "",
+        "Ipv4CurrentPreferredDNSServer": "",
+        "Ipv4CurrentAlternateDNSServer": "",
+        "Ipv6CurrentPreferredDNSServer": "",
+        "Ipv6CurrentAlternateDNSServer": ""
+    },
+    "Delay": 0,
+    "PrimaryInterface": true
+}

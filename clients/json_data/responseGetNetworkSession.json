@@ -1,0 +1,42 @@
+{
+    "@odata.context": "/api/$metadata#Collection(SessionService.SessionConfiguration)",
+    "@odata.count": 3,
+    "value": [
+        {
+            "@odata.type": "#SessionService.SessionConfiguration",
+            "SessionType": "GUI",
+            "MaxSessions": 6,
+            "SessionTimeout": 1800000,
+            "MinSessionTimeout": 60000,
+            "MaxSessionTimeout": 86400000,
+            "MinSessionsAllowed": 1,
+            "MaxSessionsAllowed": 100,
+            "MaxSessionsConfigurable": true,
+            "SessionTimeoutConfigurable": true
+        },
+        {
+            "@odata.type": "#SessionService.SessionConfiguration",
+            "SessionType": "API",
+            "MaxSessions": 100,
+            "SessionTimeout": 1800000,
+            "MinSessionTimeout": 60000,
+            "MaxSessionTimeout": 86400000,
+            "MinSessionsAllowed": 1,
+            "MaxSessionsAllowed": 100,
+            "MaxSessionsConfigurable": true,
+            "SessionTimeoutConfigurable": true
+        },
+        {
+            "@odata.type": "#SessionService.SessionConfiguration",
+            "SessionType": "UniversalTimeout",
+            "MaxSessions": 0,
+            "SessionTimeout": -1,
+            "MinSessionTimeout": -1,
+            "MaxSessionTimeout": 86400000,
+            "MinSessionsAllowed": 0,
+            "MaxSessionsAllowed": 0,
+            "MaxSessionsConfigurable": false,
+            "SessionTimeoutConfigurable": true
+        }
+    ]
+}

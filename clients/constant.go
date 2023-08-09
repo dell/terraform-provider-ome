@@ -113,6 +113,22 @@ const (
 	CertUploadAPI = "/api/ApplicationService/Actions/ApplicationService.UploadCertificate"
 	// CertGetAPI - API to get certificate info
 	CertGetAPI = "/api/ApplicationService/Certificate"
+	// GetNetworkAdapterAPI to get the adapter configuration
+	GetNetworkAdapterAPI = "/api/ApplicationService/Network/AdapterConfigurations('%s')"
+	// UpdateNetworkAdapterAPI to update the adapter configuration
+	UpdateNetworkAdapterAPI = "/api/ApplicationService/Actions/Network.ConfigureNetworkAdapter"
+	// GetNetworkSessions to get the network sessions.
+	GetNetworkSessions = "/api/SessionService/SessionConfiguration"
+	// UpdateNetworkSessions to update the network sessions.
+	UpdateNetworkSessions = "/api/SessionService/Actions/SessionService.SessionConfigurationUpdate"
+	// GetTimeConfiguration to get/update the time configuration.
+	TimeConfigurationAPI = "/api/ApplicationService/Network/TimeConfiguration"
+	// GetTimeZone to get the time zone.
+	GetTimeZone = "/api/ApplicationService/Network/TimeZones"
+	// ProxyConfigurationAPI to get/update the proxy configuration
+	ProxyConfigurationAPI = "/api/ApplicationService/Network/ProxyConfiguration"
+	// GetJobAPI to get the job info by ID.
+	GetJobAPI = "/api/JobService/Jobs(%d)"
 )
 
 // Messages constants
