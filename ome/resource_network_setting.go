@@ -34,7 +34,7 @@ func (r *networkSettingResource) Configure(ctx context.Context, req resource.Con
 
 // Metadata returns the resource type name.
 func (r *networkSettingResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_network_setting"
+	resp.TypeName = req.ProviderTypeName + "network_setting"
 }
 
 // Schema defines the schema for the resource.

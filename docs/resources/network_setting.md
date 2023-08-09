@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-title: "ome__network_setting resource"
-linkTitle: "ome__network_setting"
-page_title: "ome__network_setting Resource - terraform-provider-ome"
+title: "ome_network_setting resource"
+linkTitle: "ome_network_setting"
+page_title: "ome_network_setting Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
   Resource for managing network_setting on OpenManage Enterprise.
 ---
 
-# ome__network_setting (Resource)
+# ome_network_setting (Resource)
 
 Resource for managing network_setting on OpenManage Enterprise.
 
