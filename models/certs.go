@@ -58,6 +58,7 @@ type CertInfoModel struct {
 	ValidFrom types.String   `tfsdk:"valid_from"`
 }
 
+// NewCSRConfigModel - Converts CSRConfig to CSRConfigModel
 func NewCSRConfigModel(input CSRConfig) CSRConfigModel {
 	return CSRConfigModel{
 		DistinguishedName: types.StringValue(input.DistinguishedName),
@@ -71,6 +72,7 @@ func NewCSRConfigModel(input CSRConfig) CSRConfigModel {
 	}
 }
 
+// NewCertInfoModel - Converts CertInfo to CertInfoModel
 func NewCertInfoModel(info CertInfo) CertInfoModel {
 	return CertInfoModel{
 		ID:        types.StringValue("dummy"),
