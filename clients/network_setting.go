@@ -38,14 +38,14 @@ func (c *Client) GetNetworkAdapterConfigByInterface(interfaceName string) (model
 }
 
 // UpdateNetworkAdapterConfig to update the network adapter.
-func (c *Client) UpdateNetworkAdapterConfig(networkAdapter models.UpdateNetworkAdapterSetting) (models.Job, error) {
+func (c *Client) UpdateNetworkAdapterConfig(networkAdapter models.UpdateNetworkAdapterSetting) (JobResp, error) {
 	data, _ := c.JSONMarshal(networkAdapter)
 	response, err := c.Post(UpdateNetworkAdapterAPI, nil, data)
 	if err != nil {
-		return models.Job{}, err
+		return JobResp{}, err
 	}
 	respData, _ := c.GetBodyData(response.Body)
-	jobResponse := models.Job{}
+	jobResponse := JobResp{}
 	err = c.JSONUnMarshal(respData, &jobResponse)
 	fmt.Println(jobResponse)
 	return jobResponse, err
