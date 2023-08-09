@@ -1,5 +1,6 @@
 package models
 
+// Job for getting job info.
 type Job struct {
 	ID             int           `json:"Id"`
 	JobName        string        `json:"JobName"`
@@ -24,20 +25,28 @@ type Job struct {
 	IDUserOwner    int           `json:"IdUserOwner"`
 	IDOwner        any           `json:"IdOwner"`
 }
+
+// LastRunStatus for job last run status.
 type LastRunStatus struct {
 	ID   int    `json:"Id"`
 	Name string `json:"Name"`
 }
+
+// JobType for job type.
 type JobType struct {
 	ID                 int    `json:"Id"`
 	Name               string `json:"Name"`
 	Internal           bool   `json:"Internal"`
 	IsShareUsageActive bool   `json:"IsShareUsageActive"`
 }
+
+// JobStatus for final job status.
 type JobStatus struct {
 	ID   int    `json:"Id"`
 	Name string `json:"Name"`
 }
+
+// Params for getting job params.
 type Params struct {
 	JobID int    `json:"JobId"`
 	Key   string `json:"Key"`

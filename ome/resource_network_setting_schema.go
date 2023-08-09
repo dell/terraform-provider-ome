@@ -6,40 +6,42 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func OmeNetworkSettingSchema() map[string]schema.Attribute {
+// NetworkSettingSchema for network setting schema
+func NetworkSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"adapter_setting": schema.SingleNestedAttribute{
 			MarkdownDescription: "Ome Adapter Setting",
 			Description:         "Ome Adapter Setting",
 			Optional:            true,
-			Attributes:          OmeAdapterSettingSchema(),
+			Attributes:          AdapterSettingSchema(),
 		},
 
 		"session_setting": schema.SingleNestedAttribute{
 			MarkdownDescription: "Ome Session Setting",
 			Description:         "Ome Session Setting",
 			Optional:            true,
-			Attributes:          OmeSessionSettingSchema(),
+			Attributes:          SessionSettingSchema(),
 		},
 
 		"time_setting": schema.SingleNestedAttribute{
 			MarkdownDescription: "Ome Time Setting",
 			Description:         "Ome Time Setting",
 			Optional:            true,
-			Attributes:          OmeTimeSettingSchema(),
+			Attributes:          TimeSettingSchema(),
 		},
 
 		"proxy_setting": schema.SingleNestedAttribute{
 			MarkdownDescription: "Ome Proxy Setting",
 			Description:         "Ome Proxy Setting",
 			Optional:            true,
-			Attributes:          OmeProxySettingSchema(),
+			Attributes:          ProxySettingSchema(),
 		},
 	}
 }
 
-func OmeAdapterSettingSchema() map[string]schema.Attribute {
+// AdapterSettingSchema for adapter setting schema
+func AdapterSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_nic": schema.BoolAttribute{
@@ -62,28 +64,28 @@ func OmeAdapterSettingSchema() map[string]schema.Attribute {
 			MarkdownDescription: "IPv4 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv4 address",
 			Description:         "IPv4 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv4 address",
 			Optional:            true,
-			Attributes:          OmeIPv4ConfigSchema(),
+			Attributes:          IPv4ConfigSchema(),
 		},
 
 		"ipv6_configuration": schema.SingleNestedAttribute{
 			MarkdownDescription: "IPv6 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv6 address",
 			Description:         "IPv6 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv6 address",
 			Optional:            true,
-			Attributes:          OmeIPv6ConfigSchema(),
+			Attributes:          IPv6ConfigSchema(),
 		},
 
 		"management_vlan": schema.SingleNestedAttribute{
 			MarkdownDescription: "vLAN configuration. settings are applicable for OpenManage Enterprise Modular",
 			Description:         "vLAN configuration. settings are applicable for OpenManage Enterprise Modular",
 			Optional:            true,
-			Attributes:          OmeManagementVLANSchema(),
+			Attributes:          ManagementVLANSchema(),
 		},
 
 		"dns_configuration": schema.SingleNestedAttribute{
 			MarkdownDescription: "Domain Name System(DNS) settings",
 			Description:         "Domain Name System(DNS) settings",
 			Optional:            true,
-			Attributes:          OmeDNSConfigSchema(),
+			Attributes:          DNSConfigSchema(),
 		},
 
 		"reboot_delay": schema.Int64Attribute{
@@ -102,7 +104,8 @@ func OmeAdapterSettingSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeIPv4ConfigSchema() map[string]schema.Attribute {
+// IPv4ConfigSchema for IPv4 Configuration Schema
+func IPv4ConfigSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_ipv4": schema.BoolAttribute{
@@ -162,7 +165,8 @@ func OmeIPv4ConfigSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeIPv6ConfigSchema() map[string]schema.Attribute {
+// IPv6ConfigSchema for IPv6 Configuration Schema
+func IPv6ConfigSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_ipv6": schema.BoolAttribute{
@@ -222,7 +226,8 @@ func OmeIPv6ConfigSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeManagementVLANSchema() map[string]schema.Attribute {
+// ManagementVLANSchema for management vlan schema
+func ManagementVLANSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_vlan": schema.BoolAttribute{
@@ -241,7 +246,8 @@ func OmeManagementVLANSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeDNSConfigSchema() map[string]schema.Attribute {
+// DNSConfigSchema for DNS Configuration Schema
+func DNSConfigSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"register_with_dns": schema.BoolAttribute{
@@ -274,7 +280,8 @@ func OmeDNSConfigSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeSessionSettingSchema() map[string]schema.Attribute {
+// SessionSettingSchema for the session setting schema.
+func SessionSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_universal_timeout": schema.BoolAttribute{
@@ -349,7 +356,8 @@ func OmeSessionSettingSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeTimeSettingSchema() map[string]schema.Attribute {
+// TimeSettingSchema for time setting schema
+func TimeSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_ntp": schema.BoolAttribute{
@@ -396,47 +404,48 @@ func OmeTimeSettingSchema() map[string]schema.Attribute {
 	}
 }
 
-func OmeProxySettingSchema() map[string]schema.Attribute {
+// ProxySettingSchema for proxy setting schema
+func ProxySettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
 
 		"enable_proxy": schema.BoolAttribute{
-			MarkdownDescription: "Enable Proxy",
-			Description:         "Enable Proxy",
+			MarkdownDescription: "Enables or disables the HTTP proxy configuration. If \"enable proxy\" is false, then the HTTP proxy configuration is set to its default value.",
+			Description:         "Enables or disables the HTTP proxy configuration. If \"enable proxy\" is false, then the HTTP proxy configuration is set to its default value.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"ip_address": schema.StringAttribute{
-			MarkdownDescription: "IPAddress",
-			Description:         "IPAddress",
+			MarkdownDescription: "Proxy server address. This option is mandatory when \"enable_proxy\" is true.",
+			Description:         "Proxy server address. This option is mandatory when \"enable_proxy\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"proxy_port": schema.Int64Attribute{
-			MarkdownDescription: "Proxy Port",
-			Description:         "Proxy Port",
+			MarkdownDescription: "Proxy server's port number. This option is mandatory when \"enable_proxy\" is true.",
+			Description:         "Proxy server's port number. This option is mandatory when \"enable_proxy\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"enable_authentication": schema.BoolAttribute{
-			MarkdownDescription: "Enable Authentication",
-			Description:         "Enable Authentication",
+			MarkdownDescription: "Enable or disable proxy authentication. If \"enable_authentication\" is true, \"proxy_username\" and \"proxy_password\" must be provided. If \"enable_authentication\" is false, the proxy username and password are set to its default values.",
+			Description:         "Enable or disable proxy authentication. If \"enable_authentication\" is true, \"proxy_username\" and \"proxy_password\" must be provided. If \"enable_authentication\" is false, the proxy username and password are set to its default values.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"Username": schema.StringAttribute{
-			MarkdownDescription: "Username",
-			Description:         "Username",
+			MarkdownDescription: "Proxy server username. This option is mandatory when \"enable_authentication\" is true.",
+			Description:         "Proxy server username. This option is mandatory when \"enable_authentication\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},
 
 		"Password": schema.StringAttribute{
-			MarkdownDescription: "Password",
-			Description:         "Password",
+			MarkdownDescription: "Proxy server password. This option is mandatory when \"enable_authentication\" is true.",
+			Description:         "Proxy server password. This option is mandatory when \"enable_authentication\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},

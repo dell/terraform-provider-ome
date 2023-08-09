@@ -18,10 +18,7 @@ import (
 	"terraform-provider-ome/models"
 )
 
-const (
-	GetJobAPI = "/api/JobService/Jobs(%d)"
-)
-
+// GetJobByID to get job by ID.
 func (c *Client) GetJobByID(id int) (models.Job, error) {
 	path := fmt.Sprintf(GetJobAPI, id)
 	response, err := c.Get(path, nil, nil)

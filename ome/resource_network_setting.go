@@ -11,21 +11,21 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ resource.Resource = &network_settingResource{}
+	_ resource.Resource = &networkSettingResource{}
 )
 
-// Newnetwork_settingResource is a helper function to simplify the provider implementation.
-func Newnetwork_settingResource() resource.Resource {
-	return &network_settingResource{}
+// NewNetworkSettingResource is a helper function to simplify the provider implementation.
+func NewNetworkSettingResource() resource.Resource {
+	return &networkSettingResource{}
 }
 
-// network_settingResource is the resource implementation.
-type network_settingResource struct {
+// networkSettingResource is the resource implementation.
+type networkSettingResource struct {
 	p *omeProvider
 }
 
 // Configure implements resource.ResourceWithConfigure
-func (r *network_settingResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *networkSettingResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
@@ -33,21 +33,21 @@ func (r *network_settingResource) Configure(ctx context.Context, req resource.Co
 }
 
 // Metadata returns the resource type name.
-func (r *network_settingResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *networkSettingResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_network_setting"
 }
 
 // Schema defines the schema for the resource.
-func (r *network_settingResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *networkSettingResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Resource for managing network_setting on OpenManage Enterprise.",
 		Version:             1,
-		Attributes:          OmeNetworkSettingSchema(),
+		Attributes:          NetworkSettingSchema(),
 	}
 }
 
 // Create creates the resource and sets the initial Terraform state.
-func (r *network_settingResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *networkSettingResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	tflog.Trace(ctx, "resource_network_setting create : Started")
 	//Get Plan Data
 	var plan, state models.OmeNetworkSetting
@@ -65,7 +65,7 @@ func (r *network_settingResource) Create(ctx context.Context, req resource.Creat
 }
 
 // Read refreshes the Terraform state with the latest data.
-func (r *network_settingResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *networkSettingResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	tflog.Trace(ctx, "resource_network_setting read: started")
 	var state models.OmeNetworkSetting
 	diags := req.State.Get(ctx, &state)
@@ -82,7 +82,7 @@ func (r *network_settingResource) Read(ctx context.Context, req resource.ReadReq
 }
 
 // Update updates the resource and sets the updated Terraform state on success.
-func (r *network_settingResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *networkSettingResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	//Get state Data
 	tflog.Trace(ctx, "resource_network_setting update: started")
 	var state, plan models.OmeNetworkSetting
@@ -107,7 +107,7 @@ func (r *network_settingResource) Update(ctx context.Context, req resource.Updat
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
-func (r *network_settingResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *networkSettingResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	tflog.Trace(ctx, "resource_network_setting delete: started")
 	// Get State Data
 	var state models.OmeNetworkSetting

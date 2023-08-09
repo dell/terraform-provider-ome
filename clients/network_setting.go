@@ -18,17 +18,7 @@ import (
 	"terraform-provider-ome/models"
 )
 
-const (
-	GetNetworkAdapterAPI    = "/api/ApplicationService/Network/AdapterConfigurations('%s')"
-	UpdateNetworkAdapterAPI = "/api/ApplicationService/Actions/Network.ConfigureNetworkAdapter"
-	GetNetworkSessions      = "/api/SessionService/SessionConfiguration"
-	UpdateNetworkSessions   = "/api/SessionService/Actions/SessionService.SessionConfigurationUpdate"
-	GetTimeConfiguration    = "/api/ApplicationService/Network/TimeConfiguration"
-	GetTimeZone             = "/api/ApplicationService/Network/TimeZones"
-	UpdateTimeConfiguration = "/api/ApplicationService/Network/TimeConfiguration"
-	ProxyConfigurationAPI   = "/api/ApplicationService/Network/ProxyConfiguration"
-)
-
+// GetNetworkAdapterConfigByInterface to get adapter configuration of the interface.
 func (c *Client) GetNetworkAdapterConfigByInterface(interfaceName string) (models.NetworkAdapterSetting, error) {
 	path := fmt.Sprintf(GetNetworkAdapterAPI, interfaceName)
 	response, err := c.Get(path, nil, nil)
@@ -47,6 +37,7 @@ func (c *Client) GetNetworkAdapterConfigByInterface(interfaceName string) (model
 	return networkAdapterSetting, err
 }
 
+// UpdateNetworkAdapterConfig to update the network adapter.
 func (c *Client) UpdateNetworkAdapterConfig(networkAdapter models.UpdateNetworkAdapterSetting) (models.Job, error) {
 	data, _ := c.JSONMarshal(networkAdapter)
 	response, err := c.Post(UpdateNetworkAdapterAPI, nil, data)
@@ -60,6 +51,7 @@ func (c *Client) UpdateNetworkAdapterConfig(networkAdapter models.UpdateNetworkA
 	return jobResponse, err
 }
 
+// GetNetworkSessions to get the all sessions setting in the OME.
 func (c *Client) GetNetworkSessions() (models.NetworkSessions, error) {
 	response, err := c.Get(GetNetworkSessions, nil, nil)
 	if err != nil {
@@ -73,6 +65,7 @@ func (c *Client) GetNetworkSessions() (models.NetworkSessions, error) {
 	return networkSessions, err
 }
 
+// UpdateNetworkSessions to update the network session setting in the OME.
 func (c *Client) UpdateNetworkSessions(sessionPayload models.UpdateNetworkSessions) ([]models.SessionInfo, error) {
 	data, _ := c.JSONMarshal(sessionPayload)
 	response, err := c.Post(UpdateNetworkSessions, nil, data)
@@ -86,8 +79,9 @@ func (c *Client) UpdateNetworkSessions(sessionPayload models.UpdateNetworkSessio
 	return sessionResponse, err
 }
 
+// GetTimeConfiguration to get the time configuration of the OME.
 func (c *Client) GetTimeConfiguration() (models.TimeConfiguration, error) {
-	response, err := c.Get(GetTimeConfiguration, nil, nil)
+	response, err := c.Get(TimeConfigurationAPI, nil, nil)
 	if err != nil {
 		return models.TimeConfiguration{}, err
 	}
@@ -99,9 +93,10 @@ func (c *Client) GetTimeConfiguration() (models.TimeConfiguration, error) {
 	return timeConfig, err
 }
 
+// UpdateTimeConfiguration to update the time configuration of the OME.
 func (c *Client) UpdateTimeConfiguration(payloadTC models.TimeConfigPayload) (models.TimeConfigResponse, error) {
 	data, _ := c.JSONMarshal(payloadTC)
-	response, err := c.Put(UpdateTimeConfiguration, nil, data)
+	response, err := c.Put(TimeConfigurationAPI, nil, data)
 	if err != nil {
 		return models.TimeConfigResponse{}, err
 	}
@@ -112,6 +107,7 @@ func (c *Client) UpdateTimeConfiguration(payloadTC models.TimeConfigPayload) (mo
 	return timeConfig, err
 }
 
+// GetTimeZone to get all time zone.
 func (c *Client) GetTimeZone() (models.TimeZones, error) {
 	response, err := c.Get(GetTimeZone, nil, nil)
 	if err != nil {
@@ -125,6 +121,7 @@ func (c *Client) GetTimeZone() (models.TimeZones, error) {
 	return timeZones, err
 }
 
+// GetProxyConfig to get the proxy configuration of the OME.
 func (c *Client) GetProxyConfig() (models.ProxyConfiguration, error) {
 	response, err := c.Get(ProxyConfigurationAPI, nil, nil)
 	if err != nil {
@@ -138,6 +135,7 @@ func (c *Client) GetProxyConfig() (models.ProxyConfiguration, error) {
 	return proxyConfig, err
 }
 
+// UpdateProxyConfig to update the proxy configuration of the OME.
 func (c *Client) UpdateProxyConfig(payloadProxy models.PayloadProxyConfiguration) (models.ProxyConfiguration, error) {
 	data, _ := c.JSONMarshal(payloadProxy)
 	response, err := c.Put(ProxyConfigurationAPI, nil, data)

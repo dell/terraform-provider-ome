@@ -478,7 +478,10 @@ func mockCertAPIs(r *http.Request, w http.ResponseWriter) bool {
 	if r.URL.Path == CSRGenAPI && r.Method == "POST" {
 		bodyBytes, _ := io.ReadAll(r.Body)
 		req := make(map[string]string)
-		json.Unmarshal(bodyBytes, &req)
+		err := json.Unmarshal(bodyBytes, &req)
+		if err != nil {
+			return false
+		}
 		if req["DistinguishedName"] == "valid" {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`{
@@ -3014,11 +3017,11 @@ func mockNetworkSettingAPIs(r *http.Request, w http.ResponseWriter) bool {
 			w.Write([]byte(`invalid network session update`))
 		}
 	}
-	if r.URL.Path == GetTimeConfiguration && r.Method == "GET" {
+	if r.URL.Path == TimeConfigurationAPI && r.Method == "GET" {
 		w.WriteHeader(http.StatusOK)
 		w.Write(responseGetNetworkTimeConfiguration)
 	}
-	if r.URL.Path == UpdateTimeConfiguration && r.Method == "POST" {
+	if r.URL.Path == TimeConfigurationAPI && r.Method == "POST" {
 		body, _ := io.ReadAll(r.Body)
 		if strings.Contains(string(body), "TZ_ID_65") {
 			w.WriteHeader(http.StatusOK)
@@ -3036,7 +3039,7 @@ func mockNetworkSettingAPIs(r *http.Request, w http.ResponseWriter) bool {
 		w.WriteHeader(http.StatusOK)
 		w.Write(responseGetNetworkProxy)
 	}
-	if r.URL.Path == UpdateTimeConfiguration && r.Method == "POST" {
+	if r.URL.Path == ProxyConfigurationAPI && r.Method == "POST" {
 		body, _ := io.ReadAll(r.Body)
 		if strings.Contains(string(body), "admin") {
 			w.WriteHeader(http.StatusOK)
