@@ -436,14 +436,14 @@ func ProxySettingSchema() map[string]schema.Attribute {
 			Computed:            true,
 		},
 
-		"Username": schema.StringAttribute{
+		"username": schema.StringAttribute{
 			MarkdownDescription: "Proxy server username. This option is mandatory when \"enable_authentication\" is true.",
 			Description:         "Proxy server username. This option is mandatory when \"enable_authentication\" is true.",
 			Optional:            true,
 			Computed:            true,
 		},
 
-		"Password": schema.StringAttribute{
+		"password": schema.StringAttribute{
 			MarkdownDescription: "Proxy server password. This option is mandatory when \"enable_authentication\" is true.",
 			Description:         "Proxy server password. This option is mandatory when \"enable_authentication\" is true.",
 			Optional:            true,
