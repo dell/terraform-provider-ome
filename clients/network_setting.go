@@ -31,8 +31,6 @@ func (c *Client) GetNetworkAdapterConfigByInterface(interfaceName string) (model
 		return models.NetworkAdapterSetting{}, err
 	}
 	networkAdapterSetting := models.NetworkAdapterSetting{}
-	alpha := string(bodyData)
-	fmt.Println(alpha)
 	err = c.JSONUnMarshal(bodyData, &networkAdapterSetting)
 	return networkAdapterSetting, err
 }
@@ -47,7 +45,6 @@ func (c *Client) UpdateNetworkAdapterConfig(networkAdapter models.UpdateNetworkA
 	respData, _ := c.GetBodyData(response.Body)
 	jobResponse := JobResp{}
 	err = c.JSONUnMarshal(respData, &jobResponse)
-	fmt.Println(jobResponse)
 	return jobResponse, err
 }
 
@@ -75,7 +72,6 @@ func (c *Client) UpdateNetworkSessions(sessionPayload models.UpdateNetworkSessio
 	respData, _ := c.GetBodyData(response.Body)
 	sessionResponse := []models.SessionInfo{}
 	err = c.JSONUnMarshal(respData, &sessionResponse)
-	fmt.Println(string(respData))
 	return sessionResponse, err
 }
 
