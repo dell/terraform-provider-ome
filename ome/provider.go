@@ -219,6 +219,7 @@ func (p *omeProvider) DataSources(ctx context.Context) []func() datasource.DataS
 		NewVlanNetworkDataSource,
 		NewConfigurationReportDataSource,
 		NewDeviceDatasource,
+		NewAppCertDataSource,
 	}
 }
 
