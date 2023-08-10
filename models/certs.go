@@ -37,6 +37,12 @@ type CertInfo struct {
 
 // tfsdk structs
 
+type CsrResModel struct {
+	ID    types.String   `tfsdk:"id"`
+	Specs CSRConfigModel `tfsdk:"specs"`
+	Csr   types.String   `tfsdk:"csr"`
+}
+
 // CSRConfigModel - CSR generation tfsdk form
 type CSRConfigModel struct {
 	DistinguishedName types.String `tfsdk:"distinguished_name"`
@@ -47,6 +53,19 @@ type CSRConfigModel struct {
 	Country           types.String `tfsdk:"country"`
 	Email             types.String `tfsdk:"email"`
 	Sans              types.String `tfsdk:"subject_alternate_names"`
+}
+
+func (c CSRConfigModel) GetCsrConfig() CSRConfig {
+	return CSRConfig{
+		DistinguishedName: c.DistinguishedName.ValueString(),
+		DepartmentName:    c.DepartmentName.ValueString(),
+		BusinessName:      c.BusinessName.ValueString(),
+		Locality:          c.Locality.ValueString(),
+		State:             c.State.ValueString(),
+		Country:           c.Country.ValueString(),
+		Email:             c.Email.ValueString(),
+		Sans:              c.Sans.ValueString(),
+	}
 }
 
 // CertInfoModel - Certificate Information tfsdk received from OME

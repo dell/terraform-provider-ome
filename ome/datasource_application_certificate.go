@@ -57,7 +57,6 @@ func (g *appCertDatasource) Schema(ctx context.Context, req datasource.SchemaReq
 				MarkdownDescription: "ID for application certificate data source.",
 				Description:         "ID for application certificate data source.",
 				Computed:            true,
-				Optional:            true,
 			},
 			"issued_to": schema.SingleNestedAttribute{
 				MarkdownDescription: "List of the device id(s) associated with any of the groups.",
