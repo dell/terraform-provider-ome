@@ -65,7 +65,7 @@ func omeDeviceDataSchema() map[string]schema.Attribute {
 					Optional:            true,
 					ElementType:         types.StringType,
 					Validators: []validator.List{
-						listvalidator.ConflictsWith(path.MatchRelative().AtName("ids")),
+						listvalidator.ConflictsWith(path.MatchRelative().AtParent().AtName("ids")),
 					},
 				},
 				"ip_expressions": schema.ListAttribute{
@@ -81,8 +81,8 @@ func omeDeviceDataSchema() map[string]schema.Attribute {
 					Description:         "OData '$filter' compatible expression to be used for querying devices.",
 					Optional:            true,
 					Validators: []validator.String{
-						stringvalidator.ConflictsWith(path.MatchRelative().AtName("ids")),
-						stringvalidator.ConflictsWith(path.MatchRelative().AtName("device_service_tags")),
+						stringvalidator.ConflictsWith(path.MatchRelative().AtParent().AtName("ids")),
+						stringvalidator.ConflictsWith(path.MatchRelative().AtParent().AtName("device_service_tags")),
 					},
 				},
 			},
