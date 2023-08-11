@@ -43,6 +43,7 @@ type CertInfo struct {
 
 // tfsdk structs
 
+// CsrResModel - tfsdk model for the CSR resource
 type CsrResModel struct {
 	ID    types.String   `tfsdk:"id"`
 	Specs CSRConfigModel `tfsdk:"specs"`
@@ -61,6 +62,7 @@ type CSRConfigModel struct {
 	Sans              types.List   `tfsdk:"subject_alternate_names"`
 }
 
+// GetCsrConfig - Get json csr payload from tfsdk csr config model
 func (c CSRConfigModel) GetCsrConfig(ctx context.Context) CSRConfig {
 	sans := make([]string, 0)
 	c.Sans.ElementsAs(ctx, sans, false)
