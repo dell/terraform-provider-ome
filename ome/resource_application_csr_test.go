@@ -15,17 +15,11 @@ package ome
 
 import (
 	"os"
-	// "regexp"
-
-	// "terraform-provider-ome/clients"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
-
-// const (
-// 	InvalidBaselineID = "1000910"
-// )
 
 func TestCsr(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
@@ -36,6 +30,34 @@ func TestCsr(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			{
+				Config:      testCreateCSRWoDN,
+				ExpectError: regexp.MustCompile(".*\"distinguished_name\"[[:space:]]is[[:space:]]required.*"),
+			},
+			{
+				Config:      testCreateCSRWoDeptName,
+				ExpectError: regexp.MustCompile(".*\"department_name\"[[:space:]]is[[:space:]]required.*"),
+			},
+			{
+				Config:      testCreateCSRWoBN,
+				ExpectError: regexp.MustCompile(".*\"business_name\"[[:space:]]is[[:space:]]required.*"),
+			},
+			{
+				Config:      testCreateCSRWoLocality,
+				ExpectError: regexp.MustCompile(".*\"locality\"[[:space:]]is[[:space:]]required.*"),
+			},
+			{
+				Config:      testCreateCSRWoState,
+				ExpectError: regexp.MustCompile(".*\"state\"[[:space:]]is[[:space:]]required.*"),
+			},
+			{
+				Config:      testCreateCSRWoCountry,
+				ExpectError: regexp.MustCompile(".*\"country\"[[:space:]]is[[:space:]]required.*"),
+			},
+			{
+				Config:      testCreateCSRWoEmail,
+				ExpectError: regexp.MustCompile(".*\"email\"[[:space:]]is[[:space:]]required.*"),
+			},
 			{
 				Config: testCreateCSR,
 				Check: resource.ComposeTestCheckFunc(
@@ -76,6 +98,92 @@ resource "ome_application_csr" "csr1" {
 		country = "US"
 		email = "abc@gmail.com"
 		subject_alternate_names = "` + omeHost + `"
+	}
+}
+`
+var testCreateCSRWoDN = testProvider + `
+resource "ome_application_csr" "csr1" {
+	specs = {
+		department_name = "Terraform Server Solutions"
+		business_name = "Dell Terraform"
+		locality = "RedRock"
+		state = "Texas"
+		country = "US"
+		email = "abc@gmail.com"
+	}
+}
+`
+var testCreateCSRWoDeptName = testProvider + `
+resource "ome_application_csr" "csr1" {
+	specs = {
+		distinguished_name = "terraform.ome.com"
+		business_name = "Dell Terraform"
+		locality = "RedRock"
+		state = "Texas"
+		country = "US"
+		email = "abc@gmail.com"
+	}
+}
+`
+
+var testCreateCSRWoBN = testProvider + `
+resource "ome_application_csr" "csr1" {
+	specs = {
+		distinguished_name = "terraform.ome.com"
+		department_name = "Terraform Server Solutions"
+		locality = "RedRock"
+		state = "Texas"
+		country = "US"
+		email = "abc@gmail.com"
+	}
+}
+`
+
+var testCreateCSRWoLocality = testProvider + `
+resource "ome_application_csr" "csr1" {
+	specs = {
+		distinguished_name = "terraform.ome.com"
+		department_name = "Terraform Server Solutions"
+		business_name = "Dell Terraform"
+		state = "Texas"
+		country = "US"
+		email = "abc@gmail.com"
+	}
+}
+`
+var testCreateCSRWoState = testProvider + `
+resource "ome_application_csr" "csr1" {
+	specs = {
+		distinguished_name = "terraform.ome.com"
+		department_name = "Terraform Server Solutions"
+		business_name = "Dell Terraform"
+		locality = "RedRock"
+		country = "US"
+		email = "abc@gmail.com"
+	}
+}
+`
+var testCreateCSRWoCountry = testProvider + `
+resource "ome_application_csr" "csr1" {
+	specs = {
+		distinguished_name = "terraform.ome.com"
+		department_name = "Terraform Server Solutions"
+		business_name = "Dell Terraform"
+		locality = "RedRock"
+		state = "Texas"
+		email = "abc@gmail.com"
+	}
+}
+`
+var testCreateCSRWoEmail = testProvider + `
+resource "ome_application_csr" "csr1" {
+	specs = {
+		distinguished_name = "terraform.ome.com"
+		department_name = "Terraform Server Solutions"
+		business_name = "Dell Terraform"
+		locality = "RedRock"
+		state = "Texas"
+		country = "US"
 	}
 }
 `
