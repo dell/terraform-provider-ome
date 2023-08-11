@@ -32,7 +32,7 @@ var (
 	_ resource.ResourceWithConfigure = &resourceCsr{}
 )
 
-// NewCsrResource is new resource for configuration baseline
+// NewCsrResource is new resource for application csr
 func NewCsrResource() resource.Resource {
 	return &resourceCsr{}
 }
