@@ -19,6 +19,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 var (
@@ -57,7 +58,6 @@ func (g *appCertDatasource) Schema(ctx context.Context, req datasource.SchemaReq
 				MarkdownDescription: "ID for application certificate data source.",
 				Description:         "ID for application certificate data source.",
 				Computed:            true,
-				Optional:            true,
 			},
 			"issued_to": schema.SingleNestedAttribute{
 				MarkdownDescription: "List of the device id(s) associated with any of the groups.",
@@ -123,10 +123,11 @@ func (*appCertDatasource) infoSchema() map[string]schema.Attribute {
 			Description:         "Email address.",
 			Computed:            true,
 		},
-		"subject_alternate_names": schema.StringAttribute{
+		"subject_alternate_names": schema.ListAttribute{
 			MarkdownDescription: "Subject Alternate names.",
 			Description:         "Subject Alternate names.",
 			Computed:            true,
+			ElementType:         types.StringType,
 		},
 	}
 }
