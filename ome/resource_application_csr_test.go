@@ -59,6 +59,14 @@ func TestCsr(t *testing.T) {
 				ExpectError: regexp.MustCompile(".*\"email\"[[:space:]]is[[:space:]]required.*"),
 			},
 			{
+				Config:      testCreateCSRWithMoreThan4San,
+				ExpectError: regexp.MustCompile(".*at[[:space:]]most[[:space:]]4[[:space:]]elements.*"),
+			},
+			{
+				Config:      testCreateCSRWithZeroSan,
+				ExpectError: regexp.MustCompile(".*at[[:space:]]least[[:space:]]1[[:space:]]elements.*"),
+			},
+			{
 				Config: testCreateCSR,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet("ome_application_csr.csr1", "csr")),
@@ -97,10 +105,41 @@ resource "ome_application_csr" "csr1" {
 		state = "Texas"
 		country = "US"
 		email = "abc@gmail.com"
-		subject_alternate_names = "` + omeHost + `"
+		subject_alternate_names = ["` + omeHost + `"]
 	}
 }
 `
+
+var testCreateCSRWithMoreThan4San = testProvider + `
+resource "ome_application_csr" "csr1" {
+	specs = {
+		distinguished_name = "terraform.ome.com"
+		department_name = "Terraform Server Solutions"
+		business_name = "Dell Terraform"
+		locality = "RedRock"
+		state = "Texas"
+		country = "US"
+		email = "abc@gmail.com"
+		subject_alternate_names = ["aa","bb","cc","dd","ee"]
+	}
+}
+`
+
+var testCreateCSRWithZeroSan = testProvider + `
+resource "ome_application_csr" "csr1" {
+	specs = {
+		distinguished_name = "terraform.ome.com"
+		department_name = "Terraform Server Solutions"
+		business_name = "Dell Terraform"
+		locality = "RedRock"
+		state = "Texas"
+		country = "US"
+		email = "abc@gmail.com"
+		subject_alternate_names = []
+	}
+}
+`
+
 var testCreateCSRWoDN = testProvider + `
 resource "ome_application_csr" "csr1" {
 	specs = {

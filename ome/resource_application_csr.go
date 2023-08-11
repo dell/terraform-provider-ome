@@ -18,8 +18,10 @@ import (
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -114,10 +116,14 @@ func (*resourceCsr) specSchema() map[string]schema.Attribute {
 			Description:         "Email address.",
 			Required:            true,
 		},
-		"subject_alternate_names": schema.StringAttribute{
-			MarkdownDescription: "Comma separated Subject Alternate names (maximum 4).",
-			Description:         "Comma separated Subject Alternate names (maximum 4).",
+		"subject_alternate_names": schema.ListAttribute{
+			MarkdownDescription: "Subject Alternate names. Maximum 4.",
+			Description:         "Subject Alternate names. Maximum 4.",
 			Optional:            true,
+			ElementType:         types.StringType,
+			Validators: []validator.List{
+				listvalidator.SizeBetween(1, 4),
+			},
 		},
 	}
 }
@@ -160,7 +166,7 @@ func (r resourceCsr) genCSR(ctx context.Context, plan models.CsrResModel, c *cli
 		ID:    types.StringValue("dummy"),
 		Specs: plan.Specs,
 	}
-	csr, err := c.GetCSR(plan.Specs.GetCsrConfig())
+	csr, err := c.GetCSR(plan.Specs.GetCsrConfig(ctx))
 	state.Csr = types.StringValue(csr)
 	return state, err
 }

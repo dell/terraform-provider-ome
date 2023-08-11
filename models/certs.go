@@ -13,7 +13,13 @@ limitations under the License.
 
 package models
 
-import "github.com/hashicorp/terraform-plugin-framework/types"
+import (
+	"context"
+	"strings"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+)
 
 // CSRConfig - CSR generation form
 type CSRConfig struct {
@@ -52,10 +58,12 @@ type CSRConfigModel struct {
 	State             types.String `tfsdk:"state"`
 	Country           types.String `tfsdk:"country"`
 	Email             types.String `tfsdk:"email"`
-	Sans              types.String `tfsdk:"subject_alternate_names"`
+	Sans              types.List   `tfsdk:"subject_alternate_names"`
 }
 
-func (c CSRConfigModel) GetCsrConfig() CSRConfig {
+func (c CSRConfigModel) GetCsrConfig(ctx context.Context) CSRConfig {
+	sans := make([]string, 0)
+	c.Sans.ElementsAs(ctx, sans, false)
 	return CSRConfig{
 		DistinguishedName: c.DistinguishedName.ValueString(),
 		DepartmentName:    c.DepartmentName.ValueString(),
@@ -64,7 +72,7 @@ func (c CSRConfigModel) GetCsrConfig() CSRConfig {
 		State:             c.State.ValueString(),
 		Country:           c.Country.ValueString(),
 		Email:             c.Email.ValueString(),
-		Sans:              c.Sans.ValueString(),
+		Sans:              strings.Join(sans, ","),
 	}
 }
 
@@ -79,6 +87,15 @@ type CertInfoModel struct {
 
 // NewCSRConfigModel - Converts CSRConfig to CSRConfigModel
 func NewCSRConfigModel(input CSRConfig) CSRConfigModel {
+	sans := types.ListNull(types.StringType)
+	if input.Sans != "" {
+		sanList := strings.Split(input.Sans, ",")
+		sanValues := make([]attr.Value, 0)
+		for _, sanv := range sanList {
+			sanValues = append(sanValues, types.StringValue(sanv))
+		}
+		sans = types.ListValueMust(types.StringType, sanValues)
+	}
 	return CSRConfigModel{
 		DistinguishedName: types.StringValue(input.DistinguishedName),
 		DepartmentName:    types.StringValue(input.DepartmentName),
@@ -87,7 +104,7 @@ func NewCSRConfigModel(input CSRConfig) CSRConfigModel {
 		State:             types.StringValue(input.State),
 		Country:           types.StringValue(input.Country),
 		Email:             types.StringValue(input.Email),
-		Sans:              types.StringValue(input.Sans),
+		Sans:              sans,
 	}
 }
 
