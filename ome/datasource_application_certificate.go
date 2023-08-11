@@ -19,6 +19,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 var (
@@ -122,10 +123,11 @@ func (*appCertDatasource) infoSchema() map[string]schema.Attribute {
 			Description:         "Email address.",
 			Computed:            true,
 		},
-		"subject_alternate_names": schema.StringAttribute{
+		"subject_alternate_names": schema.ListAttribute{
 			MarkdownDescription: "Subject Alternate names.",
 			Description:         "Subject Alternate names.",
 			Computed:            true,
+			ElementType:         types.StringType,
 		},
 	}
 }
