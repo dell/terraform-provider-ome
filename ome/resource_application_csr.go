@@ -54,7 +54,7 @@ func (r resourceCsr) Metadata(ctx context.Context, req resource.MetadataRequest,
 	resp.TypeName = req.ProviderTypeName + "application_csr"
 }
 
-// Template Deployment Resource schema
+// CSR Resource schema
 func (r resourceCsr) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Resource for generating application Certificate Signing Request from OpenManage Enterprise.",
