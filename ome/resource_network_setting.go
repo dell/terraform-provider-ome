@@ -6,6 +6,7 @@ import (
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -49,6 +50,21 @@ func (r *networkSettingResource) Schema(_ context.Context, _ resource.SchemaRequ
 	}
 }
 
+func (r *networkSettingResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var data models.OmeNetworkSetting
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	if ok, err := isProxyConfigValid(data.OmeProxySetting); !ok {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("proxy_setting"),
+			"Attribute Error",
+			err.Error(),
+		)
+	}
+}
+
 // Create creates the resource and sets the initial Terraform state.
 func (r *networkSettingResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	tflog.Trace(ctx, "resource_network_setting create : Started")
@@ -86,8 +102,11 @@ func (r *networkSettingResource) Create(ctx context.Context, req resource.Create
 			)
 		}
 		proxySettingState = updateProxySettingState
+		if !plan.OmeProxySetting.Password.IsUnknown() {
+			proxySettingState.Password = plan.OmeProxySetting.Password
+		}
 	} else {
-		resp.Diagnostics.AddWarning("No Change Detected.","No change in proxy setting on the infrastructure.")
+		resp.Diagnostics.AddWarning("No Change Detected.", "No change in proxy setting on the infrastructure.")
 	}
 	// save proxy config into terraform state
 	state.OmeProxySetting = proxySettingState
@@ -120,6 +139,7 @@ func (r *networkSettingResource) Read(ctx context.Context, req resource.ReadRequ
 		)
 	}
 	// save proxy config into terraform state
+	proxySettingState.Password = state.OmeProxySetting.Password
 	state.OmeProxySetting = proxySettingState
 	tflog.Trace(ctx, "resource_network_setting read: finished reading state")
 	//Save into State
@@ -162,6 +182,9 @@ func (r *networkSettingResource) Update(ctx context.Context, req resource.Update
 			)
 		}
 		// save proxy config into terraform state
+		if !plan.OmeProxySetting.Password.IsUnknown() {
+			updateProxySettingState.Password = plan.OmeProxySetting.Password
+		}
 		state.OmeProxySetting = updateProxySettingState
 	}
 	tflog.Trace(ctx, "resource_network_setting update: finished state update")
@@ -185,6 +208,25 @@ func (r *networkSettingResource) Delete(ctx context.Context, req resource.Delete
 
 	resp.State.RemoveResource(ctx)
 	tflog.Trace(ctx, "resource_network_setting delete: finished")
+}
+
+func isProxyConfigValid(planProxy *models.OmeProxySetting) (bool, error) {
+	if planProxy.EnableProxy.ValueBool() {
+		if planProxy.IPAddress.ValueString() == "" || planProxy.ProxyPort.ValueInt64() == 0 {
+			return false, fmt.Errorf("please ensure that you set both the IP address and port when enabling the proxy")
+		}
+		if planProxy.EnableAuthentication.ValueBool() {
+			if planProxy.Username.ValueString() == "" || planProxy.Password.ValueString() == "" {
+				return false, fmt.Errorf("please ensure that you set both the username and password when enabling the proxy authentication")
+			}
+		} else if planProxy.Username.ValueString() != "" || planProxy.Password.ValueString() != "" {
+			return false, fmt.Errorf("please ensure enable authentication should be set to true before setting username and password")
+		}
+	} else if planProxy.IPAddress.ValueString() != "" || planProxy.ProxyPort.ValueInt64() > 0 || planProxy.EnableAuthentication.ValueBool() || planProxy.Username.ValueString() != "" || planProxy.Password.ValueString() != "" {
+		return false, fmt.Errorf("please ensure enable proxy should be set to true before setting any one proxy configuration")
+	}
+
+	return true, nil
 }
 
 func getProxySettingState(omeClient *clients.Client) (*models.OmeProxySetting, error) {
