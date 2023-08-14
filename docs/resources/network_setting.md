@@ -39,6 +39,10 @@ Resource for managing network_setting on OpenManage Enterprise.
 - `session_setting` (Attributes) Ome Session Setting (see [below for nested schema](#nestedatt--session_setting))
 - `time_setting` (Attributes) Ome Time Setting (see [below for nested schema](#nestedatt--time_setting))
 
+### Read-Only
+
+- `id` (String) ID of the ome network setting.
+
 <a id="nestedatt--adapter_setting"></a>
 ### Nested Schema for `adapter_setting`
 

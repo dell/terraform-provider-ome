@@ -9,6 +9,11 @@ import (
 // NetworkSettingSchema for network setting schema
 func NetworkSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
+		"id": schema.StringAttribute{
+			MarkdownDescription: "ID of the ome network setting.",
+			Description:         "ID of the ome network setting.",
+			Computed:            true,
+		},
 
 		"adapter_setting": schema.SingleNestedAttribute{
 			MarkdownDescription: "Ome Adapter Setting",

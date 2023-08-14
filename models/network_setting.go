@@ -196,7 +196,7 @@ type ProxyConfiguration struct {
 	IPAddress            string `json:"IpAddress"`
 	PortNumber           int    `json:"PortNumber"`
 	Username             string `json:"Username"`
-	Password             any    `json:"Password"`
+	Password             string `json:"Password"`
 	EnableAuthentication bool   `json:"EnableAuthentication"`
 	EnableProxy          bool   `json:"EnableProxy"`
 	SslCheckDisabled     bool   `json:"SslCheckDisabled"`
@@ -217,22 +217,23 @@ type PayloadProxyConfiguration struct {
 
 // OmeNetworkSetting for network terraform attribute
 type OmeNetworkSetting struct {
-	OmeAdapterSetting OmeAdapterSetting `tfsdk:"adapter_setting"`
-	OmeSessionSetting OmeSessionSetting `tfsdk:"session_setting"`
-	OmeTimeSetting    OmeTimeSetting    `tfsdk:"time_setting"`
-	OmeProxySetting   OmeProxySetting   `tfsdk:"proxy_setting"`
+	ID                types.String       `tfsdk:"id"`
+	OmeAdapterSetting *OmeAdapterSetting `tfsdk:"adapter_setting"`
+	OmeSessionSetting *OmeSessionSetting `tfsdk:"session_setting"`
+	OmeTimeSetting    *OmeTimeSetting    `tfsdk:"time_setting"`
+	OmeProxySetting   *OmeProxySetting   `tfsdk:"proxy_setting"`
 }
 
 // OmeAdapterSetting for adapter_setting terraform attribute.
 type OmeAdapterSetting struct {
-	EnableNic      types.Bool        `tfsdk:"enable_nic"`
-	InterfaceName  types.String      `tfsdk:"interface_name"`
-	IPV4Config     OmeIPv4Config     `tfsdk:"ipv4_configuration"`
-	IPV6Config     OmeIPv6Config     `tfsdk:"ipv6_configuration"`
-	ManagementVLAN OmeManagementVLAN `tfsdk:"management_vlan"`
-	DNSConfig      OmeDNSConfig      `tfsdk:"dns_configuration"`
-	RebootDelay    types.Int64       `tfsdk:"reboot_delay"`
-	JobID          types.Int64       `tfsdk:"job_id"`
+	EnableNic      types.Bool         `tfsdk:"enable_nic"`
+	InterfaceName  types.String       `tfsdk:"interface_name"`
+	IPV4Config     *OmeIPv4Config     `tfsdk:"ipv4_configuration"`
+	IPV6Config     *OmeIPv6Config     `tfsdk:"ipv6_configuration"`
+	ManagementVLAN *OmeManagementVLAN `tfsdk:"management_vlan"`
+	DNSConfig      *OmeDNSConfig      `tfsdk:"dns_configuration"`
+	RebootDelay    types.Int64        `tfsdk:"reboot_delay"`
+	JobID          types.Int64        `tfsdk:"job_id"`
 }
 
 // OmeIPv4Config for ipv4_configuration terraform attribute
@@ -303,6 +304,6 @@ type OmeProxySetting struct {
 	IPAddress            types.String `tfsdk:"ip_address"`
 	ProxyPort            types.Int64  `tfsdk:"proxy_port"`
 	EnableAuthentication types.Bool   `tfsdk:"enable_authentication"`
-	Username             types.String `tfsdk:"Username"`
-	Password             types.String `tfsdk:"Password"`
+	Username             types.String `tfsdk:"username"`
+	Password             types.String `tfsdk:"password"`
 }
