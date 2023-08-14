@@ -217,6 +217,7 @@ type PayloadProxyConfiguration struct {
 
 // OmeNetworkSetting for network terraform attribute
 type OmeNetworkSetting struct {
+	ID                types.String       `tfsdk:"id"`
 	OmeAdapterSetting *OmeAdapterSetting `tfsdk:"adapter_setting"`
 	OmeSessionSetting *OmeSessionSetting `tfsdk:"session_setting"`
 	OmeTimeSetting    *OmeTimeSetting    `tfsdk:"time_setting"`

@@ -101,15 +101,18 @@ func (r *networkSettingResource) Create(ctx context.Context, req resource.Create
 				"OME Proxy Create Error", err.Error(),
 			)
 		}
-		proxySettingState = updateProxySettingState
 		if !plan.OmeProxySetting.Password.IsUnknown() {
-			proxySettingState.Password = plan.OmeProxySetting.Password
+			updateProxySettingState.Password = plan.OmeProxySetting.Password
 		}
+		proxySettingState = updateProxySettingState
 	} else {
 		resp.Diagnostics.AddWarning("No Change Detected.", "No change in proxy setting on the infrastructure.")
 	}
 	// save proxy config into terraform state
 	state.OmeProxySetting = proxySettingState
+	if state.ID.IsNull() {
+		state.ID = types.StringValue("placeholder")
+	}
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	tflog.Trace(ctx, "resource_network_setting create: finish")
@@ -143,6 +146,9 @@ func (r *networkSettingResource) Read(ctx context.Context, req resource.ReadRequ
 	state.OmeProxySetting = proxySettingState
 	tflog.Trace(ctx, "resource_network_setting read: finished reading state")
 	//Save into State
+	if state.ID.IsNull() {
+		state.ID = types.StringValue("placeholder")
+	}
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	tflog.Trace(ctx, "resource_network_setting read: finished")
@@ -189,7 +195,9 @@ func (r *networkSettingResource) Update(ctx context.Context, req resource.Update
 	}
 	tflog.Trace(ctx, "resource_network_setting update: finished state update")
 	//Save into State
-
+	if state.ID.IsNull() {
+		state.ID = types.StringValue("placeholder")
+	}
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	tflog.Trace(ctx, "resource_network_setting update: finished")
@@ -223,7 +231,7 @@ func isProxyConfigValid(planProxy *models.OmeProxySetting) (bool, error) {
 			return false, fmt.Errorf("please ensure enable authentication should be set to true before setting username and password")
 		}
 	} else if planProxy.IPAddress.ValueString() != "" || planProxy.ProxyPort.ValueInt64() > 0 || planProxy.EnableAuthentication.ValueBool() || planProxy.Username.ValueString() != "" || planProxy.Password.ValueString() != "" {
-		return false, fmt.Errorf("please ensure enable proxy should be set to true before setting any one proxy configuration")
+		return false, fmt.Errorf("please ensure enable proxy should be set to true before setting any ome proxy configuration")
 	}
 
 	return true, nil
@@ -257,10 +265,10 @@ func updateProxySettingState(plan *models.OmeNetworkSetting, omeClient *clients.
 		Password:             plan.OmeProxySetting.Password.ValueString(),
 	}
 	newProxy, err := omeClient.UpdateProxyConfig(payloadProxy)
-	proxySettingState := buildProxySettingState(&newProxy)
 	if err != nil {
 		return &models.OmeProxySetting{}, err
 	}
+	proxySettingState := buildProxySettingState(&newProxy)
 	return proxySettingState, nil
 }
 
