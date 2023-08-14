@@ -150,3 +150,39 @@ func TestNetworkSettingProxyInValidConfig(t *testing.T) {
 		},
 	})
 }
+
+func TestNetworkSettingProxyNil(t *testing.T) {
+	testAccNetworkProxyCreateNil := testProvider + `
+	resource "ome_network_setting" "code_3" {
+	}
+	`
+	testAccNetworkProxyCreateUpdateNil1 := testProvider + `
+	resource "ome_network_setting" "code_4" {
+		proxy_setting = {
+			enable_proxy = false
+		}
+	}
+	`
+	testAccNetworkProxyCreateUpdateNil2 := testProvider + `
+	resource "ome_network_setting" "code_4" {
+	}
+	`
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccNetworkProxyCreateNil,
+			},
+			{
+				Config: testAccNetworkProxyCreateUpdateNil1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_network_setting.code_4", "proxy_setting.enable_proxy", "false"),
+				),
+			},
+			{
+				Config: testAccNetworkProxyCreateUpdateNil2,
+			},
+		},
+	})
+}

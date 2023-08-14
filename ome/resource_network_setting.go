@@ -56,12 +56,14 @@ func (r *networkSettingResource) ValidateConfig(ctx context.Context, req resourc
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	if ok, err := isProxyConfigValid(data.OmeProxySetting); !ok {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("proxy_setting"),
-			"Attribute Error",
-			err.Error(),
-		)
+	if data.OmeProxySetting != nil {
+		if ok, err := isProxyConfigValid(data.OmeProxySetting); !ok {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("proxy_setting"),
+				"Attribute Error",
+				err.Error(),
+			)
+		}
 	}
 }
 
@@ -70,6 +72,7 @@ func (r *networkSettingResource) Create(ctx context.Context, req resource.Create
 	tflog.Trace(ctx, "resource_network_setting create : Started")
 	//Get Plan Data
 	var plan, state models.OmeNetworkSetting
+	var getErr error
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -86,30 +89,25 @@ func (r *networkSettingResource) Create(ctx context.Context, req resource.Create
 	}
 	defer omeClient.RemoveSession()
 
-	// get proxy config
-	proxySettingState, err := getProxySettingState(omeClient)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"OME Proxy Create Error", err.Error(),
-		)
-	}
-	if isProxyConfigValuesChanged(plan.OmeProxySetting, proxySettingState) {
-		tflog.Trace(ctx, "change detected for proxy setting : "+fmt.Sprintf("%#v", proxySettingState)+fmt.Sprintf("%#v", plan.OmeProxySetting))
-		updateProxySettingState, err := updateProxySettingState(&plan, omeClient)
-		if err != nil {
+	// proxy configuration
+	if plan.OmeProxySetting != nil {
+		state.OmeProxySetting, getErr = getProxySettingState(omeClient)
+		if getErr != nil {
 			resp.Diagnostics.AddError(
-				"OME Proxy Create Error", err.Error(),
+				"OME Proxy Get Error", getErr.Error(),
 			)
 		}
-		if !plan.OmeProxySetting.Password.IsUnknown() {
-			updateProxySettingState.Password = plan.OmeProxySetting.Password
+		isChange, critcal := updateProxySettingState(&plan, &state, omeClient)
+		if !isChange {
+			resp.Diagnostics.AddWarning("No Change Detected.", "No change in proxy setting on the infrastructure.")
 		}
-		proxySettingState = updateProxySettingState
-	} else {
-		resp.Diagnostics.AddWarning("No Change Detected.", "No change in proxy setting on the infrastructure.")
+		if critcal != nil {
+			resp.Diagnostics.AddError(
+				"OME Proxy Create Error", critcal.Error(),
+			)
+		}
 	}
-	// save proxy config into terraform state
-	state.OmeProxySetting = proxySettingState
+
 	if state.ID.IsNull() {
 		state.ID = types.StringValue("placeholder")
 	}
@@ -134,16 +132,19 @@ func (r *networkSettingResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 	defer omeClient.RemoveSession()
-	// get proxy config
-	proxySettingState, err := getProxySettingState(omeClient)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"OME Proxy Get Error", err.Error(),
-		)
+	// proxy configuration
+	if state.OmeProxySetting != nil {
+		proxySettingState, err := getProxySettingState(omeClient)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"OME Proxy Get Error", err.Error(),
+			)
+		}
+		// save proxy config into terraform state
+		proxySettingState.Password = state.OmeProxySetting.Password
+		state.OmeProxySetting = proxySettingState
 	}
-	// save proxy config into terraform state
-	proxySettingState.Password = state.OmeProxySetting.Password
-	state.OmeProxySetting = proxySettingState
+
 	tflog.Trace(ctx, "resource_network_setting read: finished reading state")
 	//Save into State
 	if state.ID.IsNull() {
@@ -179,20 +180,17 @@ func (r *networkSettingResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 	defer omeClient.RemoveSession()
-
-	if isProxyConfigValuesChanged(plan.OmeProxySetting, state.OmeProxySetting) {
-		updateProxySettingState, err := updateProxySettingState(&plan, omeClient)
-		if err != nil {
+	if state.OmeProxySetting != nil && plan.OmeProxySetting != nil {
+		_, critcal := updateProxySettingState(&plan, &state, omeClient)
+		if critcal != nil {
 			resp.Diagnostics.AddError(
-				"OME Proxy Update Error", err.Error(),
+				"OME Proxy Update Error", critcal.Error(),
 			)
 		}
-		// save proxy config into terraform state
-		if !plan.OmeProxySetting.Password.IsUnknown() {
-			updateProxySettingState.Password = plan.OmeProxySetting.Password
-		}
-		state.OmeProxySetting = updateProxySettingState
+	} else {
+		state.OmeProxySetting = nil
 	}
+
 	tflog.Trace(ctx, "resource_network_setting update: finished state update")
 	//Save into State
 	if state.ID.IsNull() {
@@ -255,21 +253,27 @@ func isProxyConfigValuesChanged(planProxy, stateProxy *models.OmeProxySetting) b
 		(!planProxy.EnableAuthentication.IsUnknown() && !stateProxy.EnableAuthentication.Equal(planProxy.EnableAuthentication))
 }
 
-func updateProxySettingState(plan *models.OmeNetworkSetting, omeClient *clients.Client) (*models.OmeProxySetting, error) {
-	payloadProxy := models.PayloadProxyConfiguration{
-		IPAddress:            plan.OmeProxySetting.IPAddress.ValueString(),
-		PortNumber:           int(plan.OmeProxySetting.ProxyPort.ValueInt64()),
-		EnableAuthentication: plan.OmeProxySetting.EnableAuthentication.ValueBool(),
-		EnableProxy:          plan.OmeProxySetting.EnableProxy.ValueBool(),
-		Username:             plan.OmeProxySetting.Username.ValueString(),
-		Password:             plan.OmeProxySetting.Password.ValueString(),
+func updateProxySettingState(plan, state *models.OmeNetworkSetting, omeClient *clients.Client) (bool, error) {
+	if isProxyConfigValuesChanged(plan.OmeProxySetting, state.OmeProxySetting) {
+		payloadProxy := models.PayloadProxyConfiguration{
+			IPAddress:            plan.OmeProxySetting.IPAddress.ValueString(),
+			PortNumber:           int(plan.OmeProxySetting.ProxyPort.ValueInt64()),
+			EnableAuthentication: plan.OmeProxySetting.EnableAuthentication.ValueBool(),
+			EnableProxy:          plan.OmeProxySetting.EnableProxy.ValueBool(),
+			Username:             plan.OmeProxySetting.Username.ValueString(),
+			Password:             plan.OmeProxySetting.Password.ValueString(),
+		}
+		newProxy, err := omeClient.UpdateProxyConfig(payloadProxy)
+		if err != nil {
+			return true, err
+		}
+		state.OmeProxySetting = buildProxySettingState(&newProxy)
+		if !plan.OmeProxySetting.Password.IsUnknown() {
+			state.OmeProxySetting.Password = plan.OmeProxySetting.Password
+		}
+		return true, nil
 	}
-	newProxy, err := omeClient.UpdateProxyConfig(payloadProxy)
-	if err != nil {
-		return &models.OmeProxySetting{}, err
-	}
-	proxySettingState := buildProxySettingState(&newProxy)
-	return proxySettingState, nil
+	return false, nil
 }
 
 func buildProxySettingState(proxy *models.ProxyConfiguration) *models.OmeProxySetting {
