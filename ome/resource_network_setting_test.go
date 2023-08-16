@@ -7,6 +7,151 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
+// ============================================= Session Setting Test ===========================================
+
+func TestNetworkSettingSession(t *testing.T) {
+	testAccCreateNetworkSessionSuccess := testProvider + `
+	resource "ome_network_setting" "code_ome" {
+		session_setting = {
+		  enable_universal_timeout = true 
+		  universal_timeout = 20
+		  api_session = 10 
+		  gui_session = 11
+		}
+	  }
+	`
+	testAccUpdateNetworkSessionSuccess := testProvider + `
+	resource "ome_network_setting" "code_ome" {
+		session_setting = {
+		  enable_universal_timeout = false
+		  api_session = 15
+		  api_timeout = 40
+		  gui_session = 20
+		  gui_timeout = 40
+		}
+	  }
+	`
+
+	testAccUpdateNetworkSessionSuccess1 := testProvider + `
+	resource "ome_network_setting" "code_ome" {
+		session_setting = {
+		  enable_universal_timeout = true
+		  universal_timeout = 30
+		  api_session = 10
+		  gui_session = 10
+		}
+	  }
+	`
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCreateNetworkSessionSuccess,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.enable_universal_timeout", "true"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.universal_timeout", "20"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.api_session", "10"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.gui_session", "11"),
+				),
+			},
+			{
+				Config: testAccUpdateNetworkSessionSuccess,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.enable_universal_timeout", "false"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.api_session", "15"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.api_timeout", "40"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.gui_session", "20"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.gui_timeout", "40"),
+				),
+			},
+			{
+				Config: testAccUpdateNetworkSessionSuccess1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.enable_universal_timeout", "true"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.universal_timeout", "30"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.api_session", "10"),
+					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.gui_session", "10"),
+				),
+			},
+		},
+	})
+}
+
+func TestNetworkSettingSessionInValidConfig(t *testing.T){
+	testAccNetworkSessionInvalid := testProvider + `
+	resource "ome_network_setting" "code_1" {
+		session_setting = {
+		  enable_universal_timeout = true
+		}
+	  }
+	`
+
+	testAccNetworkSessionInvalid1 := testProvider + `
+	resource "ome_network_setting" "code_1" {
+		session_setting = {
+		  enable_universal_timeout = true
+		  universal_timeout = 10
+		  api_timeout = 20
+		}
+	  }
+	`
+
+	testAccNetworkSessionInvalid2 := testProvider + `
+	resource "ome_network_setting" "code_1" {
+		session_setting = {
+			universal_timeout = 10
+		}
+	  }
+	`
+
+	testAccNetworkSessionInvalid3 := testProvider + `
+	resource "ome_network_setting" "code_1" {
+		session_setting = {
+			ssh_timeout = 10
+		}
+	}
+	`
+
+	testAccNetworkSessionInvalid4 := testProvider + `
+	resource "ome_network_setting" "code_1" {
+		session_setting = {
+			serial_timeout = 10
+		}
+	}
+	`
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccNetworkSessionInvalid,
+				ExpectError: regexp.MustCompile(`.*please ensure universal_timeout is set*.`),
+			},
+			{
+				Config:      testAccNetworkSessionInvalid1,
+				ExpectError: regexp.MustCompile(`.*please validate that the configuration for api_timeout*.`),
+			},
+			{
+				Config:      testAccNetworkSessionInvalid2,
+				ExpectError: regexp.MustCompile(`.*please ensure universal_timeout is unset*.`),
+			},
+			{
+				Config: testAccNetworkSessionInvalid3,
+				ExpectError: regexp.MustCompile(`.*please verify that the SSH Session is unset*.`),
+			},
+			{
+				Config: testAccNetworkSessionInvalid4,
+				ExpectError: regexp.MustCompile(`.*please verify that the Serial Session is unset*.`),
+			},
+		},
+	})
+}
+
+// ============================================== Proxy Setting Test ============================================
+
 func TestNetworkSettingProxy(t *testing.T) {
 	testAccCreateNetworkProxySuccess := testProvider + `
 	resource "ome_network_setting" "code_1" {

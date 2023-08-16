@@ -270,10 +270,14 @@ func (r *networkSettingResource) Delete(ctx context.Context, req resource.Delete
 func isSessionConfigValid(planSession *models.OmeSessionSetting) (bool, error) {
 	if planSession.EnableUniversalTimeout.ValueBool(){
 		if planSession.APITimeout.ValueFloat64() > 0 || planSession.GUITimeout.ValueFloat64() > 0 || planSession.SSHTimeout.ValueFloat64() >0 || planSession.SerialTimeout.ValueFloat64() > 0 {
-			return false, fmt.Errorf("please validate that the configuration for api_timeout, gui_timeout, ssh_timeout and serial_timeout are not set when enable_universal_timeout option is active")
+			return false, fmt.Errorf("please validate that the configuration for api_timeout, gui_timeout, ssh_timeout and serial_timeout are unset when enable_universal_timeout option is active")
 		}
 		if planSession.UniversalTimeout.ValueFloat64() < 1 {
 			return false, fmt.Errorf("please ensure universal_timeout is set when enable_universal_timeout option is active")
+		}
+	} else {
+		if planSession.UniversalTimeout.ValueFloat64() > 0 {
+			return false, fmt.Errorf("please ensure universal_timeout is unset when enable_universal_timeout option is disable")
 		}
 	}
 	return true, nil 
@@ -308,7 +312,10 @@ func updateSessionSettingState(plan, state *models.OmeNetworkSetting, omeClient 
 		if err != nil {
 			return false, err
 		}
-		payload := buildSessionUpdatePayload(plan.OmeSessionSetting,session.SessionList)
+		payload, err := buildSessionUpdatePayload(plan.OmeSessionSetting,session.SessionList)
+		if err != nil {
+			return false, err
+		}
 		newSession, err := omeClient.UpdateNetworkSessions(payload)
 		if err != nil {
 			return true, err
@@ -321,43 +328,54 @@ func updateSessionSettingState(plan, state *models.OmeNetworkSetting, omeClient 
 	return false, nil 
 }
 
-func buildSessionUpdatePayload(plan *models.OmeSessionSetting, curr []models.SessionInfo) []models.SessionInfo {
+func buildSessionUpdatePayload(plan *models.OmeSessionSetting, curr []models.SessionInfo) ([]models.SessionInfo, error) {
 	var payload []models.SessionInfo
+	const MinuteToMilliSecond = 60000
+	SessionTypeMap := map[string]bool{
+		"API": false,
+		"GUI": false,
+		"SSH": false,
+		"Serial": false,
+	}
 	for _, session := range curr {
 		if session.SessionType == "API" {
 			if plan.APISession.ValueInt64() > 0 {
 				session.MaxSessions = int(plan.APISession.ValueInt64())
 			}
 			if plan.APITimeout.ValueFloat64() > 0 {
-				session.SessionTimeout = int(plan.APITimeout.ValueFloat64())
+				session.SessionTimeout = int(plan.APITimeout.ValueFloat64() * MinuteToMilliSecond)
 			}
+			SessionTypeMap["API"] = true
 		}
 		if session.SessionType == "GUI" {
 			if plan.GUISession.ValueInt64() > 0 {
 				session.MaxSessions = int(plan.GUISession.ValueInt64())
 			}
 			if plan.GUITimeout.ValueFloat64() > 0 {
-				session.SessionTimeout = int(plan.GUITimeout.ValueFloat64())
+				session.SessionTimeout = int(plan.GUITimeout.ValueFloat64() * MinuteToMilliSecond)
 			}
+			SessionTypeMap["GUI"] = true
 		}
 		if session.SessionType == "SSH" {
 			if plan.SSHSession.ValueInt64() > 0 {
 				session.MaxSessions = int(plan.SSHSession.ValueInt64())
 			}
 			if plan.SSHTimeout.ValueFloat64() > 0 {
-				session.SessionTimeout = int(plan.SSHTimeout.ValueFloat64())
+				session.SessionTimeout = int(plan.SSHTimeout.ValueFloat64() * MinuteToMilliSecond)
 			}
+			SessionTypeMap["SSH"] = true
 		}
 		if session.SessionType == "Serial" {
 			if plan.SerialSession.ValueInt64() > 0 {
 				session.MaxSessions = int(plan.SerialSession.ValueInt64())
 			}
 			if plan.SerialTimeout.ValueFloat64() > 0 {
-				session.SessionTimeout = int(plan.SerialTimeout.ValueFloat64())
+				session.SessionTimeout = int(plan.SerialTimeout.ValueFloat64() * MinuteToMilliSecond)
 			}
+			SessionTypeMap["Serial"] = true
 		}
 		if plan.EnableUniversalTimeout.ValueBool() {
-			session.SessionTimeout = int(plan.UniversalTimeout.ValueFloat64())
+			session.SessionTimeout = int(plan.UniversalTimeout.ValueFloat64() * MinuteToMilliSecond)
 		} else {
 			if session.SessionType == "UniversalTimeout" {
 				session.SessionTimeout = -1
@@ -365,29 +383,50 @@ func buildSessionUpdatePayload(plan *models.OmeSessionSetting, curr []models.Ses
 		}
 		payload = append(payload, session)
 	}
-	return payload
+	for sessionType, found := range SessionTypeMap {
+		if !found && sessionType == "SSH" && (plan.SSHSession.ValueInt64() != 0 || plan.SSHTimeout.ValueFloat64() != 0) {
+			return nil, fmt.Errorf("please verify that the SSH Session is unset, as the infrastructure does not provide support for SSH sessions")
+		}
+		if !found && sessionType == "Serial" && (plan.SerialSession.ValueInt64() != 0 || plan.SerialTimeout.ValueFloat64() != 0){
+			return nil, fmt.Errorf("please verify that the Serial Session is unset, as the infrastructure does not provide support for Serial sessions")
+		}
+		if !found && sessionType == "API" && (plan.APISession.ValueInt64() != 0 || plan.APITimeout.ValueFloat64() != 0){
+			return nil, fmt.Errorf("please verify that the API Session is unset, as the infrastructure does not provide support for API sessions")
+		}
+		if !found && sessionType == "GUI" && (plan.GUISession.ValueInt64() != 0 || plan.GUITimeout.ValueFloat64() != 0){
+			return nil, fmt.Errorf("please verify that the GUI Session is unset, as the infrastructure does not provide support for GUI sessions")
+		}
+	}
+	return payload, nil
 }
 
 func buildSessionSettingState(sessions *models.NetworkSessions) *models.OmeSessionSetting {
+	const MilliSecondToMinute = 60000
 	sessionState := &models.OmeSessionSetting{}
 	for _, session := range sessions.SessionList {
 		if session.SessionType == "UniversalTimeout" {
 			if session.SessionTimeout != -1 {
 				sessionState.EnableUniversalTimeout = types.BoolValue(true)
+				sessionState.UniversalTimeout = types.Float64Value(float64(session.SessionTimeout / MilliSecondToMinute))
 			} else {
 				sessionState.EnableUniversalTimeout = types.BoolValue(false)
 			}
-			sessionState.UniversalTimeout = types.Float64Value(float64(session.SessionTimeout))
-		} else if session.SessionType == "GUI" {
+		} 
+		// convert the session timeout in millisecond to minute 
+		session.SessionTimeout /= MilliSecondToMinute
+		if session.SessionType == "GUI" {
 			sessionState.GUISession = types.Int64Value(int64(session.MaxSessions))
 			sessionState.GUITimeout = types.Float64Value(float64(session.SessionTimeout))
-		} else if session.SessionType == "API" {
+		} 
+		if session.SessionType == "API" {
 			sessionState.APISession = types.Int64Value(int64(session.MaxSessions))
 			sessionState.APITimeout = types.Float64Value(float64(session.SessionTimeout))
-		} else if session.SessionType == "SSH" {
+		} 
+		if session.SessionType == "SSH" {
 			sessionState.SSHSession = types.Int64Value(int64(session.MaxSessions))
 			sessionState.SSHTimeout = types.Float64Value(float64(session.SessionTimeout))
-		} else if session.SessionType == "Serial" {
+		} 
+		if session.SessionType == "Serial" {
 			sessionState.SerialSession = types.Int64Value(int64(session.MaxSessions))
 			sessionState.SerialTimeout = types.Float64Value(float64(session.SessionTimeout))
 		}
