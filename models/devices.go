@@ -16,6 +16,7 @@ package models
 import (
 	"net"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/netdata/go.d.plugin/pkg/iprange"
 )
@@ -101,6 +102,27 @@ type ManagementProfile struct {
 
 // ######## tfsdk models
 
+type DevicesResModel struct {
+	ID      types.String `tfsdk:"id"`
+	Devices types.List   `tfsdk:"devices"` // []DeviceItemModel
+}
+
+type DeviceItemModel struct {
+	ID         types.Int64  `tfsdk:"id"`
+	ServiceTag types.String `tfsdk:"service_tag"`
+	IPs        types.List   `tfsdk:"management_ips"`
+}
+
+func (DeviceItemModel) getType() map[string]attr.Type {
+	return map[string]attr.Type{
+		"id":          types.Int64Type,
+		"service_tag": types.StringType,
+		"management_ips": types.ListType{
+			ElemType: types.StringType,
+		},
+	}
+}
+
 // OmeDeviceData - schema for device data source
 type OmeDeviceData struct {
 	ID             types.Int64           `tfsdk:"id"`
@@ -182,6 +204,29 @@ type OmeManagementProfileData struct {
 }
 
 // ################### tfsdk converters
+
+func NewDeviceItemModel(input Device) DeviceItemModel {
+	ips := make([]string, 0)
+	for _, m := range input.DeviceManagement {
+		ips = append(ips, m.NetworkAddress.String())
+	}
+	return DeviceItemModel{
+		ID:         types.Int64Value(input.ID),
+		ServiceTag: types.StringValue(input.DeviceServiceTag),
+		IPs:        stringListValue(ips),
+	}
+}
+
+func NewDevicesResModel(input []Device) DevicesResModel {
+	devs := make([]DeviceItemModel, 0)
+	for _, v := range input {
+		devs = append(devs, NewDeviceItemModel(v))
+	}
+	return DevicesResModel{
+		ID:      types.StringValue("dummy"),
+		Devices: objListValue(DeviceItemModel{}.getType(), devs),
+	}
+}
 
 // NewSingleOmeDeviceData converts DeviceData to OmeDeviceData
 func NewSingleOmeDeviceData(input Device) OmeSingleDeviceData {

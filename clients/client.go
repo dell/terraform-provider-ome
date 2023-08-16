@@ -27,6 +27,10 @@ import (
 	"time"
 )
 
+var (
+	ErrItemNotFound = fmt.Errorf("no items found, expecting one")
+)
+
 // Client type is to hold http client information
 type Client struct {
 	// httpclient from net/http
@@ -336,7 +340,7 @@ func (c *Client) JSONUnMarshalSingleValue(data []byte, in interface{}) error {
 		return err
 	}
 	if l := len(inV); l == 0 {
-		return fmt.Errorf("no items found, expecting one")
+		return ErrItemNotFound
 	} else if l > 1 {
 		return fmt.Errorf("multiple items found, expecting one")
 	}
