@@ -217,7 +217,7 @@ func (r *networkSettingResource) Update(ctx context.Context, req resource.Update
 	}
 	defer omeClient.RemoveSession()
 	// session configuration
-	if state.OmeSessionSetting != nil && plan.OmeSessionSetting != nil {
+	if plan.OmeSessionSetting != nil {
 		_, critcal := updateSessionSettingState(&plan, &state, omeClient)
 		if critcal != nil {
 			resp.Diagnostics.AddError(
