@@ -108,30 +108,14 @@ type UpdateNetworkAdapterSetting struct {
 
 // NetworkSessions to get network session
 type NetworkSessions struct {
-	OdataContext string        `json:"@odata.context"`
-	OdataCount   int           `json:"@odata.count"`
-	Value        []SessionInfo `json:"value"`
+	SessionList        []SessionInfo `json:"value"`
 }
 
 // SessionInfo to get session info
 type SessionInfo struct {
-	OdataType                  string `json:"@odata.type"`
 	SessionType                string `json:"SessionType"`
 	MaxSessions                int    `json:"MaxSessions"`
 	SessionTimeout             int    `json:"SessionTimeout"`
-	MinSessionTimeout          int    `json:"MinSessionTimeout"`
-	MaxSessionTimeout          int    `json:"MaxSessionTimeout"`
-	MinSessionsAllowed         int    `json:"MinSessionsAllowed"`
-	MaxSessionsAllowed         int    `json:"MaxSessionsAllowed"`
-	MaxSessionsConfigurable    bool   `json:"MaxSessionsConfigurable"`
-	SessionTimeoutConfigurable bool   `json:"SessionTimeoutConfigurable"`
-}
-
-// UpdateNetworkSessions to update network session
-type UpdateNetworkSessions []struct {
-	SessionType    string `json:"SessionType"`
-	MaxSessions    int    `json:"MaxSessions"`
-	SessionTimeout int    `json:"SessionTimeout"`
 }
 
 // TimeConfiguration to get time configuration
@@ -277,7 +261,7 @@ type OmeDNSConfig struct {
 // OmeSessionSetting for session_setting terraform attribute.
 type OmeSessionSetting struct {
 	EnableUniversalTimeout types.Bool    `tfsdk:"enable_universal_timeout"`
-	UnversalTimeout        types.Float64 `tfsdk:"universal_timeout"`
+	UniversalTimeout        types.Float64 `tfsdk:"universal_timeout"`
 	APITimeout             types.Float64 `tfsdk:"api_timeout"`
 	APISession             types.Int64   `tfsdk:"api_session"`
 	GUITimeout             types.Float64 `tfsdk:"gui_timeout"`
