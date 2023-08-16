@@ -79,7 +79,7 @@ func TestNetworkSettingSession(t *testing.T) {
 	})
 }
 
-func TestNetworkSettingSessionInValidConfig(t *testing.T){
+func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 	testAccNetworkSessionInvalid := testProvider + `
 	resource "ome_network_setting" "code_1" {
 		session_setting = {
@@ -139,11 +139,11 @@ func TestNetworkSettingSessionInValidConfig(t *testing.T){
 				ExpectError: regexp.MustCompile(`.*please ensure universal_timeout is unset*.`),
 			},
 			{
-				Config: testAccNetworkSessionInvalid3,
+				Config:      testAccNetworkSessionInvalid3,
 				ExpectError: regexp.MustCompile(`.*please verify that the SSH Session is unset*.`),
 			},
 			{
-				Config: testAccNetworkSessionInvalid4,
+				Config:      testAccNetworkSessionInvalid4,
 				ExpectError: regexp.MustCompile(`.*please verify that the Serial Session is unset*.`),
 			},
 		},

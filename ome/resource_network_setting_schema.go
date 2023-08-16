@@ -307,7 +307,7 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which all sessions end. This is applicable when \"enable_universal_timeout\" is true. This is mutually exclusive with \"api_timeout\", \"gui_timeout\", \"ssh_timeout\" and \"serial_timeout\".",
 			Optional:            true,
 			Computed:            true,
-			Validators:          []validator.Float64{
+			Validators: []validator.Float64{
 				float64validator.Between(1, 1400),
 			},
 		},
@@ -317,7 +317,7 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which the API session ends. This is mutually exclusive with \"universal_timeout\".",
 			Optional:            true,
 			Computed:            true,
-			Validators:          []validator.Float64{
+			Validators: []validator.Float64{
 				float64validator.Between(1, 1400),
 			},
 		},
@@ -328,7 +328,7 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Optional:            true,
 			Computed:            true,
 			Validators: []validator.Int64{
-				int64validator.Between(1,100),
+				int64validator.Between(1, 100),
 			},
 		},
 
@@ -337,7 +337,7 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which the web interface of Graphical User Interface (GUI) session ends. This is mutually exclusive with \"universal_timeout\".",
 			Optional:            true,
 			Computed:            true,
-			Validators:          []validator.Float64{
+			Validators: []validator.Float64{
 				float64validator.Between(1, 1400),
 			},
 		},
@@ -348,7 +348,7 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Optional:            true,
 			Computed:            true,
 			Validators: []validator.Int64{
-				int64validator.Between(1,100),
+				int64validator.Between(1, 100),
 			},
 		},
 
@@ -357,7 +357,7 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which the SSH session ends. This is applicable only for OpenManage Enterprise Modular. This is mutually exclusive with \"universal_timeout\".",
 			Optional:            true,
 			Computed:            true,
-			Validators:          []validator.Float64{
+			Validators: []validator.Float64{
 				float64validator.Between(1, 1400),
 			},
 		},
@@ -368,7 +368,7 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Optional:            true,
 			Computed:            true,
 			Validators: []validator.Int64{
-				int64validator.Between(1,100),
+				int64validator.Between(1, 100),
 			},
 		},
 
@@ -377,7 +377,7 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which the serial console session ends.This is applicable only for OpenManage Enterprise Modular. This is mutually exclusive with \"universal_timeout\"",
 			Optional:            true,
 			Computed:            true,
-			Validators:          []validator.Float64{
+			Validators: []validator.Float64{
 				float64validator.Between(1, 1400),
 			},
 		},
@@ -388,7 +388,7 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Optional:            true,
 			Computed:            true,
 			Validators: []validator.Int64{
-				int64validator.Between(1,100),
+				int64validator.Between(1, 100),
 			},
 		},
 	}
