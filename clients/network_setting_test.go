@@ -96,7 +96,7 @@ func TestNetwork_GetNetworkSessions(t *testing.T) {
 			getNetSession, err := c.GetNetworkSessions()
 			t.Log(getNetSession, err)
 			if err == nil {
-				assert.Equal(t, getNetSession.Value[0].SessionType, "GUI")
+				assert.Equal(t, getNetSession.SessionList[0].SessionType, "GUI")
 			}
 		})
 	}
@@ -110,25 +110,22 @@ func TestNetwork_UpdateNetworkSessions(t *testing.T) {
 
 	c, _ := NewClient(opts)
 
-	var sessionPayload models.UpdateNetworkSessions
+	var sessionPayload []models.SessionInfo
 	t.Logf(string(payloadUpdateNetworkSession))
 	err := c.JSONUnMarshal(payloadUpdateNetworkSession, &sessionPayload)
 	if err != nil {
 		t.Error(err)
 	}
-	var invalidUpdateNetworkSessions models.UpdateNetworkSessions
-	invalidUpdateNetworkSessions = append(invalidUpdateNetworkSessions, struct {
-		SessionType    string `json:"SessionType"`
-		MaxSessions    int    `json:"MaxSessions"`
-		SessionTimeout int    `json:"SessionTimeout"`
-	}{
+	var invalidUpdateNetworkSessions []models.SessionInfo
+	invalidSession := models.SessionInfo{
 		SessionType:    "invalid",
 		MaxSessions:    1,
 		SessionTimeout: 1000,
-	})
+	}
+	invalidUpdateNetworkSessions = append(invalidUpdateNetworkSessions, invalidSession)
 	tests := []struct {
 		name string
-		args models.UpdateNetworkSessions
+		args []models.SessionInfo
 	}{
 		{"Update Network Session Successfully", sessionPayload},
 		{"Update Network Session Failed", invalidUpdateNetworkSessions},

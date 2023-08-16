@@ -63,7 +63,7 @@ func (c *Client) GetNetworkSessions() (models.NetworkSessions, error) {
 }
 
 // UpdateNetworkSessions to update the network session setting in the OME.
-func (c *Client) UpdateNetworkSessions(sessionPayload models.UpdateNetworkSessions) ([]models.SessionInfo, error) {
+func (c *Client) UpdateNetworkSessions(sessionPayload []models.SessionInfo) ([]models.SessionInfo, error) {
 	data, _ := c.JSONMarshal(sessionPayload)
 	response, err := c.Post(UpdateNetworkSessions, nil, data)
 	if err != nil {
