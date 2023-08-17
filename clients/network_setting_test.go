@@ -174,7 +174,7 @@ func TestNetwork_UpdateTimeConfiguration(t *testing.T) {
 
 	c, _ := NewClient(opts)
 
-	var payloadTC models.TimeConfigPayload
+	var payloadTC models.TimeConfig
 	t.Logf(string(payloadUpdateNetworkTime))
 	err := c.JSONUnMarshal(payloadUpdateNetworkTime, &payloadTC)
 	if err != nil {
@@ -182,10 +182,10 @@ func TestNetwork_UpdateTimeConfiguration(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		args models.TimeConfigPayload
+		args models.TimeConfig
 	}{
 		{"Update Network Time Successfully", payloadTC},
-		{"Update Network Time Failed", models.TimeConfigPayload{TimeZone: "invalid"}},
+		{"Update Network Time Failed", models.TimeConfig{TimeZone: "invalid"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -217,7 +217,7 @@ func TestNetwork_GetTimeZone(t *testing.T) {
 			getNetTimeZone, err := c.GetTimeZone()
 			t.Log(getNetTimeZone, err)
 			if err == nil {
-				assert.Equal(t, getNetTimeZone.Value[0].Name, "TZ_ID_38")
+				assert.Equal(t, getNetTimeZone.TimeZoneList[0].Name, "TZ_ID_38")
 			}
 		})
 	}
