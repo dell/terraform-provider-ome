@@ -35,7 +35,11 @@ import (
 
 const (
 	//NoOFTries to get the task id
-	NoOFTries = 5
+	NoOFTries           = 5
+	//NotifyNonCompliance to notify on non compliance of device
+	NotifyNonCompliance = "NOTIFY_ON_NON_COMPLIANCE" // #nosec G101
+	//NotifyOnSchedule to notify on schedule
+	NotifyOnSchedule    = "NOTIFY_ON_SCHEDULE" // #nosec G101
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -703,7 +707,7 @@ func updateBaselineState(ctx context.Context, state *models.ConfigureBaselines, 
 		dia.Append(emailerror...)
 		state.EmailAddresses = emailTfsdk
 
-		if notificationSettings.NotificationType == "NOTIFY_ON_NON_COMPLIANCE" {
+		if notificationSettings.NotificationType == NotifyNonCompliance {
 			state.NotifyOnSchedule = types.BoolValue(false)
 		} else {
 			state.NotifyOnSchedule = types.BoolValue(true)
@@ -765,9 +769,9 @@ func getPayload(ctx context.Context, plan *models.ConfigureBaselines, templateID
 			return models.ConfigurationBaselinePayload{}, fmt.Errorf(clients.ErrInvalidCronExpression)
 		}
 
-		notificationType := "NOTIFY_ON_NON_COMPLIANCE"
+		notificationType := NotifyNonCompliance
 		if plan.NotifyOnSchedule.ValueBool() {
-			notificationType = "NOTIFY_ON_SCHEDULE"
+			notificationType = NotifyOnSchedule
 		}
 
 		notificationSettings := models.NotificationSettings{
