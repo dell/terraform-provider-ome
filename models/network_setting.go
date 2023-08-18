@@ -118,28 +118,9 @@ type SessionInfo struct {
 	SessionTimeout int    `json:"SessionTimeout"`
 }
 
-// TimeConfiguration to get time configuration
-type TimeConfiguration struct {
-	OdataContext         string `json:"@odata.context"`
-	OdataType            string `json:"@odata.type"`
-	OdataID              string `json:"@odata.id"`
-	TimeZone             string `json:"TimeZone"`
-	TimeZoneIDLinux      string `json:"TimeZoneIdLinux"`
-	TimeZoneIDWindows    string `json:"TimeZoneIdWindows"`
-	EnableNTP            bool   `json:"EnableNTP"`
-	PrimaryNTPAddress    any    `json:"PrimaryNTPAddress"`
-	SecondaryNTPAddress1 any    `json:"SecondaryNTPAddress1"`
-	SecondaryNTPAddress2 any    `json:"SecondaryNTPAddress2"`
-	SystemTime           string `json:"SystemTime"`
-	TimeSource           string `json:"TimeSource"`
-	UtcTime              string `json:"UtcTime"`
-}
-
 // TimeZones to get all time zones.
 type TimeZones struct {
-	OdataContext string     `json:"@odata.context"`
-	OdataCount   int        `json:"@odata.count"`
-	Value        []TimeZone `json:"value"`
+	TimeZoneList []TimeZone `json:"value"`
 }
 
 // TimeZone for one time zone.
@@ -150,29 +131,14 @@ type TimeZone struct {
 	Name             string `json:"Name"`
 }
 
-// TimeConfigPayload to get time configuration payload.
-type TimeConfigPayload struct {
+// TimeConfig to get time configuration.
+type TimeConfig struct {
 	TimeZone             string `json:"TimeZone"`
 	EnableNTP            bool   `json:"EnableNTP"`
-	PrimaryNTPAddress    any    `json:"PrimaryNTPAddress"`
-	SecondaryNTPAddress1 any    `json:"SecondaryNTPAddress1"`
-	SecondaryNTPAddress2 any    `json:"SecondaryNTPAddress2"`
+	PrimaryNTPAddress    string `json:"PrimaryNTPAddress"`
+	SecondaryNTPAddress1 string `json:"SecondaryNTPAddress1"`
+	SecondaryNTPAddress2 string `json:"SecondaryNTPAddress2"`
 	SystemTime           string `json:"SystemTime"`
-}
-
-// TimeConfigResponse to get time config response.
-type TimeConfigResponse struct {
-	TimeZone             string `json:"TimeZone"`
-	TimeZoneIDLinux      any    `json:"TimeZoneIdLinux"`
-	TimeZoneIDWindows    any    `json:"TimeZoneIdWindows"`
-	EnableNTP            bool   `json:"EnableNTP"`
-	PrimaryNTPAddress    any    `json:"PrimaryNTPAddress"`
-	SecondaryNTPAddress1 any    `json:"SecondaryNTPAddress1"`
-	SecondaryNTPAddress2 any    `json:"SecondaryNTPAddress2"`
-	SystemTime           any    `json:"SystemTime"`
-	TimeSource           string `json:"TimeSource"`
-	UtcTime              any    `json:"UtcTime"`
-	JobID                any    `json:"JobId"`
 }
 
 // ProxyConfiguration to get proxy configuration

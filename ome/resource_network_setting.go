@@ -56,6 +56,15 @@ func (r *networkSettingResource) ValidateConfig(ctx context.Context, req resourc
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	if data.OmeTimeSetting != nil {
+		if ok, err := isTimeConfigValid(data.OmeTimeSetting); !ok {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("time_setting"),
+				"Attribute Error",
+				err.Error(),
+			)
+		}
+	}
 	if data.OmeSessionSetting != nil {
 		if ok, err := isSessionConfigValid(data.OmeSessionSetting); !ok {
 			resp.Diagnostics.AddAttributeError(
@@ -97,6 +106,25 @@ func (r *networkSettingResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 	defer omeClient.RemoveSession()
+	// time configuration
+	if plan.OmeTimeSetting != nil {
+		state.OmeTimeSetting, getErr = getTimeSettingState(omeClient)
+		if getErr != nil {
+			resp.Diagnostics.AddError(
+				"OME Time Get Error", getErr.Error(),
+			)
+		}
+		isChange, critical := updateTimeSettingState(&plan, &state, omeClient)
+		if !isChange {
+			resp.Diagnostics.AddWarning("No Change Detected.", "No change in time setting on the infrastructure.")
+		}
+		if critical != nil {
+			resp.Diagnostics.AddError(
+				"OME Time Create Error", critical.Error(),
+			)
+		}
+	}
+
 	// session configuration
 	if plan.OmeSessionSetting != nil {
 		state.OmeSessionSetting, getErr = getSessionSettingState(omeClient)
@@ -160,11 +188,22 @@ func (r *networkSettingResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 	defer omeClient.RemoveSession()
+
+	if state.OmeTimeSetting != nil {
+		state.OmeTimeSetting, getErr = getTimeSettingState(omeClient)
+		if getErr != nil {
+			resp.Diagnostics.AddError(
+				"OME Time Get Error", getErr.Error(),
+			)
+		}
+	}
+
+	// session configuration
 	if state.OmeSessionSetting != nil {
 		state.OmeSessionSetting, getErr = getSessionSettingState(omeClient)
 		if getErr != nil {
 			resp.Diagnostics.AddError(
-				"OME Proxy Get Error", getErr.Error(),
+				"OME Session Get Error", getErr.Error(),
 			)
 		}
 	}
@@ -216,6 +255,18 @@ func (r *networkSettingResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 	defer omeClient.RemoveSession()
+	// time configuration
+	if plan.OmeTimeSetting != nil {
+		_, critical := updateTimeSettingState(&plan, &state, omeClient)
+		if critical != nil {
+			resp.Diagnostics.AddError(
+				"OME Time Update Error", critical.Error(),
+			)
+		}
+	} else {
+		state.OmeTimeSetting = nil
+	}
+
 	// session configuration
 	if plan.OmeSessionSetting != nil {
 		_, critcal := updateSessionSettingState(&plan, &state, omeClient)
@@ -263,6 +314,84 @@ func (r *networkSettingResource) Delete(ctx context.Context, req resource.Delete
 
 	resp.State.RemoveResource(ctx)
 	tflog.Trace(ctx, "resource_network_setting delete: finished")
+}
+
+// =============================== time configuration helper function ==================================
+func isTimeConfigValid(planTime *models.OmeTimeSetting) (bool, error) {
+	if planTime.TimeZone.ValueString() == "" {
+		return false, fmt.Errorf("please validate that the time_zone is set")
+	}
+	if planTime.EnableNTP.ValueBool() {
+		if planTime.SystemTime.ValueString() != "" {
+			return false, fmt.Errorf("please validate that the system_time is unset when enable_ntp is active")
+		}
+		if planTime.PrimaryNTPAddress.ValueString() == "" {
+			return false, fmt.Errorf("please validate that the primary_ntp_address is set when enable_ntp is active")
+		}
+	} else {
+		if planTime.PrimaryNTPAddress.ValueString() != "" ||
+			planTime.SecondaryNTPAddress1.ValueString() != "" ||
+			planTime.SecondaryNTPAddress2.ValueString() != "" {
+			return false, fmt.Errorf("please validate that primary_ntp_address, secondary_ntp_address1 and secondary_ntp_address2 are unset when enable_ntp is disable")
+		}
+		if planTime.SystemTime.ValueString() == "" {
+			return false, fmt.Errorf("please validate that the system_time is set when enable_ntp is disable")
+		}
+	}
+	return true, nil
+}
+
+func getTimeSettingState(omeClient *clients.Client) (*models.OmeTimeSetting, error) {
+	time, err := omeClient.GetTimeConfiguration()
+	if err != nil {
+		return nil, err
+	}
+	timeSettingState := buildTimeSettingState(&time)
+	return timeSettingState, nil
+}
+
+func isTimeConfigValuesChanged(planTime, stateTime *models.OmeTimeSetting) bool {
+	return (!planTime.EnableNTP.IsUnknown() && !planTime.EnableNTP.Equal(stateTime.EnableNTP)) ||
+		(!planTime.TimeZone.IsUnknown() && planTime.TimeZone.ValueString() != stateTime.SystemTime.ValueString()) ||
+		(!planTime.SystemTime.IsUnknown() && planTime.SystemTime.ValueString() != stateTime.SystemTime.ValueString()) ||
+		(!planTime.PrimaryNTPAddress.IsUnknown() && planTime.PrimaryNTPAddress.ValueString() != stateTime.PrimaryNTPAddress.ValueString()) ||
+		(!planTime.SecondaryNTPAddress1.IsUnknown() && planTime.SecondaryNTPAddress1.ValueString() != stateTime.SecondaryNTPAddress1.ValueString()) ||
+		(!planTime.SecondaryNTPAddress2.IsUnknown() && planTime.SecondaryNTPAddress2.ValueString() != stateTime.SecondaryNTPAddress2.ValueString())
+}
+
+func updateTimeSettingState(plan, state *models.OmeNetworkSetting, omeClient *clients.Client) (bool, error) {
+	if isTimeConfigValuesChanged(plan.OmeTimeSetting, state.OmeTimeSetting) {
+		payload := models.TimeConfig{
+			TimeZone:             plan.OmeTimeSetting.TimeZone.ValueString(),
+			EnableNTP:            plan.OmeTimeSetting.EnableNTP.ValueBool(),
+			PrimaryNTPAddress:    plan.OmeTimeSetting.PrimaryNTPAddress.ValueString(),
+			SecondaryNTPAddress1: plan.OmeTimeSetting.SecondaryNTPAddress1.ValueString(),
+			SecondaryNTPAddress2: plan.OmeTimeSetting.SecondaryNTPAddress2.ValueString(),
+			SystemTime:           plan.OmeTimeSetting.SystemTime.ValueString(),
+		}
+		newTime, err := omeClient.UpdateTimeConfiguration(payload)
+		if err != nil {
+			return true, err
+		}
+		state.OmeTimeSetting = buildTimeSettingState(&newTime)
+		if plan.OmeTimeSetting.SystemTime.ValueString() != "" {
+			state.OmeTimeSetting.SystemTime = plan.OmeTimeSetting.SystemTime
+		}
+		return true, nil
+	}
+	return false, nil
+}
+
+func buildTimeSettingState(time *models.TimeConfig) *models.OmeTimeSetting {
+	timeState := &models.OmeTimeSetting{
+		EnableNTP:            types.BoolValue(time.EnableNTP),
+		SystemTime:           types.StringValue(time.SystemTime),
+		TimeZone:             types.StringValue(time.TimeZone),
+		PrimaryNTPAddress:    types.StringValue(time.PrimaryNTPAddress),
+		SecondaryNTPAddress1: types.StringValue(time.SecondaryNTPAddress1),
+		SecondaryNTPAddress2: types.StringValue(time.SecondaryNTPAddress2),
+	}
+	return timeState
 }
 
 // =============================== session configuration helper function ===============================

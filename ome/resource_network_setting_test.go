@@ -7,6 +7,124 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
+// ============================================= Time Setting Test ==============================================
+func TestNetworkSettingTime(t *testing.T) {
+	testAccCreateNetworkTimeSuccess := testProvider + `
+	resource "ome_network_setting" "its_ome_time" {
+		time_setting = {
+		  time_zone = "TZ_ID_65"
+		  system_time = "2023-08-18 07:50:08.387"
+		}
+	  }
+	`
+	testAccUpdateNetworkTimeSuccess := testProvider + `
+	resource "ome_network_setting" "its_ome_time" {
+		time_setting = {
+		  time_zone = "TZ_ID_65"
+		  enable_ntp = true 
+		  primary_ntp_address = "` + DeviceIP1 + `"
+		  secondary_ntp_address1 = "` + DeviceIP2 + `"
+		  secondary_ntp_address2 = "` + DeviceIP3 + `"
+		}
+	  }
+	`
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCreateNetworkTimeSuccess,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.time_zone", "TZ_ID_65"),
+					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.system_time", "2023-08-18 07:50:08.387"),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+			{
+				Config: testAccUpdateNetworkTimeSuccess,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.time_zone", "TZ_ID_65"),
+					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.enable_ntp", "true"),
+					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.primary_ntp_address", DeviceIP1),
+					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.secondary_ntp_address1", DeviceIP2),
+					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.secondary_ntp_address2", DeviceIP3),
+				),
+			},
+		},
+	})
+}
+
+func TestNetworkSettingTimeInvalidConfig(t *testing.T) {
+	testAccNetworkTimeInvalid := testProvider + `
+	resource "ome_network_setting" "its_ome_time" {
+		time_setting = {
+		  time_zone = "TZ_ID_65"
+		  enable_ntp = true
+		  system_time = "2023-08-19 07:50:08.387"
+		}
+	}
+	`
+	testAccNetworkTimeInvalid1 := testProvider + `
+	resource "ome_network_setting" "its_ome_time" {
+		time_setting = {
+		  time_zone = "TZ_ID_65"
+		  enable_ntp = true
+		}
+	}
+	`
+
+	testAccNetworkTimeInvalid2 := testProvider + `
+	resource "ome_network_setting" "its_ome_time" {
+		time_setting = {
+		  enable_ntp = true
+		}
+	}
+	`
+	testAccNetworkTimeInvalid3 := testProvider + `
+	resource "ome_network_setting" "its_ome_time" {
+		time_setting = {
+		  time_zone = "TZ_ID_65"
+		primary_ntp_address = "10.x.x.1"
+		}
+	}
+	`
+
+	testAccNetworkTimeInvalid4 := testProvider + `
+	resource "ome_network_setting" "its_ome_time" {
+		time_setting = {
+		  time_zone = "TZ_ID_65"
+		}
+	}
+	`
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccNetworkTimeInvalid,
+				ExpectError: regexp.MustCompile(`.*please validate that the system_time is unset when enable_ntp is active*.`),
+			},
+			{
+				Config:      testAccNetworkTimeInvalid1,
+				ExpectError: regexp.MustCompile(`.*please validate that the primary_ntp_address is set when enable_ntp is active*.`),
+			},
+			{
+				Config:      testAccNetworkTimeInvalid2,
+				ExpectError: regexp.MustCompile(`.*please validate that the time_zone is set*.`),
+			},
+			{
+				Config:      testAccNetworkTimeInvalid3,
+				ExpectError: regexp.MustCompile(`.*please validate that primary_ntp_address, secondary_ntp_address1*.`),
+			},
+			{
+				Config:      testAccNetworkTimeInvalid4,
+				ExpectError: regexp.MustCompile(`.*please validate that the system_time is set*.`),
+			},
+		},
+	})
+}
+
 // ============================================= Session Setting Test ===========================================
 
 func TestNetworkSettingSession(t *testing.T) {
