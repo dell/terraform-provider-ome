@@ -59,6 +59,8 @@ const (
 	LastExecDetailAPI = "/api/JobService/Jobs(%d)/LastExecutionDetail"
 	//DeviceAPI - api for managing devices
 	DeviceAPI = "/api/DeviceService/Devices"
+	// DeviceRemovalAPI - api to remove multiple devices by ID
+	DeviceRemovalAPI = "/api/DeviceService/Actions/DeviceService.RemoveDevices"
 	//DeviceInventoryAPI - api for getting device inventory
 	DeviceInventoryAPI = DeviceAPI + "(%d)/InventoryDetails"
 	//DeviceInventoryAPI - api for getting device inventory of a single type

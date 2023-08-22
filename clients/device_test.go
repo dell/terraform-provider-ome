@@ -59,6 +59,24 @@ func TestClient_GetDevice(t *testing.T) {
 	}
 }
 
+func TestClient_RemoveDevice(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	err := c.RemoveDevices([]int64{1, 2, 3, 4})
+	assert.Nil(t, err)
+
+	err = c.RemoveDevices(nil)
+	assert.Nil(t, err)
+
+	err = c.RemoveDevices(make([]int64, 0))
+	assert.Nil(t, err)
+}
+
 func TestClient_GetDeviceByIP(t *testing.T) {
 	type args struct {
 		ips     []string

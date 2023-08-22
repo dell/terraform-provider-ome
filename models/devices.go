@@ -14,9 +14,14 @@ limitations under the License.
 package models
 
 import (
+	"context"
+	"fmt"
 	"net"
+	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/netdata/go.d.plugin/pkg/iprange"
 )
@@ -102,15 +107,17 @@ type ManagementProfile struct {
 
 // ######## tfsdk models
 
+// DevicesResModel - Tfsdk model for devices resource
 type DevicesResModel struct {
 	ID      types.String `tfsdk:"id"`
 	Devices types.List   `tfsdk:"devices"` // []DeviceItemModel
 }
 
+// DeviceItemModel - Tfsdk model for each device in devices resource
 type DeviceItemModel struct {
 	ID         types.Int64  `tfsdk:"id"`
 	ServiceTag types.String `tfsdk:"service_tag"`
-	IPs        types.List   `tfsdk:"management_ips"`
+	IPs        types.List   `tfsdk:"management_ips"` // []string
 }
 
 func (DeviceItemModel) getType() map[string]attr.Type {
@@ -205,6 +212,7 @@ type OmeManagementProfileData struct {
 
 // ################### tfsdk converters
 
+// NewDeviceItemModel - converts Device to DeviceItemModel
 func NewDeviceItemModel(input Device) DeviceItemModel {
 	ips := make([]string, 0)
 	for _, m := range input.DeviceManagement {
@@ -217,15 +225,81 @@ func NewDeviceItemModel(input Device) DeviceItemModel {
 	}
 }
 
-func NewDevicesResModel(input []Device) DevicesResModel {
+// NewDevicesResModel - converts list of json devices to DevicesResModel
+func NewDevicesResModel(input []Device) (DevicesResModel, diag.Diagnostics) {
 	devs := make([]DeviceItemModel, 0)
 	for _, v := range input {
 		devs = append(devs, NewDeviceItemModel(v))
 	}
+	tfdevs, dgs := objListValue(DeviceItemModel{}.getType(), devs)
 	return DevicesResModel{
 		ID:      types.StringValue("dummy"),
-		Devices: objListValue(DeviceItemModel{}.getType(), devs),
+		Devices: tfdevs,
+	}, dgs
+}
+
+// NewDevicesResModelFromID - converts a string id into a terraform plan
+func NewDevicesResModelFromID(id string) (types.List, diag.Diagnostics) {
+	var dgs diag.Diagnostics
+	if id == "" {
+		return types.ListUnknown(types.ObjectType{
+			AttrTypes: DeviceItemModel{}.getType(),
+		}), dgs
 	}
+	var plan types.List
+	vals := strings.Split(id, ":")
+	var did, didst string
+	if l := len(vals); l == 1 {
+		did = "id"
+		didst = id
+	} else if l > 2 {
+		dgs.AddError(
+			"Wrong id format.",
+			fmt.Sprintf("Expecting a string having maximum 1 semicolon, found %d", l-1),
+		)
+		return plan, dgs
+	} else {
+		did = vals[0]
+		didst = vals[1]
+	}
+	dids := strings.Split(didst, ",")
+	devs := make([]DeviceItemModel, 0)
+	ips := make([]string, 0)
+	if did == "id" {
+		for _, did := range dids {
+			didInt, err := strconv.ParseInt(did, 10, 64)
+			if err != nil {
+				dgs.AddError(
+					"Wrong id format. ID could not be converted to an Int64.",
+					err.Error(),
+				)
+			}
+			devs = append(devs, DeviceItemModel{
+				ServiceTag: types.StringUnknown(),
+				ID:         types.Int64Value(didInt),
+				IPs:        stringListValue(ips),
+			})
+		}
+	} else if did == "svc_tag" {
+		for _, did := range dids {
+			devs = append(devs, DeviceItemModel{
+				ServiceTag: types.StringValue(did),
+				ID:         types.Int64Unknown(),
+				IPs:        stringListValue(ips),
+			})
+		}
+	} else {
+		dgs.AddError(
+			"Wrong id format.",
+			fmt.Sprintf("Identifier of type %s is not recognised, valid values are [id, svc_tag].", did),
+		)
+	}
+	if dgs.HasError() {
+		return plan, dgs
+	}
+	return types.ListValueFrom(context.TODO(), types.ObjectType{
+		AttrTypes: DeviceItemModel{}.getType(),
+	}, devs)
 }
 
 // NewSingleOmeDeviceData converts DeviceData to OmeDeviceData

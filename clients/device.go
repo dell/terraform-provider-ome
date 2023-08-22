@@ -47,6 +47,19 @@ func (c *Client) GetDevice(serviceTag string, devID int64) (models.Device, error
 	return device, err
 }
 
+func (c *Client) RemoveDevices(ids []int64) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	bodyv := map[string]any{"DeviceIds": ids}
+	body, errb := c.JSONMarshal(bodyv)
+	if errb != nil {
+		return errb
+	}
+	_, err := c.Post(DeviceRemovalAPI, nil, body)
+	return err
+}
+
 // ValidateDevice is used to get deviceID using serviceTag in OME
 func (c *Client) ValidateDevice(serviceTag string, devID int64) (int64, error) {
 

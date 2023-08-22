@@ -17,6 +17,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
@@ -50,16 +51,12 @@ func stringListValue(inputs []string) types.List {
 	return ret
 }
 
-func objListValue(typeObj map[string]attr.Type, inputs any) types.List {
-	ret, d := types.ListValueFrom(
+func objListValue(typeObj map[string]attr.Type, inputs any) (types.List, diag.Diagnostics) {
+	return types.ListValueFrom(
 		context.TODO(),
 		basetypes.ObjectType{
 			AttrTypes: typeObj,
 		},
 		inputs,
 	)
-	if d.HasError() {
-		panic("Got error")
-	}
-	return ret
 }

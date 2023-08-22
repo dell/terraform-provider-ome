@@ -21,6 +21,7 @@ import (
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -114,7 +115,6 @@ func (*resourceDevices) singleDeviceSchema() map[string]schema.Attribute {
 
 // Create a new resource
 func (r resourceDevices) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-
 	//Get Plan Data
 	tflog.Trace(ctx, "resource_devices create: started")
 	var plan models.DevicesResModel
@@ -135,76 +135,71 @@ func (r resourceDevices) Create(ctx context.Context, req resource.CreateRequest,
 
 	tflog.Info(ctx, "resource_devices getting current infrastructure state")
 
-	state, err := r.getState(ctx, plan)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error getting current infrastructure state.",
-			err.Error(),
-		)
+	state, dgs := r.getState(ctx, plan.Devices)
+	resp.Diagnostics.Append(dgs...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r resourceDevices) getState(ctx context.Context, plan models.DevicesResModel) (models.DevicesResModel, error) {
+func (r resourceDevices) getState(ctx context.Context, tfDevices types.List) (
+	models.DevicesResModel, diag.Diagnostics) {
 	var (
 		state models.DevicesResModel
-		err   error
 		devs  []models.Device
+		pdevs []models.DeviceItemModel
 	)
 
-	if plan.Devices.IsUnknown() {
-		devM, err2 := r.c.GetAllDevices(nil)
-		devs = devM.Value
-		err = err2
-	} else {
-		pdevs := make([]models.DeviceItemModel, 0)
-		diags := plan.Devices.ElementsAs(ctx, &pdevs, false)
+	if !tfDevices.IsUnknown() {
+		pdevs = make([]models.DeviceItemModel, 0)
+		diags := tfDevices.ElementsAs(ctx, &pdevs, false)
 		if diags.HasError() {
-			err := fmt.Errorf("")
-			for _, d := range diags.Errors() {
-				err = fmt.Errorf("%w, {%s,%s}", err, d.Summary(), d.Detail())
-			}
-			return state, err
+			return state, diags
 		}
+	}
+
+	var dgs diag.Diagnostics
+
+	if pdevs == nil {
+		devM, err := r.c.GetAllDevices(nil)
+		devs = devM.Value
+		if err != nil {
+			dgs.AddError(
+				"Error getting devices.",
+				err.Error(),
+			)
+		}
+	} else {
 		for _, v := range pdevs {
 			var (
-				dev  models.Device
-				err2 = fmt.Errorf("neither id nor service tag provided for device")
+				dev models.Device
+				err = fmt.Errorf("neither id nor service tag provided for device")
 			)
 			if !v.ID.IsUnknown() {
-				dev, err2 = r.c.GetDevice("", v.ID.ValueInt64())
+				dev, err = r.c.GetDevice("", v.ID.ValueInt64())
 			} else if !v.ServiceTag.IsUnknown() {
-				dev, err2 = r.c.GetDevice(v.ServiceTag.ValueString(), 0)
+				dev, err = r.c.GetDevice(v.ServiceTag.ValueString(), 0)
 			}
-			if err2 != nil {
-				if !v.ID.IsUnknown() && !v.ServiceTag.IsUnknown() && errors.Is(err2, clients.ErrItemNotFound) {
+			if err != nil {
+				if !v.ID.IsUnknown() && !v.ServiceTag.IsUnknown() && errors.Is(err, clients.ErrItemNotFound) {
 					// this condition means that this device is not found during read refresh
 					continue
 				}
-				err = r.join(err, err2)
+				dgs.AddError(
+					"Error getting device.",
+					err.Error(),
+				)
 				continue
 			}
 			devs = append(devs, dev)
 		}
 	}
-	if err != nil {
-		return state, err
+	if dgs.HasError() {
+		return state, dgs
 	}
-
-	// for _, v := range devs {
-	// 	state.Devices = append(state.Devices, models.NewDeviceItemModel(v))
-	// }
-	state = models.NewDevicesResModel(devs)
-	return state, nil
-}
-
-func (r *resourceDevices) join(err1, err2 error) error {
-	if err1 == nil {
-		return err2
-	}
-	return fmt.Errorf("%w, %s", err1, err2.Error())
+	return models.NewDevicesResModel(devs)
 }
 
 // Read resource information
@@ -230,12 +225,9 @@ func (r resourceDevices) Read(ctx context.Context, req resource.ReadRequest, res
 
 	tflog.Info(ctx, "resource_devices getting current infrastructure state")
 
-	state, err := r.getState(ctx, state)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error getting current infrastructure state.",
-			err.Error(),
-		)
+	state, dgs := r.getState(ctx, state.Devices)
+	resp.Diagnostics.Append(dgs...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 	diags = resp.State.Set(ctx, &state)
@@ -246,8 +238,10 @@ func (r resourceDevices) Read(ctx context.Context, req resource.ReadRequest, res
 func (r resourceDevices) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	//Get Plan Data
 	tflog.Trace(ctx, "resource_devices update: started")
-	var plan models.DevicesResModel
+	var oldState, plan models.DevicesResModel
 	diags := req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	diags = req.State.Get(ctx, &oldState)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -264,20 +258,99 @@ func (r resourceDevices) Update(ctx context.Context, req resource.UpdateRequest,
 
 	tflog.Info(ctx, "resource_devices getting current infrastructure state")
 
-	state, err := r.getState(ctx, plan)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error getting current infrastructure state.",
-			err.Error(),
-		)
+	resp.Diagnostics.Append(r.updateDevs(ctx, oldState, plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	state, dgs := r.getState(ctx, plan.Devices)
+	resp.Diagnostics.Append(dgs...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 }
 
+func (r resourceDevices) getDevIDsToRmv(ctx context.Context, state, plan models.DevicesResModel) (
+	[]int64, diag.Diagnostics) {
+	var (
+		dgs      diag.Diagnostics
+		idsToRmv = make([]int64, 0)
+	)
+
+	if plan.Devices.IsUnknown() {
+		return idsToRmv, dgs
+	}
+	pdevs := make([]models.DeviceItemModel, 0)
+	dgs.Append(plan.Devices.ElementsAs(ctx, &pdevs, false)...)
+	sdevs := make([]models.DeviceItemModel, 0)
+	dgs.Append(state.Devices.ElementsAs(ctx, &sdevs, false)...)
+	if dgs.HasError() {
+		return idsToRmv, dgs
+	}
+	mid, mstag := make(map[int64]bool), make(map[string]bool)
+	for _, v := range pdevs {
+		if !v.ID.IsUnknown() {
+			mid[v.ID.ValueInt64()] = true
+		}
+		if !v.ServiceTag.IsUnknown() {
+			mstag[v.ServiceTag.ValueString()] = true
+		}
+	}
+	tflog.Debug(ctx, fmt.Sprintf("Device IDs present in plan: %v", mid))
+	tflog.Debug(ctx, fmt.Sprintf("Device ServiceTags present in plan: %v", mstag))
+	for _, v := range sdevs {
+		_, oki := mid[v.ID.ValueInt64()]
+		_, okt := mstag[v.ServiceTag.ValueString()]
+		if !(oki || okt) {
+			// this condition means that device v must be removed
+			idsToRmv = append(idsToRmv, v.ID.ValueInt64())
+		}
+	}
+	return idsToRmv, dgs
+}
+
+func (r resourceDevices) updateDevs(ctx context.Context, state, plan models.DevicesResModel) diag.Diagnostics {
+	idsToRmv, dgs := r.getDevIDsToRmv(ctx, state, plan)
+	tflog.Info(ctx, fmt.Sprintf("resource_devices removing devices with IDs %v", idsToRmv))
+	err := r.c.RemoveDevices(idsToRmv)
+	if err != nil {
+		dgs.AddError("Could not remove devices", err.Error())
+	}
+	return dgs
+}
+
 // Delete resource
 func (r resourceDevices) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// Just remove State Data
 	resp.State.RemoveResource(ctx)
+}
+
+// Import resource
+func (r resourceDevices) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	tflog.Trace(ctx, "resource_devices import: started")
+	planDevs, dgs := models.NewDevicesResModelFromID(req.ID)
+	resp.Diagnostics.Append(dgs...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// defer the remove session
+	omeClient, ds := r.p.createOMESession(ctx, "resource_devices Import")
+	resp.Diagnostics.Append(ds...)
+	if ds.HasError() {
+		return
+	}
+	r.c = omeClient
+	defer omeClient.RemoveSession()
+
+	state, dgs := r.getState(ctx, planDevs)
+	resp.Diagnostics.Append(dgs...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	diags := resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	tflog.Trace(ctx, "resource_devices import: finished")
 }
