@@ -47,6 +47,7 @@ func (c *Client) GetDevice(serviceTag string, devID int64) (models.Device, error
 	return device, err
 }
 
+// RemoveDevices - function to remove specified list of devices by id
 func (c *Client) RemoveDevices(ids []int64) error {
 	if len(ids) == 0 {
 		return nil

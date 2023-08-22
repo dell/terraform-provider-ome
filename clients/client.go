@@ -28,6 +28,7 @@ import (
 )
 
 var (
+	// ErrItemNotFound - error returned when single item is not found
 	ErrItemNotFound = fmt.Errorf("no items found, expecting one")
 )
 
