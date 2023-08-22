@@ -1,14 +1,22 @@
 package ome
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // NetworkSettingSchema for network setting schema
 func NetworkSettingSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
+		"id": schema.StringAttribute{
+			MarkdownDescription: "ID of the ome network setting.",
+			Description:         "ID of the ome network setting.",
+			Computed:            true,
+		},
 
 		"adapter_setting": schema.SingleNestedAttribute{
 			MarkdownDescription: "Ome Adapter Setting",
@@ -289,6 +297,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Enable or disable the universal inactivity timeout.",
 			Optional:            true,
 			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(false)),
+			},
 		},
 
 		"universal_timeout": schema.Float64Attribute{
@@ -296,6 +307,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which all sessions end. This is applicable when \"enable_universal_timeout\" is true. This is mutually exclusive with \"api_timeout\", \"gui_timeout\", \"ssh_timeout\" and \"serial_timeout\".",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.Float64{
+				float64validator.Between(1, 1400),
+			},
 		},
 
 		"api_timeout": schema.Float64Attribute{
@@ -303,6 +317,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which the API session ends. This is mutually exclusive with \"universal_timeout\".",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.Float64{
+				float64validator.Between(1, 1400),
+			},
 		},
 
 		"api_session": schema.Int64Attribute{
@@ -310,6 +327,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "The maximum number of API sessions to be allowed.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.Int64{
+				int64validator.Between(1, 100),
+			},
 		},
 
 		"gui_timeout": schema.Float64Attribute{
@@ -317,6 +337,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which the web interface of Graphical User Interface (GUI) session ends. This is mutually exclusive with \"universal_timeout\".",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.Float64{
+				float64validator.Between(1, 1400),
+			},
 		},
 
 		"gui_session": schema.Int64Attribute{
@@ -324,6 +347,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "The maximum number of GUI sessions to be allowed.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.Int64{
+				int64validator.Between(1, 100),
+			},
 		},
 
 		"ssh_timeout": schema.Float64Attribute{
@@ -331,6 +357,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which the SSH session ends. This is applicable only for OpenManage Enterprise Modular. This is mutually exclusive with \"universal_timeout\".",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.Float64{
+				float64validator.Between(1, 1400),
+			},
 		},
 
 		"ssh_session": schema.Int64Attribute{
@@ -338,6 +367,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "The maximum number of SSH sessions to be allowed. This is applicable to OME-M only.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.Int64{
+				int64validator.Between(1, 100),
+			},
 		},
 
 		"serial_timeout": schema.Float64Attribute{
@@ -345,6 +377,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "Duration of inactivity in minutes after which the serial console session ends.This is applicable only for OpenManage Enterprise Modular. This is mutually exclusive with \"universal_timeout\"",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.Float64{
+				float64validator.Between(1, 1400),
+			},
 		},
 
 		"serial_session": schema.Int64Attribute{
@@ -352,6 +387,9 @@ func SessionSettingSchema() map[string]schema.Attribute {
 			Description:         "The maximum number of serial console sessions to be allowed. This is applicable only for OpenManage Enterprise Modular.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.Int64{
+				int64validator.Between(1, 100),
+			},
 		},
 	}
 }

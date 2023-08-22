@@ -108,54 +108,19 @@ type UpdateNetworkAdapterSetting struct {
 
 // NetworkSessions to get network session
 type NetworkSessions struct {
-	OdataContext string        `json:"@odata.context"`
-	OdataCount   int           `json:"@odata.count"`
-	Value        []SessionInfo `json:"value"`
+	SessionList []SessionInfo `json:"value"`
 }
 
 // SessionInfo to get session info
 type SessionInfo struct {
-	OdataType                  string `json:"@odata.type"`
-	SessionType                string `json:"SessionType"`
-	MaxSessions                int    `json:"MaxSessions"`
-	SessionTimeout             int    `json:"SessionTimeout"`
-	MinSessionTimeout          int    `json:"MinSessionTimeout"`
-	MaxSessionTimeout          int    `json:"MaxSessionTimeout"`
-	MinSessionsAllowed         int    `json:"MinSessionsAllowed"`
-	MaxSessionsAllowed         int    `json:"MaxSessionsAllowed"`
-	MaxSessionsConfigurable    bool   `json:"MaxSessionsConfigurable"`
-	SessionTimeoutConfigurable bool   `json:"SessionTimeoutConfigurable"`
-}
-
-// UpdateNetworkSessions to update network session
-type UpdateNetworkSessions []struct {
 	SessionType    string `json:"SessionType"`
 	MaxSessions    int    `json:"MaxSessions"`
 	SessionTimeout int    `json:"SessionTimeout"`
 }
 
-// TimeConfiguration to get time configuration
-type TimeConfiguration struct {
-	OdataContext         string `json:"@odata.context"`
-	OdataType            string `json:"@odata.type"`
-	OdataID              string `json:"@odata.id"`
-	TimeZone             string `json:"TimeZone"`
-	TimeZoneIDLinux      string `json:"TimeZoneIdLinux"`
-	TimeZoneIDWindows    string `json:"TimeZoneIdWindows"`
-	EnableNTP            bool   `json:"EnableNTP"`
-	PrimaryNTPAddress    any    `json:"PrimaryNTPAddress"`
-	SecondaryNTPAddress1 any    `json:"SecondaryNTPAddress1"`
-	SecondaryNTPAddress2 any    `json:"SecondaryNTPAddress2"`
-	SystemTime           string `json:"SystemTime"`
-	TimeSource           string `json:"TimeSource"`
-	UtcTime              string `json:"UtcTime"`
-}
-
 // TimeZones to get all time zones.
 type TimeZones struct {
-	OdataContext string     `json:"@odata.context"`
-	OdataCount   int        `json:"@odata.count"`
-	Value        []TimeZone `json:"value"`
+	TimeZoneList []TimeZone `json:"value"`
 }
 
 // TimeZone for one time zone.
@@ -166,29 +131,14 @@ type TimeZone struct {
 	Name             string `json:"Name"`
 }
 
-// TimeConfigPayload to get time configuration payload.
-type TimeConfigPayload struct {
+// TimeConfig to get time configuration.
+type TimeConfig struct {
 	TimeZone             string `json:"TimeZone"`
 	EnableNTP            bool   `json:"EnableNTP"`
-	PrimaryNTPAddress    any    `json:"PrimaryNTPAddress"`
-	SecondaryNTPAddress1 any    `json:"SecondaryNTPAddress1"`
-	SecondaryNTPAddress2 any    `json:"SecondaryNTPAddress2"`
+	PrimaryNTPAddress    string `json:"PrimaryNTPAddress"`
+	SecondaryNTPAddress1 string `json:"SecondaryNTPAddress1"`
+	SecondaryNTPAddress2 string `json:"SecondaryNTPAddress2"`
 	SystemTime           string `json:"SystemTime"`
-}
-
-// TimeConfigResponse to get time config response.
-type TimeConfigResponse struct {
-	TimeZone             string `json:"TimeZone"`
-	TimeZoneIDLinux      any    `json:"TimeZoneIdLinux"`
-	TimeZoneIDWindows    any    `json:"TimeZoneIdWindows"`
-	EnableNTP            bool   `json:"EnableNTP"`
-	PrimaryNTPAddress    any    `json:"PrimaryNTPAddress"`
-	SecondaryNTPAddress1 any    `json:"SecondaryNTPAddress1"`
-	SecondaryNTPAddress2 any    `json:"SecondaryNTPAddress2"`
-	SystemTime           any    `json:"SystemTime"`
-	TimeSource           string `json:"TimeSource"`
-	UtcTime              any    `json:"UtcTime"`
-	JobID                any    `json:"JobId"`
 }
 
 // ProxyConfiguration to get proxy configuration
@@ -196,7 +146,7 @@ type ProxyConfiguration struct {
 	IPAddress            string `json:"IpAddress"`
 	PortNumber           int    `json:"PortNumber"`
 	Username             string `json:"Username"`
-	Password             any    `json:"Password"`
+	Password             string `json:"Password"`
 	EnableAuthentication bool   `json:"EnableAuthentication"`
 	EnableProxy          bool   `json:"EnableProxy"`
 	SslCheckDisabled     bool   `json:"SslCheckDisabled"`
@@ -217,22 +167,23 @@ type PayloadProxyConfiguration struct {
 
 // OmeNetworkSetting for network terraform attribute
 type OmeNetworkSetting struct {
-	OmeAdapterSetting OmeAdapterSetting `tfsdk:"adapter_setting"`
-	OmeSessionSetting OmeSessionSetting `tfsdk:"session_setting"`
-	OmeTimeSetting    OmeTimeSetting    `tfsdk:"time_setting"`
-	OmeProxySetting   OmeProxySetting   `tfsdk:"proxy_setting"`
+	ID                types.String       `tfsdk:"id"`
+	OmeAdapterSetting *OmeAdapterSetting `tfsdk:"adapter_setting"`
+	OmeSessionSetting *OmeSessionSetting `tfsdk:"session_setting"`
+	OmeTimeSetting    *OmeTimeSetting    `tfsdk:"time_setting"`
+	OmeProxySetting   *OmeProxySetting   `tfsdk:"proxy_setting"`
 }
 
 // OmeAdapterSetting for adapter_setting terraform attribute.
 type OmeAdapterSetting struct {
-	EnableNic      types.Bool        `tfsdk:"enable_nic"`
-	InterfaceName  types.String      `tfsdk:"interface_name"`
-	IPV4Config     OmeIPv4Config     `tfsdk:"ipv4_configuration"`
-	IPV6Config     OmeIPv6Config     `tfsdk:"ipv6_configuration"`
-	ManagementVLAN OmeManagementVLAN `tfsdk:"management_vlan"`
-	DNSConfig      OmeDNSConfig      `tfsdk:"dns_configuration"`
-	RebootDelay    types.Int64       `tfsdk:"reboot_delay"`
-	JobID          types.Int64       `tfsdk:"job_id"`
+	EnableNic      types.Bool         `tfsdk:"enable_nic"`
+	InterfaceName  types.String       `tfsdk:"interface_name"`
+	IPV4Config     *OmeIPv4Config     `tfsdk:"ipv4_configuration"`
+	IPV6Config     *OmeIPv6Config     `tfsdk:"ipv6_configuration"`
+	ManagementVLAN *OmeManagementVLAN `tfsdk:"management_vlan"`
+	DNSConfig      *OmeDNSConfig      `tfsdk:"dns_configuration"`
+	RebootDelay    types.Int64        `tfsdk:"reboot_delay"`
+	JobID          types.Int64        `tfsdk:"job_id"`
 }
 
 // OmeIPv4Config for ipv4_configuration terraform attribute
@@ -276,7 +227,7 @@ type OmeDNSConfig struct {
 // OmeSessionSetting for session_setting terraform attribute.
 type OmeSessionSetting struct {
 	EnableUniversalTimeout types.Bool    `tfsdk:"enable_universal_timeout"`
-	UnversalTimeout        types.Float64 `tfsdk:"universal_timeout"`
+	UniversalTimeout       types.Float64 `tfsdk:"universal_timeout"`
 	APITimeout             types.Float64 `tfsdk:"api_timeout"`
 	APISession             types.Int64   `tfsdk:"api_session"`
 	GUITimeout             types.Float64 `tfsdk:"gui_timeout"`
@@ -303,6 +254,6 @@ type OmeProxySetting struct {
 	IPAddress            types.String `tfsdk:"ip_address"`
 	ProxyPort            types.Int64  `tfsdk:"proxy_port"`
 	EnableAuthentication types.Bool   `tfsdk:"enable_authentication"`
-	Username             types.String `tfsdk:"Username"`
-	Password             types.String `tfsdk:"Password"`
+	Username             types.String `tfsdk:"username"`
+	Password             types.String `tfsdk:"password"`
 }

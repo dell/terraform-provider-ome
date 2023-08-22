@@ -63,7 +63,7 @@ func (c *Client) GetNetworkSessions() (models.NetworkSessions, error) {
 }
 
 // UpdateNetworkSessions to update the network session setting in the OME.
-func (c *Client) UpdateNetworkSessions(sessionPayload models.UpdateNetworkSessions) ([]models.SessionInfo, error) {
+func (c *Client) UpdateNetworkSessions(sessionPayload []models.SessionInfo) ([]models.SessionInfo, error) {
 	data, _ := c.JSONMarshal(sessionPayload)
 	response, err := c.Post(UpdateNetworkSessions, nil, data)
 	if err != nil {
@@ -76,29 +76,27 @@ func (c *Client) UpdateNetworkSessions(sessionPayload models.UpdateNetworkSessio
 }
 
 // GetTimeConfiguration to get the time configuration of the OME.
-func (c *Client) GetTimeConfiguration() (models.TimeConfiguration, error) {
+func (c *Client) GetTimeConfiguration() (models.TimeConfig, error) {
 	response, err := c.Get(TimeConfigurationAPI, nil, nil)
 	if err != nil {
-		return models.TimeConfiguration{}, err
+		return models.TimeConfig{}, err
 	}
-
 	bodyData, _ := c.GetBodyData(response.Body)
-
-	timeConfig := models.TimeConfiguration{}
+	timeConfig := models.TimeConfig{}
 	err = c.JSONUnMarshal(bodyData, &timeConfig)
 	return timeConfig, err
 }
 
 // UpdateTimeConfiguration to update the time configuration of the OME.
-func (c *Client) UpdateTimeConfiguration(payloadTC models.TimeConfigPayload) (models.TimeConfigResponse, error) {
+func (c *Client) UpdateTimeConfiguration(payloadTC models.TimeConfig) (models.TimeConfig, error) {
 	data, _ := c.JSONMarshal(payloadTC)
 	response, err := c.Put(TimeConfigurationAPI, nil, data)
 	if err != nil {
-		return models.TimeConfigResponse{}, err
+		return models.TimeConfig{}, err
 	}
 
 	bodyData, _ := c.GetBodyData(response.Body)
-	timeConfig := models.TimeConfigResponse{}
+	timeConfig := models.TimeConfig{}
 	err = c.JSONUnMarshal(bodyData, &timeConfig)
 	return timeConfig, err
 }

@@ -345,7 +345,7 @@ func (c *Client) JSONUnMarshalSingleValue(data []byte, in interface{}) error {
 	} else if l > 1 {
 		return fmt.Errorf("multiple items found, expecting one")
 	}
-	bytes := inV[0]
+	bytes := inV[0] // #nosec G602
 	fmt.Sprintln(string(bytes))
 	if err := json.Unmarshal(bytes, in); err != nil {
 		return fmt.Errorf("error unmarshalling the item in response value: %w", err)
