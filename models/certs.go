@@ -43,6 +43,12 @@ type CertInfo struct {
 
 // tfsdk structs
 
+// CertResModel - tfsdk model for the CSR resource
+type CertResModel struct {
+	ID   types.String `tfsdk:"id"`
+	Cert types.String `tfsdk:"certificate_base64"`
+}
+
 // CsrResModel - tfsdk model for the CSR resource
 type CsrResModel struct {
 	ID    types.String   `tfsdk:"id"`

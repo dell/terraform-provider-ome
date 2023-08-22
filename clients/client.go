@@ -260,6 +260,10 @@ func (c *Client) PostFile(
 	if errr != nil {
 		return nil, errr
 	}
+	//PrereqHook
+	if c.preRequestHook != nil {
+		c.preRequestHook(c, request)
+	}
 
 	//Add Request Header if any
 	for k, value := range headers {
