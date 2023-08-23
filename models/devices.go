@@ -254,7 +254,7 @@ func NewDevicesResModelFromID(id string) (types.List, diag.Diagnostics) {
 		didst = id
 	} else if l > 2 {
 		dgs.AddError(
-			"Wrong id format.",
+			"Wrong \"id\" format.",
 			fmt.Sprintf("Expecting a string having maximum 1 semicolon, found %d", l-1),
 		)
 		return plan, dgs
@@ -270,7 +270,7 @@ func NewDevicesResModelFromID(id string) (types.List, diag.Diagnostics) {
 			didInt, err := strconv.ParseInt(did, 10, 64)
 			if err != nil {
 				dgs.AddError(
-					"Wrong id format. ID could not be converted to an Int64.",
+					"Wrong \"id\" format. ID could not be converted to an Int64.",
 					err.Error(),
 				)
 			}
@@ -290,7 +290,7 @@ func NewDevicesResModelFromID(id string) (types.List, diag.Diagnostics) {
 		}
 	} else {
 		dgs.AddError(
-			"Wrong id format.",
+			"Wrong \"id\" format.",
 			fmt.Sprintf("Identifier of type %s is not recognised, valid values are [id, svc_tag].", did),
 		)
 	}
