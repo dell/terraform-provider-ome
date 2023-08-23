@@ -48,6 +48,13 @@ var DeviceIP1 = os.Getenv("DEVICEIP1")
 var DeviceIP2 = os.Getenv("DEVICEIP2")
 var DeviceIP3 = os.Getenv("DEVICEIP3")
 
+// the following must be absolute paths
+// script that accepts csr and output file as inputs respectively and generates cert
+var CertScript = os.Getenv("CERT_SCRIPT")
+
+// an invalid cert
+var InvCert = os.Getenv("INV_CERT")
+
 var testProvider = `
 provider "ome" {
 	username = "` + omeUserName + `"
