@@ -38,7 +38,7 @@ var (
 	_ resource.ResourceWithConfigure = &resourceDevices{}
 )
 
-// NewDevicesResource is new resource for application csr
+// NewDevicesResource is new resource for devices
 func NewDevicesResource() resource.Resource {
 	return &resourceDevices{}
 }
