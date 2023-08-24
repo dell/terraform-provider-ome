@@ -120,6 +120,8 @@ func (r *discoveryResource) Create(ctx context.Context, req resource.CreateReque
 	state = discoveryState(ctx, cDiscovery, plan)
 	// Save into State
 	diags = resp.State.Set(ctx, &state)
+	result, err := DiscoverJobRunner(ctx,omeClient,int64(cDiscovery.DiscoveryConfigTaskParam[0].TaskID),10)
+	tflog.Info(ctx,"alpha " + result + ", error: " + err.Error())
 	tflog.Trace(ctx, "resource_discovery create: updating state finished, saving ...")
 	resp.Diagnostics.Append(diags...)
 	tflog.Trace(ctx, "resource_discovery create: finish")

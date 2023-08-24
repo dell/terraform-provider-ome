@@ -73,7 +73,13 @@ type Params struct {
 
 // LastExecutionDetail is response returned by LastExecutionDetail job API
 type LastExecutionDetail struct {
-	Value string `json:"Value"`
+	Value              string    `json:"Value"`
+	ExecutionHistoryId int       `json:"ExecutionHistoryId"`
+	JobStatus          JobStatus `json:"JobStatus"`
+}
+
+type ExecutionHistories struct {
+	ExecutionDetails []LastExecutionDetail `json:"value"`
 }
 
 // AuthResp is the payload returned by the response of authentication
