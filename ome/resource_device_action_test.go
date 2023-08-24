@@ -7,6 +7,26 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
+func TestAccDeviceActionResInvalid(t *testing.T) {
+	test := testProvider + `
+	resource "ome_device_action" "code_1" {
+		job_name = "rounak-job"
+		device_ids = [100, 200]
+	}
+	`
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: test,
+				// PlanOnly:    true,
+				ExpectError: regexp.MustCompile(".*Error creating job.*"),
+			},
+		},
+	})
+}
+
 func TestAccDeviceActionRes(t *testing.T) {
 	getDeviceIds := `
 	data "ome_device" "devs" {

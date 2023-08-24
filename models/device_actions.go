@@ -25,4 +25,10 @@ type DeviceActionModel struct {
 	Timeout        types.Int64  `tfsdk:"timeout"`
 	JobName        types.String `tfsdk:"job_name"`
 	JobDescription types.String `tfsdk:"job_description"`
+	NextRunTime    types.String `tfsdk:"next_run_time"`
+	LastRunTime    types.String `tfsdk:"last_run_time"`
+	JobStatus      types.String `tfsdk:"current_status"`
+	LastRunStatus  types.String `tfsdk:"last_run_status"`
+	StartTime      types.String `tfsdk:"start_time"`
+	EndTime        types.String `tfsdk:"end_time"`
 }

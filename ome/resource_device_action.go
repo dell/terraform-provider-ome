@@ -138,6 +138,36 @@ func (r resourceDeviceAction) Schema(_ context.Context, _ resource.SchemaRequest
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"last_run_time": schema.StringAttribute{
+				MarkdownDescription: "Decsription.",
+				Description:         "Decsription.",
+				Computed:            true,
+			},
+			"next_run_time": schema.StringAttribute{
+				MarkdownDescription: "Decsription.",
+				Description:         "Decsription.",
+				Computed:            true,
+			},
+			"last_run_status": schema.StringAttribute{
+				MarkdownDescription: "Decsription.",
+				Description:         "Decsription.",
+				Computed:            true,
+			},
+			"current_status": schema.StringAttribute{
+				MarkdownDescription: "Decsription.",
+				Description:         "Decsription.",
+				Computed:            true,
+			},
+			"start_time": schema.StringAttribute{
+				MarkdownDescription: "Decsription.",
+				Description:         "Decsription.",
+				Computed:            true,
+			},
+			"end_time": schema.StringAttribute{
+				MarkdownDescription: "Decsription.",
+				Description:         "Decsription.",
+				Computed:            true,
+			},
 		},
 	}
 }
@@ -253,6 +283,12 @@ func (r resourceDeviceAction) getJobModel(resp clients.JobResp, pstate models.De
 		Timeout:        pstate.Timeout,
 		JobName:        types.StringValue(resp.JobName),
 		JobDescription: types.StringValue(resp.JobDescription),
+		NextRunTime:    types.StringValue(resp.NextRun),
+		LastRunTime:    types.StringValue(resp.LastRun),
+		JobStatus:      types.StringValue(resp.JobStatus.Name),
+		LastRunStatus:  types.StringValue(resp.LastRunStatus.Name),
+		StartTime:      types.StringValue(resp.StartTime),
+		EndTime:        types.StringValue(resp.EndTime),
 	}
 }
 
