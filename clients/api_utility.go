@@ -20,6 +20,10 @@ import (
 	"time"
 )
 
+const (
+	RunNowSchedule = "startnow"
+)
+
 // PaginationData common
 type PaginationData struct {
 	OdataContext string                   `json:"@odata.context"`
@@ -50,8 +54,8 @@ type JobOpts struct {
 }
 
 func (j JobOpts) getSchedule() string {
-	if j.RunNow {
-		return "startnow"
+	if j.RunNow || j.Schedule == "" {
+		return RunNowSchedule
 	}
 	return j.Schedule
 }

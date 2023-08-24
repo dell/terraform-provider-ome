@@ -18,13 +18,17 @@ import (
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -36,9 +40,9 @@ var (
 )
 
 const (
-	maxretries = 20
-	interval   = 5
-	name       = "Just-trying-out"
+	defaultJobTimeout int64 = 10
+	interval                = 5
+	name                    = "Just-trying-out"
 )
 
 // NewDeviceActionResource is new resource for device_action
@@ -79,8 +83,11 @@ func (r resourceDeviceAction) Schema(_ context.Context, _ resource.SchemaRequest
 				Description:         "List of device_action to be managed by this resource.",
 				Required:            true,
 				ElementType:         types.Int64Type,
+				Validators: []validator.List{
+					listvalidator.SizeAtLeast(1),
+				},
 				PlanModifiers: []planmodifier.List{
-					listplanmodifier.RequiresReplaceIfConfigured(),
+					listplanmodifier.RequiresReplace(),
 				},
 			},
 			"action": schema.StringAttribute{
@@ -94,7 +101,41 @@ func (r resourceDeviceAction) Schema(_ context.Context, _ resource.SchemaRequest
 				Computed: true,
 				Default:  stringdefault.StaticString("inventory_refresh"),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplaceIfConfigured(),
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"cron": schema.StringAttribute{
+				MarkdownDescription: "Cron.",
+				Description:         "Cron.",
+				Optional:            true,
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(path.MatchRelative().AtParent().AtName("timeout")),
+				},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"timeout": schema.Int64Attribute{
+				MarkdownDescription: "ID of the job created for carrying out the action.",
+				Description:         "ID of the job created for carrying out the action.",
+				Optional:            true,
+			},
+			"job_name": schema.StringAttribute{
+				MarkdownDescription: "Name.",
+				Description:         "Name.",
+				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"job_description": schema.StringAttribute{
+				MarkdownDescription: "Decsription.",
+				Description:         "Decsription.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 		},
@@ -134,7 +175,17 @@ func (r resourceDeviceAction) Create(ctx context.Context, req resource.CreateReq
 		return
 	}
 
-	if ok, message := omeClient.TrackJob(state.ID.ValueInt64(), maxretries, interval); !ok {
+	if !plan.Cron.IsNull() {
+		return
+	}
+
+	timeout := defaultJobTimeout
+	if !plan.Timeout.IsNull() {
+		timeout = plan.Timeout.ValueInt64()
+	}
+	retries := timeout * 60 / interval
+
+	if ok, message := omeClient.TrackJob(state.ID.ValueInt64(), retries, interval); !ok {
 		resp.Diagnostics.AddError(
 			"Refresh Job could not complete.",
 			message,
@@ -156,8 +207,9 @@ func (r resourceDeviceAction) create(ctx context.Context, plan models.DeviceActi
 	models.DeviceActionModel, diag.Diagnostics) {
 	var dgs diag.Diagnostics
 	jobResp, err := r.c.RefreshDeviceInventory(plan.DeviceIDs, clients.JobOpts{
-		Name:   "Just-checking",
-		RunNow: true,
+		Name:        plan.JobName.ValueString(),
+		Description: plan.JobDescription.ValueString(),
+		Schedule:    plan.Cron.ValueString(),
 	})
 	if err != nil {
 		dgs.AddError("Error creating job.", err.Error())
@@ -182,12 +234,25 @@ func (r resourceDeviceAction) read(ctx context.Context, pstate models.DeviceActi
 	return r.convertJobRespToTfsdk(ctx, jobResp, pstate), dgs
 }
 
-func (r resourceDeviceAction) convertJobRespToTfsdk(ctx context.Context, jobResp clients.JobResp,
+func (r resourceDeviceAction) convertJobRespToTfsdk(ctx context.Context, resp clients.JobResp,
 	pstate models.DeviceActionModel) models.DeviceActionModel {
+	ret := r.getJobModel(resp, pstate)
+	ret.ID = types.Int64Value(resp.ID)
+	ret.DeviceIDs = pstate.DeviceIDs
+	ret.Action = pstate.Action
+	return ret
+}
+
+func (r resourceDeviceAction) getJobModel(resp clients.JobResp, pstate models.DeviceActionModel) models.DeviceActionModel {
+	cron := types.StringNull()
+	if !(resp.Schedule == clients.RunNowSchedule || resp.Schedule == "") {
+		cron = types.StringValue(resp.Schedule)
+	}
 	return models.DeviceActionModel{
-		ID:        types.Int64Value(jobResp.ID),
-		DeviceIDs: pstate.DeviceIDs,
-		Action:    pstate.Action,
+		Cron:           cron,
+		Timeout:        pstate.Timeout,
+		JobName:        types.StringValue(resp.JobName),
+		JobDescription: types.StringValue(resp.JobDescription),
 	}
 }
 
@@ -224,10 +289,19 @@ func (r resourceDeviceAction) Read(ctx context.Context, req resource.ReadRequest
 
 // Update resource
 func (r resourceDeviceAction) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	resp.Diagnostics.AddError(
-		"Update is not expected by this resource.",
-		"An update plan should never be generated. Please report this bug to the developers.",
-	)
+	// update ONLY happens if someone ONLY changes timeout
+	// so set state timeout as plan
+	var plan, state models.DeviceActionModel
+	diags := req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	diags = req.Plan.Get(ctx, &plan)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	state.Timeout = plan.Timeout
+	diags = resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
 }
 
 // Delete resource

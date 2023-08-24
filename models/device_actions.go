@@ -18,7 +18,11 @@ import (
 )
 
 type DeviceActionModel struct {
-	ID        types.Int64  `tfsdk:"id"`
-	DeviceIDs []int64      `tfsdk:"device_ids"`
-	Action    types.String `tfsdk:"action"`
+	ID             types.Int64  `tfsdk:"id"`
+	DeviceIDs      []int64      `tfsdk:"device_ids"`
+	Action         types.String `tfsdk:"action"`
+	Cron           types.String `tfsdk:"cron"`
+	Timeout        types.Int64  `tfsdk:"timeout"`
+	JobName        types.String `tfsdk:"job_name"`
+	JobDescription types.String `tfsdk:"job_description"`
 }
