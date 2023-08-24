@@ -35,6 +35,12 @@ var (
 	_ resource.ResourceWithConfigure = &resourceDeviceAction{}
 )
 
+const (
+	maxretries = 20
+	interval   = 5
+	name       = "Just-trying-out"
+)
+
 // NewDeviceActionResource is new resource for device_action
 func NewDeviceActionResource() resource.Resource {
 	return &resourceDeviceAction{}
@@ -124,12 +130,35 @@ func (r resourceDeviceAction) Create(ctx context.Context, req resource.CreateReq
 	}
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if ok, message := omeClient.TrackJob(state.ID.ValueInt64(), maxretries, interval); !ok {
+		resp.Diagnostics.AddError(
+			"Refresh Job could not complete.",
+			message,
+		)
+	} else {
+		tflog.Info(ctx, "Refresh job completed successfully. "+message)
+	}
+
+	state, dgs = r.read(ctx, state)
+	resp.Diagnostics.Append(dgs...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	diags = resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
 }
 
 func (r resourceDeviceAction) create(ctx context.Context, plan models.DeviceActionModel) (
 	models.DeviceActionModel, diag.Diagnostics) {
 	var dgs diag.Diagnostics
-	jobResp, err := r.c.RefreshDeviceInventory(plan.DeviceIDs)
+	jobResp, err := r.c.RefreshDeviceInventory(plan.DeviceIDs, clients.JobOpts{
+		Name:   "Just-checking",
+		RunNow: true,
+	})
 	if err != nil {
 		dgs.AddError("Error creating job.", err.Error())
 		return plan, dgs

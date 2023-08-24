@@ -51,8 +51,7 @@ func (c *Client) GetDeviceInventoryByType(deviceID int64, inventoryType string) 
 }
 
 // RefreshDeviceInventory returns the inventory of a device of a particular type
-func (c *Client) RefreshDeviceInventory(deviceIDs []int64) (JobResp, error) {
-	name := fmt.Sprintf("Refresh devices with ids: %v", deviceIDs)
+func (c *Client) RefreshDeviceInventory(deviceIDs []int64, opts JobOpts) (JobResp, error) {
 	targets := make([]models.JobTargetType, 0)
 	for _, id := range deviceIDs {
 		targets = append(targets, models.JobTargetType{
@@ -62,9 +61,9 @@ func (c *Client) RefreshDeviceInventory(deviceIDs []int64) (JobResp, error) {
 	}
 	payload := models.JobPayload{
 		Enabled:        true,
-		JobName:        name,
-		JobDescription: name,
-		Schedule:       "startnow",
+		JobName:        opts.Name,
+		JobDescription: opts.Description,
+		Schedule:       opts.getSchedule(),
 		JobType:        models.InventoryRefreshJobType,
 		Params: map[string]string{
 			"action":                   "CONFIG_INVENTORY",

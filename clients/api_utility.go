@@ -41,6 +41,21 @@ type JobStatus struct {
 	Name string `json:"Name"`
 }
 
+// JobOpts is a common set of options that can be used when creating a job
+type JobOpts struct {
+	Name        string
+	Description string
+	RunNow      bool // if this is true, ignore schedule
+	Schedule    string
+}
+
+func (j JobOpts) getSchedule() string {
+	if j.RunNow {
+		return "startnow"
+	}
+	return j.Schedule
+}
+
 // JobResp is the response returned by the jobs API
 type JobResp struct {
 	ID             int64     `json:"Id"`
@@ -113,7 +128,7 @@ func (c *Client) RemoveSession() (*http.Response, error) {
 	return resp, err
 }
 
-// TrackJob - is used to track job status
+// TrackJob - is used to track job status. It returns isJobCompleted, message
 func (c *Client) TrackJob(jobID int64, maxRetries int64, sleepInterval int64) (bool, string) {
 	var status bool
 	var message string

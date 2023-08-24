@@ -21,7 +21,7 @@ type JobPayload struct {
 	ID             int64     `json:"Id"`
 	Enabled        StateType `json:"State"`
 	JobName        string
-	JobDescription string
+	JobDescription string `json:"JobDescription,omitempty"`
 	Schedule       string
 	JobType        JobType
 	Params         JobParams `json:"Params,omitempty"`
