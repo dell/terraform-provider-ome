@@ -49,3 +49,32 @@ func (c *Client) GetDeviceInventoryByType(deviceID int64, inventoryType string) 
 	err = inv.AddInfo(temp)
 	return inv, err
 }
+
+// RefreshDeviceInventory returns the inventory of a device of a particular type
+func (c *Client) RefreshDeviceInventory(deviceIDs []int64) (JobResp, error) {
+	name := fmt.Sprintf("Refresh devices with ids: %v", deviceIDs)
+	targets := make([]models.JobTargetType, 0)
+	for _, id := range deviceIDs {
+		targets = append(targets, models.JobTargetType{
+			ID:         id,
+			TargetType: models.DeviceTargetType,
+		})
+	}
+	payload := models.JobPayload{
+		Enabled:        true,
+		JobName:        name,
+		JobDescription: name,
+		Schedule:       "startnow",
+		JobType:        models.InventoryRefreshJobType,
+		Params: map[string]string{
+			"action":                   "CONFIG_INVENTORY",
+			"isCollectDriverInventory": "true",
+		},
+		Targets: targets,
+	}
+	response, err := c.CreateJob(payload)
+	if err != nil {
+		return JobResp{}, fmt.Errorf("error creating device inventory refresh job: %w", err)
+	}
+	return response, nil
+}
