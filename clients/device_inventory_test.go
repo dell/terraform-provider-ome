@@ -45,3 +45,27 @@ func TestClient_GetDeviceInventory(t *testing.T) {
 	assert.NotEmpty(t, v.ServerDeviceCards)
 	assert.Empty(t, v.DeviceManagement)
 }
+
+func TestClient_RefreshDeviceInventory(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
+
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	v, err := c.RefreshDeviceInventory([]int64{1, 2}, JobOpts{
+		Name:        "valid",
+		Description: "valid job",
+		RunNow:      true,
+	})
+	assert.Nil(t, err)
+	assert.NotEmpty(t, v.JobName)
+
+	_, err = c.RefreshDeviceInventory([]int64{1000, 2000}, JobOpts{
+		Name:        "invalid",
+		Description: "invalid job",
+		RunNow:      true,
+	})
+	assert.NotNil(t, err)
+}

@@ -19,8 +19,7 @@ func TestAccDeviceActionResInvalid(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: test,
-				// PlanOnly:    true,
+				Config:      test,
 				ExpectError: regexp.MustCompile(".*Error creating job.*"),
 			},
 		},
@@ -153,7 +152,6 @@ func TestAccDeviceActionRes(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_device_action.code_1", "action", "inventory_refresh"),
 					resource.TestCheckResourceAttr("ome_device_action.code_1", "timeout", "10"),
 					resource.TestCheckNoResourceAttr("ome_device_action.code_1", "cron"),
-					// resource.TestCheckResourceAttr("ome_device_action.code_1", "cron", "ronny"),
 				),
 			},
 		},

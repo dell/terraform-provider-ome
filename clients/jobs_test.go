@@ -14,25 +14,22 @@ limitations under the License.
 package clients
 
 import (
-	"encoding/json"
-	"fmt"
-	"terraform-provider-ome/models"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-func (c *Client) CreateJob(payload models.JobPayload) (JobResp, error) {
-	payloadb, _ := json.Marshal(payload)
-	response, err := c.Post(JobAPI, nil, payloadb)
-	if err != nil {
-		return JobResp{}, err
-	}
-	bodyData, _ := c.GetBodyData(response.Body)
-	temp := JobResp{}
-	_ = json.Unmarshal(bodyData, &temp)
-	return temp, nil
-}
+func TestClient_DeleteJob(t *testing.T) {
+	ts := createNewTLSServer(t)
+	defer ts.Close()
 
-func (c *Client) DeleteJob(id int64) error {
-	path := fmt.Sprintf(GetJobAPI, id)
-	_, err := c.Delete(path, nil, nil)
-	return err
+	opts := initOptions(ts)
+
+	c, _ := NewClient(opts)
+
+	err := c.DeleteJob(1)
+	assert.Nil(t, err)
+
+	err = c.DeleteJob(1000)
+	assert.NotNil(t, err)
 }
