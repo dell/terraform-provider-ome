@@ -17,6 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+// DeviceActionModel - Tfsdk model for device action resource
 type DeviceActionModel struct {
 	ID             types.Int64  `tfsdk:"id"`
 	DeviceIDs      []int64      `tfsdk:"device_ids"`

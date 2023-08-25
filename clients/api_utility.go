@@ -21,6 +21,7 @@ import (
 )
 
 const (
+	// RunNowSchedule - Schedule type for a job that is scheduled to run immediately
 	RunNowSchedule = "startnow"
 )
 
@@ -45,7 +46,7 @@ type JobStatus struct {
 	Name string `json:"Name"`
 }
 
-// JobOpts is a common set of options that can be used when creating a job
+// JobOpts - a common set of options that can be used when creating a job
 type JobOpts struct {
 	Name        string
 	Description string

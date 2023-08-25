@@ -17,6 +17,7 @@ import (
 	"encoding/json"
 )
 
+// JobPayload - The payload for creating a generic OME job
 type JobPayload struct {
 	ID             int64     `json:"Id"`
 	Enabled        StateType `json:"State"`
@@ -28,6 +29,7 @@ type JobPayload struct {
 	Targets        []JobTargetType
 }
 
+// StateType - type representing state of a job (true->Enabled, false->Disabled)
 type StateType bool
 
 // MarshalJSON - implements marshaller interface
@@ -38,6 +40,7 @@ func (s StateType) MarshalJSON() ([]byte, error) {
 	return json.Marshal("Disabled")
 }
 
+// JobParams - Params of a OME job
 type JobParams map[string]string
 
 // MarshalJSON - implements marshaller interface
@@ -53,15 +56,19 @@ func (j JobParams) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&k)
 }
 
+// JobTargetType - "Target" items of a job
 type JobTargetType struct {
 	ID         int64 `json:"Id"`
 	Data       string
 	TargetType TargetType
 }
 
+// TargetType - enum type representing type of target of a job
 type TargetType uint8
 
+// enum for TargetType type
 const (
+	// DeviceTargetType - type of device job target
 	DeviceTargetType TargetType = iota
 )
 
@@ -73,24 +80,29 @@ func (TargetType) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// JobType - enum type representing type of a job
 type JobType uint8
 
+// enum for JobType
 const (
+	// InventoryRefreshJobType - inventory refresh job type
 	InventoryRefreshJobType JobType = iota
+	// ResetIDRACJobType - iDRAC reset job type
 	ResetIDRACJobType
+	// ClearJobQueueJobType - iDrac job queue clear job type
 	ClearJobQueueJobType
 )
 
 // MarshalJSON - implements marshaller interface
 func (j JobType) MarshalJSON() ([]byte, error) {
-	job_type_map := map[JobType]uint8{InventoryRefreshJobType: 8, ResetIDRACJobType: 3, ClearJobQueueJobType: 3}
-	jtype_map := map[uint8]string{3: "DeviceAction_Task", 8: "Inventory_Task"}
+	jobTypeMap := map[JobType]uint8{InventoryRefreshJobType: 8, ResetIDRACJobType: 3, ClearJobQueueJobType: 3}
+	jtypeMap := map[uint8]string{3: "DeviceAction_Task", 8: "Inventory_Task"}
 
 	return json.Marshal(&struct {
 		ID   uint8  `json:"Id"`
 		Name string `json:"Name"`
 	}{
-		ID:   job_type_map[j],
-		Name: jtype_map[job_type_map[j]],
+		ID:   jobTypeMap[j],
+		Name: jtypeMap[jobTypeMap[j]],
 	})
 }

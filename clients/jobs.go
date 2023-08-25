@@ -19,6 +19,7 @@ import (
 	"terraform-provider-ome/models"
 )
 
+// CreateJob - creates a job with given payload
 func (c *Client) CreateJob(payload models.JobPayload) (JobResp, error) {
 	payloadb, _ := json.Marshal(payload)
 	response, err := c.Post(JobAPI, nil, payloadb)
@@ -31,6 +32,7 @@ func (c *Client) CreateJob(payload models.JobPayload) (JobResp, error) {
 	return temp, nil
 }
 
+// DeleteJob - Deletes job with given ID
 func (c *Client) DeleteJob(id int64) error {
 	path := fmt.Sprintf(GetJobAPI, id)
 	_, err := c.Delete(path, nil, nil)
