@@ -81,7 +81,7 @@ resource "ome_device_action" "code_2" {
 #     https://developer.hashicorp.com/terraform/cli/commands/taint
 # Option 2: From Terraform 1.5, one can use the -replace directive 
 #     https://developer.hashicorp.com/terraform/cli/commands/plan#replace-address
-# Option 3 (shown beloy): From Terraform 1.2, one can use the replace-triggered-by lifecycle method 
+# Option 3 (shown below): From Terraform 1.2, one can use the replace-triggered-by lifecycle method 
 #     https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle#replace_triggered_by
 
 resource "terraform_data" "devices_firmware" {
@@ -99,7 +99,7 @@ resource "ome_device_action" "code_3" {
       timeout,
     ]
     replace_triggered_by = [
-      aws_ecs_service.svc.id
+      terraform_data.devices_firmware
     ]
   }
 }
