@@ -10,7 +10,7 @@ import (
 func TestAccDeviceActionResInvalid(t *testing.T) {
 	test := testProvider + `
 	resource "ome_device_action" "code_1" {
-		job_name = "rounak-job"
+		job_name = "refresh-job"
 		device_ids = [100, 200]
 	}
 	`
@@ -37,7 +37,7 @@ func TestAccDeviceActionRes(t *testing.T) {
 	testAccCreateDevicesResSuccess := testProvider + getDeviceIds + `
 	resource "ome_device_action" "code_1" {
 		device_ids = data.ome_device.devs.devices[*].id
-		job_name = "rounak-job"
+		job_name = "refresh-job"
 		job_description = "r-job-desc"
 		timeout = 5
 	}
@@ -46,7 +46,7 @@ func TestAccDeviceActionRes(t *testing.T) {
 	testAccUpdateDevicesRes := testProvider + getDeviceIds + `
 	resource "ome_device_action" "code_1" {
 		device_ids = data.ome_device.devs.devices[*].id
-		job_name = "rounak-job"
+		job_name = "refresh-job"
 		job_description = "r-job-desc"
 		timeout = 10
 	}
@@ -55,7 +55,7 @@ func TestAccDeviceActionRes(t *testing.T) {
 	testAccCreateDevicesResCron := testProvider + getDeviceIds + `
 	resource "ome_device_action" "code_1" {
 		device_ids = data.ome_device.devs.devices[*].id
-		job_name = "rounak-job"
+		job_name = "refresh-job"
 		job_description = "r-job-desc"
 		cron = "0 * */10 * * ? *"
 	}
@@ -63,14 +63,14 @@ func TestAccDeviceActionRes(t *testing.T) {
 	testAccNoDesc := testProvider + getDeviceIds + `
 	resource "ome_device_action" "code_1" {
 		device_ids = data.ome_device.devs.devices[*].id
-		job_name = "rounak-job"
+		job_name = "refresh-job"
 		cron = "0 * */10 * * ? *"
 	}
 	`
 	testAccNoCronOrTimeout := testProvider + getDeviceIds + `
 	resource "ome_device_action" "code_1" {
 		device_ids = data.ome_device.devs.devices[*].id
-		job_name = "rounak-job"
+		job_name = "refresh-job"
 	}
 	`
 	testAccNoJobNameNeg := testProvider + getDeviceIds + `
@@ -80,12 +80,12 @@ func TestAccDeviceActionRes(t *testing.T) {
 	`
 	testAccNoDevicesNeg := testProvider + getDeviceIds + `
 	resource "ome_device_action" "code_1" {
-		job_name = "rounak-job"
+		job_name = "refresh-job"
 	}
 	`
 	testAccZeroDevicesNeg := testProvider + getDeviceIds + `
 	resource "ome_device_action" "code_1" {
-		job_name = "rounak-job"
+		job_name = "refresh-job"
 		device_ids = []
 	}
 	`
