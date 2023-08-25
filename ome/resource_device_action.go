@@ -71,16 +71,23 @@ func (r resourceDeviceAction) Metadata(ctx context.Context, req resource.Metadat
 // Devices Resource schema
 func (r resourceDeviceAction) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing device_action on OpenManage Enterprise.",
+		Description: "Resource for running actions on devices managed by OpenManage Enterprise." +
+			" The only supported action, for now, is refreshing inventory." +
+			" This resource creates a job in OME to run the actions and does not support updating in-place." +
+			" The resource generates a recreation plan instead for any necessary update action.",
+		MarkdownDescription: "Resource for running actions on devices managed by OpenManage Enterprise." +
+			" The only supported action, for now, is refreshing inventory." +
+			" This resource creates a job in OME to run the actions and does not support updating in-place." +
+			" The resource generates a recreation plan instead for any necessary update action.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
-				MarkdownDescription: "ID of the job created for carrying out the action.",
-				Description:         "ID of the job created for carrying out the action.",
+				MarkdownDescription: "ID of the job created on OME appliance for carrying out the action.",
+				Description:         "ID of the job created on OME appliance for carrying out the action.",
 				Computed:            true,
 			},
 			"device_ids": schema.ListAttribute{
-				MarkdownDescription: "List of device_action to be managed by this resource.",
-				Description:         "List of device_action to be managed by this resource.",
+				MarkdownDescription: "List of id of devices on whom the action would be carried out.",
+				Description:         "List of id of devices on whom the action would be carried out.",
 				Required:            true,
 				ElementType:         types.Int64Type,
 				Validators: []validator.List{
@@ -105,9 +112,13 @@ func (r resourceDeviceAction) Schema(_ context.Context, _ resource.SchemaRequest
 				},
 			},
 			"cron": schema.StringAttribute{
-				MarkdownDescription: "Cron.",
-				Description:         "Cron.",
-				Optional:            true,
+				MarkdownDescription: "Cron expression to schedule an action in the future." +
+					" If not specified, the action runs immediately on apply." +
+					" Conflicts with `timeout`.",
+				Description: "Cron expression to schedule an action in the future." +
+					" If not specified, the action runs immediately on apply." +
+					" Conflicts with 'timeout'.",
+				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.ConflictsWith(path.MatchRelative().AtParent().AtName("timeout")),
 				},
@@ -116,21 +127,25 @@ func (r resourceDeviceAction) Schema(_ context.Context, _ resource.SchemaRequest
 				},
 			},
 			"timeout": schema.Int64Attribute{
-				MarkdownDescription: "ID of the job created for carrying out the action.",
-				Description:         "ID of the job created for carrying out the action.",
-				Optional:            true,
+				MarkdownDescription: "Timeout, in minutes, for monitoring an immediately running action." +
+					" Conflicts with `cron`." +
+					" Default value is `10`.",
+				Description: "Timeout, in minutes, for monitoring an immediately running action." +
+					" Conflicts with 'cron'." +
+					" Default value is '10'.",
+				Optional: true,
 			},
 			"job_name": schema.StringAttribute{
-				MarkdownDescription: "Name.",
-				Description:         "Name.",
+				MarkdownDescription: "Name of the job to be created on the OME appliance that will run the action.",
+				Description:         "Name of the job to be created on the OME appliance that will run the action.",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"job_description": schema.StringAttribute{
-				MarkdownDescription: "Decsription.",
-				Description:         "Decsription.",
+				MarkdownDescription: "Description of the job to be created on the OME appliance that will run the action.",
+				Description:         "Description of the job to be created on the OME appliance that will run the action.",
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
@@ -139,33 +154,33 @@ func (r resourceDeviceAction) Schema(_ context.Context, _ resource.SchemaRequest
 				},
 			},
 			"last_run_time": schema.StringAttribute{
-				MarkdownDescription: "Decsription.",
-				Description:         "Decsription.",
+				MarkdownDescription: "Last run time of the job.",
+				Description:         "Last run time of the job.",
 				Computed:            true,
 			},
 			"next_run_time": schema.StringAttribute{
-				MarkdownDescription: "Decsription.",
-				Description:         "Decsription.",
+				MarkdownDescription: "Next run time of the job.",
+				Description:         "Next run time of the job.",
 				Computed:            true,
 			},
 			"last_run_status": schema.StringAttribute{
-				MarkdownDescription: "Decsription.",
-				Description:         "Decsription.",
+				MarkdownDescription: "Last run status of the job.",
+				Description:         "Last run status of the job.",
 				Computed:            true,
 			},
 			"current_status": schema.StringAttribute{
-				MarkdownDescription: "Decsription.",
-				Description:         "Decsription.",
+				MarkdownDescription: "Current status of the job.",
+				Description:         "Current status of the job.",
 				Computed:            true,
 			},
 			"start_time": schema.StringAttribute{
-				MarkdownDescription: "Decsription.",
-				Description:         "Decsription.",
+				MarkdownDescription: "Start time of the job.",
+				Description:         "Start time of the job.",
 				Computed:            true,
 			},
 			"end_time": schema.StringAttribute{
-				MarkdownDescription: "Decsription.",
-				Description:         "Decsription.",
+				MarkdownDescription: "End time of the job.",
+				Description:         "End time of the job.",
 				Computed:            true,
 			},
 		},
