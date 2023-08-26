@@ -179,6 +179,9 @@ func TestDiscoveryThree(t *testing.T) {
 	invalidDiscoveryConfigtwo := testAccProvider + `
 	resource "ome_discovery" "code_4" {
 		name = "invalid-config"
+		schedule = "RunNow"
+		timeout = 10
+		ignore_partial_failure = true
 		discovery_config_targets = []
 	  }
 	`
@@ -186,9 +189,29 @@ func TestDiscoveryThree(t *testing.T) {
 	invalidDiscoveryConfigThree := testAccProvider + `
 	resource "ome_discovery" "code_4" {
 		name = "invalid-config"
+		schedule = "RunNow"
+		timeout = 10
+		ignore_partial_failure = true
 		discovery_config_targets = [{
 		  device_type = []
 		  network_address_detail = []
+		}]
+	  }
+	`
+
+	invalidDiscoveryConfigFour := testAccProvider + `
+	resource "ome_discovery" "code_4" {
+		name     = "invalid-config"
+		schedule = "RunLater"
+		timeout = 10
+		ignore_partial_failure = true
+		discovery_config_targets = [{
+		  device_type            = ["SERVER"]
+		  network_address_detail = ["9.0.0.1"]
+		  wsman = {
+			username = "ping"
+			password = "pong"
+		  }
 		}]
 	  }
 	`
@@ -217,6 +240,74 @@ func TestDiscoveryThree(t *testing.T) {
 				Config:      invalidDiscoveryConfigThree,
 				ExpectError: regexp.MustCompile(`.*list must contain at least 1 elements*.`),
 			},
+			{
+				Config:      invalidDiscoveryConfigFour,
+				ExpectError: regexp.MustCompile(`.*With Schedule as RunLater, Partial Failure can't be set*.`),
+			},
+			{
+				Config:      invalidDiscoveryConfigFour,
+				ExpectError: regexp.MustCompile(`.*With Schedule as RunLater, cron must be set*.`),
+			},
+			{
+				Config:      invalidDiscoveryConfigFour,
+				ExpectError: regexp.MustCompile(`.*With Schedule as RunLater, Timeout can't be set*.`),
+			},
 		},
 	})
+}
+
+func TestDiscoveryFour(t *testing.T) {
+	TrackDiscoveryJob := testProvider + `
+	resource "ome_discovery" "discover1" {
+		name = "discover-lab"
+		schedule = "RunNow"
+		timeout = 10
+		ignore_partial_failure = true
+		discovery_config_targets = [
+		  {
+		  network_address_detail = ["` + DeviceIP1 + `","` + DeviceIP2 + `","` + DeviceIP3 + `", "127.0.0.1","0.42.42.42","1.1.1.1","8.8.8.8","192.168.1.1"]
+		  device_type = ["SERVER"]
+		  wsman = {
+			username = "root"
+			password = "calvin"
+		  }
+		}]
+	  }
+	`
+	TrackDiscoveryJobUpdate := testProvider + `
+	resource "ome_discovery" "discover1" {
+		name = "discover-up-lab"
+		schedule = "RunNow"
+		timeout = 5
+		ignore_partial_failure = true
+		discovery_config_targets = [
+		  {
+		  network_address_detail = ["` + DeviceIP1 + `"]
+		  device_type = ["SERVER"]
+		  wsman = {
+			username = "root"
+			password = "calvin"
+		  }
+		}]
+	  }
+	`
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: TrackDiscoveryJob,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_discovery.discover1", "name", "discover-lab"),
+				),
+			},
+			{
+				Config: TrackDiscoveryJobUpdate,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_discovery.discover1", "name", "discover-up-lab"),
+				),
+			},
+		},
+	},
+	)
 }

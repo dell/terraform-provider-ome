@@ -37,6 +37,7 @@ Resource for managing discovery on OpenManage Enterprise.
 - `discovery_config_targets` (Attributes Set) - Provide the list of discovery targets.
       			- Each discovery target is a set of "network_address_detail", "device_types", and one or more protocol credentials. (see [below for nested schema](#nestedatt--discovery_config_targets))
 - `name` (String) Name of the discovery configuration job
+- `schedule` (String) Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified. If `RunNow` is selected, then attribute `timeout` must be specified.
 
 ### Optional
 
@@ -45,7 +46,8 @@ Resource for managing discovery on OpenManage Enterprise.
 				- Configure the SMTP settings to allow sending notifications to an email address.
 - `enable_community_strings` (Boolean) - Enable the use of SNMP community strings to receive SNMP traps using Application Settings in OpenManage Enterprise. 
 				- This option is available only for the discovered iDRAC servers and MX7000 chassis.
-- `schedule` (String) Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.
+- `ignore_partial_failure` (Boolean) Provides the option to ignore partial failures. Partial failures occur when there is a combination of both discovered and undiscovered IPs with Schedule is set to `RunNow`. If `partial_failure` is set `false` then partial_failure is not ignored, and module will error out.If `partial_failure` is set `true` then partial_failure is ignored, and module will not error out.
+- `timeout` (Number) Provide a timeout in minute to track the job
 - `trap_destination` (Boolean) - Enable OpenManage Enterprise to receive the incoming SNMP traps from the discovered devices. 
 				- This is effective only for servers discovered by using their iDRAC interface.
 
@@ -53,6 +55,7 @@ Resource for managing discovery on OpenManage Enterprise.
 
 - `id` (String) ID of the discovery configuration group
 - `job_id` (Number) Discovery Job ID.
+- `job_tracking` (Attributes) Discovery Job Tracking Info Captured When Schedule is set to `RunNow` (see [below for nested schema](#nestedatt--job_tracking))
 
 <a id="nestedatt--discovery_config_targets"></a>
 ### Nested Schema for `discovery_config_targets`
@@ -154,4 +157,15 @@ Optional:
 - `port` (Number) Enter the port number that the job must use to discover the devices.
 - `retries` (Number) Enter the number of repeated attempts required to discover a device
 - `timeout` (Number) Enter the time in seconds after which a job must stop running.
+
+
+
+<a id="nestedatt--job_tracking"></a>
+### Nested Schema for `job_tracking`
+
+Read-Only:
+
+- `discovered_ip` (List of String) IPs discovered after tracking the job until it timeout.
+- `job_execution_results` (List of String) Provides information about job executions discovered after tracking the job until it timeout.
+- `undiscovered_ip` (List of String) IPs remains undiscovered after tracking the job until it timeout.
 

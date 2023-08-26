@@ -78,6 +78,7 @@ type LastExecutionDetail struct {
 	JobStatus          JobStatus `json:"JobStatus"`
 }
 
+// ExecutionHistories is response returned by execution history job api.
 type ExecutionHistories struct {
 	ExecutionDetails []LastExecutionDetail `json:"value"`
 }

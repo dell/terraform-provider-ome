@@ -154,9 +154,19 @@ type OmeDiscoveryJob struct {
 	DiscoveryConfigTargets []OmeDiscoveryConfigTargets `tfsdk:"discovery_config_targets"`
 	Schedule               types.String                `tfsdk:"schedule"`
 	Cron                   types.String                `tfsdk:"cron"`
+	Timeout                types.Int64                 `tfsdk:"timeout"`
+	PartialFailure         types.Bool                  `tfsdk:"ignore_partial_failure"`
 	TrapDestination        types.Bool                  `tfsdk:"trap_destination"`
 	CommunityString        types.Bool                  `tfsdk:"enable_community_strings"`
 	JobID                  types.Int64                 `tfsdk:"job_id"`
+	JobTracking            *OmeJobTracking             `tfsdk:"job_tracking"`
+}
+
+// OmeJobTracking to collect job info after tracking the job
+type OmeJobTracking struct {
+	JobExecutionResults []types.String `tfsdk:"job_execution_results"`
+	DiscoveredIPs       []types.String `tfsdk:"discovered_ip"`
+	UnDiscoveredIPs     []types.String `tfsdk:"undiscovered_ip"`
 }
 
 // OmeDiscoveryConfigTargets for discovery configuration
