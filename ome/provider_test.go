@@ -39,13 +39,21 @@ var DeviceSvcTag2 = os.Getenv("DEVICESVCTAG2")
 var GroupID1 = os.Getenv("GROUPID1")
 var DeviceID1 = os.Getenv("DEVICEID1")
 var DeviceID2 = os.Getenv("DEVICEID2")
-var DeviceID3 = os.Getenv("DEVICEID3") // Not capable for deployment
+var DeviceID3 = os.Getenv("DEVICEID3")             // Not capable for deployment
+var DeviceSvcTagRmv = os.Getenv("DEVICESVCTAGRMV") // Will be removed
 var ShareUser = os.Getenv("SHAREUSERNAME")
 var SharePassword = os.Getenv("SHAREPASSWORD")
 var ShareIP = os.Getenv("SHAREIP")
 var DeviceIP1 = os.Getenv("DEVICEIP1")
 var DeviceIP2 = os.Getenv("DEVICEIP2")
 var DeviceIP3 = os.Getenv("DEVICEIP3")
+
+// the following must be absolute paths
+// script that accepts csr and output file as inputs respectively and generates cert
+var CertScript = os.Getenv("CERT_SCRIPT")
+
+// an invalid cert
+var InvCert = os.Getenv("INV_CERT")
 
 var testProvider = `
 provider "ome" {

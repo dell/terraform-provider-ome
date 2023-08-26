@@ -470,6 +470,33 @@ func mockDeviceAPIs(r *http.Request, w http.ResponseWriter) bool {
 		return true
 	}
 
+	if r.URL.Path == DeviceRemovalAPI && r.Method == "POST" {
+		bodyBytes, _ := io.ReadAll(r.Body)
+		body := string(bodyBytes)
+		if strings.Contains(body, `{"DeviceIds":null}`) || strings.Contains(body, `{"DeviceIds":[]}`) {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`{
+				"error":
+					{
+						"code":"Base.1.0.GeneralError",
+						"message":"A general error has occurred. See ExtendedInfo for more information.",
+						"@Message.ExtendedInfo":[
+							{
+								"MessageId":"CGEN6002",
+								"RelatedProperties":[],
+								"Message":"Unable to complete the request because the input value for DeviceId is missing or an invalid value is entered.",
+								"MessageArgs":["DeviceId"],
+								"Severity":"Critical",
+								"Resolution":"Enter a valid value and retry the operation."
+							}
+						]
+					}
+			}`))
+		}
+		w.WriteHeader(204)
+		return true
+	}
+
 	return false
 }
 

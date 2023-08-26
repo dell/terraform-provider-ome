@@ -14,8 +14,12 @@ limitations under the License.
 package models
 
 import (
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 func stringPointerValue(k *string) types.String {
@@ -36,4 +40,23 @@ func int64ListValue(inputs []int64) types.List {
 		retVals,
 	)
 	return ret
+}
+
+func stringListValue(inputs []string) types.List {
+	ret, _ := types.ListValueFrom(
+		context.TODO(),
+		types.StringType,
+		inputs,
+	)
+	return ret
+}
+
+func objListValue(typeObj map[string]attr.Type, inputs any) (types.List, diag.Diagnostics) {
+	return types.ListValueFrom(
+		context.TODO(),
+		basetypes.ObjectType{
+			AttrTypes: typeObj,
+		},
+		inputs,
+	)
 }
