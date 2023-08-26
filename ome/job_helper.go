@@ -117,13 +117,13 @@ func (jr *JobRunner) GetExecutionDetails(ctx context.Context, executionHistoryID
 }
 
 // DiscoverJobRunner to track the discover job.
-func DiscoverJobRunner(ctx context.Context, omeClient *clients.Client, jobId, timeout int64, partialFailure bool) ([]string, error) {
+func DiscoverJobRunner(ctx context.Context, omeClient *clients.Client, jobID, timeout int64, partialFailure bool) ([]string, error) {
 	results := make([]string, 0)
 	sleepInterval := int64(10)
 	maxRetries := timeout * 60 / sleepInterval
 	jobRunner := JobRunner{
 		client:         omeClient,
-		jobID:          jobId,
+		jobID:          jobID,
 		maxRetries:     maxRetries,
 		sleepInterval:  sleepInterval,
 		partialFailure: partialFailure,
@@ -144,7 +144,7 @@ func DiscoverJobRunner(ctx context.Context, omeClient *clients.Client, jobId, ti
 	if err != nil {
 		return results, err
 	}
-	ehd, err := jobRunner.GetExecutionDetails(ctx, int64(led.ExecutionHistoryId))
+	ehd, err := jobRunner.GetExecutionDetails(ctx, int64(led.ExecutionHistoryID))
 	if err != nil {
 		return results, err
 	}
@@ -152,6 +152,5 @@ func DiscoverJobRunner(ctx context.Context, omeClient *clients.Client, jobId, ti
 	for _, ehd := range ehd.ExecutionDetails {
 		results = append(results, ehd.Value)
 	}
-	tflog.Info(ctx, results[0])
 	return results, nil
 }

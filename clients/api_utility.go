@@ -74,7 +74,7 @@ type Params struct {
 // LastExecutionDetail is response returned by LastExecutionDetail job API
 type LastExecutionDetail struct {
 	Value              string    `json:"Value"`
-	ExecutionHistoryId int       `json:"ExecutionHistoryId"`
+	ExecutionHistoryID int       `json:"ExecutionHistoryId"`
 	JobStatus          JobStatus `json:"JobStatus"`
 }
 
