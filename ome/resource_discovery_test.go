@@ -26,15 +26,15 @@ func TestDiscoveryOne(t *testing.T) {
 		  device_type = [ "SERVER" ]
 		  network_address_detail = [ "` + DeviceIP1 + `", "` + DeviceIP2 + `"]
 		  redfish = {
-		   username = "root"
-		   password = "calvin" 
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		  snmp = {
 			community = "public"
 		  }
 		  ssh = {
-			username = "root"
-			password = "calvin"
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		}]
 	  }
@@ -48,15 +48,15 @@ func TestDiscoveryOne(t *testing.T) {
 		  device_type = [ "SERVER" ]
 		  network_address_detail = [ "` + DeviceIP1 + `"]
 		  redfish = {
-		   username = "root"
-		   password = "calvin" 
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		  snmp = {
 			community = "public"
 		  }
 		  ssh = {
-			username = "root"
-			password = "calvin"
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		}]
 	  }
@@ -102,8 +102,8 @@ func TestDiscoveryTwo(t *testing.T) {
 			community = "public"
 		  }
 		  ssh = {
-			username = "root"
-			password = "calvin"
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		}]
 	  }
@@ -117,15 +117,15 @@ func TestDiscoveryTwo(t *testing.T) {
 		  device_type = [ "SERVER" ]
 		  network_address_detail = ["` + DeviceIP3 + `"]
 		  redfish = {
-		   username = "root"
-		   password = "calvin" 
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		  snmp = {
 			community = "public"
 		  }
 		  ssh = {
-			username = "root"
-			password = "calvin"
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		}]
 	  }
@@ -209,8 +209,8 @@ func TestDiscoveryThree(t *testing.T) {
 		  device_type            = ["SERVER"]
 		  network_address_detail = ["9.0.0.1"]
 		  wsman = {
-			username = "ping"
-			password = "pong"
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		}]
 	  }
@@ -268,8 +268,8 @@ func TestDiscoveryFour(t *testing.T) {
 		  network_address_detail = ["` + DeviceIP1 + `","` + DeviceIP2 + `","` + DeviceIP3 + `", "127.0.0.1","0.42.42.42","1.1.1.1","8.8.8.8","192.168.1.1"]
 		  device_type = ["SERVER"]
 		  wsman = {
-			username = "root"
-			password = "calvin"
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		}]
 	  }
@@ -285,8 +285,8 @@ func TestDiscoveryFour(t *testing.T) {
 		  network_address_detail = ["` + DeviceIP1 + `"]
 		  device_type = ["SERVER"]
 		  wsman = {
-			username = "root"
-			password = "calvin"
+			username = "` + IdracUsername + `"
+			password = "` + IdracPassword + `"
 		  }
 		}]
 	  }
