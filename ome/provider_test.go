@@ -55,9 +55,10 @@ var CertScript = os.Getenv("CERT_SCRIPT")
 // an invalid cert
 var InvCert = os.Getenv("INV_CERT")
 
-// idrac username 
+// idrac username
 var IdracUsername = os.Getenv("IDRAC_USERNAME")
-// idrac password 
+
+// idrac password
 var IdracPassword = os.Getenv("IDRAC_PASSWORD")
 
 var testProvider = `
