@@ -3,6 +3,7 @@ package ome
 import (
 	"context"
 	"encoding/json"
+	"regexp"
 	"strconv"
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
@@ -11,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/mitchellh/mapstructure"
 )
@@ -67,6 +69,44 @@ func (r *discoveryResource) ValidateConfig(ctx context.Context, req resource.Val
 				"With Schedule as RunNow, CRON can't be set.",
 			)
 		}
+		if data.Timeout.IsNull() {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("timeout"),
+				"Attribute Error",
+				"With Schedule as RunNow, Timeout must be set.",
+			)
+		}
+		if data.PartialFailure.IsNull() {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("partial_failure"),
+				"Attribute Error",
+				"With Schedule as RunNow, Partial Failure must be set.",
+			)
+		}
+	}
+
+	if data.Schedule.ValueString() == "RunLater" {
+		if !data.Timeout.IsNull() {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("timeout"),
+				"Attribute Error",
+				"With Schedule as RunLater, Timeout can't be set.",
+			)
+		}
+		if !data.PartialFailure.IsNull() {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("partial_failure"),
+				"Attribute Error",
+				"With Schedule as RunLater, Partial Failure can't be set.",
+			)
+		}
+		if data.Cron.IsNull() {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("cron"),
+				"Attribute Error",
+				"With Schedule as RunLater, cron must be set.",
+			)
+		}
 	}
 
 	if len(data.DiscoveryConfigTargets) > 0 {
@@ -86,6 +126,7 @@ func (r *discoveryResource) ValidateConfig(ctx context.Context, req resource.Val
 func (r *discoveryResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	tflog.Trace(ctx, "resource_discovery create : Started")
 	//Get Plan Data
+	req.Plan.SetAttribute(ctx, path.Root("job_tracking"), &models.OmeJobTracking{})
 	var plan, state models.OmeDiscoveryJob
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
@@ -118,6 +159,13 @@ func (r *discoveryResource) Create(ctx context.Context, req resource.CreateReque
 	tflog.Trace(ctx, "resource_discovery : create Finished creating discovery")
 	tflog.Trace(ctx, "resource_discovery : create Fetching discovery id for a discovery")
 	state = discoveryState(ctx, cDiscovery, plan)
+	// if schedule is set to RunNow, we will track the job till it times out.
+	err = jobTrackState(ctx, state, plan, omeClient)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrGnrCreateDiscovery, err.Error(),
+		)
+	}
 	// Save into State
 	diags = resp.State.Set(ctx, &state)
 	tflog.Trace(ctx, "resource_discovery create: updating state finished, saving ...")
@@ -168,6 +216,7 @@ func (r *discoveryResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	// Get plan Data
+	req.Plan.SetAttribute(ctx, path.Root("job_tracking"), &models.OmeJobTracking{})
 	diags = req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -196,7 +245,12 @@ func (r *discoveryResource) Update(ctx context.Context, req resource.UpdateReque
 	}
 	state = discoveryState(ctx, respDiscovery, plan)
 	// }
-
+	err = jobTrackState(ctx, state, plan, omeClient)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrGnrCreateDiscovery, err.Error(),
+		)
+	}
 	tflog.Trace(ctx, "resource_discovery update: finished state update")
 	//Save into State
 	diags = resp.State.Set(ctx, &state)
@@ -422,7 +476,38 @@ func discoveryState(ctx context.Context, resp models.DiscoveryJob, plan models.O
 	if len(resp.DiscoveryConfigTaskParam) == 1 {
 		state.JobID = types.Int64Value(int64(resp.DiscoveryConfigTaskParam[0].TaskID))
 	}
+	state.Timeout = plan.Timeout
+	state.PartialFailure = plan.PartialFailure
+	state.JobTracking = plan.JobTracking
 	return
+}
+
+func jobTrackState(ctx context.Context, state models.OmeDiscoveryJob, plan models.OmeDiscoveryJob, omeClient *clients.Client) error {
+	if plan.Timeout.ValueInt64() > 0 && !plan.PartialFailure.IsUnknown() {
+		results, err := DiscoverJobRunner(ctx, omeClient, state.JobID.ValueInt64(), plan.Timeout.ValueInt64(), plan.PartialFailure.ValueBool())
+		if err != nil && !plan.PartialFailure.ValueBool() {
+			return err
+		}
+		JobExecutionResults := make([]basetypes.StringValue, 0)
+		DiscoveredIPResults := make([]basetypes.StringValue, 0)
+		UnDiscoveredIPResults := make([]basetypes.StringValue, 0)
+		for _, jer := range results {
+			reIP := regexp.MustCompile(`\b(?:\d{1,3}\.){3}\d{1,3}\b`)
+			ip := reIP.FindString(jer)
+			reComp := regexp.MustCompile(".*Completed$")
+			isDiscoverd := reComp.MatchString(jer)
+			if isDiscoverd {
+				DiscoveredIPResults = append(DiscoveredIPResults, types.StringValue(ip))
+			} else {
+				UnDiscoveredIPResults = append(UnDiscoveredIPResults, types.StringValue(ip))
+			}
+			JobExecutionResults = append(JobExecutionResults, types.StringValue(jer))
+		}
+		state.JobTracking.JobExecutionResults = JobExecutionResults
+		state.JobTracking.DiscoveredIPs = DiscoveredIPResults
+		state.JobTracking.UnDiscoveredIPs = UnDiscoveredIPResults
+	}
+	return nil
 }
 
 func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConfigModels, plan models.OmeDiscoveryConfigTargets) models.OmeDiscoveryConfigTargets {
