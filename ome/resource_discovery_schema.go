@@ -1,6 +1,7 @@
 package ome
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -57,10 +58,9 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 		},
 
 		"schedule": schema.StringAttribute{
-			MarkdownDescription: "Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.",
-			Description:         "Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified.",
-			Optional:            true,
-			Computed:            true,
+			MarkdownDescription: "Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified. If `RunNow` is selected, then attribute `timeout` must be specified.",
+			Description:         "Provides the option to schedule the discovery job. If `RunLater` is selected, then attribute `cron` must be specified. If `RunNow` is selected, then attribute `timeout` must be specified.",
+			Required:            true,
 			Validators: []validator.String{stringvalidator.OneOf(
 				"RunNow",
 				"RunLater",
@@ -78,6 +78,21 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
 			},
+		},
+
+		"timeout": schema.Int64Attribute{
+			MarkdownDescription: "Provide a timeout in minute to track the job",
+			Description:         "Provide a timeout in minute to track the job",
+			Optional:            true,
+			Validators: []validator.Int64{
+				int64validator.AtLeast(1),
+			},
+		},
+
+		"ignore_partial_failure": schema.BoolAttribute{
+			MarkdownDescription: "Provides the option to ignore partial failures. Partial failures occur when there is a combination of both discovered and undiscovered IPs with Schedule is set to `RunNow`. If `partial_failure` is set `false` then partial_failure is not ignored, and module will error out.If `partial_failure` is set `true` then partial_failure is ignored, and module will not error out.",
+			Description:         "Provides the option to ignore partial failures. Partial failures occur when there is a combination of both discovered and undiscovered IPs with Schedule is set to `RunNow`. If `partial_failure` is set `false` then partial_failure is not ignored, and module will error out.If `partial_failure` is set `true` then partial_failure is ignored, and module will not error out.",
+			Optional:            true,
 		},
 
 		"trap_destination": schema.BoolAttribute{
@@ -111,6 +126,36 @@ func DiscoveryJobSchema() map[string]schema.Attribute {
 			MarkdownDescription: "Discovery Job ID.",
 			Description:         "Discovery Job ID.",
 			Computed:            true,
+		},
+		"job_tracking": schema.SingleNestedAttribute{
+			MarkdownDescription: "Discovery Job Tracking Info Captured When Schedule is set to `RunNow`",
+			Description:         "Discovery Job Tracking Info Captured When Schedule is set to `RunNow`",
+			Computed:            true,
+			Attributes:          JobSchema(),
+		},
+	}
+}
+
+// JobSchema for collecting info of job tracking.
+func JobSchema() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+		"job_execution_results": schema.ListAttribute{
+			MarkdownDescription: "Provides information about job executions discovered after tracking the job until it timeout.",
+			Description:         "Provides information about job executions discovered after tracking the job until it timeout.",
+			Computed:            true,
+			ElementType:         types.StringType,
+		},
+		"discovered_ip": schema.ListAttribute{
+			MarkdownDescription: "IPs discovered after tracking the job until it timeout.",
+			Description:         "IPs discovered after tracking the job until it timeout.",
+			Computed:            true,
+			ElementType:         types.StringType,
+		},
+		"undiscovered_ip": schema.ListAttribute{
+			MarkdownDescription: "IPs remains undiscovered after tracking the job until it timeout.",
+			Description:         "IPs remains undiscovered after tracking the job until it timeout.",
+			Computed:            true,
+			ElementType:         types.StringType,
 		},
 	}
 }
