@@ -323,6 +323,133 @@ func mockJobsAPI(r *http.Request, w http.ResponseWriter, jobRetries *int) bool {
 		}`))
 		return true
 	}
+	if r.Method == "DELETE" {
+		if r.URL.Path == "/api/JobService/Jobs(1000)" {
+			// invalid
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`
+			{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CJOB4041",
+							"RelatedProperties": [],
+							"Message": "Unable to retrieve or modify the job information because no record exists for the job ID entered.",
+							"MessageArgs": [],
+							"Severity": "Warning",
+							"Resolution": "Enter a valid job ID and retry the operation."
+						}
+					]
+				}
+			}
+			`))
+			return true
+		}
+		if r.URL.Path == "/api/JobService/Jobs(1)" {
+			// valid
+			w.WriteHeader(http.StatusNoContent)
+			return true
+		}
+	}
+	if r.Method == "POST" && r.URL.Path == "/api/JobService/Jobs" {
+		bodyb, _ := io.ReadAll(r.Body)
+		body := string(bodyb)
+		if strings.Contains(body, "invalid") {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(`
+			{
+				"error": {
+					"code": "Base.1.0.GeneralError",
+					"message": "A general error has occurred. See ExtendedInfo for more information.",
+					"@Message.ExtendedInfo": [
+						{
+							"MessageId": "CJOB4035",
+							"RelatedProperties": [],
+							"Message": "Unable to create or update the job.",
+							"MessageArgs": [],
+							"Severity": "Warning",
+							"Resolution": "Make sure the request payload is valid and that the current user has sufficient permissions and retry the operation."
+						}
+					]
+				}
+			}
+			`))
+			return true
+		}
+		if strings.Contains(body, "valid") {
+			w.WriteHeader(http.StatusCreated)
+			w.Write([]byte(`
+			{
+				"Id": 14376,
+				"JobName": "TestUnitJob",
+				"JobDescription": "TestUnitJob",
+				"NextRun": null,
+				"LastRun": null,
+				"StartTime": null,
+				"EndTime": null,
+				"Schedule": "startnow",
+				"State": "Enabled",
+				"CreatedBy": "admin",
+				"UpdatedBy": null,
+				"LastRunStatus": {
+					"Id": 2200,
+					"Name": "NotRun"
+				},
+				"JobType": {
+					"Id": 8,
+					"Name": "Inventory_Task",
+					"Internal": false,
+					"IsShareUsageActive": false
+				},
+				"JobStatus": {
+					"Id": 2080,
+					"Name": "New"
+				},
+				"Targets": [
+					{
+						"JobId": 14376,
+						"Id": 1,
+						"Data": null,
+						"TargetType": {
+							"Id": 1000,
+							"Name": "DEVICE"
+						}
+					},
+					{
+						"JobId": 14376,
+						"Id": 2,
+						"Data": null,
+						"TargetType": {
+							"Id": 1000,
+							"Name": "DEVICE"
+						}
+					}
+				],
+				"Params": [
+					{
+						"JobId": 14376,
+						"Key": "action",
+						"Value": "CONFIG_INVENTORY"
+					},
+					{
+						"JobId": 14376,
+						"Key": "isCollectDriverInventory",
+						"Value": "true"
+					}
+				],
+				"Visible": true,
+				"Editable": true,
+				"Builtin": false,
+				"UserGenerated": true,
+				"IdUserOwner": 10078,
+				"IdOwner": null
+			}
+			`))
+			return true
+		}
+	}
 	return false
 }
 

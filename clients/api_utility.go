@@ -20,6 +20,11 @@ import (
 	"time"
 )
 
+const (
+	// RunNowSchedule - Schedule type for a job that is scheduled to run immediately
+	RunNowSchedule = "startnow"
+)
+
 // PaginationData common
 type PaginationData struct {
 	OdataContext string                   `json:"@odata.context"`
@@ -39,6 +44,21 @@ type AuthReq struct {
 type JobStatus struct {
 	ID   int    `json:"Id"`
 	Name string `json:"Name"`
+}
+
+// JobOpts - a common set of options that can be used when creating a job
+type JobOpts struct {
+	Name        string
+	Description string
+	RunNow      bool // if this is true, ignore schedule
+	Schedule    string
+}
+
+func (j JobOpts) getSchedule() string {
+	if j.RunNow || j.Schedule == "" {
+		return RunNowSchedule
+	}
+	return j.Schedule
 }
 
 // JobResp is the response returned by the jobs API
@@ -120,7 +140,7 @@ func (c *Client) RemoveSession() (*http.Response, error) {
 	return resp, err
 }
 
-// TrackJob - is used to track job status
+// TrackJob - is used to track job status. It returns isJobCompleted, message
 func (c *Client) TrackJob(jobID int64, maxRetries int64, sleepInterval int64) (bool, string) {
 	var status bool
 	var message string

@@ -212,6 +212,7 @@ func (p *omeProvider) Resources(ctx context.Context) []func() resource.Resource 
 		NewCsrResource,
 		NewDevicesResource,
 		NewCertResource,
+		NewDeviceActionResource,
 	}
 }
 

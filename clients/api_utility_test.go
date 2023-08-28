@@ -252,3 +252,22 @@ func TestGetJob(t *testing.T) {
 		})
 	}
 }
+
+func TestJobOptsGetSchedule(t *testing.T) {
+	tests := []struct {
+		name   string
+		input  JobOpts
+		output string
+	}{
+		{"OnlyRunNow", JobOpts{"", "", true, ""}, RunNowSchedule},
+		{"Both", JobOpts{"", "", true, "something"}, RunNowSchedule},
+		{"None", JobOpts{"", "", false, ""}, RunNowSchedule},
+		{"OnlySchedule", JobOpts{"", "", false, "something"}, "something"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.output, tt.input.getSchedule())
+		})
+	}
+}
