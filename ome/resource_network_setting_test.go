@@ -7,10 +7,187 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
+// ============================================= Adapter Setting Test ===========================================
+func TestNetworkSettingAdapter(t *testing.T) {
+	testAccCreateAdapterSetting := testProvider + `
+	resource "ome_appliance_network" "net1" {
+		adapter_setting = {
+		  enable_nic     = true
+		  interface_name = "ens160"
+		  reboot_delay   = 0
+		  management_vlan = {
+			  enable_vlan = false 
+		  }
+		  ipv6_configuration = {
+			enable_ipv6                   = false
+			enable_auto_configuration = false
+		  }
+		dns_configuration = {
+		  register_with_dns = false
+		}
+		}
+	  }
+	`
+	testAccUpdateAdapterSetting := testProvider + `
+	resource "ome_appliance_network" "net1" {
+		adapter_setting = {
+		  enable_nic     = true
+		  interface_name = "ens160"
+		  reboot_delay   = 0
+		  management_vlan = {
+			  enable_vlan = false 
+		  }
+		  ipv6_configuration = {
+			enable_ipv6                   = true
+			enable_auto_configuration = true
+		  }
+		dns_configuration = {
+		  register_with_dns = false
+		}
+		}
+	  }
+	`
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCreateAdapterSetting,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_appliance_network.net1", "adapter_setting.ipv6_configuration.enable_ipv6", "false"),
+				),
+			},
+			{
+				Config: testAccUpdateAdapterSetting,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_appliance_network.net1", "adapter_setting.ipv6_configuration.enable_ipv6", "true"),
+				),
+			},
+		},
+	})
+}
+
+func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
+	testAccNetworkAdapterInvalid1 := testProvider + `
+	resource "ome_appliance_network" "invalid1" {
+		adapter_setting = {
+		  interface_name = "invalid"
+		  ipv4_configuration = {
+			enable_ipv4        = true
+			enable_dhcp        = true
+			static_ip_address  = "0.0.0.0"
+			static_subnet_mask = "1.1.1.1"
+			static_gateway     = "2.2.2.2"
+		  }
+		}
+	  }
+	`
+
+	testAccNetworkAdapterInvalid2 := testProvider + `
+	resource "ome_appliance_network" "invalid2" {
+		adapter_setting = {
+		  interface_name = "invalid"
+		  ipv4_configuration = {
+			enable_ipv4 = true
+			use_dhcp_for_dns_server_names = true
+			static_preferred_dns_server    = "3.3.3.3"
+			static_alternate_dns_server    = "4.4.4.4"
+		  }
+		}
+	  }
+	`
+	testAccNetworkAdapterInvalid3 := testProvider + `
+	resource "ome_appliance_network" "invalid3" {
+		adapter_setting = {
+		  interface_name = "invalid"
+		  ipv6_configuration = {
+			enable_ipv6 = true
+			enable_auto_configuration = true 
+			static_ip_address = "0.0.0.0"
+			static_prefix_length = 0
+			static_gateway = "1.1.1.1"
+		  }
+		}
+	  }
+	`
+
+	testAccNetworkAdapterInvalid4 := testProvider + `
+	resource "ome_appliance_network" "invalid4" {
+		adapter_setting = {
+		  interface_name = "invalid"
+		  ipv6_configuration = {
+			enable_ipv6 = true
+			use_dhcp_for_dns_server_names = true
+			static_preferred_dns_server    = "3.3.3.3"
+			static_alternate_dns_server    = "4.4.4.4"
+		  }
+		}
+	  }
+	`
+
+	testAccNetworkAdapterInvalid5 := testProvider + `
+	resource "ome_appliance_network" "invalid5" {
+		adapter_setting = {
+		  interface_name = "invalid"
+		  management_vlan = {
+			enable_vlan = false
+			id = 1 
+		  }
+		}
+	  }
+	`
+
+	testAccNetworkAdapterInvalid6 := testProvider + `
+	resource "ome_appliance_network" "invalid6" {
+		adapter_setting = {
+		  interface_name = "invalid"
+		  dns_configuration = {
+			register_with_dns              = false
+			dns_name                       = "err"
+			use_dhcp_for_dns_server_names = true
+			dns_domain_name                = "err"
+		  }
+		}
+	  }
+	`
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccNetworkAdapterInvalid1,
+				ExpectError: regexp.MustCompile(`.*please validate enable_dhcp is disable*.`),
+			},
+			{
+				Config:      testAccNetworkAdapterInvalid2,
+				ExpectError: regexp.MustCompile(`.*please validate use_dhcp_for_dns_server_names is disable*.`),
+			},
+			{
+				Config:      testAccNetworkAdapterInvalid3,
+				ExpectError: regexp.MustCompile(`.*please validate enable_auto_configuration is disable*.`),
+			},
+			{
+				Config:      testAccNetworkAdapterInvalid4,
+				ExpectError: regexp.MustCompile(`.*please validate use_dhcp_for_dns_server_names is disable*.`),
+			},
+			{
+				Config:      testAccNetworkAdapterInvalid5,
+				ExpectError: regexp.MustCompile(`.*please validate enable_vlan is true*.`),
+			},
+			{
+				Config:      testAccNetworkAdapterInvalid6,
+				ExpectError: regexp.MustCompile(`.*please validate register_with_dn is true*.`),
+			},
+		},
+	})
+}
+
 // ============================================= Time Setting Test ==============================================
 func TestNetworkSettingTime(t *testing.T) {
 	testAccCreateNetworkTimeSuccess := testProvider + `
-	resource "ome_network_setting" "its_ome_time" {
+	resource "ome_appliance_network" "its_ome_time" {
 		time_setting = {
 		  time_zone = "TZ_ID_65"
 		  system_time = "2023-08-18 07:50:08.387"
@@ -18,7 +195,7 @@ func TestNetworkSettingTime(t *testing.T) {
 	  }
 	`
 	testAccUpdateNetworkTimeSuccess := testProvider + `
-	resource "ome_network_setting" "its_ome_time" {
+	resource "ome_appliance_network" "its_ome_time" {
 		time_setting = {
 		  time_zone = "TZ_ID_65"
 		  enable_ntp = true 
@@ -36,19 +213,19 @@ func TestNetworkSettingTime(t *testing.T) {
 			{
 				Config: testAccCreateNetworkTimeSuccess,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.time_zone", "TZ_ID_65"),
-					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.system_time", "2023-08-18 07:50:08.387"),
+					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.time_zone", "TZ_ID_65"),
+					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.system_time", "2023-08-18 07:50:08.387"),
 				),
 				ExpectNonEmptyPlan: true,
 			},
 			{
 				Config: testAccUpdateNetworkTimeSuccess,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.time_zone", "TZ_ID_65"),
-					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.enable_ntp", "true"),
-					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.primary_ntp_address", DeviceIP1),
-					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.secondary_ntp_address1", DeviceIP2),
-					resource.TestCheckResourceAttr("ome_network_setting.its_ome_time", "time_setting.secondary_ntp_address2", DeviceIP3),
+					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.time_zone", "TZ_ID_65"),
+					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.enable_ntp", "true"),
+					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.primary_ntp_address", DeviceIP1),
+					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.secondary_ntp_address1", DeviceIP2),
+					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.secondary_ntp_address2", DeviceIP3),
 				),
 			},
 		},
@@ -57,7 +234,7 @@ func TestNetworkSettingTime(t *testing.T) {
 
 func TestNetworkSettingTimeInvalidConfig(t *testing.T) {
 	testAccNetworkTimeInvalid := testProvider + `
-	resource "ome_network_setting" "its_ome_time" {
+	resource "ome_appliance_network" "its_ome_time" {
 		time_setting = {
 		  time_zone = "TZ_ID_65"
 		  enable_ntp = true
@@ -66,7 +243,7 @@ func TestNetworkSettingTimeInvalidConfig(t *testing.T) {
 	}
 	`
 	testAccNetworkTimeInvalid1 := testProvider + `
-	resource "ome_network_setting" "its_ome_time" {
+	resource "ome_appliance_network" "its_ome_time" {
 		time_setting = {
 		  time_zone = "TZ_ID_65"
 		  enable_ntp = true
@@ -75,14 +252,14 @@ func TestNetworkSettingTimeInvalidConfig(t *testing.T) {
 	`
 
 	testAccNetworkTimeInvalid2 := testProvider + `
-	resource "ome_network_setting" "its_ome_time" {
+	resource "ome_appliance_network" "its_ome_time" {
 		time_setting = {
 		  enable_ntp = true
 		}
 	}
 	`
 	testAccNetworkTimeInvalid3 := testProvider + `
-	resource "ome_network_setting" "its_ome_time" {
+	resource "ome_appliance_network" "its_ome_time" {
 		time_setting = {
 		  time_zone = "TZ_ID_65"
 		primary_ntp_address = "10.x.x.1"
@@ -91,7 +268,7 @@ func TestNetworkSettingTimeInvalidConfig(t *testing.T) {
 	`
 
 	testAccNetworkTimeInvalid4 := testProvider + `
-	resource "ome_network_setting" "its_ome_time" {
+	resource "ome_appliance_network" "its_ome_time" {
 		time_setting = {
 		  time_zone = "TZ_ID_65"
 		}
@@ -129,7 +306,7 @@ func TestNetworkSettingTimeInvalidConfig(t *testing.T) {
 
 func TestNetworkSettingSession(t *testing.T) {
 	testAccCreateNetworkSessionSuccess := testProvider + `
-	resource "ome_network_setting" "code_ome" {
+	resource "ome_appliance_network" "code_ome" {
 		session_setting = {
 		  enable_universal_timeout = true 
 		  universal_timeout = 20
@@ -139,7 +316,7 @@ func TestNetworkSettingSession(t *testing.T) {
 	  }
 	`
 	testAccUpdateNetworkSessionSuccess := testProvider + `
-	resource "ome_network_setting" "code_ome" {
+	resource "ome_appliance_network" "code_ome" {
 		session_setting = {
 		  enable_universal_timeout = false
 		  api_session = 15
@@ -151,7 +328,7 @@ func TestNetworkSettingSession(t *testing.T) {
 	`
 
 	testAccUpdateNetworkSessionSuccess1 := testProvider + `
-	resource "ome_network_setting" "code_ome" {
+	resource "ome_appliance_network" "code_ome" {
 		session_setting = {
 		  enable_universal_timeout = true
 		  universal_timeout = 30
@@ -168,29 +345,29 @@ func TestNetworkSettingSession(t *testing.T) {
 			{
 				Config: testAccCreateNetworkSessionSuccess,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.enable_universal_timeout", "true"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.universal_timeout", "20"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.api_session", "10"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.gui_session", "11"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.enable_universal_timeout", "true"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.universal_timeout", "20"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.api_session", "10"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.gui_session", "11"),
 				),
 			},
 			{
 				Config: testAccUpdateNetworkSessionSuccess,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.enable_universal_timeout", "false"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.api_session", "15"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.api_timeout", "40"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.gui_session", "20"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.gui_timeout", "40"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.enable_universal_timeout", "false"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.api_session", "15"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.api_timeout", "40"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.gui_session", "20"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.gui_timeout", "40"),
 				),
 			},
 			{
 				Config: testAccUpdateNetworkSessionSuccess1,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.enable_universal_timeout", "true"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.universal_timeout", "30"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.api_session", "10"),
-					resource.TestCheckResourceAttr("ome_network_setting.code_ome", "session_setting.gui_session", "10"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.enable_universal_timeout", "true"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.universal_timeout", "30"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.api_session", "10"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_ome", "session_setting.gui_session", "10"),
 				),
 			},
 		},
@@ -199,7 +376,7 @@ func TestNetworkSettingSession(t *testing.T) {
 
 func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 	testAccNetworkSessionInvalid := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		session_setting = {
 		  enable_universal_timeout = true
 		}
@@ -207,7 +384,7 @@ func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 	`
 
 	testAccNetworkSessionInvalid1 := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		session_setting = {
 		  enable_universal_timeout = true
 		  universal_timeout = 10
@@ -217,7 +394,7 @@ func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 	`
 
 	testAccNetworkSessionInvalid2 := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		session_setting = {
 			universal_timeout = 10
 		}
@@ -225,7 +402,7 @@ func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 	`
 
 	testAccNetworkSessionInvalid3 := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		session_setting = {
 			ssh_timeout = 10
 		}
@@ -233,7 +410,7 @@ func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 	`
 
 	testAccNetworkSessionInvalid4 := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		session_setting = {
 			serial_timeout = 10
 		}
@@ -272,7 +449,7 @@ func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 
 func TestNetworkSettingProxy(t *testing.T) {
 	testAccCreateNetworkProxySuccess := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		proxy_setting = {
 		  enable_proxy = true
 		  ip_address = "` + DeviceIP1 + `"
@@ -283,7 +460,7 @@ func TestNetworkSettingProxy(t *testing.T) {
 	`
 
 	testAccUpdateNetworkProxySuccess := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		proxy_setting = {
 		  enable_proxy = true
 		  ip_address = "` + DeviceIP1 + `"
@@ -301,13 +478,13 @@ func TestNetworkSettingProxy(t *testing.T) {
 			{
 				Config: testAccCreateNetworkProxySuccess,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.code_1", "proxy_setting.enable_proxy", "true"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_1", "proxy_setting.enable_proxy", "true"),
 				),
 			},
 			{
 				Config: testAccUpdateNetworkProxySuccess,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.code_1", "proxy_setting.username", "root"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_1", "proxy_setting.username", "root"),
 				),
 			},
 		},
@@ -316,7 +493,7 @@ func TestNetworkSettingProxy(t *testing.T) {
 
 func TestNetworkSettingProxyIsInfraChangeDetected(t *testing.T) {
 	testAccCreateNetworkProxy := testProvider + `
-	resource "ome_network_setting" "code_2" {
+	resource "ome_appliance_network" "code_2" {
 		proxy_setting = {
 		  enable_proxy = true
 		  ip_address = "` + DeviceIP2 + `"
@@ -326,7 +503,7 @@ func TestNetworkSettingProxyIsInfraChangeDetected(t *testing.T) {
 	  }
 	`
 	testAccUpdateNetworkProxy := testProvider + `
-	resource "ome_network_setting" "code_2" {
+	resource "ome_appliance_network" "code_2" {
 		proxy_setting = {
 		  enable_proxy = false
 		}
@@ -339,13 +516,13 @@ func TestNetworkSettingProxyIsInfraChangeDetected(t *testing.T) {
 			{
 				Config: testAccCreateNetworkProxy,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.code_2", "proxy_setting.enable_proxy", "true"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_2", "proxy_setting.enable_proxy", "true"),
 				),
 			},
 			{
 				Config: testAccUpdateNetworkProxy,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.code_2", "proxy_setting.enable_proxy", "false"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_2", "proxy_setting.enable_proxy", "false"),
 				),
 			},
 		},
@@ -354,7 +531,7 @@ func TestNetworkSettingProxyIsInfraChangeDetected(t *testing.T) {
 
 func TestNetworkSettingProxyInValidConfig(t *testing.T) {
 	testAccNetworkProxyInvalid := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		proxy_setting = {
 			enable_proxy = false
 			ip_address = "` + DeviceIP1 + `"
@@ -362,14 +539,14 @@ func TestNetworkSettingProxyInValidConfig(t *testing.T) {
 	}
 	`
 	testAccNetworkProxyInvalid1 := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		proxy_setting = {
 			enable_proxy = true
 		}
 	}
 	`
 	testAccNetworkProxyInvalid2 := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		proxy_setting = {
 			enable_proxy = true
 			ip_address = "` + DeviceIP1 + `"
@@ -380,7 +557,7 @@ func TestNetworkSettingProxyInValidConfig(t *testing.T) {
 	`
 
 	testAccNetworkProxyInvalid3 := testProvider + `
-	resource "ome_network_setting" "code_1" {
+	resource "ome_appliance_network" "code_1" {
 		proxy_setting = {
 			enable_proxy = true
 			ip_address = "` + DeviceIP1 + `"
@@ -416,18 +593,18 @@ func TestNetworkSettingProxyInValidConfig(t *testing.T) {
 
 func TestNetworkSettingProxyNil(t *testing.T) {
 	testAccNetworkProxyCreateNil := testProvider + `
-	resource "ome_network_setting" "code_3" {
+	resource "ome_appliance_network" "code_3" {
 	}
 	`
 	testAccNetworkProxyCreateUpdateNil1 := testProvider + `
-	resource "ome_network_setting" "code_4" {
+	resource "ome_appliance_network" "code_4" {
 		proxy_setting = {
 			enable_proxy = false
 		}
 	}
 	`
 	testAccNetworkProxyCreateUpdateNil2 := testProvider + `
-	resource "ome_network_setting" "code_4" {
+	resource "ome_appliance_network" "code_4" {
 	}
 	`
 	resource.Test(t, resource.TestCase{
@@ -440,7 +617,7 @@ func TestNetworkSettingProxyNil(t *testing.T) {
 			{
 				Config: testAccNetworkProxyCreateUpdateNil1,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_network_setting.code_4", "proxy_setting.enable_proxy", "false"),
+					resource.TestCheckResourceAttr("ome_appliance_network.code_4", "proxy_setting.enable_proxy", "false"),
 				),
 			},
 			{

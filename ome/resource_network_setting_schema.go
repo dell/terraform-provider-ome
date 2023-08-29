@@ -3,6 +3,7 @@ package ome
 import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/float64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -64,8 +65,10 @@ func AdapterSettingSchema() map[string]schema.Attribute {
 		"interface_name": schema.StringAttribute{
 			MarkdownDescription: "If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.If this option is not specified, Primary interface is chosen by default.",
 			Description:         "If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.If this option is not specified, Primary interface is chosen by default.Interface Name",
-			Optional:            true,
-			Computed:            true,
+			Required:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"ipv4_configuration": schema.SingleNestedAttribute{
@@ -127,6 +130,9 @@ func IPv4ConfigSchema() map[string]schema.Attribute {
 			Description:         "Enable or disable the automatic request to get an IPv4 address from the IPv4 Dynamic Host Configuration Protocol (DHCP) server. If enable_dhcp option is true, OpenManage Enterprise retrieves the IP configuration—IPv4 address, subnet mask, and gateway from a DHCP server on the existing network.",
 			Optional:            true,
 			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(false)),
+			},
 		},
 
 		"static_ip_address": schema.StringAttribute{
@@ -134,6 +140,9 @@ func IPv4ConfigSchema() map[string]schema.Attribute {
 			Description:         "Static IPv4 address. This option is applicable when \"enable_dhcp\" is false.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"static_subnet_mask": schema.StringAttribute{
@@ -141,6 +150,9 @@ func IPv4ConfigSchema() map[string]schema.Attribute {
 			Description:         "Static IPv4 subnet mask address.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"static_gateway": schema.StringAttribute{
@@ -148,6 +160,9 @@ func IPv4ConfigSchema() map[string]schema.Attribute {
 			Description:         "Static IPv4 gateway address. This option is applicable when \"enable_dhcp\" is false.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"use_dhcp_for_dns_server_names": schema.BoolAttribute{
@@ -155,6 +170,9 @@ func IPv4ConfigSchema() map[string]schema.Attribute {
 			Description:         "This option allows to automatically request and obtain a DNS server IPv4 address from the DHCP server. This option is applicable when \"enable_dhcp\" is true.",
 			Optional:            true,
 			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(false)),
+			},
 		},
 
 		"static_preferred_dns_server": schema.StringAttribute{
@@ -162,6 +180,9 @@ func IPv4ConfigSchema() map[string]schema.Attribute {
 			Description:         "Static IPv4 DNS preferred server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"static_alternate_dns_server": schema.StringAttribute{
@@ -169,6 +190,9 @@ func IPv4ConfigSchema() map[string]schema.Attribute {
 			Description:         "Static IPv4 DNS alternate server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 	}
 }
@@ -188,6 +212,9 @@ func IPv6ConfigSchema() map[string]schema.Attribute {
 			Description:         "Enable or disable the automatic request to get an IPv6 address from the IPv6 DHCP server or router advertisements(RA). If \"enable_auto_configuration\" is true, OME retrieves IP configuration-IPv6 address, prefix, and gateway, from a DHCPv6 server on the existing network",
 			Optional:            true,
 			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(false)),
+			},
 		},
 
 		"static_ip_address": schema.StringAttribute{
@@ -195,6 +222,9 @@ func IPv6ConfigSchema() map[string]schema.Attribute {
 			Description:         "Static IPv6 address. This option is applicable when \"enable_auto_configuration\" is false.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"static_prefix_length": schema.Int64Attribute{
@@ -209,6 +239,9 @@ func IPv6ConfigSchema() map[string]schema.Attribute {
 			Description:         "Static IPv6 gateway address. This option is applicable when \"enable_auto_configuration\" is false.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"use_dhcp_for_dns_server_names": schema.BoolAttribute{
@@ -216,6 +249,9 @@ func IPv6ConfigSchema() map[string]schema.Attribute {
 			Description:         "This option allows to automatically request and obtain a DNS server IPv6 address from the DHCP server. This option is applicable when \"enable_auto_configuration\" is true.",
 			Optional:            true,
 			Computed:            true,
+			PlanModifiers: []planmodifier.Bool{
+				BoolDefaultValue(types.BoolValue(false)),
+			},
 		},
 
 		"static_preferred_dns_server": schema.StringAttribute{
@@ -223,6 +259,9 @@ func IPv6ConfigSchema() map[string]schema.Attribute {
 			Description:         "Static IPv6 DNS preferred server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"static_alternate_dns_server": schema.StringAttribute{
@@ -230,6 +269,9 @@ func IPv6ConfigSchema() map[string]schema.Attribute {
 			Description:         "Static IPv6 DNS alternate server. This option is applicable when \"use_dhcp_for_dns_server_names\" is false.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 	}
 }
@@ -241,8 +283,7 @@ func ManagementVLANSchema() map[string]schema.Attribute {
 		"enable_vlan": schema.BoolAttribute{
 			MarkdownDescription: "Enable or disable vLAN for management.The vLAN configuration cannot be updated if the \"register_with_dns\" field under \"dns_configuration\" is true. WARNING: Ensure that the network cable is plugged to the correct port after the vLAN configurationchanges have been made. If not, the configuration change may not be effective.",
 			Description:         "Enable or disable vLAN for management.The vLAN configuration cannot be updated if the \"register_with_dns\" field under \"dns_configuration\" is true. WARNING: Ensure that the network cable is plugged to the correct port after the vLAN configurationchanges have been made. If not, the configuration change may not be effective.",
-			Optional:            true,
-			Computed:            true,
+			Required:            true,
 		},
 
 		"id": schema.Int64Attribute{
@@ -277,6 +318,9 @@ func DNSConfigSchema() map[string]schema.Attribute {
 			Description:         "DNS name for \"hostname\". This is applicable when \"register_with_dns\" is true.DNSName",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"dns_domain_name": schema.StringAttribute{
@@ -284,6 +328,9 @@ func DNSConfigSchema() map[string]schema.Attribute {
 			Description:         "Static DNS domain name. This is applicable when \"use_dhcp_for_dns_domain_name\" is false.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 	}
 }

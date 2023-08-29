@@ -102,6 +102,7 @@ type UpdateNetworkAdapterSetting struct {
 	Ipv4Configuration Ipv4Configuration `json:"Ipv4Configuration"`
 	Ipv6Configuration Ipv6Configuration `json:"Ipv6Configuration"`
 	DNSConfiguration  DNSConfiguration  `json:"DnsConfiguration"`
+	ManagementVLAN    ManagementVLAN    `json:"ManagementVLAN"`
 	Delay             int               `json:"Delay"`
 	PrimaryInterface  bool              `json:"PrimaryInterface"`
 }
