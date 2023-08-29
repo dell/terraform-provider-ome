@@ -484,7 +484,7 @@ func updateAdapterSettingState(ctx context.Context, plan, state *models.OmeNetwo
 	err = NetworkJobRunner(ctx, omeClient, newJob.ID)
 	if err != nil {
 		if newOmeIP != "" {
-			currentUrl := omeClient.GetURL()
+			currentURL := omeClient.GetURL()
 			omeClient.SetURL(fmt.Sprintf("https://%s:%d", newOmeIP, 443))
 			err = NetworkJobRunner(ctx, omeClient, newJob.ID)
 			if err != nil {
@@ -494,7 +494,7 @@ func updateAdapterSettingState(ctx context.Context, plan, state *models.OmeNetwo
 			if err != nil {
 				return err
 			}
-			omeClient.SetURL(currentUrl)
+			omeClient.SetURL(currentURL)
 			return nil
 		}
 		return err
