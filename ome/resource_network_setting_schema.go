@@ -63,8 +63,8 @@ func AdapterSettingSchema() map[string]schema.Attribute {
 		},
 
 		"interface_name": schema.StringAttribute{
-			MarkdownDescription: "If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.If this option is not specified, Primary interface is chosen by default.",
-			Description:         "If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.If this option is not specified, Primary interface is chosen by default.Interface Name",
+			MarkdownDescription: "If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.",
+			Description:         "If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.",
 			Required:            true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
