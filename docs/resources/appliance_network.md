@@ -93,7 +93,7 @@ resource "ome_appliance_network" "net1" {
 
 Required:
 
-- `interface_name` (String) If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.If this option is not specified, Primary interface is chosen by default.
+- `interface_name` (String) If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.
 
 Optional:
 
