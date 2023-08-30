@@ -120,6 +120,11 @@ func (c *Client) GetURL() string {
 	return c.url
 }
 
+// SetURL sets the ome url
+func (c *Client) SetURL(url string) {
+	c.url = url
+}
+
 // GetHTTPClient returns the https client
 func (c *Client) GetHTTPClient() *http.Client {
 	return c.httpclient

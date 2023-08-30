@@ -38,7 +38,7 @@ func (r *networkSettingResource) Configure(ctx context.Context, req resource.Con
 
 // Metadata returns the resource type name.
 func (r *networkSettingResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "network_setting"
+	resp.TypeName = req.ProviderTypeName + "appliance_network"
 }
 
 // Schema defines the schema for the resource.
@@ -78,6 +78,15 @@ func (r *networkSettingResource) ValidateConfig(ctx context.Context, req resourc
 		if ok, err := isProxyConfigValid(data.OmeProxySetting); !ok {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("proxy_setting"),
+				"Attribute Error",
+				err.Error(),
+			)
+		}
+	}
+	if data.OmeAdapterSetting != nil {
+		if err := isAdapterConfigValid(data.OmeAdapterSetting); err != nil {
+			resp.Diagnostics.AddAttributeError(
+				path.Root("adapter_setting"),
 				"Attribute Error",
 				err.Error(),
 			)
@@ -163,6 +172,22 @@ func (r *networkSettingResource) Create(ctx context.Context, req resource.Create
 		}
 	}
 
+	// adapter configuration
+	if plan.OmeAdapterSetting != nil {
+		state.OmeAdapterSetting, getErr = getAdapterSettingState(omeClient, plan.OmeAdapterSetting)
+		if getErr != nil {
+			resp.Diagnostics.AddError(
+				"OME Adapter Get Error", getErr.Error(),
+			)
+		}
+		err := updateAdapterSettingState(ctx, &plan, &state, omeClient)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"OME Adapter Create Error", err.Error(),
+			)
+		}
+	}
+
 	if state.ID.IsNull() {
 		state.ID = types.StringValue("placeholder")
 	}
@@ -218,6 +243,16 @@ func (r *networkSettingResource) Read(ctx context.Context, req resource.ReadRequ
 		// save proxy config into terraform state
 		proxySettingState.Password = state.OmeProxySetting.Password
 		state.OmeProxySetting = proxySettingState
+	}
+
+	// adapter configuration
+	if state.OmeAdapterSetting != nil {
+		state.OmeAdapterSetting, getErr = getAdapterSettingState(omeClient, state.OmeAdapterSetting)
+		if getErr != nil {
+			resp.Diagnostics.AddError(
+				"OME Adapter Get Error", getErr.Error(),
+			)
+		}
 	}
 
 	tflog.Trace(ctx, "resource_network_setting read: finished reading state")
@@ -291,6 +326,18 @@ func (r *networkSettingResource) Update(ctx context.Context, req resource.Update
 		state.OmeProxySetting = nil
 	}
 
+	// adapter configuration
+	if plan.OmeAdapterSetting != nil {
+		err := updateAdapterSettingState(ctx, &plan, &state, omeClient)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"OME Adapter Update Error", err.Error(),
+			)
+		}
+	} else {
+		state.OmeAdapterSetting = nil
+	}
+
 	tflog.Trace(ctx, "resource_network_setting update: finished state update")
 	//Save into State
 	if state.ID.IsNull() {
@@ -314,6 +361,211 @@ func (r *networkSettingResource) Delete(ctx context.Context, req resource.Delete
 
 	resp.State.RemoveResource(ctx)
 	tflog.Trace(ctx, "resource_network_setting delete: finished")
+}
+
+// ============================== adapter configuration helper function ================================
+
+func isAdapterConfigValid(plan *models.OmeAdapterSetting) error {
+	if plan.IPV4Config != nil {
+		if plan.IPV4Config.EnableDHCP.ValueBool() {
+			if plan.IPV4Config.StaticIPAddress.ValueString() != "" || plan.IPV4Config.StaticSubnetMask.ValueString() != "" || plan.IPV4Config.StaticGateway.ValueString() != "" {
+				return fmt.Errorf("please validate enable_dhcp is disable, when static_ip_address / static_subnet_mask / static_gateway is set")
+			}
+		}
+
+		if plan.IPV4Config.UseDHCPforDNSServerNames.ValueBool() {
+			if plan.IPV4Config.StaticPreferredDNSServer.ValueString() != "" || plan.IPV4Config.StaticAlternateDNSServer.ValueString() != "" {
+				return fmt.Errorf("please validate use_dhcp_for_dns_server_names is disable, when static_preferred_dns_server / static_alternate_dns_server is set")
+			}
+		}
+	}
+
+	if plan.IPV6Config != nil {
+		if plan.IPV6Config.EnableAutoConfiguration.ValueBool() {
+			if plan.IPV6Config.StaticIPAddress.ValueString() != "" || plan.IPV6Config.StaticPrefixLength.ValueInt64() > 0 || plan.IPV6Config.StaticGateway.ValueString() != "" {
+				return fmt.Errorf("please validate enable_auto_configuration is disable, when static_ip_address / static_prefix_length / static_gateway is set")
+			}
+		}
+
+		if plan.IPV6Config.UseDHCPforDNSServerNames.ValueBool() {
+			if plan.IPV6Config.StaticPreferredDNSServer.ValueString() != "" || plan.IPV6Config.StaticAlternateDNSServer.ValueString() != "" {
+				return fmt.Errorf("please validate use_dhcp_for_dns_server_names is disable, when static_preferred_dns_server / static_alternate_dns_server is set")
+			}
+		}
+	}
+
+	if plan.ManagementVLAN != nil {
+		if !plan.ManagementVLAN.EnableVLAN.ValueBool() && !plan.ManagementVLAN.ID.IsNull() {
+			return fmt.Errorf("please validate enable_vlan is true, when id is set")
+		}
+	}
+
+	if plan.DNSConfig != nil {
+		if !plan.DNSConfig.RegisterWithDNS.ValueBool() && !plan.DNSConfig.DNSName.IsNull() {
+			return fmt.Errorf("please validate register_with_dn is true, when dns_name is set")
+		}
+
+		if plan.DNSConfig.UseDHCPforDNSServerNames.ValueBool() && !plan.DNSConfig.DNSDomainName.IsNull() {
+			return fmt.Errorf("please validate use_dhcp_for_dns_server_names is false, when dns_domain_name is set")
+		}
+	}
+
+	return nil
+}
+
+func updateAdapterSettingState(ctx context.Context, plan, state *models.OmeNetworkSetting, omeClient *clients.Client) error {
+	var newOmeIP string
+	currentAdapter, err := omeClient.GetNetworkAdapterConfigByInterface(state.OmeAdapterSetting.InterfaceName.ValueString())
+	if err != nil {
+		return err
+	}
+	adapter := models.UpdateNetworkAdapterSetting{
+		InterfaceName:    plan.OmeAdapterSetting.InterfaceName.ValueString(),
+		ProfileName:      plan.OmeAdapterSetting.InterfaceName.ValueString(),
+		EnableNIC:        plan.OmeAdapterSetting.EnableNic.ValueBool(),
+		Delay:            int(plan.OmeAdapterSetting.RebootDelay.ValueInt64()),
+		PrimaryInterface: true,
+	}
+	if plan.OmeAdapterSetting.IPV4Config != nil {
+		adapter.Ipv4Configuration = models.Ipv4Configuration{
+			Enable:                   plan.OmeAdapterSetting.IPV4Config.EnableIPv4.ValueBool(),
+			EnableDHCP:               plan.OmeAdapterSetting.IPV4Config.EnableDHCP.ValueBool(),
+			StaticIPAddress:          plan.OmeAdapterSetting.IPV4Config.StaticIPAddress.ValueString(),
+			StaticSubnetMask:         plan.OmeAdapterSetting.IPV4Config.StaticSubnetMask.ValueString(),
+			StaticGateway:            plan.OmeAdapterSetting.IPV4Config.StaticGateway.ValueString(),
+			UseDHCPForDNSServerNames: plan.OmeAdapterSetting.IPV4Config.UseDHCPforDNSServerNames.ValueBool(),
+			StaticPreferredDNSServer: plan.OmeAdapterSetting.IPV4Config.StaticPreferredDNSServer.ValueString(),
+			StaticAlternateDNSServer: plan.OmeAdapterSetting.IPV4Config.StaticAlternateDNSServer.ValueString(),
+		}
+		newOmeIP = plan.OmeAdapterSetting.IPV4Config.StaticIPAddress.ValueString()
+	} else {
+		adapter.Ipv4Configuration = currentAdapter.Ipv4Configuration
+	}
+
+	if plan.OmeAdapterSetting.IPV6Config != nil {
+		adapter.Ipv6Configuration = models.Ipv6Configuration{
+			Enable:                   plan.OmeAdapterSetting.IPV6Config.EnableIPv6.ValueBool(),
+			EnableAutoConfiguration:  plan.OmeAdapterSetting.IPV6Config.EnableAutoConfiguration.ValueBool(),
+			StaticIPAddress:          plan.OmeAdapterSetting.IPV6Config.StaticIPAddress.ValueString(),
+			StaticPrefixLength:       int(plan.OmeAdapterSetting.IPV6Config.StaticPrefixLength.ValueInt64()),
+			StaticGateway:            plan.OmeAdapterSetting.IPV6Config.StaticGateway.ValueString(),
+			UseDHCPForDNSServerNames: plan.OmeAdapterSetting.IPV6Config.UseDHCPforDNSServerNames.ValueBool(),
+			StaticPreferredDNSServer: plan.OmeAdapterSetting.IPV6Config.StaticPreferredDNSServer.ValueString(),
+			StaticAlternateDNSServer: plan.OmeAdapterSetting.IPV6Config.StaticAlternateDNSServer.ValueString(),
+		}
+	} else {
+		adapter.Ipv6Configuration = currentAdapter.Ipv6Configuration
+	}
+
+	if plan.OmeAdapterSetting.DNSConfig != nil {
+		adapter.DNSConfiguration = models.DNSConfiguration{
+			RegisterWithDNS:         plan.OmeAdapterSetting.DNSConfig.RegisterWithDNS.ValueBool(),
+			DNSName:                 plan.OmeAdapterSetting.DNSConfig.DNSName.ValueString(),
+			UseDHCPForDNSDomainName: plan.OmeAdapterSetting.DNSConfig.UseDHCPforDNSServerNames.ValueBool(),
+			DNSDomainName:           plan.OmeAdapterSetting.DNSConfig.DNSDomainName.ValueString(),
+		}
+	} else {
+		adapter.DNSConfiguration = currentAdapter.DNSConfiguration
+	}
+
+	if plan.OmeAdapterSetting.ManagementVLAN != nil {
+		adapter.ManagementVLAN = models.ManagementVLAN{
+			EnableVLAN: plan.OmeAdapterSetting.ManagementVLAN.EnableVLAN.ValueBool(),
+			ID:         int(plan.OmeAdapterSetting.ManagementVLAN.ID.ValueInt64()),
+		}
+	} else {
+		adapter.ManagementVLAN = currentAdapter.ManagementVLAN
+	}
+
+	newJob, err := omeClient.UpdateNetworkAdapterConfig(adapter)
+	if err != nil {
+		return err
+	}
+	err = NetworkJobRunner(ctx, omeClient, newJob.ID)
+	if err != nil {
+		if newOmeIP != "" {
+			currentURL := omeClient.GetURL()
+			omeClient.SetURL(fmt.Sprintf("https://%s:%d", newOmeIP, 443))
+			err = NetworkJobRunner(ctx, omeClient, newJob.ID)
+			if err != nil {
+				return err
+			}
+			state.OmeAdapterSetting, err = getAdapterSettingState(omeClient, plan.OmeAdapterSetting)
+			if err != nil {
+				return err
+			}
+			omeClient.SetURL(currentURL)
+			return nil
+		}
+		return err
+	}
+	state.OmeAdapterSetting, err = getAdapterSettingState(omeClient, plan.OmeAdapterSetting)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func getAdapterSettingState(omeClient *clients.Client, plan *models.OmeAdapterSetting) (*models.OmeAdapterSetting, error) {
+	if plan.InterfaceName.ValueString() == "" {
+		return nil, fmt.Errorf("interface not found")
+	}
+	adapter, err := omeClient.GetNetworkAdapterConfigByInterface(plan.InterfaceName.ValueString())
+	if err != nil {
+		return nil, err
+	}
+	adapterSettingState := &models.OmeAdapterSetting{
+		EnableNic:     types.BoolValue(adapter.EnableNIC),
+		InterfaceName: types.StringValue(adapter.InterfaceName),
+		RebootDelay:   types.Int64Value(int64(adapter.Delay)),
+	}
+	if plan.IPV4Config != nil {
+		adapterSettingState.IPV4Config = &models.OmeIPv4Config{
+			EnableIPv4:               types.BoolValue(adapter.Ipv4Configuration.Enable),
+			EnableDHCP:               types.BoolValue(adapter.Ipv4Configuration.EnableDHCP),
+			StaticIPAddress:          types.StringValue(adapter.Ipv4Configuration.StaticIPAddress),
+			StaticSubnetMask:         types.StringValue(adapter.Ipv4Configuration.StaticSubnetMask),
+			StaticGateway:            types.StringValue(adapter.Ipv4Configuration.StaticGateway),
+			UseDHCPforDNSServerNames: types.BoolValue(adapter.Ipv4Configuration.UseDHCPForDNSServerNames),
+			StaticPreferredDNSServer: types.StringValue(adapter.Ipv4Configuration.StaticPreferredDNSServer),
+			StaticAlternateDNSServer: types.StringValue(adapter.Ipv4Configuration.StaticAlternateDNSServer),
+		}
+	} else {
+		adapterSettingState.IPV4Config = nil
+	}
+	if plan.IPV6Config != nil {
+		adapterSettingState.IPV6Config = &models.OmeIPv6Config{
+			EnableIPv6:               types.BoolValue(adapter.Ipv6Configuration.Enable),
+			EnableAutoConfiguration:  types.BoolValue(adapter.Ipv6Configuration.EnableAutoConfiguration),
+			StaticIPAddress:          types.StringValue(adapter.Ipv6Configuration.StaticIPAddress),
+			StaticPrefixLength:       types.Int64Value(int64(adapter.Ipv6Configuration.StaticPrefixLength)),
+			StaticGateway:            types.StringValue(adapter.Ipv6Configuration.StaticGateway),
+			UseDHCPforDNSServerNames: types.BoolValue(adapter.Ipv6Configuration.UseDHCPForDNSServerNames),
+			StaticPreferredDNSServer: types.StringValue(adapter.Ipv6Configuration.StaticPreferredDNSServer),
+			StaticAlternateDNSServer: types.StringValue(adapter.Ipv6Configuration.StaticAlternateDNSServer),
+		}
+	} else {
+		adapterSettingState.IPV6Config = nil
+	}
+	if plan.DNSConfig != nil {
+		adapterSettingState.DNSConfig = &models.OmeDNSConfig{
+			RegisterWithDNS:          types.BoolValue(adapter.DNSConfiguration.RegisterWithDNS),
+			UseDHCPforDNSServerNames: types.BoolValue(adapter.DNSConfiguration.UseDHCPForDNSDomainName),
+			DNSName:                  types.StringValue(adapter.DNSConfiguration.DNSName),
+			DNSDomainName:            types.StringValue(adapter.DNSConfiguration.DNSDomainName),
+		}
+	} else {
+		adapterSettingState.DNSConfig = nil
+	}
+	if plan.ManagementVLAN != nil {
+		adapterSettingState.ManagementVLAN = &models.OmeManagementVLAN{
+			EnableVLAN: types.BoolValue(adapter.ManagementVLAN.EnableVLAN),
+			ID:         types.Int64Value(int64(adapter.ManagementVLAN.ID)),
+		}
+	} else {
+		adapterSettingState.ManagementVLAN = nil
+	}
+	return adapterSettingState, nil
 }
 
 // =============================== time configuration helper function ==================================

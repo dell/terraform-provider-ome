@@ -154,3 +154,21 @@ func DiscoverJobRunner(ctx context.Context, omeClient *clients.Client, jobID, ti
 	}
 	return results, nil
 }
+
+// NetworkJobRunner to monitor the job for changing ome appliance network setting.
+func NetworkJobRunner(ctx context.Context, omeClient *clients.Client, jobID int64) error {
+	jobRunner := JobRunner{
+		client:         omeClient,
+		jobID:          jobID,
+		maxRetries:     60,
+		sleepInterval:  10,
+		partialFailure: false,
+	}
+	time.Sleep(time.Second * time.Duration(20))
+	err := jobRunner.Monitor(ctx)
+	tflog.Info(ctx, "NET-IP1 finish the monitoring/exits")
+	if err != nil {
+		return err
+	}
+	return nil
+}
