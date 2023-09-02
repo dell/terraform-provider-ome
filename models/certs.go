@@ -120,8 +120,8 @@ func NewCSRConfigModel(input CSRConfig) CSRConfigModel {
 func NewCertInfoModel(info CertInfo) CertInfoModel {
 	return CertInfoModel{
 		ID:        types.StringValue("dummy"),
-		IssuedTo:  NewCSRConfigModel(info.IssuedBy),
-		IssuedBy:  NewCSRConfigModel(info.IssuedTo),
+		IssuedTo:  NewCSRConfigModel(info.IssuedTo),
+		IssuedBy:  NewCSRConfigModel(info.IssuedBy),
 		ValidTo:   types.StringValue(info.ValidTo),
 		ValidFrom: types.StringValue(info.ValidFrom),
 	}
