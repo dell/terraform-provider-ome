@@ -33,6 +33,7 @@ func TestDataSource_ReadGroupDevices(t *testing.T) {
 			{
 				Config: testgroupDeviceDS,
 				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.ome_groupdevices_info.gd", "id"),
 					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_ids.#", "2"),
 					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_servicetags.#", "2"),
 					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.%", "1"),
@@ -50,6 +51,7 @@ func TestDataSource_ReadGroupDevices(t *testing.T) {
 				// create subGroup, but it wont reflect in datasource yet
 				Config: testgroupDeviceDSWithSubGroups,
 				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.ome_groupdevices_info.gd", "id"),
 					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.test_device_group.sub_groups.#", "0"),
 				),
 			},
@@ -58,6 +60,7 @@ func TestDataSource_ReadGroupDevices(t *testing.T) {
 				// now it will reflect
 				Config: testgroupDeviceDSWithSubGroups,
 				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet("data.ome_groupdevices_info.gd", "id"),
 					resource.TestCheckResourceAttr("data.ome_groupdevices_info.gd", "device_groups.test_device_group.sub_groups.#", "1"),
 					resource.TestCheckTypeSetElemNestedAttrs(
 						"data.ome_groupdevices_info.gd",

@@ -62,7 +62,7 @@ resource "ome_static_group" "linux-group" {
 
 - `device_ids` (Set of Number) Device ids in the group
 - `name` (String) Name of the static group resource.
-- `parent_id` (Number) ID of the parent group of the static group.
+- `parent_id` (Number) ID of the parent group of the static group. If the value of `parent_id` changes, Terraform will destroy and recreate the resource.
 
 ### Optional
 

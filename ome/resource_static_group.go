@@ -24,6 +24,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -85,14 +86,21 @@ func (r resourceStaticGroup) Schema(_ context.Context, _ resource.SchemaRequest,
 				MarkdownDescription: "Description of the static group",
 				Description:         "Description of the static group",
 				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString(""),
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"parent_id": schema.Int64Attribute{
-				MarkdownDescription: "ID of the parent group of the static group.",
-				Description:         "ID of the parent group of the static group.",
-				Required:            true,
+				MarkdownDescription: "ID of the parent group of the static group." +
+					" If the value of `parent_id` changes, Terraform will destroy and recreate the resource.",
+				Description: "ID of the parent group of the static group." +
+					" If the value of 'parent_id' changes, Terraform will destroy and recreate the resource.",
+				Required: true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.RequiresReplace(),
+				},
 			},
 			"membership_type_id": schema.Int64Attribute{
 				MarkdownDescription: "Membership type of the static group",

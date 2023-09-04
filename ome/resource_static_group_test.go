@@ -35,6 +35,19 @@ func TestStaticGroup(t *testing.T) {
 		skipssl = true
 	}
 	`
+
+	preReqs := `
+	data "ome_device" "devs" {
+		filters = {
+			device_service_tags = ["` + DeviceSvcTag1 + `", "` + DeviceSvcTag2 + `"]
+		}
+	}
+
+	data "ome_groupdevices_info" "ome_root" {
+		device_group_names = ["Static Groups"]
+	}
+	`
+
 	testAccCreateGroupSuccess := testAccProvider + `	
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1 + `"
@@ -44,72 +57,93 @@ func TestStaticGroup(t *testing.T) {
 	}
 	`
 
-	testAccUpdateGroupSuccess := testAccProvider + `	
+	testAccUpdateGroupSuccess := testAccProvider + preReqs + `
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = ` + GroupID1 + `
-		device_ids = [` + DeviceID1 + `]
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = [data.ome_device.devs.devices[0].id]
 	}
 	`
 
-	testAccDuplicateNameNeg := testAccProvider + `	
+	testAccDuplicateNameNeg := testAccProvider + preReqs + `
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = ` + GroupID1 + `
-		device_ids = [` + DeviceID1 + `]
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = [data.ome_device.devs.devices[0].id]
 	}
 	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = ` + GroupID1 + `
-		device_ids = [` + DeviceID2 + `]
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = [data.ome_device.devs.devices[1].id]
 	}
 	`
 
-	testAccInvalidDeviceNeg := testAccProvider + `	
+	testAccInvalidDeviceNeg := testAccProvider + preReqs + `
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = ` + GroupID1 + `
-		device_ids = [` + DeviceID1 + `]
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = [data.ome_device.devs.devices[0].id]
 	}
 	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = ` + GroupID1 + `
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
 		device_ids = [-1]
 	}
 	`
 
-	testAccCreate2 := testAccProvider + `	
+	testAccCreate2 := testAccProvider + preReqs + `
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = ` + GroupID1 + `
-		device_ids = [` + DeviceID1 + `]
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = [data.ome_device.devs.devices[0].id]
 	}
 	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = ` + GroupID1 + `
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
 		device_ids = []
 	}
 	`
 
-	testAccUpdateMultipleDevices := testAccProvider + `	
+	testAccUpdateMultipleDevices := testAccProvider + preReqs + `
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1Update + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = ` + GroupID1 + `
-		device_ids = [` + DeviceID1 + `]
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = [data.ome_device.devs.devices[0].id]
 	}
 	resource "ome_static_group" "terraform-acceptance-test-2" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1 Updated"
-		parent_id = ` + GroupID1 + `
-		device_ids = [` + DeviceID1 + `, ` + DeviceID2 + `]
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = data.ome_device.devs.devices[*].id
+	}
+	`
+
+	testGroupWoDesc := testAccProvider + preReqs + `
+	resource "ome_static_group" "terraform-acceptance-test" {
+		name       = "` + DeviceGroup1 + `"
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = data.ome_device.devs.devices[*].id
+	}
+	`
+
+	testUpdateParentID := testAccProvider + preReqs + `
+	resource "ome_static_group" "parent" {
+		name       = "` + DeviceGroup1 + `_parent"
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = data.ome_device.devs.devices[*].id
+	}
+	resource "ome_static_group" "terraform-acceptance-test" {
+		name       = "` + DeviceGroup1 + `"
+		parent_id  = ome_static_group.parent.id
+		device_ids = data.ome_device.devs.devices[*].id
 	}
 	`
 
@@ -117,6 +151,16 @@ func TestStaticGroup(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			{
+				Config: testGroupWoDesc,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_static_group.terraform-acceptance-test", "name", DeviceGroup1),
+					resource.TestCheckResourceAttr("ome_static_group.terraform-acceptance-test", "description", ""),
+				),
+			},
+			{
+				Config: testUpdateParentID,
+			},
 			{
 				Config: testAccCreateGroupSuccess,
 				Check: resource.ComposeTestCheckFunc(

@@ -234,6 +234,7 @@ func (g *groupDevicesDatasource) Read(ctx context.Context, req datasource.ReadRe
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	groupDevices.ID = types.StringValue("dummy")
 	groupNames := []string{}
 	resp.Diagnostics.Append(groupDevices.DeviceGroupNames.ElementsAs(ctx, &groupNames, true)...)
 	if diags.HasError() {
