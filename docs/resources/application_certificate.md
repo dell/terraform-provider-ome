@@ -57,7 +57,7 @@ resource "ome_application_certificate" "ome_cert" {
 
 ### Required
 
-- `certificate_base64` (String) Base64 encoded certificate.
+- `certificate_base64` (String) Base64 encoded certificate. Terraform will replace (delete and recreate) this resource if this attribute is modified.
 
 ### Read-Only
 

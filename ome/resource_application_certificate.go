@@ -21,6 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -64,9 +66,14 @@ func (r resourceCert) Schema(_ context.Context, _ resource.SchemaRequest, resp *
 				Computed:            true,
 			},
 			"certificate_base64": schema.StringAttribute{
-				MarkdownDescription: "Base64 encoded certificate.",
-				Description:         "Base64 encoded certificate.",
-				Required:            true,
+				MarkdownDescription: "Base64 encoded certificate." +
+					" Terraform will replace (delete and recreate) this resource if this attribute is modified.",
+				Description: "Base64 encoded certificate." +
+					" Terraform will replace (delete and recreate) this resource if this attribute is modified.",
+				Required: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 		},
 	}
@@ -129,22 +136,11 @@ func (r resourceCert) Read(ctx context.Context, req resource.ReadRequest, resp *
 
 // Update resource
 func (r resourceCert) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	//Get Plan Data
-	tflog.Trace(ctx, "resource_Cert update: started")
-	var plan models.CertResModel
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	state, dgs := r.uploadCert(ctx, plan)
-	resp.Diagnostics.Append(dgs...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	diags = resp.State.Set(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	// Update should never happen
+	resp.Diagnostics.AddError(
+		"Error updating Certificate.",
+		"An update plan of Certificate should never be invoked. This resource is supposed to be replaced on update.",
+	)
 }
 
 // Delete resource
