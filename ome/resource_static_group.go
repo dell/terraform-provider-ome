@@ -93,9 +93,11 @@ func (r resourceStaticGroup) Schema(_ context.Context, _ resource.SchemaRequest,
 				},
 			},
 			"parent_id": schema.Int64Attribute{
-				MarkdownDescription: "ID of the parent group of the static group.",
-				Description:         "ID of the parent group of the static group.",
-				Required:            true,
+				MarkdownDescription: "ID of the parent group of the static group." +
+					" If the value of `parent_id` changes, Terraform will destroy and recreate the resource.",
+				Description: "ID of the parent group of the static group." +
+					" If the value of 'parent_id' changes, Terraform will destroy and recreate the resource.",
+				Required: true,
 				PlanModifiers: []planmodifier.Int64{
 					int64planmodifier.RequiresReplace(),
 				},
