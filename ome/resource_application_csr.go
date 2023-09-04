@@ -21,6 +21,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -65,10 +67,15 @@ func (r resourceCsr) Schema(_ context.Context, _ resource.SchemaRequest, resp *r
 				Computed:            true,
 			},
 			"specs": schema.SingleNestedAttribute{
-				MarkdownDescription: "CSR specifications.",
-				Description:         "CSR specifications.",
-				Attributes:          r.specSchema(),
-				Required:            true,
+				MarkdownDescription: "CSR specifications." +
+					" Terraform will replace (delete and recreate) this resource if this attribute is modified.",
+				Description: "CSR specifications." +
+					" Terraform will replace (delete and recreate) this resource if this attribute is modified.",
+				Attributes: r.specSchema(),
+				Required:   true,
+				PlanModifiers: []planmodifier.Object{
+					objectplanmodifier.RequiresReplace(),
+				},
 			},
 			"csr": schema.StringAttribute{
 				MarkdownDescription: "CSR in single line PEM format returned from OME.",
@@ -179,35 +186,11 @@ func (r resourceCsr) Read(ctx context.Context, req resource.ReadRequest, resp *r
 
 // Update resource
 func (r resourceCsr) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	//Get Plan Data
-	tflog.Trace(ctx, "resource_csr update: started")
-	var plan models.CsrResModel
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	//Create Session and defer the remove session
-	omeClient, d := r.p.createOMESession(ctx, "resource_csr Update")
-	resp.Diagnostics.Append(d...)
-	if d.HasError() {
-		return
-	}
-	defer omeClient.RemoveSession()
-
-	tflog.Info(ctx, "resource_csr generating csr")
-
-	state, err := r.genCSR(ctx, plan, omeClient)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Error generating CSR.",
-			err.Error(),
-		)
-		return
-	}
-	diags = resp.State.Set(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	// Update should never happen
+	resp.Diagnostics.AddError(
+		"Error updating CSR.",
+		"An update plan of CSR should never be invoked. This resource is supposed to be replaced on update.",
+	)
 }
 
 // Delete resource

@@ -67,7 +67,7 @@ resource "local_file" "csr_file" {
 
 ### Required
 
-- `specs` (Attributes) CSR specifications. (see [below for nested schema](#nestedatt--specs))
+- `specs` (Attributes) CSR specifications. Terraform will replace (delete and recreate) this resource if this attribute is modified. (see [below for nested schema](#nestedatt--specs))
 
 ### Read-Only
 
