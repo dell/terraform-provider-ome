@@ -11,13 +11,25 @@
 # limitations under the License.
 # */
 
-# TODO: Get parent id from ome_groupdevice_info datasource
+# get all devices in the CIDR "10.10.10.10/26" with model PowerEdge MX840c
+data "ome_device" "devs" {
+  filters = {
+    ip_expressions    = ["10.10.10.10/26"]
+    filter_expression = "Model eq 'PowerEdge MX840c'"
+  }
+}
 
-# TODO: Get device ids from ome_device datasource by ips
+# get the root group of all static groups in OME
+# we are mainly concerned with the ID of this group which we shall use to create a child group
+data "ome_groupdevices_info" "ome_root" {
+  device_group_names = ["Static Groups"]
+}
 
-resource "ome_static_group" "linux-group" {
-  name        = "Linux"
-  description = "All linux servers"
-  parent_id   = 1011
-  device_ids  = [10056, 10057]
+# Create a group of all the devices fetched by the device datasource
+# Its parent group will be "Static Groups"
+resource "ome_static_group" "pE-slash-26" {
+  name        = "Group46"
+  description = "Group of all devices in the CIDR '10.10.10.10/26' with model PowerEdge MX840c"
+  parent_id   = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+  device_ids  = data.ome_device.devs.devices[*].id
 }
