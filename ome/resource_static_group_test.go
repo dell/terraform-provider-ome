@@ -107,7 +107,6 @@ func TestStaticGroup(t *testing.T) {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
-		device_ids = []
 	}
 	`
 
@@ -123,6 +122,21 @@ func TestStaticGroup(t *testing.T) {
 		description = "Device Group for Acceptance Test 1 Updated"
 		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
 		device_ids = data.ome_device.devs.devices[*].id
+	}
+	`
+
+	testAccNoDevices := testAccProvider + preReqs + `
+	resource "ome_static_group" "terraform-acceptance-test-1" {
+		name = "` + DeviceGroup1Update + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = [data.ome_device.devs.devices[0].id]
+	}
+	resource "ome_static_group" "terraform-acceptance-test-2" {
+		name = "` + DeviceGroup1 + `"
+		description = "Device Group for Acceptance Test 1 Updated"
+		parent_id  = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = []
 	}
 	`
 
@@ -216,6 +230,28 @@ func TestStaticGroup(t *testing.T) {
 				Config: testAccUpdateMultipleDevices,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_static_group.terraform-acceptance-test-2", "device_ids.#", "2"),
+				),
+			},
+			{
+				// Recreate sub group with zero devices
+				Taint:  []string{"ome_static_group.terraform-acceptance-test-2"},
+				Config: testAccNoDevices,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_static_group.terraform-acceptance-test-2", "device_ids.#", "0"),
+				),
+			},
+			{
+				// update Group to add 2 devices at once
+				Config: testAccUpdateMultipleDevices,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_static_group.terraform-acceptance-test-2", "device_ids.#", "2"),
+				),
+			},
+			{
+				// remove all devices from sub group
+				Config: testAccNoDevices,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_static_group.terraform-acceptance-test-2", "device_ids.#", "0"),
 				),
 			},
 		},

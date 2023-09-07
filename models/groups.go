@@ -261,7 +261,7 @@ func (plan *StaticGroup) GetMemberPayload(ctx context.Context, state StaticGroup
 func (plan *StaticGroup) GetDeviceIDMap(ctx context.Context) (map[int64]bool, diag.Diagnostics) {
 	var d diag.Diagnostics
 	ret, devIds := make(map[int64]bool), make([]int64, 0)
-	d.Append(plan.DeviceIds.ElementsAs(ctx, &devIds, false)...)
+	d.Append(plan.DeviceIds.ElementsAs(ctx, &devIds, true)...)
 	for _, id := range devIds {
 		ret[id] = true
 	}
