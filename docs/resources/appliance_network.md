@@ -201,6 +201,10 @@ Optional:
 <a id="nestedatt--time_setting"></a>
 ### Nested Schema for `time_setting`
 
+Required:
+
+- `time_zone` (String) The valid timezone ID to be used. This option is applicable for both system time and NTP time synchronization.
+
 Optional:
 
 - `enable_ntp` (Boolean) Enables or disables Network Time Protocol(NTP).If "enable_ntp" is false, then the NTP addresses reset to their default values.
@@ -208,5 +212,4 @@ Optional:
 - `secondary_ntp_address1` (String) The first secondary NTP address. This option is applicable when "enable_ntp" is true.
 - `secondary_ntp_address2` (String) The second secondary NTP address. This option is applicable when "enable_ntp" is true.
 - `system_time` (String) Time in the current system. This option is only applicable when "enable_ntp" is false. This option must be provided in following format 'yyyy-mm-dd hh:mm:ss'.
-- `time_zone` (String) The valid timezone ID to be used. This option is applicable for both system time and NTP time synchronization.
 

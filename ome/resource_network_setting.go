@@ -570,26 +570,27 @@ func getAdapterSettingState(omeClient *clients.Client, plan *models.OmeAdapterSe
 
 // =============================== time configuration helper function ==================================
 func isTimeConfigValid(planTime *models.OmeTimeSetting) (bool, error) {
-	if planTime.TimeZone.ValueString() == "" {
-		return false, fmt.Errorf("please validate that the time_zone is set")
+	if planTime.EnableNTP.IsUnknown() {
+		return true, nil
 	}
 	if planTime.EnableNTP.ValueBool() {
-		if planTime.SystemTime.ValueString() != "" {
-			return false, fmt.Errorf("please validate that the system_time is unset when enable_ntp is active")
+		if !planTime.SystemTime.IsNull() {
+			return false, fmt.Errorf("system_time should not be set when enable_ntp is active")
 		}
-		if planTime.PrimaryNTPAddress.ValueString() == "" {
-			return false, fmt.Errorf("please validate that the primary_ntp_address is set when enable_ntp is active")
+		if planTime.PrimaryNTPAddress.IsNull() {
+			return false, fmt.Errorf("primary_ntp_address should be set when enable_ntp is active")
 		}
-	} else {
-		if planTime.PrimaryNTPAddress.ValueString() != "" ||
-			planTime.SecondaryNTPAddress1.ValueString() != "" ||
-			planTime.SecondaryNTPAddress2.ValueString() != "" {
-			return false, fmt.Errorf("please validate that primary_ntp_address, secondary_ntp_address1 and secondary_ntp_address2 are unset when enable_ntp is disable")
-		}
-		if planTime.SystemTime.ValueString() == "" {
-			return false, fmt.Errorf("please validate that the system_time is set when enable_ntp is disable")
-		}
+		return true, nil
 	}
+
+	if !(planTime.PrimaryNTPAddress.IsNull() && planTime.SecondaryNTPAddress1.IsNull() && planTime.SecondaryNTPAddress2.IsNull()) {
+		return false, fmt.Errorf("primary_ntp_address, secondary_ntp_address1 and secondary_ntp_address2 should not be set when enable_ntp is disable")
+	}
+
+	if planTime.SystemTime.IsNull() {
+		return false, fmt.Errorf("system_time should be set when enable_ntp is disable")
+	}
+
 	return true, nil
 }
 
@@ -649,17 +650,20 @@ func buildTimeSettingState(time *models.TimeConfig) *models.OmeTimeSetting {
 // =============================== session configuration helper function ===============================
 
 func isSessionConfigValid(planSession *models.OmeSessionSetting) (bool, error) {
+	if planSession.EnableUniversalTimeout.IsUnknown() {
+		return true, nil
+	}
 	if planSession.EnableUniversalTimeout.ValueBool() {
-		if planSession.APITimeout.ValueFloat64() > 0 || planSession.GUITimeout.ValueFloat64() > 0 || planSession.SSHTimeout.ValueFloat64() > 0 || planSession.SerialTimeout.ValueFloat64() > 0 {
-			return false, fmt.Errorf("please validate that the configuration for api_timeout, gui_timeout, ssh_timeout and serial_timeout are unset when enable_universal_timeout option is active")
+		if !(planSession.APITimeout.IsNull() && planSession.GUITimeout.IsNull() && planSession.SSHTimeout.IsNull() && planSession.SerialTimeout.IsNull()) {
+			return false, fmt.Errorf("api_timeout, gui_timeout, ssh_timeout and serial_timeout should not be set when enable_universal_timeout option is active")
 		}
-		if planSession.UniversalTimeout.ValueFloat64() < 1 {
-			return false, fmt.Errorf("please ensure universal_timeout is set when enable_universal_timeout option is active")
+		if planSession.UniversalTimeout.IsNull() {
+			return false, fmt.Errorf("universal_timeout should be set when enable_universal_timeout option is active")
 		}
-	} else {
-		if planSession.UniversalTimeout.ValueFloat64() > 0 {
-			return false, fmt.Errorf("please ensure universal_timeout is unset when enable_universal_timeout option is disable")
-		}
+		return true, nil
+	}
+	if !planSession.UniversalTimeout.IsNull() {
+		return false, fmt.Errorf("universal_timeout should not be set when enable_universal_timeout option is disable")
 	}
 	return true, nil
 }
@@ -818,21 +822,30 @@ func buildSessionSettingState(sessions *models.NetworkSessions) *models.OmeSessi
 // ============================= proxy configuration helper function =================================
 
 func isProxyConfigValid(planProxy *models.OmeProxySetting) (bool, error) {
-	if planProxy.EnableProxy.ValueBool() {
-		if planProxy.IPAddress.ValueString() == "" || planProxy.ProxyPort.ValueInt64() == 0 {
-			return false, fmt.Errorf("please ensure that you set both the IP address and port when enabling the proxy")
-		}
-		if planProxy.EnableAuthentication.ValueBool() {
-			if planProxy.Username.ValueString() == "" || planProxy.Password.ValueString() == "" {
-				return false, fmt.Errorf("please ensure that you set both the username and password when enabling the proxy authentication")
-			}
-		} else if planProxy.Username.ValueString() != "" || planProxy.Password.ValueString() != "" {
-			return false, fmt.Errorf("please ensure enable authentication should be set to true before setting username and password")
-		}
-	} else if planProxy.IPAddress.ValueString() != "" || planProxy.ProxyPort.ValueInt64() > 0 || planProxy.EnableAuthentication.ValueBool() || planProxy.Username.ValueString() != "" || planProxy.Password.ValueString() != "" {
-		return false, fmt.Errorf("please ensure enable proxy should be set to true before setting any ome proxy configuration")
+	if planProxy.EnableProxy.IsUnknown() {
+		return true, nil
 	}
+	if planProxy.EnableProxy.ValueBool() {
+		if planProxy.IPAddress.IsNull() || planProxy.ProxyPort.IsNull() {
+			return false, fmt.Errorf("both IP address and port are required when enabling proxy")
+		}
 
+		if !(planProxy.EnableAuthentication.IsNull() || planProxy.EnableAuthentication.IsUnknown()) {
+			if planProxy.EnableAuthentication.ValueBool() {
+				if planProxy.Username.IsNull() || planProxy.Password.IsNull() {
+					return false, fmt.Errorf("both username and password are required when enabling proxy authentication")
+				}
+				return true, nil
+			}
+			if !(planProxy.Username.IsNull() && planProxy.Password.IsNull()) {
+				return false, fmt.Errorf("enable authentication should be set to true before setting username and password")
+			}
+		}
+		return true, nil
+	}
+	if !(planProxy.IPAddress.IsNull() && planProxy.ProxyPort.IsNull() && planProxy.EnableAuthentication.IsNull() && planProxy.Username.IsNull() && planProxy.Password.IsNull()) {
+		return false, fmt.Errorf("enable proxy should be set to true before setting any ome proxy configuration")
+	}
 	return true, nil
 }
 

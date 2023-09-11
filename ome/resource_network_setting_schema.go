@@ -457,13 +457,18 @@ func TimeSettingSchema() map[string]schema.Attribute {
 			Description:         "Time in the current system. This option is only applicable when \"enable_ntp\" is false. This option must be provided in following format 'yyyy-mm-dd hh:mm:ss'.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"time_zone": schema.StringAttribute{
 			MarkdownDescription: "The valid timezone ID to be used. This option is applicable for both system time and NTP time synchronization.",
 			Description:         "The valid timezone ID to be used. This option is applicable for both system time and NTP time synchronization.",
-			Optional:            true,
-			Computed:            true,
+			Required:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"primary_ntp_address": schema.StringAttribute{
@@ -471,6 +476,9 @@ func TimeSettingSchema() map[string]schema.Attribute {
 			Description:         "The primary NTP address. This option is applicable when \"enable_ntp\" is true.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"secondary_ntp_address1": schema.StringAttribute{
@@ -478,6 +486,9 @@ func TimeSettingSchema() map[string]schema.Attribute {
 			Description:         "The first secondary NTP address. This option is applicable when \"enable_ntp\" is true.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 
 		"secondary_ntp_address2": schema.StringAttribute{
@@ -485,6 +496,9 @@ func TimeSettingSchema() map[string]schema.Attribute {
 			Description:         "The second secondary NTP address. This option is applicable when \"enable_ntp\" is true.",
 			Optional:            true,
 			Computed:            true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
 	}
 }

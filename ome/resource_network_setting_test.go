@@ -280,23 +280,23 @@ func TestNetworkSettingTimeInvalidConfig(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccNetworkTimeInvalid,
-				ExpectError: regexp.MustCompile(`.*please validate that the system_time is unset when enable_ntp is active*.`),
+				ExpectError: regexp.MustCompile(`.*system_time should not be set when enable_ntp is active*.`),
 			},
 			{
 				Config:      testAccNetworkTimeInvalid1,
-				ExpectError: regexp.MustCompile(`.*please validate that the primary_ntp_address is set when enable_ntp is active*.`),
+				ExpectError: regexp.MustCompile(`.*primary_ntp_address should be set when enable_ntp is active*.`),
 			},
 			{
 				Config:      testAccNetworkTimeInvalid2,
-				ExpectError: regexp.MustCompile(`.*please validate that the time_zone is set*.`),
+				ExpectError: regexp.MustCompile(`.*Inappropriate value for attribute "time_setting": attribute "time_zone"*.`),
 			},
 			{
 				Config:      testAccNetworkTimeInvalid3,
-				ExpectError: regexp.MustCompile(`.*please validate that primary_ntp_address, secondary_ntp_address1*.`),
+				ExpectError: regexp.MustCompile(`.*primary_ntp_address, secondary_ntp_address1 and secondary_ntp_address2*.`),
 			},
 			{
 				Config:      testAccNetworkTimeInvalid4,
-				ExpectError: regexp.MustCompile(`.*please validate that the system_time is set*.`),
+				ExpectError: regexp.MustCompile(`.*system_time should be set when enable_ntp is disable*.`),
 			},
 		},
 	})
@@ -423,15 +423,15 @@ func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccNetworkSessionInvalid,
-				ExpectError: regexp.MustCompile(`.*please ensure universal_timeout is set*.`),
+				ExpectError: regexp.MustCompile(`.*universal_timeout should be set*.`),
 			},
 			{
 				Config:      testAccNetworkSessionInvalid1,
-				ExpectError: regexp.MustCompile(`.*please validate that the configuration for api_timeout*.`),
+				ExpectError: regexp.MustCompile(`.*api_timeout, gui_timeout, ssh_timeout and serial_timeout*.`),
 			},
 			{
 				Config:      testAccNetworkSessionInvalid2,
-				ExpectError: regexp.MustCompile(`.*please ensure universal_timeout is unset*.`),
+				ExpectError: regexp.MustCompile(`.*universal_timeout should not be set*.`),
 			},
 			{
 				Config:      testAccNetworkSessionInvalid3,
@@ -573,19 +573,19 @@ func TestNetworkSettingProxyInValidConfig(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccNetworkProxyInvalid,
-				ExpectError: regexp.MustCompile(`.*please ensure enable proxy should be set to true*.`),
+				ExpectError: regexp.MustCompile(`.*enable proxy should be set to true*.`),
 			},
 			{
 				Config:      testAccNetworkProxyInvalid1,
-				ExpectError: regexp.MustCompile(`.*please ensure that you set both the IP address and port*.`),
+				ExpectError: regexp.MustCompile(`.*both IP address and port are required*.`),
 			},
 			{
 				Config:      testAccNetworkProxyInvalid2,
-				ExpectError: regexp.MustCompile(`.*please ensure that you set both the username and password*.`),
+				ExpectError: regexp.MustCompile(`.*both username and password are required*.`),
 			},
 			{
 				Config:      testAccNetworkProxyInvalid3,
-				ExpectError: regexp.MustCompile(`.*please ensure enable authentication should be set to true*.`),
+				ExpectError: regexp.MustCompile(`.*enable authentication should be set to true*.`),
 			},
 		},
 	})
