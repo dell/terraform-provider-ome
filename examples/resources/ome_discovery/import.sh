@@ -1,0 +1,1 @@
+terraform import ome_discovery.code_1 "<discovery-job-id>"

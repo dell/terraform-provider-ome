@@ -496,8 +496,7 @@ func ProxySettingSchema() map[string]schema.Attribute {
 		"enable_proxy": schema.BoolAttribute{
 			MarkdownDescription: "Enables or disables the HTTP proxy configuration. If \"enable proxy\" is false, then the HTTP proxy configuration is set to its default value.",
 			Description:         "Enables or disables the HTTP proxy configuration. If \"enable proxy\" is false, then the HTTP proxy configuration is set to its default value.",
-			Optional:            true,
-			Computed:            true,
+			Required:            true,
 		},
 
 		"ip_address": schema.StringAttribute{

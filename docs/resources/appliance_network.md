@@ -168,10 +168,13 @@ Optional:
 <a id="nestedatt--proxy_setting"></a>
 ### Nested Schema for `proxy_setting`
 
+Required:
+
+- `enable_proxy` (Boolean) Enables or disables the HTTP proxy configuration. If "enable proxy" is false, then the HTTP proxy configuration is set to its default value.
+
 Optional:
 
 - `enable_authentication` (Boolean) Enable or disable proxy authentication. If "enable_authentication" is true, "proxy_username" and "proxy_password" must be provided. If "enable_authentication" is false, the proxy username and password are set to its default values.
-- `enable_proxy` (Boolean) Enables or disables the HTTP proxy configuration. If "enable proxy" is false, then the HTTP proxy configuration is set to its default value.
 - `ip_address` (String) Proxy server address. This option is mandatory when "enable_proxy" is true.
 - `password` (String) Proxy server password. This option is mandatory when "enable_authentication" is true.
 - `proxy_port` (Number) Proxy server's port number. This option is mandatory when "enable_proxy" is true.

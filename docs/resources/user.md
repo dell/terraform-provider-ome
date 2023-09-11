@@ -54,10 +54,10 @@ resource "ome_user" "code_1" {
 ### Optional
 
 - `description` (String) Description of the OME user.
-- `directory_service_id` (Number) Directory Service ID of the OME user.
+- `directory_service_id` (Number) Directory Service ID of the OME user. If the value of `directory_service_id` changes, Terraform will destroy and recreate the resource.
 - `enabled` (Boolean) Enable OME user.
-- `locked` (Boolean) Lock OME user.
-- `user_type_id` (Number) User Type ID of the OME user.
+- `locked` (Boolean) Lock OME user. If the value of `locked` changes, Terraform will destroy and recreate the resource.
+- `user_type_id` (Number) User Type ID of the OME user. If the value of `user_type_id` changes, Terraform will destroy and recreate the resource.
 
 ### Read-Only
 
