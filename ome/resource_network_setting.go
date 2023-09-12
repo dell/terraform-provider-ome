@@ -366,46 +366,47 @@ func (r *networkSettingResource) Delete(ctx context.Context, req resource.Delete
 // ============================== adapter configuration helper function ================================
 
 func isAdapterConfigValid(plan *models.OmeAdapterSetting) error {
+
 	if plan.IPV4Config != nil {
-		if plan.IPV4Config.EnableDHCP.ValueBool() {
-			if plan.IPV4Config.StaticIPAddress.ValueString() != "" || plan.IPV4Config.StaticSubnetMask.ValueString() != "" || plan.IPV4Config.StaticGateway.ValueString() != "" {
+		if !plan.IPV4Config.EnableDHCP.IsUnknown() && plan.IPV4Config.EnableDHCP.ValueBool() {
+			if !(plan.IPV4Config.StaticIPAddress.IsNull() && plan.IPV4Config.StaticSubnetMask.IsNull() && plan.IPV4Config.StaticGateway.IsNull()) {
 				return fmt.Errorf("please validate enable_dhcp is disable, when static_ip_address / static_subnet_mask / static_gateway is set")
 			}
 		}
 
-		if plan.IPV4Config.UseDHCPforDNSServerNames.ValueBool() {
-			if plan.IPV4Config.StaticPreferredDNSServer.ValueString() != "" || plan.IPV4Config.StaticAlternateDNSServer.ValueString() != "" {
+		if !plan.IPV4Config.UseDHCPforDNSServerNames.IsUnknown() && plan.IPV4Config.UseDHCPforDNSServerNames.ValueBool() {
+			if !(plan.IPV4Config.StaticPreferredDNSServer.IsNull() && plan.IPV4Config.StaticAlternateDNSServer.IsNull()) {
 				return fmt.Errorf("please validate use_dhcp_for_dns_server_names is disable, when static_preferred_dns_server / static_alternate_dns_server is set")
 			}
 		}
 	}
 
 	if plan.IPV6Config != nil {
-		if plan.IPV6Config.EnableAutoConfiguration.ValueBool() {
-			if plan.IPV6Config.StaticIPAddress.ValueString() != "" || plan.IPV6Config.StaticPrefixLength.ValueInt64() > 0 || plan.IPV6Config.StaticGateway.ValueString() != "" {
+		if !plan.IPV6Config.EnableAutoConfiguration.IsUnknown() && plan.IPV6Config.EnableAutoConfiguration.ValueBool() {
+			if !(plan.IPV6Config.StaticIPAddress.IsNull() && plan.IPV6Config.StaticPrefixLength.IsNull() && plan.IPV6Config.StaticGateway.IsNull()) {
 				return fmt.Errorf("please validate enable_auto_configuration is disable, when static_ip_address / static_prefix_length / static_gateway is set")
 			}
 		}
 
-		if plan.IPV6Config.UseDHCPforDNSServerNames.ValueBool() {
-			if plan.IPV6Config.StaticPreferredDNSServer.ValueString() != "" || plan.IPV6Config.StaticAlternateDNSServer.ValueString() != "" {
+		if !plan.IPV6Config.UseDHCPforDNSServerNames.IsUnknown() && plan.IPV6Config.UseDHCPforDNSServerNames.ValueBool() {
+			if !(plan.IPV6Config.StaticPreferredDNSServer.IsNull() && plan.IPV6Config.StaticAlternateDNSServer.IsNull()) {
 				return fmt.Errorf("please validate use_dhcp_for_dns_server_names is disable, when static_preferred_dns_server / static_alternate_dns_server is set")
 			}
 		}
 	}
 
 	if plan.ManagementVLAN != nil {
-		if !plan.ManagementVLAN.EnableVLAN.ValueBool() && !plan.ManagementVLAN.ID.IsNull() {
+		if !plan.ManagementVLAN.EnableVLAN.IsUnknown() && !plan.ManagementVLAN.EnableVLAN.ValueBool() && !plan.ManagementVLAN.ID.IsNull() {
 			return fmt.Errorf("please validate enable_vlan is true, when id is set")
 		}
 	}
 
 	if plan.DNSConfig != nil {
-		if !plan.DNSConfig.RegisterWithDNS.ValueBool() && !plan.DNSConfig.DNSName.IsNull() {
+		if !plan.DNSConfig.RegisterWithDNS.IsUnknown() && !plan.DNSConfig.RegisterWithDNS.ValueBool() && !plan.DNSConfig.DNSName.IsNull() {
 			return fmt.Errorf("please validate register_with_dn is true, when dns_name is set")
 		}
 
-		if plan.DNSConfig.UseDHCPforDNSServerNames.ValueBool() && !plan.DNSConfig.DNSDomainName.IsNull() {
+		if !plan.DNSConfig.RegisterWithDNS.IsUnknown() && plan.DNSConfig.UseDHCPforDNSServerNames.ValueBool() && !plan.DNSConfig.DNSDomainName.IsNull() {
 			return fmt.Errorf("please validate use_dhcp_for_dns_server_names is false, when dns_domain_name is set")
 		}
 	}
@@ -627,7 +628,7 @@ func updateTimeSettingState(plan, state *models.OmeNetworkSetting, omeClient *cl
 			return true, err
 		}
 		state.OmeTimeSetting = buildTimeSettingState(&newTime)
-		if plan.OmeTimeSetting.SystemTime.ValueString() != "" {
+		if !plan.OmeTimeSetting.SystemTime.IsNull() {
 			state.OmeTimeSetting.SystemTime = plan.OmeTimeSetting.SystemTime
 		}
 		return true, nil
