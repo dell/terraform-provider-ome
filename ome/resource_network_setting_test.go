@@ -73,6 +73,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	resource "ome_appliance_network" "invalid1" {
 		adapter_setting = {
 		  interface_name = "invalid"
+		  enable_nic = true
 		  ipv4_configuration = {
 			enable_ipv4        = true
 			enable_dhcp        = true
@@ -87,6 +88,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	testAccNetworkAdapterInvalid2 := testProvider + `
 	resource "ome_appliance_network" "invalid2" {
 		adapter_setting = {
+		  enable_nic = true
 		  interface_name = "invalid"
 		  ipv4_configuration = {
 			enable_ipv4 = true
@@ -100,6 +102,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	testAccNetworkAdapterInvalid3 := testProvider + `
 	resource "ome_appliance_network" "invalid3" {
 		adapter_setting = {
+		  enable_nic = true
 		  interface_name = "invalid"
 		  ipv6_configuration = {
 			enable_ipv6 = true
@@ -116,6 +119,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	resource "ome_appliance_network" "invalid4" {
 		adapter_setting = {
 		  interface_name = "invalid"
+		  enable_nic = true
 		  ipv6_configuration = {
 			enable_ipv6 = true
 			use_dhcp_for_dns_server_names = true
@@ -130,6 +134,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	resource "ome_appliance_network" "invalid5" {
 		adapter_setting = {
 		  interface_name = "invalid"
+		  enable_nic = true
 		  management_vlan = {
 			enable_vlan = false
 			id = 1 
@@ -142,6 +147,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	resource "ome_appliance_network" "invalid6" {
 		adapter_setting = {
 		  interface_name = "invalid"
+		  enable_nic = true
 		  dns_configuration = {
 			register_with_dns              = false
 			dns_name                       = "err"
