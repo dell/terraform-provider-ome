@@ -93,12 +93,12 @@ resource "ome_appliance_network" "net1" {
 
 Required:
 
+- `enable_nic` (Boolean) Enable or disable Network Interface Card (NIC) configuration
 - `interface_name` (String) If there are multiple interfaces, network configuration changes can be applied to a single interface using the `interface name` of the NIC.
 
 Optional:
 
 - `dns_configuration` (Attributes) Domain Name System(DNS) settings (see [below for nested schema](#nestedatt--adapter_setting--dns_configuration))
-- `enable_nic` (Boolean) Enable or disable Network Interface Card (NIC) configuration
 - `ipv4_configuration` (Attributes) IPv4 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv4 address (see [below for nested schema](#nestedatt--adapter_setting--ipv4_configuration))
 - `ipv6_configuration` (Attributes) IPv6 network configuration. (Warning) Ensure that you have an alternate interface to access OpenManage Enterprise as these options can change the current IPv6 address (see [below for nested schema](#nestedatt--adapter_setting--ipv6_configuration))
 - `job_id` (Number) Job ID
