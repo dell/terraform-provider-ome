@@ -38,22 +38,21 @@ func TestDataSource_ReadDevice(t *testing.T) {
 			{
 				Config:      testGetDevicesWithNoIDs,
 				ExpectError: regexp.MustCompile(".*Attribute filters.ids list must contain at least 1 elements.*"),
-				// PlanOnly:    true,
+				PlanOnly:    true,
 			},
 			{
 				Config:      testGetDevicesWithNoIPs,
 				ExpectError: regexp.MustCompile(".*Attribute filters.ip_expressions list must contain at least 1 elements.*"),
-				// PlanOnly:    true,
+				PlanOnly:    true,
 			},
 			{
 				Config:      testGetDevicesWithNoSvcTags,
 				ExpectError: regexp.MustCompile(".*Attribute filters.device_service_tags list must contain at least 1 elements.*"),
-				// PlanOnly:    true,
+				PlanOnly:    true,
 			},
 			{
 				Config:      testGetDevicesWithInvalidInventory,
 				ExpectError: regexp.MustCompile(".*Invalid Attribute Value Match.*"),
-				// PlanOnly:    true,
 			},
 			{
 				Config:      testGetInvalidDevices,
