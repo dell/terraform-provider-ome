@@ -158,19 +158,19 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccNetworkAdapterInvalid1,
-				ExpectError: regexp.MustCompile(`.*please validate enable_dhcp is disable*.`),
+				ExpectError: regexp.MustCompile(`.*static_ip_address / static_subnet_mask / static_gateway should not be set*.`),
 			},
 			{
 				Config:      testAccNetworkAdapterInvalid2,
-				ExpectError: regexp.MustCompile(`.*please validate use_dhcp_for_dns_server_names is disable*.`),
+				ExpectError: regexp.MustCompile(`.*static_ip_address / static_subnet_mask / static_gateway are required*.`),
 			},
 			{
 				Config:      testAccNetworkAdapterInvalid3,
-				ExpectError: regexp.MustCompile(`.*please validate enable_auto_configuration is disable*.`),
+				ExpectError: regexp.MustCompile(`.*static_ip_address / static_prefix_length / static_gateway should not be set*.`),
 			},
 			{
 				Config:      testAccNetworkAdapterInvalid4,
-				ExpectError: regexp.MustCompile(`.*please validate use_dhcp_for_dns_server_names is disable*.`),
+				ExpectError: regexp.MustCompile(`.*static_ip_address / static_prefix_length / static_gateway are required*.`),
 			},
 			{
 				Config:      testAccNetworkAdapterInvalid5,

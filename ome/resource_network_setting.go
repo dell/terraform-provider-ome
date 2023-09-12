@@ -366,31 +366,58 @@ func (r *networkSettingResource) Delete(ctx context.Context, req resource.Delete
 // ============================== adapter configuration helper function ================================
 
 func isAdapterConfigValid(plan *models.OmeAdapterSetting) error {
-
 	if plan.IPV4Config != nil {
-		if !plan.IPV4Config.EnableDHCP.IsUnknown() && plan.IPV4Config.EnableDHCP.ValueBool() {
-			if !(plan.IPV4Config.StaticIPAddress.IsNull() && plan.IPV4Config.StaticSubnetMask.IsNull() && plan.IPV4Config.StaticGateway.IsNull()) {
-				return fmt.Errorf("please validate enable_dhcp is disable, when static_ip_address / static_subnet_mask / static_gateway is set")
+		if !plan.IPV4Config.EnableDHCP.IsUnknown() {
+			check := plan.IPV4Config.StaticIPAddress.IsNull() && plan.IPV4Config.StaticSubnetMask.IsNull() && plan.IPV4Config.StaticGateway.IsNull()
+			if plan.IPV4Config.EnableDHCP.ValueBool() {
+				if !check {
+					return fmt.Errorf("static_ip_address / static_subnet_mask / static_gateway should not be set when enable_dhcp is active")
+				}
+			} else {
+				if check {
+					return fmt.Errorf("static_ip_address / static_subnet_mask / static_gateway are required when enable_dhcp is inactive")
+				}
 			}
 		}
 
-		if !plan.IPV4Config.UseDHCPforDNSServerNames.IsUnknown() && plan.IPV4Config.UseDHCPforDNSServerNames.ValueBool() {
-			if !(plan.IPV4Config.StaticPreferredDNSServer.IsNull() && plan.IPV4Config.StaticAlternateDNSServer.IsNull()) {
-				return fmt.Errorf("please validate use_dhcp_for_dns_server_names is disable, when static_preferred_dns_server / static_alternate_dns_server is set")
+		if !plan.IPV4Config.UseDHCPforDNSServerNames.IsUnknown() {
+			check := plan.IPV4Config.StaticPreferredDNSServer.IsNull() && plan.IPV4Config.StaticAlternateDNSServer.IsNull()
+			if plan.IPV4Config.UseDHCPforDNSServerNames.ValueBool() {
+				if !check {
+					return fmt.Errorf("static_preferred_dns_server / static_alternate_dns_server should not be set when use_dhcp_for_dns_server_names is active")
+				}
+			} else {
+				if check {
+					return fmt.Errorf("static_preferred_dns_server / static_alternate_dns_server are required when use_dhcp_for_dns_server_names is inactive")
+				}
 			}
 		}
 	}
 
 	if plan.IPV6Config != nil {
-		if !plan.IPV6Config.EnableAutoConfiguration.IsUnknown() && plan.IPV6Config.EnableAutoConfiguration.ValueBool() {
-			if !(plan.IPV6Config.StaticIPAddress.IsNull() && plan.IPV6Config.StaticPrefixLength.IsNull() && plan.IPV6Config.StaticGateway.IsNull()) {
-				return fmt.Errorf("please validate enable_auto_configuration is disable, when static_ip_address / static_prefix_length / static_gateway is set")
+		if !plan.IPV6Config.EnableAutoConfiguration.IsUnknown() {
+			check := plan.IPV6Config.StaticIPAddress.IsNull() && plan.IPV6Config.StaticPrefixLength.IsNull() && plan.IPV6Config.StaticGateway.IsNull()
+			if plan.IPV6Config.EnableAutoConfiguration.ValueBool() {
+				if !(check) {
+					return fmt.Errorf("static_ip_address / static_prefix_length / static_gateway should not be set when enable_auto_configuration is disable")
+				}
+			} else {
+				if check {
+					return fmt.Errorf("static_ip_address / static_prefix_length / static_gateway are required when enable_auto_configuration is disable")
+				}
 			}
 		}
 
-		if !plan.IPV6Config.UseDHCPforDNSServerNames.IsUnknown() && plan.IPV6Config.UseDHCPforDNSServerNames.ValueBool() {
-			if !(plan.IPV6Config.StaticPreferredDNSServer.IsNull() && plan.IPV6Config.StaticAlternateDNSServer.IsNull()) {
-				return fmt.Errorf("please validate use_dhcp_for_dns_server_names is disable, when static_preferred_dns_server / static_alternate_dns_server is set")
+		if !plan.IPV6Config.UseDHCPforDNSServerNames.IsUnknown() {
+			check := plan.IPV6Config.StaticPreferredDNSServer.IsNull() && plan.IPV6Config.StaticAlternateDNSServer.IsNull()
+			if plan.IPV6Config.UseDHCPforDNSServerNames.ValueBool() {
+				if !(check) {
+					return fmt.Errorf("static_preferred_dns_server / static_alternate_dns_server should not be set when use_dhcp_for_dns_servers_name is active")
+				}
+			} else {
+				if check {
+					return fmt.Errorf("static_preferred_dns_server / static_alternate_dns_server are required when use_dhcp_for_dns_servers_name is inactive")
+				}
 			}
 		}
 	}
