@@ -56,7 +56,7 @@ func AdapterSettingSchema() map[string]schema.Attribute {
 		"enable_nic": schema.BoolAttribute{
 			MarkdownDescription: "Enable or disable Network Interface Card (NIC) configuration",
 			Description:         "Enable or disable Network Interface Card (NIC) configuration",
-			Optional:            true,
+			Required:            true,
 			PlanModifiers: []planmodifier.Bool{
 				BoolDefaultValue(types.BoolValue(true)),
 			},
