@@ -31,6 +31,26 @@ func TestDataSource_ReadDevice(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
+				Config:      testGetDevicesWithEmptyQuerys,
+				ExpectError: regexp.MustCompile(".*Attribute filters.filter_expression string length must be at least 1.*"),
+				PlanOnly:    true,
+			},
+			{
+				Config:      testGetDevicesWithNoIDs,
+				ExpectError: regexp.MustCompile(".*Attribute filters.ids list must contain at least 1 elements.*"),
+				// PlanOnly:    true,
+			},
+			{
+				Config:      testGetDevicesWithNoIPs,
+				ExpectError: regexp.MustCompile(".*Attribute filters.ip_expressions list must contain at least 1 elements.*"),
+				// PlanOnly:    true,
+			},
+			{
+				Config:      testGetDevicesWithNoSvcTags,
+				ExpectError: regexp.MustCompile(".*Attribute filters.device_service_tags list must contain at least 1 elements.*"),
+				// PlanOnly:    true,
+			},
+			{
 				Config:      testGetDevicesWithInvalidInventory,
 				ExpectError: regexp.MustCompile(".*Invalid Attribute Value Match.*"),
 				// PlanOnly:    true,
@@ -130,6 +150,37 @@ output "fetched_inventory" {
 		dev.detailed_inventory.subsytem_rollup_status != null
 		]
 	]))
+}
+`
+var testGetDevicesWithNoIDs = testProvider + `
+data "ome_device" "devs" {
+	filters = {
+		ids = []
+	}
+}
+`
+
+var testGetDevicesWithNoSvcTags = testProvider + `
+data "ome_device" "devs" {
+	filters = {
+		device_service_tags = []
+	}
+}
+`
+
+var testGetDevicesWithNoIPs = testProvider + `
+data "ome_device" "devs" {
+	filters = {
+		ip_expressions = []
+	}
+}
+`
+
+var testGetDevicesWithEmptyQuerys = testProvider + `
+data "ome_device" "devs" {
+	filters = {
+		filter_expression = ""
+	}
 }
 `
 
