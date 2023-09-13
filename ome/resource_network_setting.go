@@ -367,45 +367,64 @@ func (r *networkSettingResource) Delete(ctx context.Context, req resource.Delete
 
 func isAdapterConfigValid(plan *models.OmeAdapterSetting) error {
 	if plan.IPV4Config != nil {
-		if plan.IPV4Config.EnableDHCP.ValueBool() {
-			if plan.IPV4Config.StaticIPAddress.ValueString() != "" || plan.IPV4Config.StaticSubnetMask.ValueString() != "" || plan.IPV4Config.StaticGateway.ValueString() != "" {
-				return fmt.Errorf("please validate enable_dhcp is disable, when static_ip_address / static_subnet_mask / static_gateway is set")
+		if !plan.IPV4Config.EnableIPv4.IsUnknown() && plan.IPV4Config.EnableIPv4.ValueBool() {
+			if !plan.IPV4Config.EnableDHCP.IsUnknown() {
+				check := plan.IPV4Config.StaticIPAddress.IsNull() && plan.IPV4Config.StaticSubnetMask.IsNull() && plan.IPV4Config.StaticGateway.IsNull()
+				if plan.IPV4Config.EnableDHCP.ValueBool() {
+					if !check {
+						return fmt.Errorf("static_ip_address / static_subnet_mask / static_gateway should not be set when enable_dhcp is active")
+					}
+				} else {
+					if check {
+						return fmt.Errorf("static_ip_address / static_subnet_mask / static_gateway are required when enable_dhcp is inactive")
+					}
+				}
 			}
-		}
-
-		if plan.IPV4Config.UseDHCPforDNSServerNames.ValueBool() {
-			if plan.IPV4Config.StaticPreferredDNSServer.ValueString() != "" || plan.IPV4Config.StaticAlternateDNSServer.ValueString() != "" {
-				return fmt.Errorf("please validate use_dhcp_for_dns_server_names is disable, when static_preferred_dns_server / static_alternate_dns_server is set")
+			if !plan.IPV4Config.UseDHCPforDNSServerNames.IsUnknown() {
+				check := plan.IPV4Config.StaticPreferredDNSServer.IsNull() && plan.IPV4Config.StaticAlternateDNSServer.IsNull()
+				if plan.IPV4Config.UseDHCPforDNSServerNames.ValueBool() && !check {
+					return fmt.Errorf("static_preferred_dns_server / static_alternate_dns_server should not be set when use_dhcp_for_dns_server_names is active")
+				}
 			}
 		}
 	}
 
 	if plan.IPV6Config != nil {
-		if plan.IPV6Config.EnableAutoConfiguration.ValueBool() {
-			if plan.IPV6Config.StaticIPAddress.ValueString() != "" || plan.IPV6Config.StaticPrefixLength.ValueInt64() > 0 || plan.IPV6Config.StaticGateway.ValueString() != "" {
-				return fmt.Errorf("please validate enable_auto_configuration is disable, when static_ip_address / static_prefix_length / static_gateway is set")
+		if !plan.IPV6Config.EnableIPv6.IsUnknown() && plan.IPV6Config.EnableIPv6.ValueBool() {
+			if !plan.IPV6Config.EnableAutoConfiguration.IsUnknown() {
+				check := plan.IPV6Config.StaticIPAddress.IsNull() && plan.IPV6Config.StaticPrefixLength.IsNull() && plan.IPV6Config.StaticGateway.IsNull()
+				if plan.IPV6Config.EnableAutoConfiguration.ValueBool() {
+					if !(check) {
+						return fmt.Errorf("static_ip_address / static_prefix_length / static_gateway should not be set when enable_auto_configuration is disable")
+					}
+				} else {
+					if check {
+						return fmt.Errorf("static_ip_address / static_prefix_length / static_gateway are required when enable_auto_configuration is disable")
+					}
+				}
 			}
-		}
 
-		if plan.IPV6Config.UseDHCPforDNSServerNames.ValueBool() {
-			if plan.IPV6Config.StaticPreferredDNSServer.ValueString() != "" || plan.IPV6Config.StaticAlternateDNSServer.ValueString() != "" {
-				return fmt.Errorf("please validate use_dhcp_for_dns_server_names is disable, when static_preferred_dns_server / static_alternate_dns_server is set")
+			if !plan.IPV6Config.UseDHCPforDNSServerNames.IsUnknown() {
+				check := plan.IPV6Config.StaticPreferredDNSServer.IsNull() && plan.IPV6Config.StaticAlternateDNSServer.IsNull()
+				if plan.IPV6Config.UseDHCPforDNSServerNames.ValueBool() && !(check) {
+					return fmt.Errorf("static_preferred_dns_server / static_alternate_dns_server should not be set when use_dhcp_for_dns_servers_name is active")
+				}
 			}
 		}
 	}
 
 	if plan.ManagementVLAN != nil {
-		if !plan.ManagementVLAN.EnableVLAN.ValueBool() && !plan.ManagementVLAN.ID.IsNull() {
+		if !plan.ManagementVLAN.EnableVLAN.IsUnknown() && !plan.ManagementVLAN.EnableVLAN.ValueBool() && !plan.ManagementVLAN.ID.IsNull() {
 			return fmt.Errorf("please validate enable_vlan is true, when id is set")
 		}
 	}
 
 	if plan.DNSConfig != nil {
-		if !plan.DNSConfig.RegisterWithDNS.ValueBool() && !plan.DNSConfig.DNSName.IsNull() {
+		if !plan.DNSConfig.RegisterWithDNS.IsUnknown() && !plan.DNSConfig.RegisterWithDNS.ValueBool() && !plan.DNSConfig.DNSName.IsNull() {
 			return fmt.Errorf("please validate register_with_dn is true, when dns_name is set")
 		}
 
-		if plan.DNSConfig.UseDHCPforDNSServerNames.ValueBool() && !plan.DNSConfig.DNSDomainName.IsNull() {
+		if !plan.DNSConfig.RegisterWithDNS.IsUnknown() && plan.DNSConfig.UseDHCPforDNSServerNames.ValueBool() && !plan.DNSConfig.DNSDomainName.IsNull() {
 			return fmt.Errorf("please validate use_dhcp_for_dns_server_names is false, when dns_domain_name is set")
 		}
 	}
@@ -570,26 +589,27 @@ func getAdapterSettingState(omeClient *clients.Client, plan *models.OmeAdapterSe
 
 // =============================== time configuration helper function ==================================
 func isTimeConfigValid(planTime *models.OmeTimeSetting) (bool, error) {
-	if planTime.TimeZone.ValueString() == "" {
-		return false, fmt.Errorf("please validate that the time_zone is set")
+	if planTime.EnableNTP.IsUnknown() {
+		return true, nil
 	}
 	if planTime.EnableNTP.ValueBool() {
-		if planTime.SystemTime.ValueString() != "" {
-			return false, fmt.Errorf("please validate that the system_time is unset when enable_ntp is active")
+		if !planTime.SystemTime.IsNull() {
+			return false, fmt.Errorf("system_time should not be set when enable_ntp is active")
 		}
-		if planTime.PrimaryNTPAddress.ValueString() == "" {
-			return false, fmt.Errorf("please validate that the primary_ntp_address is set when enable_ntp is active")
+		if planTime.PrimaryNTPAddress.IsNull() {
+			return false, fmt.Errorf("primary_ntp_address should be set when enable_ntp is active")
 		}
-	} else {
-		if planTime.PrimaryNTPAddress.ValueString() != "" ||
-			planTime.SecondaryNTPAddress1.ValueString() != "" ||
-			planTime.SecondaryNTPAddress2.ValueString() != "" {
-			return false, fmt.Errorf("please validate that primary_ntp_address, secondary_ntp_address1 and secondary_ntp_address2 are unset when enable_ntp is disable")
-		}
-		if planTime.SystemTime.ValueString() == "" {
-			return false, fmt.Errorf("please validate that the system_time is set when enable_ntp is disable")
-		}
+		return true, nil
 	}
+
+	if !(planTime.PrimaryNTPAddress.IsNull() && planTime.SecondaryNTPAddress1.IsNull() && planTime.SecondaryNTPAddress2.IsNull()) {
+		return false, fmt.Errorf("primary_ntp_address, secondary_ntp_address1 and secondary_ntp_address2 should not be set when enable_ntp is disable")
+	}
+
+	if planTime.SystemTime.IsNull() {
+		return false, fmt.Errorf("system_time should be set when enable_ntp is disable")
+	}
+
 	return true, nil
 }
 
@@ -626,7 +646,7 @@ func updateTimeSettingState(plan, state *models.OmeNetworkSetting, omeClient *cl
 			return true, err
 		}
 		state.OmeTimeSetting = buildTimeSettingState(&newTime)
-		if plan.OmeTimeSetting.SystemTime.ValueString() != "" {
+		if !plan.OmeTimeSetting.SystemTime.IsNull() {
 			state.OmeTimeSetting.SystemTime = plan.OmeTimeSetting.SystemTime
 		}
 		return true, nil
@@ -649,17 +669,20 @@ func buildTimeSettingState(time *models.TimeConfig) *models.OmeTimeSetting {
 // =============================== session configuration helper function ===============================
 
 func isSessionConfigValid(planSession *models.OmeSessionSetting) (bool, error) {
+	if planSession.EnableUniversalTimeout.IsUnknown() {
+		return true, nil
+	}
 	if planSession.EnableUniversalTimeout.ValueBool() {
-		if planSession.APITimeout.ValueFloat64() > 0 || planSession.GUITimeout.ValueFloat64() > 0 || planSession.SSHTimeout.ValueFloat64() > 0 || planSession.SerialTimeout.ValueFloat64() > 0 {
-			return false, fmt.Errorf("please validate that the configuration for api_timeout, gui_timeout, ssh_timeout and serial_timeout are unset when enable_universal_timeout option is active")
+		if !(planSession.APITimeout.IsNull() && planSession.GUITimeout.IsNull() && planSession.SSHTimeout.IsNull() && planSession.SerialTimeout.IsNull()) {
+			return false, fmt.Errorf("api_timeout, gui_timeout, ssh_timeout and serial_timeout should not be set when enable_universal_timeout option is active")
 		}
-		if planSession.UniversalTimeout.ValueFloat64() < 1 {
-			return false, fmt.Errorf("please ensure universal_timeout is set when enable_universal_timeout option is active")
+		if planSession.UniversalTimeout.IsNull() {
+			return false, fmt.Errorf("universal_timeout should be set when enable_universal_timeout option is active")
 		}
-	} else {
-		if planSession.UniversalTimeout.ValueFloat64() > 0 {
-			return false, fmt.Errorf("please ensure universal_timeout is unset when enable_universal_timeout option is disable")
-		}
+		return true, nil
+	}
+	if !planSession.UniversalTimeout.IsNull() {
+		return false, fmt.Errorf("universal_timeout should not be set when enable_universal_timeout option is disable")
 	}
 	return true, nil
 }
@@ -818,21 +841,30 @@ func buildSessionSettingState(sessions *models.NetworkSessions) *models.OmeSessi
 // ============================= proxy configuration helper function =================================
 
 func isProxyConfigValid(planProxy *models.OmeProxySetting) (bool, error) {
-	if planProxy.EnableProxy.ValueBool() {
-		if planProxy.IPAddress.ValueString() == "" || planProxy.ProxyPort.ValueInt64() == 0 {
-			return false, fmt.Errorf("please ensure that you set both the IP address and port when enabling the proxy")
-		}
-		if planProxy.EnableAuthentication.ValueBool() {
-			if planProxy.Username.ValueString() == "" || planProxy.Password.ValueString() == "" {
-				return false, fmt.Errorf("please ensure that you set both the username and password when enabling the proxy authentication")
-			}
-		} else if planProxy.Username.ValueString() != "" || planProxy.Password.ValueString() != "" {
-			return false, fmt.Errorf("please ensure enable authentication should be set to true before setting username and password")
-		}
-	} else if planProxy.IPAddress.ValueString() != "" || planProxy.ProxyPort.ValueInt64() > 0 || planProxy.EnableAuthentication.ValueBool() || planProxy.Username.ValueString() != "" || planProxy.Password.ValueString() != "" {
-		return false, fmt.Errorf("please ensure enable proxy should be set to true before setting any ome proxy configuration")
+	if planProxy.EnableProxy.IsUnknown() {
+		return true, nil
 	}
+	if planProxy.EnableProxy.ValueBool() {
+		if planProxy.IPAddress.IsNull() || planProxy.ProxyPort.IsNull() {
+			return false, fmt.Errorf("both IP address and port are required when enabling proxy")
+		}
 
+		if !(planProxy.EnableAuthentication.IsNull() || planProxy.EnableAuthentication.IsUnknown()) {
+			if planProxy.EnableAuthentication.ValueBool() {
+				if planProxy.Username.IsNull() || planProxy.Password.IsNull() {
+					return false, fmt.Errorf("both username and password are required when enabling proxy authentication")
+				}
+				return true, nil
+			}
+			if !(planProxy.Username.IsNull() && planProxy.Password.IsNull()) {
+				return false, fmt.Errorf("enable authentication should be set to true before setting username and password")
+			}
+		}
+		return true, nil
+	}
+	if !(planProxy.IPAddress.IsNull() && planProxy.ProxyPort.IsNull() && planProxy.EnableAuthentication.IsNull() && planProxy.Username.IsNull() && planProxy.Password.IsNull()) {
+		return false, fmt.Errorf("enable proxy should be set to true before setting any ome proxy configuration")
+	}
 	return true, nil
 }
 
