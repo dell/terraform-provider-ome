@@ -70,6 +70,9 @@ func omeDeviceDataSchema() map[string]schema.Attribute {
 					Validators: []validator.List{
 						listvalidator.ConflictsWith(path.MatchRelative().AtParent().AtName("ids")),
 						listvalidator.SizeAtLeast(1),
+						listvalidator.ValueStringsAre(
+							stringvalidator.LengthAtLeast(1),
+						),
 					},
 				},
 				"ip_expressions": schema.ListAttribute{
@@ -81,6 +84,9 @@ func omeDeviceDataSchema() map[string]schema.Attribute {
 					ElementType: types.StringType,
 					Validators: []validator.List{
 						listvalidator.SizeAtLeast(1),
+						listvalidator.ValueStringsAre(
+							stringvalidator.LengthAtLeast(1),
+						),
 					},
 				},
 				"filter_expression": schema.StringAttribute{

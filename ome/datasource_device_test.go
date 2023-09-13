@@ -31,6 +31,16 @@ func TestDataSource_ReadDevice(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
+				Config:      testGetDevicesWithEmptyIP,
+				ExpectError: regexp.MustCompile(".*filters.ip_expressions.*string length must be at least 1.*"),
+				PlanOnly:    true,
+			},
+			{
+				Config:      testGetDevicesWithEmptySvcTag,
+				ExpectError: regexp.MustCompile(".*filters.device_service_tags.*string length must be at least 1.*"),
+				PlanOnly:    true,
+			},
+			{
 				Config:      testGetDevicesWithEmptyQuerys,
 				ExpectError: regexp.MustCompile(".*Attribute filters.filter_expression string length must be at least 1.*"),
 				PlanOnly:    true,
@@ -171,6 +181,22 @@ var testGetDevicesWithNoIPs = testProvider + `
 data "ome_device" "devs" {
 	filters = {
 		ip_expressions = []
+	}
+}
+`
+
+var testGetDevicesWithEmptySvcTag = testProvider + `
+data "ome_device" "devs" {
+	filters = {
+		device_service_tags = [""]
+	}
+}
+`
+
+var testGetDevicesWithEmptyIP = testProvider + `
+data "ome_device" "devs" {
+	filters = {
+		ip_expressions = [""]
 	}
 }
 `
