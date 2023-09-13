@@ -10,6 +10,4 @@ You may obtain a copy of the License at
 
 # Support
 
-  * To report any issue, create an issue [here](https://github.com/dell/terraform-provider-ome/issues).
-  * If any requirements have not been addressed, then create an issue [here](https://github.com/dell/terraform-provider-ome/issues).
-  * To provide feedback to the development team, send an email to **Terraform.Providers@dell.com**.
+For any Terraform Provider for Dell OME issues, questions or feedback, please follow our [Support Process](https://github.com/dell/dell-terraform-providers/blob/main/docs/SUPPORT.md)
