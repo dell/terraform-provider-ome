@@ -73,6 +73,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	resource "ome_appliance_network" "invalid1" {
 		adapter_setting = {
 		  interface_name = "invalid"
+		  enable_nic = true
 		  ipv4_configuration = {
 			enable_ipv4        = true
 			enable_dhcp        = true
@@ -87,6 +88,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	testAccNetworkAdapterInvalid2 := testProvider + `
 	resource "ome_appliance_network" "invalid2" {
 		adapter_setting = {
+		  enable_nic = true
 		  interface_name = "invalid"
 		  ipv4_configuration = {
 			enable_ipv4 = true
@@ -100,6 +102,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	testAccNetworkAdapterInvalid3 := testProvider + `
 	resource "ome_appliance_network" "invalid3" {
 		adapter_setting = {
+		  enable_nic = true
 		  interface_name = "invalid"
 		  ipv6_configuration = {
 			enable_ipv6 = true
@@ -116,6 +119,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	resource "ome_appliance_network" "invalid4" {
 		adapter_setting = {
 		  interface_name = "invalid"
+		  enable_nic = true
 		  ipv6_configuration = {
 			enable_ipv6 = true
 			use_dhcp_for_dns_server_names = true
@@ -130,6 +134,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	resource "ome_appliance_network" "invalid5" {
 		adapter_setting = {
 		  interface_name = "invalid"
+		  enable_nic = true
 		  management_vlan = {
 			enable_vlan = false
 			id = 1 
@@ -142,6 +147,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 	resource "ome_appliance_network" "invalid6" {
 		adapter_setting = {
 		  interface_name = "invalid"
+		  enable_nic = true
 		  dns_configuration = {
 			register_with_dns              = false
 			dns_name                       = "err"
@@ -158,19 +164,19 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccNetworkAdapterInvalid1,
-				ExpectError: regexp.MustCompile(`.*please validate enable_dhcp is disable*.`),
+				ExpectError: regexp.MustCompile(`.*static_ip_address / static_subnet_mask / static_gateway should not be set*.`),
 			},
 			{
 				Config:      testAccNetworkAdapterInvalid2,
-				ExpectError: regexp.MustCompile(`.*please validate use_dhcp_for_dns_server_names is disable*.`),
+				ExpectError: regexp.MustCompile(`.*static_ip_address / static_subnet_mask / static_gateway are required*.`),
 			},
 			{
 				Config:      testAccNetworkAdapterInvalid3,
-				ExpectError: regexp.MustCompile(`.*please validate enable_auto_configuration is disable*.`),
+				ExpectError: regexp.MustCompile(`.*static_ip_address / static_prefix_length / static_gateway should not be set*.`),
 			},
 			{
 				Config:      testAccNetworkAdapterInvalid4,
-				ExpectError: regexp.MustCompile(`.*please validate use_dhcp_for_dns_server_names is disable*.`),
+				ExpectError: regexp.MustCompile(`.*static_ip_address / static_prefix_length / static_gateway are required*.`),
 			},
 			{
 				Config:      testAccNetworkAdapterInvalid5,
@@ -280,23 +286,23 @@ func TestNetworkSettingTimeInvalidConfig(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccNetworkTimeInvalid,
-				ExpectError: regexp.MustCompile(`.*please validate that the system_time is unset when enable_ntp is active*.`),
+				ExpectError: regexp.MustCompile(`.*system_time should not be set when enable_ntp is active*.`),
 			},
 			{
 				Config:      testAccNetworkTimeInvalid1,
-				ExpectError: regexp.MustCompile(`.*please validate that the primary_ntp_address is set when enable_ntp is active*.`),
+				ExpectError: regexp.MustCompile(`.*primary_ntp_address should be set when enable_ntp is active*.`),
 			},
 			{
 				Config:      testAccNetworkTimeInvalid2,
-				ExpectError: regexp.MustCompile(`.*please validate that the time_zone is set*.`),
+				ExpectError: regexp.MustCompile(`.*Inappropriate value for attribute "time_setting": attribute "time_zone"*.`),
 			},
 			{
 				Config:      testAccNetworkTimeInvalid3,
-				ExpectError: regexp.MustCompile(`.*please validate that primary_ntp_address, secondary_ntp_address1*.`),
+				ExpectError: regexp.MustCompile(`.*primary_ntp_address, secondary_ntp_address1 and secondary_ntp_address2*.`),
 			},
 			{
 				Config:      testAccNetworkTimeInvalid4,
-				ExpectError: regexp.MustCompile(`.*please validate that the system_time is set*.`),
+				ExpectError: regexp.MustCompile(`.*system_time should be set when enable_ntp is disable*.`),
 			},
 		},
 	})
@@ -423,15 +429,15 @@ func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccNetworkSessionInvalid,
-				ExpectError: regexp.MustCompile(`.*please ensure universal_timeout is set*.`),
+				ExpectError: regexp.MustCompile(`.*universal_timeout should be set*.`),
 			},
 			{
 				Config:      testAccNetworkSessionInvalid1,
-				ExpectError: regexp.MustCompile(`.*please validate that the configuration for api_timeout*.`),
+				ExpectError: regexp.MustCompile(`.*api_timeout, gui_timeout, ssh_timeout and serial_timeout*.`),
 			},
 			{
 				Config:      testAccNetworkSessionInvalid2,
-				ExpectError: regexp.MustCompile(`.*please ensure universal_timeout is unset*.`),
+				ExpectError: regexp.MustCompile(`.*universal_timeout should not be set*.`),
 			},
 			{
 				Config:      testAccNetworkSessionInvalid3,
@@ -573,19 +579,19 @@ func TestNetworkSettingProxyInValidConfig(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testAccNetworkProxyInvalid,
-				ExpectError: regexp.MustCompile(`.*please ensure enable proxy should be set to true*.`),
+				ExpectError: regexp.MustCompile(`.*enable proxy should be set to true*.`),
 			},
 			{
 				Config:      testAccNetworkProxyInvalid1,
-				ExpectError: regexp.MustCompile(`.*please ensure that you set both the IP address and port*.`),
+				ExpectError: regexp.MustCompile(`.*both IP address and port are required*.`),
 			},
 			{
 				Config:      testAccNetworkProxyInvalid2,
-				ExpectError: regexp.MustCompile(`.*please ensure that you set both the username and password*.`),
+				ExpectError: regexp.MustCompile(`.*both username and password are required*.`),
 			},
 			{
 				Config:      testAccNetworkProxyInvalid3,
-				ExpectError: regexp.MustCompile(`.*please ensure enable authentication should be set to true*.`),
+				ExpectError: regexp.MustCompile(`.*enable authentication should be set to true*.`),
 			},
 		},
 	})
