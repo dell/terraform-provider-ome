@@ -19,12 +19,12 @@ linkTitle: "ome_device"
 page_title: "ome_device Data Source - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Data source to list devices from OpenManage Enterprise.
+  This Terraform DataSource is used to query devices from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 ---
 
 # ome_device (Data Source)
 
-Data source to list devices from OpenManage Enterprise.
+This Terraform DataSource is used to query devices from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 
 ## Example Usage
 

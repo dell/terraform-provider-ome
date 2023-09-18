@@ -19,12 +19,12 @@ linkTitle: "ome_appliance_network"
 page_title: "ome_appliance_network Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing network_setting on OpenManage Enterprise.
+  This terraform resource is used to manage Appliance Network Settings on OME.We can Create, Update and Delete OME Appliance Network Settings using this resource.
 ---
 
 # ome_appliance_network (Resource)
 
-Resource for managing network_setting on OpenManage Enterprise.
+This terraform resource is used to manage Appliance Network Settings on OME.We can Create, Update and Delete OME Appliance Network Settings using this resource.
 
 
 ## Example Usage

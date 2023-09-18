@@ -19,12 +19,12 @@ linkTitle: "ome_configuration_report_info"
 page_title: "ome_configuration_report_info Data Source - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Data source to list the compliance configuration report of a baseline from OpenManage Enterprise.
+  This Terraform DataSource is used to query compliance configuration report of a baseline data from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 ---
 
 # ome_configuration_report_info (Data Source)
 
-Data source to list the compliance configuration report of a baseline from OpenManage Enterprise.
+This Terraform DataSource is used to query compliance configuration report of a baseline data from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 
 ## Example Usage
 

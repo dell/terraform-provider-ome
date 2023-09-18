@@ -74,7 +74,7 @@ func (r resourceConfigurationBaseline) Metadata(ctx context.Context, req resourc
 // Template Deployment Resource schema
 func (r resourceConfigurationBaseline) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing configuration baselines on OpenManage Enterprise.",
+		MarkdownDescription: "This terraform resource is used to manage configuration baseline entity of OME. We can Create, Update and Delete the OME configuration baseline using this resource. We can also do an 'Import' an existing 'configuration baseline' from OME .",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "ID of the configuration baseline resource.",

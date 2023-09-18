@@ -19,12 +19,12 @@ linkTitle: "ome_configuration_compliance"
 page_title: "ome_configuration_compliance Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing configuration baselines remediation.
+  This terraform resource is used to manage configuration baseline remediations entity of OME. We can Create, Update and Delete the OME configuration baseline remediations using this resource.
 ---
 
 # ome_configuration_compliance (Resource)
 
-Resource for managing configuration baselines remediation.
+This terraform resource is used to manage configuration baseline remediations entity of OME. We can Create, Update and Delete the OME configuration baseline remediations using this resource.
 
 
 ## Example Usage

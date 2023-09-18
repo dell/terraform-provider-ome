@@ -55,7 +55,8 @@ func (*groupDevicesDatasource) Metadata(ctx context.Context, req datasource.Meta
 // Schema implements datasource.DataSource
 func (*groupDevicesDatasource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Data source to list groups and their devices from OpenManage Enterprise.",
+		MarkdownDescription: "This Terraform DataSource is used to query groups and their devices from OME." +
+			" The information fetched from this data source can be used for getting the details / for further processing in resource block.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID for group devices data source.",

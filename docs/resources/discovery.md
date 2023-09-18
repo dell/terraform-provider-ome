@@ -19,12 +19,12 @@ linkTitle: "ome_discovery"
 page_title: "ome_discovery Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing discovery on OpenManage Enterprise.
+  This terraform resource is used to manage Discovery entity on OME.We can Create, Update and Delete OME Discoveries using this resource. We can also do an 'Import' an existing 'Discovery' from OME .
 ---
 
 # ome_discovery (Resource)
 
-Resource for managing discovery on OpenManage Enterprise.
+This terraform resource is used to manage Discovery entity on OME.We can Create, Update and Delete OME Discoveries using this resource. We can also do an 'Import' an existing 'Discovery' from OME .
 
 
 ## Example Usage

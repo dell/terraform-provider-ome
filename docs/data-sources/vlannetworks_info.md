@@ -19,12 +19,12 @@ linkTitle: "ome_vlannetworks_info"
 page_title: "ome_vlannetworks_info Data Source - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Data source to list the vlan networks from OpenManage Enterprise.
+  This Terraform DataSource is used to query templates from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 ---
 
 # ome_vlannetworks_info (Data Source)
 
-Data source to list the vlan networks from OpenManage Enterprise.
+This Terraform DataSource is used to query templates from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 
 ## Example Usage
 

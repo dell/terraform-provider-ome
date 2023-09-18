@@ -52,7 +52,8 @@ func (*appCertDatasource) Metadata(ctx context.Context, req datasource.MetadataR
 // Schema implements datasource.DataSource
 func (g *appCertDatasource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Data source to read application certificate data from OpenManage Enterprise.",
+		MarkdownDescription: "This terraform DataSource is used to query the existing application certificate data from OME." +
+			" The information fetched from this data source can be used for getting the details / for further processing in resource block.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID for application certificate data source.",

@@ -19,12 +19,12 @@ linkTitle: "ome_deployment"
 page_title: "ome_deployment Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing template deployment on OpenManage Enterprise.
+  This terraform resource is used to manage template deployment entity of OME. We can Create, Update and Delete the OME Deployments using this resource. We can also do an 'Import' an existing 'Deployment' from OME .
 ---
 
 # ome_deployment (Resource)
 
-Resource for managing template deployment on OpenManage Enterprise.
+This terraform resource is used to manage template deployment entity of OME. We can Create, Update and Delete the OME Deployments using this resource. We can also do an 'Import' an existing 'Deployment' from OME .
 
 ~> **Note:** Atleast one of `ref_template_name` and `ref_template_id` and exactly one of `device_ids` and `device_servicetags` are required.
 

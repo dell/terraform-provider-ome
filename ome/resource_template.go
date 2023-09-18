@@ -89,8 +89,9 @@ func (*resourceTemplate) Metadata(ctx context.Context, req resource.MetadataRequ
 // Order Resource schema
 func (r *resourceTemplate) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing template on OpenManage Enterprise.",
-		Version:             1,
+		MarkdownDescription: "This terraform resource is used to manage Template entity on OME." +
+			"We can Create, Update and Delete OME Template using this resource. We can also do an 'Import' an existing 'Template' from OME.",
+		Version: 1,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID of the template resource.",

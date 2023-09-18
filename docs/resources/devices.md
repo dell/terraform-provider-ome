@@ -19,12 +19,12 @@ linkTitle: "ome_devices"
 page_title: "ome_devices Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing devices on OpenManage Enterprise.
+  This terraform resource is used to manage a set of device entities on OME.
 ---
 
 # ome_devices (Resource)
 
-Resource for managing devices on OpenManage Enterprise.
+This terraform resource is used to manage a set of device entities on OME.
 
 
 ## Example Usage

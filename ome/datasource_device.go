@@ -60,8 +60,9 @@ func (*deviceDatasource) Metadata(ctx context.Context, req datasource.MetadataRe
 // Schema implements datasource.DataSource
 func (*deviceDatasource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Data source to list devices from OpenManage Enterprise.",
-		Attributes:          omeDeviceDataSchema(),
+		MarkdownDescription: "This Terraform DataSource is used to query devices from OME." +
+			" The information fetched from this data source can be used for getting the details / for further processing in resource block.",
+		Attributes: omeDeviceDataSchema(),
 	}
 }
 

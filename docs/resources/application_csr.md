@@ -19,12 +19,12 @@ linkTitle: "ome_application_csr"
 page_title: "ome_application_csr Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for generating application Certificate Signing Request from OpenManage Enterprise.
+  This terraform resource is used to generate application Certificate Signing Request from OME.
 ---
 
 # ome_application_csr (Resource)
 
-Resource for generating application Certificate Signing Request from OpenManage Enterprise.
+This terraform resource is used to generate application Certificate Signing Request from OME.
 
 
 ## Example Usage

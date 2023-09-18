@@ -19,12 +19,12 @@ linkTitle: "ome_application_certificate"
 page_title: "ome_application_certificate Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for uploading Certificate to OpenManage Enterprise.
+  This terraform resource is used to upload certificate to OME.
 ---
 
 # ome_application_certificate (Resource)
 
-Resource for uploading Certificate to OpenManage Enterprise.
+This terraform resource is used to upload certificate to OME.
 
 
 ## Example Usage

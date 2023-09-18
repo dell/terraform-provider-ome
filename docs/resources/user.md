@@ -19,12 +19,12 @@ linkTitle: "ome_user"
 page_title: "ome_user Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for managing user on OpenManage Enterprise.
+  This terraform resource is used to manage User entity on OME.We can Create, Update and Delete OME User using this resource. We can also do an 'Import' an existing 'User' from OME.
 ---
 
 # ome_user (Resource)
 
-Resource for managing user on OpenManage Enterprise.
+This terraform resource is used to manage User entity on OME.We can Create, Update and Delete OME User using this resource. We can also do an 'Import' an existing 'User' from OME.
 
 
 ## Example Usage

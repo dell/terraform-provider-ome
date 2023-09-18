@@ -71,11 +71,11 @@ func (r resourceDeviceAction) Metadata(ctx context.Context, req resource.Metadat
 // Devices Resource schema
 func (r resourceDeviceAction) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Resource for running actions on devices managed by OpenManage Enterprise." +
+		Description: "This terraform resource is used to run actions on devices managed by OME." +
 			" The only supported action, for now, is refreshing inventory." +
 			" This resource creates a job in OME to run the actions and does not support updating in-place." +
 			" The resource generates a recreation plan instead for any necessary update action.",
-		MarkdownDescription: "Resource for running actions on devices managed by OpenManage Enterprise." +
+		MarkdownDescription: "This terraform resource is used to run actions on devices managed by OME." +
 			" The only supported action, for now, is refreshing inventory." +
 			" This resource creates a job in OME to run the actions and does not support updating in-place." +
 			" The resource generates a recreation plan instead for any necessary update action.",

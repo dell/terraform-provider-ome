@@ -19,12 +19,12 @@ linkTitle: "ome_device_action"
 page_title: "ome_device_action Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  Resource for running actions on devices managed by OpenManage Enterprise. The only supported action, for now, is refreshing inventory. This resource creates a job in OME to run the actions and does not support updating in-place. The resource generates a recreation plan instead for any necessary update action.
+  This terraform resource is used to run actions on devices managed by OME. The only supported action, for now, is refreshing inventory. This resource creates a job in OME to run the actions and does not support updating in-place. The resource generates a recreation plan instead for any necessary update action.
 ---
 
 # ome_device_action (Resource)
 
-Resource for running actions on devices managed by OpenManage Enterprise. The only supported action, for now, is refreshing inventory. This resource creates a job in OME to run the actions and does not support updating in-place. The resource generates a recreation plan instead for any necessary update action.
+This terraform resource is used to run actions on devices managed by OME. The only supported action, for now, is refreshing inventory. This resource creates a job in OME to run the actions and does not support updating in-place. The resource generates a recreation plan instead for any necessary update action.
 
 
 ## Example Usage
