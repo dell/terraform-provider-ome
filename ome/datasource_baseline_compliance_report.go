@@ -52,7 +52,7 @@ func (*configurationReportDataSource) Metadata(ctx context.Context, req datasour
 
 func (*configurationReportDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "This Terraform DataSource is used to query compliance configuration report of a baseline data from OME." +
+		MarkdownDescription: "This Terraform DataSource is used to query compliance configuration report of a compliance template baseline data from OME." +
 			" The information fetched from this data source can be used for getting the details / for further processing in resource block.",
 		Attributes: map[string]schema.Attribute{
 
