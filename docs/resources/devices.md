@@ -61,6 +61,7 @@ resource "ome_devices" "dev_list_2" {
     {
       id = 2000
     },
+    # removing this block will remove device with service tag `QWX321` from the OME
     {
       service_tag = "QWX321"
     }

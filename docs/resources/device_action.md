@@ -57,7 +57,7 @@ data "ome_device" "devs" {
 }
 
 # refresh inventory of devices immediately on apply
-# The resource creation will fail if the inventory refresh job fails or doesnt complete within 8 minutes
+# The resource creation will fail if the inventory refresh job fails or doesnt complete within `timeout` in minutes (here 8 minutes).
 resource "ome_device_action" "code_1" {
   device_ids      = data.ome_device.devs.devices[*].id
   action          = "inventory_refresh"
@@ -89,6 +89,8 @@ resource "ome_device_action" "code_2" {
 # Option 3 (shown below): From Terraform 1.2, one can use the replace-triggered-by lifecycle method 
 #     https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle#replace_triggered_by
 
+
+# In below example, changing the string firmware_v1 to firmware_v2 will rerun the action
 resource "terraform_data" "devices_firmware" {
   input = "firmware_v1"
 }
@@ -103,13 +105,13 @@ resource "ome_device_action" "code_3" {
     ignore_changes = [
       timeout,
     ]
+    # From Terraform 1.2, one can use the replace-triggered-by lifecycle method 
+    # https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle#replace_triggered_by
     replace_triggered_by = [
       terraform_data.devices_firmware
     ]
   }
 }
-
-# In above example, changing the string firmware_v1 to firmware_v2 will rerun the action
 ```
 
 After the execution of above resource block, device action would have been initiated on the OME. For more information, Please check the terraform state file.
