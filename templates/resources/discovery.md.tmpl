@@ -37,9 +37,9 @@ description: |-
 
 {{tffile .ExampleFile }}
 
-After the execution of above resource block, discovery would have been created on the OME. For more information, Please check the terraform state file.
 {{- end }}
 
+After the execution of above resource block, discovery would have been created on the OME. For more information, Please check the terraform state file.
 {{ .SchemaMarkdown | trimspace }}
 
 {{ if .HasImport -}}
