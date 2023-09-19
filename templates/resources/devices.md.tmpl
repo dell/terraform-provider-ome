@@ -26,14 +26,18 @@ description: |-
 
 {{ .Description | trimspace }}
 
-~> **Note:** Atleast one of `ref_template_name` and `ref_template_id` and exactly one of `device_ids` and `device_servicetags` are required.
+~> **Note:** Exactly one of `ref_template_name` and `ref_template_id` and exactly one of `device_ids` and `device_servicetags` are required.
+
+~> **Note:** When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`.
+
+~> **Note:** Updates are supported for all the parameters.
 
 {{ if .HasExample -}}
 ## Example Usage
 
 {{tffile .ExampleFile }}
 
-After the execution of above resource block, template deployment would have been finished on the OME. For more information, Please check the terraform state file.
+After the execution of above resource block, devices would have been updated on the OME. For more information, Please check the terraform state file.
 {{- end }}
 
 {{ .SchemaMarkdown | trimspace }}
