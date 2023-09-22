@@ -99,4 +99,15 @@
 | <sub>/api/IdentityPoolService/IdentityPools({id}) </sub> | GET | [Read]
 | <sub>/api/IdentityPoolService/IdentityPools </sub> | GET | [Update]
 | <sub>/api/NetworkConfigurationService/Networks </sub> | GET | [Update]
+| **Network Settings Resource**                |
+| <sub>/api/ApplicationService/Network/AdapterConfigurations('{interface_name}') </sub> | GET | [Create, Read, Update]
+| <sub>/api/ApplicationService/Actions/Network.ConfigureNetworkAdapter | POST | [Create, Update] 
+| <sub>/api/JobService/Jobs | GET | [Create, Update]
+| <sub>/api/SessionService/SessionConfiguration | GET | [Create, Read, Update]
+| <sub>/api/SessionService/Actions/SessionService.SessionConfigurationUpdate | POST | [Create, Update]
+| <sub>/api/ApplicationService/Network/TimeConfiguration | GET | [Create, Read]
+| <sub>/api/ApplicationService/Network/TimeConfiguration | PUT | [Create, Update]
+| <sub>/api/ApplicationService/Network/TimeZone | GET | 
+| <sub>/api/ApplicationService/Network/ProxyConfiguration | GET | [Create, Read]
+| <sub>/api/ApplicationService/Network/ProxyConfiguration | PUT | [Create, Update]
 
