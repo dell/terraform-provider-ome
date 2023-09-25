@@ -15,7 +15,7 @@
 # limitations under the License.
 
 title: "{{.Name }} {{.Type | lower}}"
-linkTitle: "{{.Name }}"
+linkTitle: "{{.Name}}"
 page_title: "{{.Name}} {{.Type}} - {{.ProviderName}}"
 subcategory: ""
 description: |-
@@ -26,12 +26,6 @@ description: |-
 
 {{ .Description | trimspace }}
 
-~> **Note:** Exactly one of `ref_template_name` and `ref_template_id` and exactly one of `device_ids` and `device_servicetags` are required.
-
-~> **Note:** When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`.
-
-~> **Note:** Updates are supported for all the parameters.
-
 {{ if .HasExample -}}
 ## Example Usage
 
@@ -39,14 +33,7 @@ description: |-
 
 {{- end }}
 
-After the execution of above resource block, configuration baseline template would have been created on the OME. For more information, Please check the terraform state file.
+After the successful execution of above said block, We can see the output value by executing `terraform output` command.
+Also, we can use the fetched information by the variable `data.ome_device.devi`
+
 {{ .SchemaMarkdown | trimspace }}
-
-{{ if .HasImport -}}
-## Import
-
-Import is supported using the following syntax:
-
-{{codefile "shell" .ImportFile }}
-
-{{- end }}

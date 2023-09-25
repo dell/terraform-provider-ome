@@ -58,7 +58,7 @@ func (r resourceCert) Metadata(ctx context.Context, req resource.MetadataRequest
 // Cert Resource schema
 func (r resourceCert) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for uploading Certificate to OpenManage Enterprise.",
+		MarkdownDescription: "This terraform resource is used to upload certificate to OME.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID for application Cert resource.",

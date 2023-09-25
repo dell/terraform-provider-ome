@@ -49,9 +49,10 @@ func (r *discoveryResource) Metadata(_ context.Context, req resource.MetadataReq
 // Schema defines the schema for the resource.
 func (r *discoveryResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing discovery on OpenManage Enterprise.",
-		Version:             1,
-		Attributes:          DiscoveryJobSchema(),
+		MarkdownDescription: "This terraform resource is used to manage Discovery entity on OME." +
+			"We can Create, Update and Delete OME Discoveries using this resource. We can also do an 'Import' an existing 'Discovery' from OME .",
+		Version:    1,
+		Attributes: DiscoveryJobSchema(),
 	}
 }
 
