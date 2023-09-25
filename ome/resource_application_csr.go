@@ -59,7 +59,7 @@ func (r resourceCsr) Metadata(ctx context.Context, req resource.MetadataRequest,
 // CSR Resource schema
 func (r resourceCsr) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for generating application Certificate Signing Request from OpenManage Enterprise.",
+		MarkdownDescription: "This terraform resource is used to generate application Certificate Signing Request from OME.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID for application csr resource.",

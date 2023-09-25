@@ -65,7 +65,7 @@ func (resourceDeployment) Metadata(ctx context.Context, req resource.MetadataReq
 // Template Deployment Resource schema
 func (r resourceDeployment) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing template deployment on OpenManage Enterprise.",
+		MarkdownDescription: "This terraform resource is used to manage template deployment entity of OME. We can Create, Update and Delete the OME Deployments using this resource. We can also do an 'Import' an existing 'Deployment' from OME .",
 		Version:             1,
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

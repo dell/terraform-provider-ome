@@ -32,8 +32,10 @@ description: |-
 ## Example Usage
 
 {{tffile .ExampleFile }}
+
 {{- end }}
 
+After the execution of above resource block, template deployment would have been finished on the OME. For more information, Please check the terraform state file.
 {{ .SchemaMarkdown | trimspace }}
 
 {{ if .HasImport -}}

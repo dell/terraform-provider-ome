@@ -73,7 +73,7 @@ func (*resourceConfigurationCompliance) Metadata(ctx context.Context, req resour
 func (r resourceConfigurationCompliance) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Version:             1,
-		MarkdownDescription: "Resource for managing configuration baselines remediation.",
+		MarkdownDescription: "This terraform resource is used to manage configuration baseline remediations entity of OME. We can Create, Update and Delete the OME configuration baseline remediations using this resource.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID of the configuration compliance resource.",
