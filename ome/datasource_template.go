@@ -54,7 +54,8 @@ func (*templateDataSource) Metadata(ctx context.Context, req datasource.Metadata
 
 func (t templateDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Data Source to list the Template details from OpenManage Enterprise",
+		MarkdownDescription: "This Terraform DataSource is used to query templates from OME." +
+			" The information fetched from this data source can be used for getting the details / for further processing in resource block.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID of the template data source.",

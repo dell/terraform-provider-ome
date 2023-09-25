@@ -44,9 +44,10 @@ func (r *networkSettingResource) Metadata(_ context.Context, req resource.Metada
 // Schema defines the schema for the resource.
 func (r *networkSettingResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing network_setting on OpenManage Enterprise.",
-		Version:             1,
-		Attributes:          NetworkSettingSchema(),
+		MarkdownDescription: "This terraform resource is used to manage Appliance Network Settings on OME." +
+			"We can Create, Update and Delete OME Appliance Network Settings using this resource.",
+		Version:    1,
+		Attributes: NetworkSettingSchema(),
 	}
 }
 

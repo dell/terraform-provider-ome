@@ -64,7 +64,7 @@ func (r resourceDevices) Metadata(ctx context.Context, req resource.MetadataRequ
 // Devices Resource schema
 func (r resourceDevices) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Resource for managing devices on OpenManage Enterprise.",
+		MarkdownDescription: "This terraform resource is used to manage a set of device entities on OME.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID for devices resource.",

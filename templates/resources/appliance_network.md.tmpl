@@ -39,7 +39,8 @@ description: |-
 
 {{- end }}
 
-After the execution of above resource block, configuration baseline template would have been created on the OME. For more information, Please check the terraform state file.
+After the execution of above resource block, network setting would have been applied on the OME. For more information, Please check the terraform state file.
+
 {{ .SchemaMarkdown | trimspace }}
 
 {{ if .HasImport -}}
