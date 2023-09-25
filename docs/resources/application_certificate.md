@@ -49,6 +49,7 @@ limitations under the License.
 */
 
 data "local_file" "cert" {
+  # this is the path to the certificate that we want to upload.
   filename = "./signed-certificate.pem.crt"
 }
 

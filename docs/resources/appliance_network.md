@@ -38,7 +38,10 @@ This terraform resource is used to manage Appliance Network Settings on OME.We c
 resource "ome_appliance_network" "net1" {
   // to change the ome appliance time setting
   time_setting = {
-    time_zone              = "TZ_ID_65"
+    # Required Attribute
+    time_zone = "TZ_ID_65"
+
+    # Optional Attribute
     enable_ntp             = true
     primary_ntp_address    = "1.0.0.0"
     secondary_ntp_address1 = "2.0.0.0"
@@ -54,8 +57,11 @@ resource "ome_appliance_network" "net1" {
   }
   // to change the ome appliance time setting
   proxy_setting = {
+    # Required Attribute
     enable_proxy = true
-    # ip address and port is require when enable proxy is true 
+
+    # Optional Attribute
+    # ip address and port is required when enable proxy is true 
     ip_address            = "1.0.0.1"
     proxy_port            = 443
     enable_authentication = true
@@ -65,14 +71,21 @@ resource "ome_appliance_network" "net1" {
   }
   // to change the ome appliance adapter setting
   adapter_setting = {
+    # Required Attributes
     enable_nic     = true
     interface_name = "ens160"
-    reboot_delay   = 0
+
+    # Optional Attributes
+    reboot_delay = 0
     management_vlan = {
+      # Required Attribute
       enable_vlan = false
     }
     ipv6_configuration = {
-      enable_ipv6               = true
+      # Required Attribute
+      enable_ipv6 = true
+
+      # Optional Attribute
       enable_auto_configuration = true
     }
     dns_configuration = {
@@ -98,11 +111,17 @@ resource "ome_appliance_network" "net2" {
 # static IP adapter setting 
 resource "ome_appliance_network" "net3" {
   adapter_setting = {
+    # Requried Attribute 
     enable_nic     = true
     interface_name = "ens160"
-    reboot_delay   = 0
+
+    # Optional Attribute
+    reboot_delay = 0
     ipv6_configuration = {
-      enable_ipv6               = true
+      # Required Attribute
+      enable_ipv6 = true
+
+      # Optional Attribute
       enable_auto_configuration = false
       # static ipv6 configuration
       static_ip_address    = "<static-ipv6>"
@@ -115,7 +134,10 @@ resource "ome_appliance_network" "net3" {
     }
 
     ipv4_configuration = {
+      # Required Attribute
       enable_ipv4 = true
+
+      # Optional Attribute
       enable_dhcp = false
       # static ipv4 configuration
       static_ip_address  = "10.10.10.10"
