@@ -107,7 +107,6 @@
 | <sub>/api/SessionService/Actions/SessionService.SessionConfigurationUpdate | POST | [Create, Update]
 | <sub>/api/ApplicationService/Network/TimeConfiguration | GET | [Create, Read]
 | <sub>/api/ApplicationService/Network/TimeConfiguration | PUT | [Create, Update]
-| <sub>/api/ApplicationService/Network/TimeZone | GET | 
 | <sub>/api/ApplicationService/Network/ProxyConfiguration | GET | [Create, Read]
 | <sub>/api/ApplicationService/Network/ProxyConfiguration | PUT | [Create, Update]
 
