@@ -21,7 +21,7 @@
 | <sub>/api/TemplateService/Templates({id})/AttributeDetails </sub> | GET | [Read]
 | <sub>/api/TemplateService/Template({id})/Views(4)/AttributeViewDetails </sub> | GET | [Read]
 | **VLAN Datasource**                |
-| <sub>api/NetworkConfigurationService/Networks </sub> | GET | [Read]
+| <sub>/api/NetworkConfigurationService/Networks </sub> | GET | [Read]
 | **Certificate Resource**                |
 | <sub>/api/ApplicationService/Actions/ApplicationService.UploadCertificate </sub> | POST | [Create]
 | **CSR Resource**                |
@@ -50,10 +50,10 @@
 | <sub>/api/GroupService/Actions/GroupService.RemoveMemberDevices </sub> | POST | [Update]
 | <sub>/api/GroupService/Groups({id})/Devices </sub> | GET | [Create, Read, Import, Update]
 | **User Resource**                |
-| /api/AccountService/Accounts </sub> | POST | [Create]
-| /api/AccountService/Accounts({id}) </sub> | PUT | [Update]
-| /api/AccountService/Accounts({id}) </sub> | GET | [Read, Import]
-| /api/AccountService/Accounts({id}) </sub> | DELETE | [Delete]
+| <sub>/api/AccountService/Accounts </sub> | POST | [Create]
+| <sub>/api/AccountService/Accounts({id}) </sub> | PUT | [Update]
+| <sub>/api/AccountService/Accounts({id}) </sub> | GET | [Read, Import]
+| <sub>/api/AccountService/Accounts({id}) </sub> | DELETE | [Delete]
 | **Configuration Compliance Resource**                |
 | <sub>/api/TemplateService/Baselines({id})/DeviceConfigComplianceReports </sub> | GET | [Read]
 | <sub>/api/TemplateService/Baselines </sub> | GET | [Create, Update]
