@@ -1,7 +1,7 @@
 
 ## Dell OME
 
-|  Endpoints  |  Verb  |  Terraform Actions  |
+|  **Endpoints**  |  **Verb**  |  **Terraform Actions**  |
 | :-----------------------------------------------------------------: | :----: | :----------------: |
 | **Certificate Datasource**                |
 | <sub>/api/ApplicationService/Certificate </sub> | GET | [Read]
