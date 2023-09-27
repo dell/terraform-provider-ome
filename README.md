@@ -2,8 +2,8 @@
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](https://github.com/dell/terraform-provider-ome/blob/main/about/CODE_OF_CONDUCT.md)
 [![License](https://img.shields.io/github/license/dell/terraform-provider-ome)](https://github.com/dell/terraform-provider-ome/blob/main/LICENSE)
-[![Go version](https://img.shields.io/badge/go-1.19+-blue.svg)](https://go.dev/dl/)
-[![Terraform version](https://img.shields.io/badge/terraform-1.0+-blue.svg)](https://www.terraform.io/downloads)
+[![Go version](https://img.shields.io/badge/go-1.20+-blue.svg)](https://go.dev/dl/)
+[![Terraform version](https://img.shields.io/badge/terraform-1.4+-blue.svg)](https://www.terraform.io/downloads)
 [![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/dell/terraform-provider-ome?include_prereleases&label=latest&style=flat-square)](https://github.com/dell/terraform-provider-ome/releases)
 
 
@@ -29,23 +29,33 @@ For general information about Terraform, visit the [official website][tf-website
   * [Attribution](https://github.com/dell/terraform-provider-ome/blob/main/about/ATTRIBUTION.md)
 
 ## Supported Platforms
-  * Dell OpenManage Enterprise versions 3.9.0 (Build 55) and above.
+  * Dell OpenManage Enterprise versions 3.10.x.
 
 ## Prerequisites
-  * [Terraform >= 1.3.2](https://www.terraform.io)
-  * Go >= 1.19
+  * [Terraform >= 1.4.6](https://www.terraform.io)
+  * Go >= 1.20
 
 ## List of DataSources in Terraform Provider for Dell OME
   * Configuration Report
   * Device Groups
   * Template
   * VLAN Networks
+  * Device Datasource
+  * Application Certificate Datasource
 
 ## List of Resources in Terraform Provider for Dell OME
   * Configuration Baseline
   * Configuration Compliance
   * Deployment
   * Template
+  * User Resource
+  * Static Group Resource
+  * Discovery Resource
+  * Devices Resource
+  * Device Action Resource
+  * Application CSR Resource
+  * Application Certificate Resource
+  * Appliance Network Resource
 
 ## Installation
 Install Terraform Provider for OpenManage Enterprise from terraform registry by adding the following block
@@ -53,7 +63,7 @@ Install Terraform Provider for OpenManage Enterprise from terraform registry by 
 terraform {
   required_providers {
     ome = {
-      version = "1.0.0"
+      version = "1.1.0"
       source  = "dell/ome"
     }
   }
