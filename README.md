@@ -29,7 +29,7 @@ For general information about Terraform, visit the [official website][tf-website
   * [Attribution](https://github.com/dell/terraform-provider-ome/blob/main/about/ATTRIBUTION.md)
 
 ## Supported Platforms
-  * Dell OpenManage Enterprise versions 3.10.2 (Build 13) and above.
+  * Dell OpenManage Enterprise versions 3.10.x.
 
 ## Prerequisites
   * [Terraform >= 1.4.6](https://www.terraform.io)
