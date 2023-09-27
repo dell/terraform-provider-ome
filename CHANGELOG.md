@@ -1,3 +1,30 @@
+# v1.1.0
+
+## Release Summary
+The release supports resources and data sources mentioned in the Features section for Dell OME.
+
+## Features
+
+- List of new Resources and supported operations in Terraform Provider for Dell OME.
+  * User Resource - Create, Read, Update, Delete, Import 
+  * Static Group Resource -  Create, Read, Update, Delete, Import 
+  * Discovery Resource -  Create, Read, Update, Delete, Import 
+  * Devices Resource -  Create(Implicit Import), Read, Update, Delete, Import 
+  * Device Action Resource -  Create, Read, Update, Delete
+  * Application CSR Resource -  Create, Read, Update, Delete
+  * Application Certificate Resource -  Create, Read, Update, Delete
+  * Appliance Network Resource -  Create (Implicit Import), Read, Update, Delete
+
+- List of new DataSources and supported operations in Terraform Provider for Dell OME.
+  * Device Datasource - Read
+  * Application Certificate Datasource - Read
+
+## Enhancements
+Group Devices Info Datasource was enhanced to add field `device_groups` which contains information about groups.
+
+## Bug Fixes
+N/A
+
 # v1.0.0
 
 ## Release Summary
