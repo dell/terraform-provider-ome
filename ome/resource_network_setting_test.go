@@ -1,6 +1,7 @@
 package ome
 
 import (
+	"os"
 	"regexp"
 	"testing"
 
@@ -9,6 +10,13 @@ import (
 
 // ============================================= Adapter Setting Test ===========================================
 func TestNetworkSettingAdapter(t *testing.T) {
+	if os.Getenv("TF_ACC") == "" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
+	if os.Getenv("TF_ACC_NWAD") == "" {
+		t.Skip("Skipping as TF_ACC_NWAD is not set")
+	}
+
 	testAccCreateAdapterSetting := testProvider + `
 	resource "ome_appliance_network" "net1" {
 		adapter_setting = {
@@ -16,7 +24,7 @@ func TestNetworkSettingAdapter(t *testing.T) {
 		  interface_name = "ens160"
 		  reboot_delay   = 0
 		  management_vlan = {
-			  enable_vlan = false 
+			  enable_vlan = false
 		  }
 		  ipv6_configuration = {
 			enable_ipv6                   = false
@@ -35,7 +43,7 @@ func TestNetworkSettingAdapter(t *testing.T) {
 		  interface_name = "ens160"
 		  reboot_delay   = 0
 		  management_vlan = {
-			  enable_vlan = false 
+			  enable_vlan = false
 		  }
 		  ipv6_configuration = {
 			enable_ipv6                   = true
@@ -106,7 +114,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 		  interface_name = "invalid"
 		  ipv6_configuration = {
 			enable_ipv6 = true
-			enable_auto_configuration = true 
+			enable_auto_configuration = true
 			static_ip_address = "0.0.0.0"
 			static_prefix_length = 0
 			static_gateway = "1.1.1.1"
@@ -137,7 +145,7 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 		  enable_nic = true
 		  management_vlan = {
 			enable_vlan = false
-			id = 1 
+			id = 1
 		  }
 		}
 	  }
@@ -204,7 +212,7 @@ func TestNetworkSettingTime(t *testing.T) {
 	resource "ome_appliance_network" "its_ome_time" {
 		time_setting = {
 		  time_zone = "TZ_ID_65"
-		  enable_ntp = true 
+		  enable_ntp = true
 		  primary_ntp_address = "` + DeviceIP1 + `"
 		  secondary_ntp_address1 = "` + DeviceIP2 + `"
 		  secondary_ntp_address2 = "` + DeviceIP3 + `"
@@ -314,9 +322,9 @@ func TestNetworkSettingSession(t *testing.T) {
 	testAccCreateNetworkSessionSuccess := testProvider + `
 	resource "ome_appliance_network" "code_ome" {
 		session_setting = {
-		  enable_universal_timeout = true 
+		  enable_universal_timeout = true
 		  universal_timeout = 20
-		  api_session = 10 
+		  api_session = 10
 		  gui_session = 11
 		}
 	  }
@@ -472,7 +480,7 @@ func TestNetworkSettingProxy(t *testing.T) {
 		  ip_address = "` + DeviceIP1 + `"
 		  proxy_port = 443
 		  enable_authentication = true
-		  username = "root" 
+		  username = "root"
 		  password = "root"
 		}
 	  }

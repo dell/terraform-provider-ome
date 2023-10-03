@@ -27,6 +27,12 @@ const (
 	InvalidBaselineID = "1000910"
 )
 
+func testConfCompPrecheck(t *testing.T) {
+	if os.Getenv("TF_ACC_CC") == "" {
+		t.Skip("Dont run this test because TF_ACC_CC env var must be set to enable this test.")
+	}
+}
+
 func TestConfigurationRemediationErrors(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
@@ -251,7 +257,10 @@ func TestConfigurationRemediation(t *testing.T) {
 	}
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
+		PreCheck: func() {
+			testAccPreCheck(t)
+			testConfCompPrecheck(t)
+		},
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
