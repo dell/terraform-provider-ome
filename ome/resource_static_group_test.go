@@ -48,6 +48,8 @@ func TestStaticGroup(t *testing.T) {
 	}
 	`
 
+	t.Log(testAccProvider)
+
 	testAccCreateGroupSuccess := testAccProvider + preReqs + `	
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1 + `"
