@@ -27,7 +27,7 @@ func UserSchema() map[string]schema.Attribute {
 			Optional: true,
 			Computed: true,
 			PlanModifiers: []planmodifier.Int64{
-				int64planmodifier.RequiresReplace(),
+				int64planmodifier.RequiresReplaceIfConfigured(),
 			},
 		},
 
@@ -39,7 +39,7 @@ func UserSchema() map[string]schema.Attribute {
 			Optional: true,
 			Computed: true,
 			PlanModifiers: []planmodifier.Int64{
-				int64planmodifier.RequiresReplace(),
+				int64planmodifier.RequiresReplaceIfConfigured(),
 			},
 		},
 
@@ -89,7 +89,7 @@ func UserSchema() map[string]schema.Attribute {
 			Optional: true,
 			Computed: true,
 			PlanModifiers: []planmodifier.Bool{
-				boolplanmodifier.RequiresReplace(),
+				boolplanmodifier.RequiresReplaceIfConfigured(),
 			},
 		},
 
