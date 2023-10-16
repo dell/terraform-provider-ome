@@ -88,10 +88,10 @@ func NewClient(opts ClientOptions) (*Client, error) {
 		preRequestHook: opts.PreRequestHook,
 	}
 
-	if opts.SkipSSL {
+	if opts.SkipSSL { // #nosec G402
 		omeClient.httpclient.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: opts.SkipSSL, // #nosec G402
+				InsecureSkipVerify: opts.SkipSSL,
 			},
 		}
 
@@ -104,9 +104,10 @@ func NewClient(opts ClientOptions) (*Client, error) {
 			}
 			pool.AppendCertsFromPEM(rootCAsData)
 		}
+		// #nosec G402
 		omeClient.httpclient.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: opts.SkipSSL, // #nosec G402
+				InsecureSkipVerify: opts.SkipSSL,
 				RootCAs:            pool,
 			},
 		}
