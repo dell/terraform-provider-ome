@@ -43,6 +43,10 @@ func TestCert(t *testing.T) {
 				ExpectError: regexp.MustCompile(".*failed to decode base64.*"),
 			},
 			{
+				SkipFunc: func() (bool, error) {
+					t.Log("Skipping as INV_CERT is not set")
+					return (InvCert == ""), nil
+				},
 				Config:      testCertBad,
 				ExpectError: regexp.MustCompile(".*certificate[[:space:]]file[[:space:]]provided[[:space:]]is[[:space:]]invalid.*"),
 			},
@@ -54,10 +58,6 @@ func TestCert(t *testing.T) {
 func TestCertPos(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
-	}
-
-	if InvCert == "" || CertScript == "" {
-		t.Skip("InvCert=", InvCert, " and CertScript=", CertScript)
 	}
 
 	var testCreateCert = testProvider + `
@@ -118,7 +118,12 @@ func TestCertPos(t *testing.T) {
 	`
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
+		PreCheck: func() {
+			testAccPreCheck(t)
+			if InvCert == "" || CertScript == "" {
+				t.Skip("Skipping because INV_CERT=", InvCert, " and CERT_SCRIPT=", CertScript)
+			}
+		},
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		ExternalProviders: map[string]resource.ExternalProvider{
 			"random": {

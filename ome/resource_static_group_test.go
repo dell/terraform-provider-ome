@@ -48,12 +48,14 @@ func TestStaticGroup(t *testing.T) {
 	}
 	`
 
-	testAccCreateGroupSuccess := testAccProvider + `	
+	t.Log(testAccProvider)
+
+	testAccCreateGroupSuccess := testAccProvider + preReqs + `	
 	resource "ome_static_group" "terraform-acceptance-test-1" {
 		name = "` + DeviceGroup1 + `"
 		description = "Device Group for Acceptance Test 1"
-		parent_id = ` + GroupID1 + `
-		device_ids = [` + DeviceID1 + `, ` + DeviceID2 + `]
+		parent_id = data.ome_groupdevices_info.ome_root.device_groups["Static Groups"].id
+		device_ids = data.ome_device.devs.devices[*].id
 	}
 	`
 
