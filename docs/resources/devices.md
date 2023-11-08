@@ -26,12 +26,6 @@ description: |-
 
 This terraform resource is used to manage a set of device entities on OME.
 
-~> **Note:** Exactly one of `ref_template_name` and `ref_template_id` and exactly one of `device_ids` and `device_servicetags` are required.
-
-~> **Note:** When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`.
-
-~> **Note:** Updates are supported for all the parameters.
-
 ## Example Usage
 
 ```terraform

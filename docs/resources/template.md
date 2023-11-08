@@ -19,12 +19,12 @@ linkTitle: "ome_template"
 page_title: "ome_template Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  This terraform resource is used to manage Template entity on OME.We can Create, Update and Delete OME Template using this resource. We can also do an 'Import' an existing 'Template' from OME.
+  This terraform resource is used to manage Template entity on OME. We can Create, Update and Delete OME Template using this resource. We can also do an 'Import' an existing 'Template' from OME.
 ---
 
 # ome_template (Resource)
 
-This terraform resource is used to manage Template entity on OME.We can Create, Update and Delete OME Template using this resource. We can also do an 'Import' an existing 'Template' from OME.
+This terraform resource is used to manage Template entity on OME. We can Create, Update and Delete OME Template using this resource. We can also do an 'Import' an existing 'Template' from OME.
 
 ~> **Note:** Exactly one of `reftemplate_name`, `refdevice_id`, `refdevice_servicetag` and `content` are required.
 

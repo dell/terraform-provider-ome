@@ -64,7 +64,7 @@ func (resourceStaticGroup) Metadata(ctx context.Context, req resource.MetadataRe
 // StaticGroup Resource schema
 func (r resourceStaticGroup) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "This terraform resource is used to manage Static Device Group entity on OME." +
+		MarkdownDescription: "This terraform resource is used to manage Static Device Group entity on OME. " +
 			"We can Create, Update and Delete OME Static Device Group using this resource. We can also do an 'Import' an existing 'Static Device Group' from OME .",
 		Version: 1,
 		Attributes: map[string]schema.Attribute{

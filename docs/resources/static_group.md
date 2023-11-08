@@ -19,18 +19,12 @@ linkTitle: "ome_static_group"
 page_title: "ome_static_group Resource - terraform-provider-ome"
 subcategory: ""
 description: |-
-  This terraform resource is used to manage Static Device Group entity on OME.We can Create, Update and Delete OME Static Device Group using this resource. We can also do an 'Import' an existing 'Static Device Group' from OME .
+  This terraform resource is used to manage Static Device Group entity on OME. We can Create, Update and Delete OME Static Device Group using this resource. We can also do an 'Import' an existing 'Static Device Group' from OME .
 ---
 
 # ome_static_group (Resource)
 
-This terraform resource is used to manage Static Device Group entity on OME.We can Create, Update and Delete OME Static Device Group using this resource. We can also do an 'Import' an existing 'Static Device Group' from OME .
-
-~> **Note:** Exactly one of `ref_template_name` and `ref_template_id` and exactly one of `device_ids` and `device_servicetags` are required.
-
-~> **Note:** When `schedule` is `true`, following parameters are considered: `notify_on_schedule`, `cron`, `email_addresses`, `output_format`.
-
-~> **Note:** Updates are supported for all the parameters.
+This terraform resource is used to manage Static Device Group entity on OME. We can Create, Update and Delete OME Static Device Group using this resource. We can also do an 'Import' an existing 'Static Device Group' from OME .
 
 ## Example Usage
 

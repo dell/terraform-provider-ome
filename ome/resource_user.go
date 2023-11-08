@@ -45,7 +45,7 @@ func (r *userResource) Metadata(_ context.Context, req resource.MetadataRequest,
 // Schema defines the schema for the resource.
 func (r *userResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "This terraform resource is used to manage User entity on OME." +
+		MarkdownDescription: "This terraform resource is used to manage User entity on OME. " +
 			"We can Create, Update and Delete OME User using this resource. We can also do an 'Import' an existing 'User' from OME.",
 		Version:    1,
 		Attributes: UserSchema(),

@@ -19,12 +19,12 @@ linkTitle: "ome_application_certificate"
 page_title: "ome_application_certificate Data Source - terraform-provider-ome"
 subcategory: ""
 description: |-
-  This terraform DataSource is used to query the existing application certificate data from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
+  This terraform DataSource is used to query the existing application certificate data from OME. The information fetched from this data source can be used for getting the details for further processing in resource block.
 ---
 
 # ome_application_certificate (Data Source)
 
-This terraform DataSource is used to query the existing application certificate data from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
+This terraform DataSource is used to query the existing application certificate data from OME. The information fetched from this data source can be used for getting the details for further processing in resource block.
 
 ## Example Usage
 

@@ -52,7 +52,7 @@ func (*vlanNetworksDataSource) Metadata(ctx context.Context, req datasource.Meta
 func (g vlanNetworksDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "This Terraform DataSource is used to query templates from OME." +
-			" The information fetched from this data source can be used for getting the details / for further processing in resource block.",
+			" The information fetched from this data source can be used for getting the details for further processing in resource block.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "ID for vlan networks data source.",

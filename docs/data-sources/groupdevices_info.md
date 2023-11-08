@@ -19,12 +19,12 @@ linkTitle: "ome_groupdevices_info"
 page_title: "ome_groupdevices_info Data Source - terraform-provider-ome"
 subcategory: ""
 description: |-
-  This Terraform DataSource is used to query groups and their devices from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
+  This Terraform DataSource is used to query groups and their devices from OME. The information fetched from this data source can be used for getting the details for further processing in resource block.
 ---
 
 # ome_groupdevices_info (Data Source)
 
-This Terraform DataSource is used to query groups and their devices from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
+This Terraform DataSource is used to query groups and their devices from OME. The information fetched from this data source can be used for getting the details for further processing in resource block.
 
 ## Example Usage
 
