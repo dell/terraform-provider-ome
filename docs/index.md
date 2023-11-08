@@ -57,7 +57,7 @@ provider "ome" {
   username = "username"
   password = "password"
   host     = "yourhost.host.com"
-  skipssl  = false
+  skipssl  = true # not recommended in production
 }
 
 # creating baseline from a reference device and making other devices complaint with that baseline. 
