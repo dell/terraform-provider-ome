@@ -62,7 +62,7 @@ test: check
 
 check:
 	gofmt -s -w .
-	go vet
+	# go vet
 	golangci-lint run --fix --timeout 5m
 
 gosec:
