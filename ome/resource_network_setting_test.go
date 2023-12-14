@@ -215,7 +215,7 @@ func TestNetworkSettingTime(t *testing.T) {
 		  enable_ntp = true
 		  primary_ntp_address = "` + DeviceIP1 + `"
 		  secondary_ntp_address1 = "` + DeviceIP2 + `"
-		  secondary_ntp_address2 = "` + DeviceIP3 + `"
+		  secondary_ntp_address2 = "` + DeviceIpExt + `"
 		}
 	  }
 	`
@@ -239,7 +239,7 @@ func TestNetworkSettingTime(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.enable_ntp", "true"),
 					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.primary_ntp_address", DeviceIP1),
 					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.secondary_ntp_address1", DeviceIP2),
-					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.secondary_ntp_address2", DeviceIP3),
+					resource.TestCheckResourceAttr("ome_appliance_network.its_ome_time", "time_setting.secondary_ntp_address2", DeviceIpExt),
 				),
 			},
 		},

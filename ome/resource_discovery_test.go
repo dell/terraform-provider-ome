@@ -93,7 +93,7 @@ func TestDiscoveryTwo(t *testing.T) {
 		cron = "0 * */10 * * ? *"
 		discovery_config_targets = [{
 		  device_type = [ "SERVER" ]
-		  network_address_detail = [ "` + DeviceIP1 + `","` + DeviceIP2 + `","` + DeviceIP3 + `"]
+		  network_address_detail = [ "` + DeviceIP1 + `","` + DeviceIP2 + `","` + DeviceIpExt + `"]
 		  # redfish = {
 		  #  username = "root"
 		  #  password = "calvin" 
@@ -115,7 +115,7 @@ func TestDiscoveryTwo(t *testing.T) {
 		cron = "0 * */12 * * ? *"
 		discovery_config_targets = [{
 		  device_type = [ "SERVER" ]
-		  network_address_detail = ["` + DeviceIP3 + `"]
+		  network_address_detail = ["` + DeviceIpExt + `"]
 		  redfish = {
 			username = "` + IdracUsername + `"
 			password = "` + IdracPassword + `"
@@ -265,7 +265,7 @@ func TestDiscoveryFour(t *testing.T) {
 		ignore_partial_failure = true
 		discovery_config_targets = [
 		  {
-		  network_address_detail = ["` + DeviceIP1 + `","` + DeviceIP2 + `","` + DeviceIP3 + `", "127.0.0.1","0.42.42.42","1.1.1.1","8.8.8.8","192.168.1.1"]
+		  network_address_detail = ["` + DeviceIP1 + `","` + DeviceIP2 + `","` + DeviceIpExt + `", "127.0.0.1","0.42.42.42","1.1.1.1","8.8.8.8","192.168.1.1"]
 		  device_type = ["SERVER"]
 		  wsman = {
 			username = "` + IdracUsername + `"

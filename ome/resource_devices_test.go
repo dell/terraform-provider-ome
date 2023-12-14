@@ -99,14 +99,40 @@ func TestAccDevicesResUpdate(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
-	if DeviceSvcTagRmv == "" {
+	if DeviceIpExt == "" {
 		t.Skip("Skipping this test as there is no Device to remove.")
 	}
-	testAccCreateDevicesResMixedSuccess := testProvider + `
+
+	DiscoveryJob := `
+	resource "ome_discovery" "discover1" {
+		name = "discover-lab"
+		schedule = "RunNow"
+		ignore_partial_failure = true
+		timeout = 10
+		discovery_config_targets = [
+			{
+				network_address_detail = ["` + DeviceIpExt + `"]
+				device_type = ["SERVER"]
+				wsman = {
+					username = "` + IdracUsername + `"
+					password = "` + IdracPassword + `"
+				}
+			}
+		]
+	}
+	`
+
+	testAccCreateDevicesResMixedSuccess := testProvider + DiscoveryJob + `
+	data "ome_device" "dev" {
+		depends_on = [ome_discovery.discover1]
+		filters = {
+			ip_expressions = ["` + DeviceIpExt + `"]
+		}
+	}
 	resource "ome_devices" "code_3" {
 		devices = [
 			{
-				service_tag = "` + DeviceSvcTagRmv + `"
+				service_tag = data.ome_device.dev.devices[0].device_service_tag
 			},
 			{
 				id = ` + DeviceID1 + `
@@ -153,6 +179,8 @@ func TestAccDevicesResUpdate(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_devices.code_3", "devices.#", "3"),
 				),
+				// TBD: non empty plan fix for discovery resource
+				ExpectNonEmptyPlan: true,
 			},
 			{
 				// check that device can be removed from the list

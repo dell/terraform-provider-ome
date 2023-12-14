@@ -1,9 +1,10 @@
 TEST?=$$(go list ./... | grep -v 'vendor')
+INSTALL_ROOT?=~/.terraform.d/plugins
 HOSTNAME=registry.terraform.io
 NAMESPACE=dell
 NAME=ome
 BINARY=terraform-provider-${NAME}
-VERSION=1.1.0
+VERSION?=1.1.0
 OS_ARCH=linux_amd64
 
 default: install
@@ -27,7 +28,7 @@ release:
 
 
 install: build
-	rm -rfv ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
+	rm -rfv $(INSTALL_ROOT)/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
 	find examples -type d -name ".terraform" -exec rm -rfv "{}" +;
 	find examples -type f -name "trace.*" -delete
 	find examples -type f -name "*.tfstate" -delete
@@ -35,17 +36,18 @@ install: build
 	find examples -type f -name "*.backup" -delete
 	rm -rf trace.*
 	
-	mkdir -p ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
-	mv ${BINARY} ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
+	mkdir -p $(INSTALL_ROOT)/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
+	mv ${BINARY} $(INSTALL_ROOT)/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
 
 uninstall:
-	rm -rfv ~/.terraform.d/plugins/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
+	rm -rfv $(INSTALL_ROOT)/${HOSTNAME}/${NAMESPACE}/${NAME}/${VERSION}/${OS_ARCH}
 	find examples -type d -name ".terraform" -exec rm -rfv "{}" +;
 	find examples -type f -name "trace.*" -delete
 	find examples -type f -name "*.tfstate" -delete
 	find examples -type f -name "*.hcl" -delete
 	find examples -type f -name "*.backup" -delete
 	rm -rf trace.*
+
 unit_test:
 	echo "Running unit tests"
 	go test -v ./clients -cover -timeout 60m

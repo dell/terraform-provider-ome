@@ -395,7 +395,7 @@ var testCreateBaselineValidationDeviceCapable = `
 	resource "ome_configuration_baseline" "create_baseline_validation_empty_email" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"
-		device_servicetags = [` + DeviceID3 + `]
+		device_servicetags = [` + DeviceID2 + `]
 	}
 `
 
