@@ -99,7 +99,7 @@ func TestAccDevicesResUpdate(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
-	if DeviceIpExt == "" {
+	if DeviceIPExt == "" {
 		t.Skip("Skipping this test as there is no Device to remove.")
 	}
 
@@ -111,7 +111,7 @@ func TestAccDevicesResUpdate(t *testing.T) {
 		timeout = 10
 		discovery_config_targets = [
 			{
-				network_address_detail = ["` + DeviceIpExt + `"]
+				network_address_detail = ["` + DeviceIPExt + `"]
 				device_type = ["SERVER"]
 				wsman = {
 					username = "` + IdracUsername + `"
@@ -126,7 +126,7 @@ func TestAccDevicesResUpdate(t *testing.T) {
 	data "ome_device" "dev" {
 		depends_on = [ome_discovery.discover1]
 		filters = {
-			ip_expressions = ["` + DeviceIpExt + `"]
+			ip_expressions = ["` + DeviceIPExt + `"]
 		}
 	}
 	resource "ome_devices" "code_3" {
