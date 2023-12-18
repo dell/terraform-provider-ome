@@ -1,3 +1,17 @@
+# v1.1.1
+
+## Release Summary
+Security Patch for CVE-2023-44487
+
+## Features
+N/A
+
+## Enhancements
+Security Patch for CVE-2023-44487
+
+## Bug Fixes
+N/A
+
 # v1.1.0
 
 ## Release Summary

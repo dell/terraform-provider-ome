@@ -63,7 +63,7 @@ Install Terraform Provider for OpenManage Enterprise from terraform registry by 
 terraform {
   required_providers {
     ome = {
-      version = "1.1.0"
+      version = "1.1.1"
       source  = "dell/ome"
     }
   }
