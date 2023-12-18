@@ -84,7 +84,7 @@ func TestDataSource_ReadGroupDevices(t *testing.T) {
 	})
 }
 
-var testgroupDeviceDS = `
+var testgroupPreReq = `
 	provider "ome" {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
@@ -92,21 +92,36 @@ var testgroupDeviceDS = `
 		skipssl = true
 	}
 
+	data "ome_groupdevices_info" "all_father" {
+		id = "0"
+		device_group_names = ["Static Groups"]
+	}
+
+	data "ome_device" "devs" {
+		filters = {
+			device_service_tags = ["` + DeviceSvcTag1 + `", "` + DeviceSvcTag2 + `"]
+		}
+	}
+
+	resource "ome_static_group" "test_group" {
+		name        = "test_device_group"
+		description = "Group for Group Device DataSource Acceptance Test"
+		parent_id   = data.ome_groupdevices_info.all_father.device_groups["Static Groups"].id
+		device_ids = data.ome_device.devs.devices[*].id
+	}
+`
+
+var testgroupDeviceDS = testgroupPreReq + `
 	data "ome_groupdevices_info" "gd" {
+		depends_on = [ ome_static_group.test_group ]
 		id = "0"
 		device_group_names = ["test_device_group"]
 	}
 `
 
-var testgroupDeviceDSWithSubGroups = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-
+var testgroupDeviceDSWithSubGroups = testgroupPreReq + `
 	data "ome_groupdevices_info" "gd" {
+		depends_on = [ ome_static_group.test_group ]
 		id = "0"
 		device_group_names = ["test_device_group"]
 	}

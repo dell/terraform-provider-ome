@@ -372,36 +372,7 @@ var testAccUpdateTemplateSuccess = `
 		vlan = {
 			propogate_vlan = true
 			bonding_technology = "NoTeaming"
-			vlan_attributes = [
-				{
-					is_nic_bonded =  false,
-					nic_identifier = "Integrated NIC 1"
-					port = 1
-					tagged_networks = [0]
-					untagged_network = lookup(local.vlan_network_map, "VLAN1", 0)
-				},
-				{
-					is_nic_bonded =  false
-					nic_identifier = "Integrated NIC 1"
-					port = 2
-					tagged_networks = [0]
-					untagged_network = 0
-				},
-				{
-					is_nic_bonded =  false,
-					nic_identifier = "Integrated NIC 1"
-					port = 3
-					tagged_networks = [0]
-					untagged_network = lookup(local.vlan_network_map, "VLAN1", 0)
-				},
-				{
-					is_nic_bonded =  false
-					nic_identifier = "Integrated NIC 1"
-					port = 4
-					tagged_networks = [0]
-					untagged_network = 0 
-				}
-			]
+			vlan_attributes = local.vlan_attributes
 		}
 	}
 
@@ -440,6 +411,18 @@ var testAccUpdateTemplateSuccess = `
 		})] : null
 
 		vlan_network_map = {for vlan_network in  data.ome_vlannetworks_info.vlans.vlan_networks : vlan_network.name => vlan_network.vlan_id}
+		
+		vlan_attributes_to_change = tomap({
+			"Integrated NIC 1 - 1": lookup(local.vlan_network_map, "VLAN1", 0)
+			"Integrated NIC 1 - 3": lookup(local.vlan_network_map, "VLAN1", 0)
+		})
+		vlan_attributes = [ for attr in data.ome_template_info.template_data.vlan.vlan_attributes : {
+			is_nic_bonded = attr.is_nic_bonded
+			nic_identifier   = attr.nic_identifier
+			port = attr.port
+			tagged_networks = attr.tagged_networks
+			untagged_network        = lookup(local.vlan_attributes_to_change, "${attr.nic_identifier} - ${attr.port}", attr.untagged_network)
+		}]
 	  }
 `
 

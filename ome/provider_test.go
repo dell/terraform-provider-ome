@@ -37,21 +37,19 @@ var omePassword = os.Getenv("OME_PASSWORD")
 var DeviceSvcTag1 = os.Getenv("DEVICESVCTAG1")
 var DeviceSvcTag2 = os.Getenv("DEVICESVCTAG2")
 var DeviceID1 = os.Getenv("DEVICEID1")
-var DeviceID2 = os.Getenv("DEVICEID2")
-var DeviceID3 = os.Getenv("DEVICEID3")             // Not capable for deployment
-var DeviceSvcTagRmv = os.Getenv("DEVICESVCTAGRMV") // Will be removed
+var DeviceID2 = os.Getenv("DEVICEID2")     // Not capable for deployment
+var DeviceIPExt = os.Getenv("DEVICEIPEXT") // Must be external to OME environment but discoverable
 var ShareUser = os.Getenv("SHAREUSERNAME")
 var SharePassword = os.Getenv("SHAREPASSWORD")
 var ShareIP = os.Getenv("SHAREIP")
 var DeviceIP1 = os.Getenv("DEVICEIP1")
 var DeviceIP2 = os.Getenv("DEVICEIP2")
-var DeviceIP3 = os.Getenv("DEVICEIP3")
 
-// the following must be absolute paths
-// script that accepts csr and output file as inputs respectively and generates cert
-var CertScript = os.Getenv("CERT_SCRIPT")
+// Device Model to be used in DS test
+// Must have multiple devices of this model
+var DeviceModel = os.Getenv("DEVICE_MODEL")
 
-// an invalid cert
+// an invalid cert - can be set to any text file
 var InvCert = os.Getenv("INV_CERT")
 
 // idrac username

@@ -109,6 +109,13 @@ func TestDataSource_ReadDevice(t *testing.T) {
 				),
 			},
 			{
+				SkipFunc: func() (bool, error) {
+					if DeviceModel == "" {
+						t.Log("Skipping as DEVICE_MODEL is not set")
+						return true, nil
+					}
+					return false, nil
+				},
 				Config: testGetDevicesWithFilterExp + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckOutput("fetched_any", "true"),
@@ -264,7 +271,7 @@ data "ome_device" "devs" {
 var testGetDevicesWithFilterExp = testProvider + `
 data "ome_device" "devs" {
 	filters = {
-		filter_expression = "Model eq 'PowerEdge MX840c'"
+		filter_expression = "Model eq '` + DeviceModel + `'"
 	}
 }
 `
