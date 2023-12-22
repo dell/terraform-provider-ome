@@ -123,3 +123,5 @@ jobs:
     - run: go mod download
     - run: go test -v -cover ./clients/
       timeout-minutes: 60
+    - run: go test -v ./utils/
+      timeout-minutes: 60

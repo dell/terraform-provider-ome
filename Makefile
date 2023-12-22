@@ -51,6 +51,7 @@ uninstall:
 unit_test:
 	echo "Running unit tests"
 	go test -v ./clients -cover -timeout 60m
+	go test -v ./utils
 
 integration_test:
 	echo "Running integration test"
