@@ -49,7 +49,8 @@ jobs:
       - name: Run the static check
         uses: dominikh/staticcheck-action@v1.3.0
         with:
-          version: "2022.1.3"
+          # Trying this fix https://github.com/dominikh/staticcheck-action/pull/12
+          version: "2023.1.3"
           install-go: false
  sanitize:
     name: Check for forbidden words
