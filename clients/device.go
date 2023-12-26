@@ -16,6 +16,7 @@ package clients
 import (
 	"fmt"
 	"terraform-provider-ome/models"
+	"terraform-provider-ome/utils"
 )
 
 // GetDevice is used to get device using serviceTag or devID in OME
@@ -194,7 +195,7 @@ func (c *Client) GetDeviceByIps(networks []string) ([]models.Device, error) {
 // FilterDeviceByIps - method to filter device using ips
 func FilterDeviceByIps(devices []models.Device, networks []string) ([]models.Device, error) {
 	ret := make([]models.Device, 0)
-	pool, err := ParseNetworks(networks)
+	pool, err := utils.ParseNetworks(networks)
 	if err != nil {
 		return ret, err
 	}

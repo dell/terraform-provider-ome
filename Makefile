@@ -4,7 +4,7 @@ HOSTNAME=registry.terraform.io
 NAMESPACE=dell
 NAME=ome
 BINARY=terraform-provider-${NAME}
-VERSION?=1.1.0
+VERSION?=1.1.1
 OS_ARCH=linux_amd64
 
 default: install
@@ -51,6 +51,7 @@ uninstall:
 unit_test:
 	echo "Running unit tests"
 	go test -v ./clients -cover -timeout 60m
+	go test -v ./utils
 
 integration_test:
 	echo "Running integration test"

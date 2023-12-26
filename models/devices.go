@@ -23,7 +23,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/netdata/go.d.plugin/pkg/iprange"
+
+	"terraform-provider-ome/utils"
 )
 
 // Devices - list of device response from on OME
@@ -60,7 +61,7 @@ type Device struct {
 }
 
 // BelongsToPool - method to check if a device belongs to that ip pool
-func (d *Device) BelongsToPool(pool iprange.Pool) bool {
+func (d *Device) BelongsToPool(pool utils.IPSet) bool {
 	for _, devM := range d.DeviceManagement {
 		if pool.Contains(devM.NetworkAddress) {
 			return true
