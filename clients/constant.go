@@ -133,6 +133,10 @@ const (
 	GetJobAPI = "/api/JobService/Jobs(%d)"
 	// CatalogFirmwareAPI gets the list of catalog firmware
 	CatalogFirmwareAPI = "/api/UpdateService/Catalogs"
+	// CatalogFirmwareSpecificAPI gets a specific catalog firmware
+	CatalogFirmwareSpecificAPI = "/api/UpdateService/Catalogs(%d)"
+	// DeleteFirmwareCatalogAPI deletes a catalog firmware
+	DeleteFirmwareCatalogAPI = "/api/UpdateService/Actions/UpdateService.RemoveCatalogs"
 )
 
 // Messages constants
@@ -145,6 +149,8 @@ const (
 	ErrEmptyBodyMsg = "body cannot be empty"
 	// ErrInvalidDeviceIdentifiers - error message for invalid device service tag
 	ErrInvalidDeviceIdentifiers = "invalid device servicetag or id"
+	// ErrInvalidDeviceIdentifiers - error message for invalid firmware catalog id
+	ErrInvalidFirmwareCatalogIdentifiers = "invalid firmware catalog id"
 	// ErrComplianceTemplateIDOrName - error message when either compliance template ID or name is not given
 	ErrComplianceTemplateIDOrName = "either compliance template ID or template name is expected"
 	// ErrEmptyDeviceDetails - error message when both device service tag and device id not given
