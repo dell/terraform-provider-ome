@@ -20,11 +20,13 @@ import (
 	"terraform-provider-ome/clients"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -33,6 +35,7 @@ const (
 	defaultPort             int64         = 443
 	defaultTimeoutInSeconds int           = 30
 	defaultTimeout          time.Duration = time.Second * time.Duration(defaultTimeoutInSeconds)
+	defaultProtocol         string        = "https"
 )
 
 var (
@@ -65,6 +68,7 @@ type providerData struct {
 	Port     types.Int64  `tfsdk:"port"`
 	SkipSSL  types.Bool   `tfsdk:"skipssl"`
 	Timeout  types.Int64  `tfsdk:"timeout"`
+	Protocol types.String `tfsdk:"protocol"`
 }
 
 // Metadata - provider metadata AKA name.
@@ -142,6 +146,11 @@ func (p *omeProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	if data.Timeout.ValueInt64() != 0 {
 		timeout = time.Second * time.Duration(data.Timeout.ValueInt64())
 	}
+	//Default https to https
+	https := defaultProtocol
+	if !data.Protocol.IsNull() {
+		https = data.Protocol.ValueString()
+	}
 
 	if data.SkipSSL.IsUnknown() {
 		// Cannot connect to client with an unknown value
@@ -152,7 +161,7 @@ func (p *omeProvider) Configure(ctx context.Context, req provider.ConfigureReque
 		return
 	}
 
-	url := clients.GetURL(data.Host.ValueString(), port)
+	url := clients.GetURL(https, data.Host.ValueString(), port)
 
 	tflog.Info(ctx, "Collected all data creating client options")
 
@@ -224,6 +233,7 @@ func (p *omeProvider) DataSources(ctx context.Context) []func() datasource.DataS
 		NewConfigurationReportDataSource,
 		NewDeviceDatasource,
 		NewAppCertDataSource,
+		NewFirmwareCatalogDataSource,
 	}
 }
 
@@ -267,6 +277,19 @@ func (p *omeProvider) Schema(ctx context.Context, _ provider.SchemaRequest, resp
 				Description: "HTTPS timeout in seconds for OpenManage Enterprise client." +
 					fmt.Sprintf(" Default value is '%d'.", defaultTimeoutInSeconds),
 				Optional: true,
+			},
+			"protocol": schema.StringAttribute{
+				MarkdownDescription: "Set the Http protocol for OpenManage Enterprise client." +
+					fmt.Sprintf(" Default value is `%s`.", defaultProtocol),
+				Description: "Set the Http protocol for OpenManage Enterprise client." +
+					fmt.Sprintf(" Default value is '%s'.", defaultProtocol),
+				Optional: true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{
+						"http",
+						"https",
+					}...),
+				},
 			},
 		},
 	}

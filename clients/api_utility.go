@@ -215,8 +215,8 @@ func findElementInArray(arr []any, find any) any {
 }
 
 // GetURL returns the url framed from the given host and port
-func GetURL(host string, port int64) string {
-	return fmt.Sprintf("https://%s:%d", host, port)
+func GetURL(https string, host string, port int64) string {
+	return fmt.Sprintf("%s://%s:%d", https, host, port)
 }
 
 // ClientPreReqHook - performs the set of predefined operations

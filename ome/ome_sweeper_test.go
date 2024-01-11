@@ -26,7 +26,7 @@ func TestMain(m *testing.M) {
 }
 
 func getSweeperClient(region string) (*clients.Client, error) {
-	url := clients.GetURL(omeHost, defaultPort)
+	url := clients.GetURL(defaultProtocol, omeHost, defaultPort)
 	clientOptions := clients.ClientOptions{
 		Username:       omeUserName,
 		Password:       omePassword,

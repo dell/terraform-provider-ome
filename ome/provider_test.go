@@ -19,6 +19,7 @@ import (
 	"strings"
 	"testing"
 
+	. "github.com/bytedance/mockey"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/joho/godotenv"
@@ -30,10 +31,15 @@ const (
 	SweepTestsTemplateIdentifier = "test_acc"
 )
 
+// Used for Mocking responses from functions
+var FunctionMocker *Mocker
+
 var testAccProtoV6ProviderFactories map[string]func() (tfprotov6.ProviderServer, error)
 var omeUserName = os.Getenv("OME_USERNAME")
 var omeHost = os.Getenv("OME_HOST")
 var omePassword = os.Getenv("OME_PASSWORD")
+var port = setDefault(os.Getenv("OME_PORT"), "443")
+var protocol = setDefault(os.Getenv("OME_PROTOCOL"), "https")
 var DeviceSvcTag1 = os.Getenv("DEVICESVCTAG1")
 var DeviceSvcTag2 = os.Getenv("DEVICESVCTAG2")
 var DeviceID1 = os.Getenv("DEVICEID1")
@@ -44,6 +50,7 @@ var SharePassword = os.Getenv("SHAREPASSWORD")
 var ShareIP = os.Getenv("SHAREIP")
 var DeviceIP1 = os.Getenv("DEVICEIP1")
 var DeviceIP2 = os.Getenv("DEVICEIP2")
+var Catalog1 = setDefault(os.Getenv("CATALOG1"), "tfacc_catalog_dell_online_1")
 
 // Device Model to be used in DS test
 // Must have multiple devices of this model
@@ -63,6 +70,8 @@ provider "ome" {
 	username = "` + omeUserName + `"
 	password = "` + omePassword + `"
 	host = "` + omeHost + `"
+	port = "` + port + `"
+	protocol = "` + protocol + `"
 	skipssl = true
 }
 `
@@ -84,16 +93,21 @@ func init() {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("OME_USERNAME"); v == "" {
+	if v := omeUserName; v == "" {
 		t.Fatal("OME_USERNAME must be set for acceptance tests")
 	}
 
-	if v := os.Getenv("OME_PASSWORD"); v == "" {
+	if v := omePassword; v == "" {
 		t.Fatal("OME_PASSWORD must be set for acceptance tests")
 	}
 
-	if v := os.Getenv("OME_HOST"); v == "" {
+	if v := omeHost; v == "" {
 		t.Fatal("OME_HOST must be set for acceptance tests")
+	}
+
+	// Make sure to unpatch before each new test is run
+	if FunctionMocker != nil {
+		FunctionMocker.UnPatch()
 	}
 
 	// testProvider.Configure(context.Background(), tfsdk.ConfigureProviderRequest{}, &tfsdk.ConfigureProviderResponse{})
@@ -109,4 +123,12 @@ func getTestData(fileName string) string {
 	parent := filepath.Dir(wd)
 	fileP := filepath.Join(parent, "testdata", fileName)
 	return strings.ReplaceAll(fileP, "\\", "/")
+}
+
+// if there is no os setting set, then use the default value
+func setDefault(osInput string, defaultStr string) string {
+	if osInput == "" {
+		return defaultStr
+	}
+	return osInput
 }

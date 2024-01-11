@@ -143,10 +143,11 @@ func TestClient_TrackJob(t *testing.T) {
 }
 
 func TestGetURL(t *testing.T) {
+	https := "https"
 	host := "localhost"
 	port := int64(443)
 
-	actualURL := GetURL(host, port)
+	actualURL := GetURL(https, host, port)
 
 	assert.Equal(t, fmt.Sprintf("https://%s:%d", host, port), actualURL)
 }

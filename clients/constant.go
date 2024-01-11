@@ -131,6 +131,8 @@ const (
 	ProxyConfigurationAPI = "/api/ApplicationService/Network/ProxyConfiguration"
 	// GetJobAPI to get the job info by ID.
 	GetJobAPI = "/api/JobService/Jobs(%d)"
+	// CatalogFirmwareAPI gets the list of catalog firmware
+	CatalogFirmwareAPI = "/api/UpdateService/Catalogs"
 )
 
 // Messages constants
