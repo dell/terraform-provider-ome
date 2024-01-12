@@ -51,6 +51,7 @@ var ShareIP = os.Getenv("SHAREIP")
 var DeviceIP1 = os.Getenv("DEVICEIP1")
 var DeviceIP2 = os.Getenv("DEVICEIP2")
 var Catalog1 = setDefault(os.Getenv("CATALOG1"), "tfacc_catalog_dell_online_1")
+var Repository = setDefault(os.Getenv("REPOSITORY"), "tfacc_catalog_dell_online_1")
 
 // Device Model to be used in DS test
 // Must have multiple devices of this model
