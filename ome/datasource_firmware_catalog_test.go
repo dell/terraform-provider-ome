@@ -22,7 +22,7 @@ import (
 	"testing"
 
 	. "github.com/bytedance/mockey"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestDataSource_FirmwareCatalogRead(t *testing.T) {

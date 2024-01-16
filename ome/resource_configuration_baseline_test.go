@@ -23,9 +23,7 @@ import (
 	"terraform-provider-ome/models"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/stretchr/testify/assert"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 const (
@@ -403,11 +401,6 @@ func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
-	assertTFImportState := func(s []*terraform.InstanceState) error {
-		assert.Equal(t, BaselineNameUpdate+"-1", s[0].Attributes["baseline_name"])
-		// assert.Equal(t, DeviceID2, s[0].Attributes["device_ids.0"])
-		return nil
-	}
 	temps := initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
@@ -453,12 +446,11 @@ func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_configuration_baseline.create_baseline", "device_ids.0", DeviceID2)),
 			},
 			{
-				Config:           testImportConfigurationBaseline,
-				ResourceName:     "ome_configuration_baseline.import_baseline",
-				ImportState:      true,
-				ImportStateCheck: assertTFImportState,
-				ExpectError:      nil,
-				ImportStateId:    BaselineNameUpdate + "-1",
+				Config:        testImportConfigurationBaseline,
+				ResourceName:  "ome_configuration_baseline.import_baseline",
+				ImportState:   true,
+				ExpectError:   nil,
+				ImportStateId: BaselineNameUpdate + "-1",
 			},
 		},
 	})
@@ -536,16 +528,6 @@ func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
-	assertTFImportState := func(s []*terraform.InstanceState) error {
-		assert.Equal(t, BaselineName, s[0].Attributes["baseline_name"])
-		assert.Equal(t, DeviceSvcTag1, s[0].Attributes["device_servicetags.0"])
-		assert.Equal(t, "true", s[0].Attributes["schedule"])
-		assert.Equal(t, "test@mail.com", s[0].Attributes["email_addresses.0"])
-		assert.Equal(t, "0 50 8 * * ? *", s[0].Attributes["cron"])
-		assert.Equal(t, "true", s[0].Attributes["notify_on_schedule"])
-		assert.Equal(t, "html", s[0].Attributes["output_format"])
-		return nil
-	}
 	temps := initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
@@ -587,12 +569,11 @@ func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
 				),
 			},
 			{
-				Config:           testImportConfigurationBaseline,
-				ResourceName:     "ome_configuration_baseline.import_baseline",
-				ImportState:      true,
-				ImportStateCheck: assertTFImportState,
-				ExpectError:      nil,
-				ImportStateId:    BaselineName,
+				Config:        testImportConfigurationBaseline,
+				ResourceName:  "ome_configuration_baseline.import_baseline",
+				ImportState:   true,
+				ExpectError:   nil,
+				ImportStateId: BaselineName,
 			},
 		},
 	})

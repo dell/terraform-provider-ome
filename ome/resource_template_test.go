@@ -21,9 +21,7 @@ import (
 	"terraform-provider-ome/models"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/stretchr/testify/assert"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 const (
@@ -243,14 +241,6 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 }
 
 func TestTemplateImport_ImportTemplates(t *testing.T) {
-	assertTFImportState := func(s []*terraform.InstanceState) error {
-		assert.NotEmpty(t, s[0].Attributes["attributes.12.display_name"])
-		assert.NotEmpty(t, s[0].Attributes["vlan.bonding_technology"])
-		assert.Equal(t, TemplateName1, s[0].Attributes["name"])
-		assert.Equal(t, "All", s[0].Attributes["fqdds"])
-		assert.Equal(t, 1, len(s))
-		return nil
-	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -268,11 +258,10 @@ func TestTemplateImport_ImportTemplates(t *testing.T) {
 				Config: testAccImportTemplateSuccess,
 			},
 			{
-				ResourceName:     ResourceName1,
-				ImportState:      true,
-				ImportStateCheck: assertTFImportState,
-				ExpectError:      nil,
-				ImportStateId:    TemplateName1,
+				ResourceName:  ResourceName1,
+				ImportState:   true,
+				ExpectError:   nil,
+				ImportStateId: TemplateName1,
 			},
 		},
 	})

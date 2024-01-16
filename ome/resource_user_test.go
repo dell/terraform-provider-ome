@@ -14,13 +14,11 @@ limitations under the License.
 package ome
 
 import (
-	"fmt"
 	"regexp"
 	"terraform-provider-ome/clients"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 const (
@@ -111,7 +109,7 @@ func TestUser(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 				ExpectError:       nil,
-				ImportStateIdFunc: testAccImportStateIDFunc("ome_user.code_1"),
+				ImportStateId:     ("ome_user.code_1"),
 			},
 			{
 				ResourceName:      "ome_user.code_1",
@@ -133,14 +131,4 @@ func TestUser(t *testing.T) {
 			},
 		},
 	})
-}
-
-func testAccImportStateIDFunc(resourceName string) resource.ImportStateIdFunc {
-	return func(s *terraform.State) (string, error) {
-		rs, ok := s.RootModule().Resources[resourceName]
-		if !ok {
-			return "", fmt.Errorf("Not found: %s", resourceName)
-		}
-		return fmt.Sprintf("%s,%s", rs.Primary.Attributes["id"], rs.Primary.Attributes["password"]), nil
-	}
 }

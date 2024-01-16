@@ -7,8 +7,7 @@ import (
 	"terraform-provider-ome/clients"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccDevicesRes(t *testing.T) {
@@ -216,12 +215,9 @@ func TestAccDevicesResUnk(t *testing.T) {
 				),
 			},
 			{
-				Config:       testAccCreateDevicesResSuccess,
-				ImportState:  true,
-				ResourceName: "ome_devices.code_1",
-				ImportStateIdFunc: func(*terraform.State) (string, error) {
-					return "", nil
-				},
+				Config:            testAccCreateDevicesResSuccess,
+				ImportState:       true,
+				ResourceName:      "ome_devices.code_1",
 				ImportStateVerify: true,
 			},
 		},

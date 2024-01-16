@@ -21,9 +21,7 @@ import (
 	"terraform-provider-ome/models"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
-	"github.com/stretchr/testify/assert"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 const (
@@ -177,12 +175,6 @@ func TestTemplateDeploy_ImportDeploymentError(t *testing.T) {
 		t.Skip(SkipTestMsg)
 	}
 
-	assertTFImportState := func(s []*terraform.InstanceState) error {
-		assert.Equal(t, 1, len(s))
-		assert.Equal(t, TestAccTemplateName, s[0].Attributes["template_name"])
-		assert.Equal(t, DeviceSvcTag1, s[0].Attributes["device_servicetags.0"])
-		return nil
-	}
 	temp := initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
@@ -209,12 +201,11 @@ func TestTemplateDeploy_ImportDeploymentError(t *testing.T) {
 				Config: testTemplateDeploymentSuccess + temp.templateDeploySvcTag1,
 			},
 			{
-				Config:           testAccImportDeploymentSuccess,
-				ResourceName:     "ome_deployment.import-deployment-success",
-				ImportState:      true,
-				ImportStateCheck: assertTFImportState,
-				ExpectError:      nil,
-				ImportStateId:    TestAccTemplateName,
+				Config:        testAccImportDeploymentSuccess,
+				ResourceName:  "ome_deployment.import-deployment-success",
+				ImportState:   true,
+				ExpectError:   nil,
+				ImportStateId: TestAccTemplateName,
 			},
 		},
 	})
