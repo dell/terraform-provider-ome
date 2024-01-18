@@ -15,6 +15,7 @@ package ome
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -470,7 +471,7 @@ func (r *resourceTemplate) Create(ctx context.Context, req resource.CreateReques
 
 	tflog.Trace(ctx, "resource_template create: fetching template attributes")
 
-	omeAttributes, err := omeClient.GetTemplateAttributes(omeTemplateData.ID, []models.Attribute{}, true)
+	omeAttributes, err := r.getTemplateAttributes(omeClient, omeTemplateData.ID, []models.Attribute{})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrCreateTemplate,
@@ -546,6 +547,34 @@ func (r *resourceTemplate) Create(ctx context.Context, req resource.CreateReques
 
 }
 
+// getTemplateAttributes gets the template attributes in order of existing reference list
+func (r *resourceTemplate) getTemplateAttributes(omeClient *clients.Client, templateID int64, refAttributes []models.Attribute) ([]models.OmeAttribute, error) {
+	omeAttributes, err := omeClient.GetTemplateAttributes(templateID, nil, true)
+	if err != nil {
+		return nil, fmt.Errorf("unable to refresh template attributes: %w", err)
+	}
+	// create a map of display name to omeAttribute
+	attrMap := make(map[string]models.OmeAttribute, len(omeAttributes))
+	for _, attr := range omeAttributes {
+		attrMap[attr.DisplayName] = attr
+	}
+
+	// loop of state attributes and add corresponding response attribute to the list in order
+	// remove found attributes from map
+	var omeAttributesOrdered []models.OmeAttribute
+	for _, attr := range refAttributes {
+		if val, ok := attrMap[attr.DisplayName.ValueString()]; ok {
+			omeAttributesOrdered = append(omeAttributesOrdered, val)
+			delete(attrMap, attr.DisplayName.ValueString())
+		}
+	}
+	// loop over remaining items of the map and add them to the list
+	for _, attr := range attrMap {
+		omeAttributesOrdered = append(omeAttributesOrdered, attr)
+	}
+	return omeAttributesOrdered, nil
+}
+
 // Read resource information
 func (r *resourceTemplate) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	tflog.Trace(ctx, "resource_template read: started")
@@ -589,11 +618,11 @@ func (r *resourceTemplate) Read(ctx context.Context, req resource.ReadRequest, r
 
 	tflog.Trace(ctx, "resource_template read: fetching template attributes")
 
-	omeAttributes, err := omeClient.GetTemplateAttributes(templateID, stateAttributes, true)
+	omeAttributes, err := r.getTemplateAttributes(omeClient, templateID, stateAttributes)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrReadTemplate,
-			fmt.Sprintf("Unable to refresh template attributes: %s", err.Error()),
+			err.Error(),
 		)
 		return
 	}
@@ -675,6 +704,11 @@ func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
+	stateAttributes := getTfsdkStateAttributes(ctx, stateTemplate)
+	planAttributes := getTfsdkStateAttributes(ctx, planTemplate)
+	// check what has changed and
+	da, _ := getDeltaAttributes(ctx, planAttributes, stateAttributes)
+
 	//Create Session and defer the remove session
 	omeClient, d := r.p.createOMESession(ctx, "resource_template Update")
 	resp.Diagnostics.Append(d...)
@@ -724,13 +758,9 @@ func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest
 		updatePayload.Description = planTemplate.Description.ValueString()
 	}
 
-	stateAttributes := getTfsdkStateAttributes(ctx, stateTemplate)
-	// Terraform compares the list elements based on order, hence it is expected that the practitioner gives all attributes
-	// along with the attribute for which modification is expected.
-	da, _ := getDeltaAttributes(ctx, planTemplate, stateAttributes)
-
 	tflog.Trace(ctx, "resource_template update: finished fetching delta attributes")
 
+	// if there are any delta attributes, add them to update payload
 	if len(da) != 0 {
 		tflog.Info(ctx, "resource_template update: delta attributes exists")
 		updatePayload.Attributes = da
@@ -838,11 +868,11 @@ func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest
 
 	tflog.Trace(ctx, "resource_template update: fetching template attributes")
 
-	omeAttributes, err := omeClient.GetTemplateAttributes(templateID, stateAttributes, true)
+	omeAttributes, err := r.getTemplateAttributes(omeClient, templateID, planAttributes)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrUpdateTemplate,
-			fmt.Sprintf("unable to refresh template attributes: %s", err.Error()),
+			err.Error(),
 		)
 		return
 	}
@@ -966,11 +996,11 @@ func (r resourceTemplate) ImportState(ctx context.Context, req resource.ImportSt
 		return
 	}
 
-	omeAttributes, err := omeClient.GetTemplateAttributes(omeTemplateData.ID, []models.Attribute{}, true)
+	omeAttributes, err := r.getTemplateAttributes(omeClient, omeTemplateData.ID, []models.Attribute{})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			clients.ErrImportTemplate,
-			fmt.Sprintf("unable to get template attributes: %s", err.Error()),
+			err.Error(),
 		)
 		return
 	}
@@ -1231,32 +1261,44 @@ func getDeltaVlan(ctx context.Context, planVlan, stateVlan models.OMEVlan) model
 	return deltaVlan
 }
 
-func getDeltaAttributes(ctx context.Context, planTemplate models.Template, stateAttributes []models.Attribute) ([]models.UpdateAttribute, error) {
-	updatedAttributes := []models.UpdateAttribute{}
+func getDeltaAttributes(ctx context.Context, planUpdateAttributes []models.Attribute, stateAttributes []models.Attribute) ([]models.UpdateAttribute, error) {
+	var updatedAttributes []models.UpdateAttribute
+	var err error
 
-	planUpdateAttributes := []models.Attribute{}
-	planUpdateAttributeObjects := []types.Object{}
-	planTemplate.Attributes.ElementsAs(ctx, &planUpdateAttributeObjects, true)
-
-	for _, planUpdateAttrObject := range planUpdateAttributeObjects {
-		planUpdateAttribute := models.Attribute{}
-		planUpdateAttrObject.As(ctx, &planUpdateAttribute, basetypes.ObjectAsOptions{UnhandledNullAsEmpty: true})
-		planUpdateAttributes = append(planUpdateAttributes, planUpdateAttribute)
+	if len(planUpdateAttributes) == 0 {
+		return updatedAttributes, nil
 	}
-	if !reflect.DeepEqual(planUpdateAttributes, stateAttributes) {
-		for index, attribute := range planUpdateAttributes {
-			if attribute.Value != stateAttributes[index].Value {
-				updateAttribute := models.UpdateAttribute{
-					ID:        attribute.AttributeID.ValueInt64(),
-					IsIgnored: attribute.IsIgnored.ValueBool(),
-					Value:     attribute.Value.ValueString(),
-				}
-				updatedAttributes = append(updatedAttributes, updateAttribute)
+
+	// create map of plan attributes keyed by the display name
+	planAttributesMap := make(map[string]models.Attribute)
+	for _, planAttr := range planUpdateAttributes {
+		planAttributesMap[planAttr.DisplayName.ValueString()] = planAttr
+	}
+
+	// loop over state to see which values have changed
+	for _, stateAttr := range stateAttributes {
+		name := stateAttr.DisplayName.ValueString()
+		if planAttr, ok := planAttributesMap[name]; ok {
+			updateAttribute := models.UpdateAttribute{
+				ID:        stateAttr.AttributeID.ValueInt64(),
+				IsIgnored: planAttr.IsIgnored.ValueBool(),
+				Value:     stateAttr.Value.ValueString(),
 			}
+			updatedAttributes = append(updatedAttributes, updateAttribute)
+			// delete processed attribute from plan
+			delete(planAttributesMap, name)
+		} else {
+			// add error that the attribute does not exist
+			errors.Join(err, fmt.Errorf("attribute %s (given in plan) does not exist in state", name))
 		}
 	}
 
-	return updatedAttributes, nil
+	// loop over leftover plan items add them as errors
+	for _, planAttr := range planAttributesMap {
+		errors.Join(err, fmt.Errorf("attribute %s (given in plan) is not in state", planAttr.DisplayName.ValueString()))
+	}
+
+	return updatedAttributes, err
 }
 
 func updateState(stateTemplate *models.Template, planVlanAttributes []models.VlanAttributes, omeTemplateData *models.OMETemplate, omeTemplateAttributes []models.OmeAttribute, omeVlan models.OMEVlan) {

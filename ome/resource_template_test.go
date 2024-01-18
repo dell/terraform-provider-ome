@@ -82,6 +82,11 @@ func init() {
 
 func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 
+	t.Log("Create")
+	t.Log(testAccCreateTemplateSuccess)
+	t.Log("Update")
+	t.Log(testAccUpdateTemplateSuccess)
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -128,6 +133,118 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 		},
 	})
 }
+
+/*
+root@lglap049:~/terraform-provider-ome# go test ./ome -v -run TestTemplateCreation_CreateAndUpdateTemplateSuccess
+=== RUN   TestTemplateCreation_CreateAndUpdateTemplateSuccess
+    resource_template_test.go:85: Create
+    resource_template_test.go:86:
+                provider "ome" {
+                        username = "admin"
+                        password = "Password123!"
+                        host = "10.225.105.1"
+                        skipssl = true
+                }
+
+                resource "ome_template" "terraform-acceptance-test-1" {
+                        name = "test_acc_template-1"
+                        refdevice_servicetag = "HRPB0M3"
+                        fqdds = "iDRAC,niC"
+                }
+
+                resource "ome_template" "terraform-acceptance-test-2" {
+                        name = "test_acc_template-2"
+                        refdevice_id = 24341
+                        description = "This is sample description"
+                        job_retry_count  = 10
+                        sleep_interval = 60
+                }
+
+    resource_template_test.go:87: Update
+    resource_template_test.go:88:
+                provider "ome" {
+                        username = "admin"
+                        password = "Password123!"
+                        host = "10.225.105.1"
+                        skipssl = true
+                }
+
+                data "ome_template_info" "template_data" {
+                        name = "test_acc_template-1"
+                        id = 0
+                }
+
+                data "ome_vlannetworks_info" "vlans" {
+                }
+
+
+                resource "ome_template" "terraform-acceptance-test-1" {
+                        name = "test_acc_template-1"
+                        refdevice_servicetag = "HRPB0M3"
+                        attributes = local.template_attributes
+                        description = "This is a test template"
+                        fqdds = "iDRAC,niC"
+                        identity_pool_name   = "IO1"
+                        vlan = {
+                                propogate_vlan = true
+                                bonding_technology = "NoTeaming"
+                                vlan_attributes = local.vlan_attributes
+                        }
+                }
+
+                resource "ome_template" "terraform-acceptance-test-2" {
+                        name = "test_acc_template-2"
+                        refdevice_id = 24341
+                        job_retry_count  = 10
+                        sleep_interval = 60
+                }
+
+
+                locals {
+                        attributes_value = tomap({
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 Initiator Persistence Policy": "WarmReset, ColdReset, ACPowerLoss"
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 Storage Target Persistence Policy": "WarmReset, ColdReset, ACPowerLoss"
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Auxiliary Powered": "WarmReset, ColdReset, ACPowerLoss"
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Non Auxiliary Powered": "WarmReset, ColdReset, ACPowerLoss"
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 IOIDOpt Enable" : "Enabled"
+                          "iDRAC,Time Zone Configuration Information,Time 1 Time Zone String": "IST"
+                        })
+                        attributes_is_ignored = tomap({
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 Initiator Persistence Policy": false
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 Storage Target Persistence Policy": false
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Auxiliary Powered": false
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 Virtual Address Persistence Policy Non Auxiliary Powered": false
+                          "iDRAC,IO Identity Optimization,IOIDOpt 1 IOIDOpt Enable" : false
+
+                        })
+
+                        template_attributes = data.ome_template_info.template_data.attributes != null ? [
+                          for attr in data.ome_template_info.template_data.attributes : tomap({
+                                attribute_id = attr.attribute_id
+                                is_ignored   = lookup(local.attributes_is_ignored, attr.display_name, attr.is_ignored)
+                                display_name = attr.display_name
+                                value        = lookup(local.attributes_value, attr.display_name, attr.value)
+                        })] : null
+
+                        vlan_network_map = {for vlan_network in  data.ome_vlannetworks_info.vlans.vlan_networks : vlan_network.name => vlan_network.vlan_id}
+
+                        vlan_attributes_to_change = tomap({
+                                "Integrated NIC 1 - 1": lookup(local.vlan_network_map, "VLAN1", 0)
+                                "Integrated NIC 1 - 3": lookup(local.vlan_network_map, "VLAN1", 0)
+                        })
+                        vlan_attributes = [ for attr in data.ome_template_info.template_data.vlan.vlan_attributes : {
+                                is_nic_bonded = attr.is_nic_bonded
+                                nic_identifier   = attr.nic_identifier
+                                port = attr.port
+                                tagged_networks = attr.tagged_networks
+                                untagged_network        = lookup(local.vlan_attributes_to_change, "${attr.nic_identifier} - ${attr.port}", attr.untagged_network)
+                        }]
+                  }
+
+--- PASS: TestTemplateCreation_CreateAndUpdateTemplateSuccess (0.00s)
+PASS
+ok      terraform-provider-ome/ome      0.033s
+*/
 
 // The identity pool and Vlans does not get cloned into the new template in OME.
 func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
