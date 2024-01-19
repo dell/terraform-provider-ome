@@ -234,6 +234,7 @@ func (p *omeProvider) DataSources(ctx context.Context) []func() datasource.DataS
 		NewDeviceDatasource,
 		NewAppCertDataSource,
 		NewFirmwareCatalogDataSource,
+		NewFirmwareBaselineComplianceRepositoryDatasource,
 	}
 }
 
