@@ -137,6 +137,10 @@ const (
 	CatalogFirmwareSpecificAPI = "/api/UpdateService/Catalogs(%d)"
 	// DeleteFirmwareCatalogAPI deletes a catalog firmware
 	DeleteFirmwareCatalogAPI = "/api/UpdateService/Actions/UpdateService.RemoveCatalogs"
+	//FwBaselineComplianceReportsAPI - api to fetch baseline firmware baseline compliance report
+	FwBaselineComplianceReportsAPI = "/api/UpdateService/Baselines(%d)/DeviceComplianceReports"
+	//FwUpdateServiceBaselineAPI - api to fetch baselines
+	FwUpdateServiceBaselineAPI = "/api/UpdateService/Baselines"
 )
 
 // Messages constants
@@ -300,6 +304,7 @@ const (
 	ErrGnrDeleteDiscovery = "error deleting a discovery"
 	// ErrDiscoveryJobIsRunning - device capablity
 	ErrDiscoveryJobIsRunning = "job with id %d is already running please wait for sometime and try again"
+	ErrFwBaselineReport      = "device compliance reports not found for baseline %d with given filter"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job

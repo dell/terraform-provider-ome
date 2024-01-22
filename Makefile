@@ -85,3 +85,6 @@ cover:
 
 sweep :
 	go test -v ./ome -timeout 5h -sweep=all
+
+format:
+	gofmt -s -w .	
