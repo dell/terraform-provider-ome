@@ -86,13 +86,22 @@ func (g *firmwareBaselineComplianceRepositoryDatasource) Read(ctx context.Contex
 		return
 	}
 	var repos []models.RepositoryModel
+	var filterErr error
 
 	if len(plan.Names) == 0 {
 		// get all Repositories
 		repos = repositories
 	} else {
 		// get filtered Repositories
-		repos = helper.GetFilteredRepositoriesByName(ctx, repositories, plan)
+		repos, filterErr = helper.GetFilteredRepositoriesByName(ctx, repositories, plan)
+	}
+
+	if filterErr != nil {
+		resp.Diagnostics.AddError(
+			"Error Filtering Repositories",
+			filterErr.Error(),
+		)
+		return
 	}
 
 	vals := make([]models.CatalogRepository, 0)

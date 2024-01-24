@@ -40,7 +40,7 @@ func GetAllRepositories(client *clients.Client) ([]models.RepositoryModel, error
 }
 
 // GetFilteredRepositoriesByName get all FBC Repositories by name
-func GetFilteredRepositoriesByName(context context.Context, repos []models.RepositoryModel, plan models.OMERepositoryData) []models.RepositoryModel {
+func GetFilteredRepositoriesByName(context context.Context, repos []models.RepositoryModel, plan models.OMERepositoryData) ([]models.RepositoryModel, error) {
 	var filteredArray []models.RepositoryModel
 	var repoNames []string
 
@@ -53,5 +53,9 @@ func GetFilteredRepositoriesByName(context context.Context, repos []models.Repos
 		}
 	}
 
-	return filteredArray
+	if len(repoNames) != 0 && len(filteredArray) != len(repoNames) {
+		return nil, fmt.Errorf("one of the filtered names (%s) does not exist in the list of repositories", repoNames)
+	}
+
+	return filteredArray, nil
 }

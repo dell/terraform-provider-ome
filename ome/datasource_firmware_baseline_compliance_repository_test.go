@@ -41,7 +41,7 @@ func TestDataSource_Fbc_Repository_Read(t *testing.T) {
 					resource.TestCheckOutput("fbc-repository", "true"),
 				),
 			},
-			// Empty Filter so should return all values
+			// Empty Filter should show error
 			{
 				Config:      filterReposEmptyFilter,
 				ExpectError: regexp.MustCompile(`.*Attribute names set must contain at least 1 elements.*`),

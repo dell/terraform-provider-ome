@@ -87,10 +87,8 @@ func (g *firmwareCatalogDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 	var filteredNames []string
-	diags := plan.Names.ElementsAs(ctx, &filteredNames, true)
-	if diags.HasError() {
-		resp.Diagnostics.Append(diags...)
-		return
+	for _, sv := range plan.Names {
+		filteredNames = append(filteredNames, sv.ValueString())
 	}
 
 	vals, filterErr := helper.FilterCatalogFirmware(ctx, filteredNames, cat)

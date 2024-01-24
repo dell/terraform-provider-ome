@@ -14,7 +14,7 @@ limitations under the License.
 terraform {
   required_providers {
     ome = {
-      source  = "registry.terraform.io/dell/ome"
+      source = "registry.terraform.io/dell/ome"
     }
   }
 }
