@@ -43,14 +43,10 @@ func TestDataSource_FirmwareCatalogRead(t *testing.T) {
 					resource.TestCheckOutput("fetched_one", "false"),
 				),
 			},
-			// Empty Filter so should return all values
+			// Empty Filter should return error
 			{
-				Config: firmwareCatAllEmptyNameFilter + outputs,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckOutput("fetched_any", "true"),
-					resource.TestCheckOutput("fetched_many", "true"),
-					resource.TestCheckOutput("fetched_one", "false"),
-				),
+				Config:      firmwareCatAllEmptyNameFilter + outputs,
+				ExpectError: regexp.MustCompile(`.*Invalid Attribute Value*.`),
 			},
 			// Using the name filter
 			{

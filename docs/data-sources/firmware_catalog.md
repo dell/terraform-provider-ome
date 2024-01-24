@@ -45,8 +45,8 @@ limitations under the License.
 # Get details of all the firmware catalogs 
 data "ome_firmware_catalog" "data-catalog" {
   # Can filter based on the catalog name
-  # If empty then all catalogs are returned
-  # If invalid name is set that will be ignored
+  # If at least one of the filtered names is invalid, the terraform command will return an error
+  # If you want to get all catalogs remove the names filter completely
   names = ["example_catalog_1", "example_catalog_2"]
 }
 
@@ -60,7 +60,7 @@ output "data-catalog" {
 
 ### Optional
 
-- `names` (List of String) A list of catalog names which can filter the datasource, if blank will return all catalogs.
+- `names` (Set of String) A list of catalog names which can filter the datasource
 
 ### Read-Only
 

@@ -15,6 +15,7 @@ package helper
 
 import (
 	"context"
+	"fmt"
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 	"terraform-provider-ome/utils"
@@ -37,6 +38,10 @@ func FilterCatalogFirmware(ctx context.Context, filterElements []string, cat *mo
 			}
 			vals = append(vals, val)
 		}
+	}
+
+	if len(filterElements) != 0 && len(filterElements) != len(vals) {
+		return nil, fmt.Errorf("one of the filtered names (%s) does not exist in the list of catalogs", filterElements)
 	}
 
 	return vals, nil

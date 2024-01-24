@@ -106,7 +106,7 @@ type RepositoryModel struct {
 type OMECatalogData struct {
 	ID      types.Int64           `tfsdk:"id"`
 	Catalog []OmeSigleCatalogData `tfsdk:"firmware_catalogs"`
-	Names   types.List            `tfsdk:"names"`
+	Names   []types.String        `tfsdk:"names"`
 }
 
 // OmeSigleCatalogData represents the OME Firmware Catalog

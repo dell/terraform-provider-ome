@@ -14,7 +14,10 @@ limitations under the License.
 package ome
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -31,11 +34,17 @@ func omeFirmwareCatalogDataSchema() map[string]schema.Attribute {
 			Computed:            true,
 			NestedObject:        schema.NestedAttributeObject{Attributes: omeSingleCatalogFirmwareDataSchema()},
 		},
-		"names": schema.ListAttribute{
-			MarkdownDescription: "A list of catalog names which can filter the datasource, if blank will return all catalogs.",
-			Description:         "A list of catalog names which can filter the datasource, if blank will return all catalogs.",
+		"names": schema.SetAttribute{
+			MarkdownDescription: "A list of catalog names which can filter the datasource",
+			Description:         "A list of catalog names which can filter the datasource",
 			Optional:            true,
 			ElementType:         types.StringType,
+			Validators: []validator.Set{
+				setvalidator.SizeAtLeast(1),
+				setvalidator.ValueStringsAre(
+					stringvalidator.LengthAtLeast(1),
+				),
+			},
 		},
 	}
 }
