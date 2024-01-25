@@ -71,10 +71,10 @@ type CatalogsModel struct {
 // ScheduleModel - model for schedule response
 type ScheduleModel struct {
 	Cron      string `json:"Cron"`
-	EndTime   string `json:"EndTime"`
-	RunLater  bool   `json:"RunLater"`
-	RunNow    bool   `json:"RunNow"`
-	StartTime string `json:"StartTime"`
+	EndTime   string `json:"EndTime,omitempty"`
+	RunLater  bool   `json:"RunLater,omitempty"`
+	RunNow    bool   `json:"RunNow,omitempty"`
+	StartTime string `json:"StartTime,omitempty"`
 }
 
 // RepositoryModel - model for repository response
@@ -129,6 +129,47 @@ type OmeSigleCatalogData struct {
 	SourcePath            types.String          `tfsdk:"source_path"`
 	Status                types.String          `tfsdk:"status"`
 	TaskID                types.Int64           `tfsdk:"task_id"`
+}
+
+// OmeSingleCatalogResource - model for catalog resource response
+type OmeSingleCatalogResource struct {
+	// This part is used to create an update the catalog
+	Name                   types.String           `tfsdk:"name"`
+	CatalogUpdateType      types.String           `tfsdk:"catalog_update_type"`
+	ShareType              types.String           `tfsdk:"share_type"`
+	CatalogRefreshSchedule CatalogRefreshSchedule `tfsdk:"catalog_refresh_schedule"`
+	ShareAddress           types.String           `tfsdk:"share_address"`
+	CatalogFilePath        types.String           `tfsdk:"catalog_file_path"`
+	Domain                 types.String           `tfsdk:"domain"`
+	CatalogUser            types.String           `tfsdk:"catalog_user"`
+	CatalogPassword        types.String           `tfsdk:"catalog_password"`
+
+	// These are the read only resources of the catalog
+	AssociatedBaselines   types.List   `tfsdk:"associated_baselines"`
+	BaseLocation          types.String `tfsdk:"baseline_location"`
+	BundlesCount          types.Int64  `tfsdk:"bundles_count"`
+	CreatedDate           types.String `tfsdk:"create_date"`
+	Filename              types.String `tfsdk:"filename"`
+	ID                    types.Int64  `tfsdk:"id"`
+	LastUpdated           types.String `tfsdk:"last_update"`
+	ManifestIdentifier    types.String `tfsdk:"manifest_identifier"`
+	ManifestVersion       types.String `tfsdk:"manifest_version"`
+	NextUpdate            types.String `tfsdk:"next_update"`
+	OwnerID               types.Int64  `tfsdk:"owner_id"`
+	PredecessorIdentifier types.String `tfsdk:"predcessor_identifier"`
+	ReleaseIdentifier     types.String `tfsdk:"release_identifier"`
+	Repository            types.Object `tfsdk:"repository"`
+	SourcePath            types.String `tfsdk:"source_path"`
+	Status                types.String `tfsdk:"status"`
+	TaskID                types.Int64  `tfsdk:"task_id"`
+}
+
+// CatalogRefreshSchedule - model for catalog refresh schedule
+type CatalogRefreshSchedule struct {
+	Cadence      types.String `tfsdk:"cadence"`
+	DayOfTheWeek types.String `tfsdk:"day_of_the_week"`
+	TimeOfDay    types.Int64  `tfsdk:"time_of_day"`
+	AmPm         types.String `tfsdk:"am_pm"`
 }
 
 // ScheduleCatalog - model for schedule tf

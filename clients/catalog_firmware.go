@@ -14,6 +14,7 @@ limitations under the License.
 package clients
 
 import (
+	"fmt"
 	"terraform-provider-ome/models"
 )
 
@@ -24,4 +25,60 @@ func (c *Client) GetAllCatalogFirmware() (*models.Catalogs, error) {
 		URL: CatalogFirmwareAPI,
 	}, &response.Value)
 	return &response, err
+}
+
+// GetSpecificCatalogFirmware - Get specific catalog firmware
+func (c *Client) GetSpecificCatalogFirmware(id int64) (models.CatalogsModel, error) {
+	catalog := models.CatalogsModel{}
+	resp, err := c.Get(fmt.Sprintf(CatalogFirmwareSpecificAPI, id), nil, nil)
+	if err != nil {
+		return catalog, err
+	}
+	bodyData, _ := c.GetBodyData(resp.Body)
+	err = c.JSONUnMarshal(bodyData, &catalog)
+	if err != nil {
+		err = fmt.Errorf(ErrInvalidFirmwareCatalogIdentifiers+" %w", err)
+	}
+	return catalog, err
+}
+
+// CreateCatalogFirmware - Create catalog firmware
+func (c *Client) CreateCatalogFirmware(payload models.CatalogsModel) (models.CatalogsModel, error) {
+	data, _ := c.JSONMarshal(payload)
+	response, err := c.Post(CatalogFirmwareAPI, nil, data)
+	var returnVal = models.CatalogsModel{}
+	if err != nil {
+		return returnVal, err
+	}
+	bodyData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshal(bodyData, &returnVal)
+	return returnVal, err
+}
+
+// DeleteCatalogFirmware - Deletes firmware catalogs
+func (c *Client) DeleteCatalogFirmware(ids []int64) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	bodyv := map[string]any{"CatalogIds": ids}
+	body, errb := c.JSONMarshal(bodyv)
+	if errb != nil {
+		return errb
+	}
+	_, err := c.Post(DeleteFirmwareCatalogAPI, nil, body)
+	return err
+}
+
+// UpdateCatalogFirmware - Update firmware catalog details
+func (c *Client) UpdateCatalogFirmware(id int64, payload models.CatalogsModel) (models.CatalogsModel, error) {
+	data, _ := c.JSONMarshal(payload)
+	response, err := c.Put(fmt.Sprintf(CatalogFirmwareSpecificAPI, id), nil, data)
+	var returnVal = models.CatalogsModel{}
+	if err != nil {
+		return returnVal, err
+	}
+
+	bodyData, _ := c.GetBodyData(response.Body)
+	err = c.JSONUnMarshal(bodyData, &returnVal)
+	return returnVal, err
 }
