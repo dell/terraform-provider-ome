@@ -63,7 +63,7 @@ func (c *Client) GetFwBaselineComplianceReport(ctx context.Context, baseLineID i
 // the retrieval process.
 func (c *Client) GetUpdateServiceBaselineIDByName(name string) (int64, error) {
 	baseLines := models.BaseLineModel{}
-	resp, err := c.Get(FwUpdateServiceBaselineAPI, nil, nil)
+	resp, err := c.Get(FirmwareBaselineAPI, nil, nil)
 	if err != nil {
 		return -1, err
 	}

@@ -1,4 +1,4 @@
-package ome
+package helper
 
 import (
 	"context"
@@ -24,6 +24,20 @@ const (
 	Stopped = 2102
 	// Cancelled to get job cancel status
 	Cancelled = 2103
+	// NotRun to get job not run status
+	NotRun = 2200
+	// Paused to get job pause status
+	Paused = 2101
+	// New to get job new status
+	New = 2080
+	// Running to get job running status
+	Running = 2050
+	// Starting to get job starting status
+	Starting = 2040
+	// Queued to get job queued status
+	Queued = 2030
+	// Scheduled to get job scheduled status
+	Scheduled = 2020
 )
 
 // JobRunner to construct the job data and method for job runs.
@@ -171,4 +185,29 @@ func NetworkJobRunner(ctx context.Context, omeClient *clients.Client, jobID int6
 		return err
 	}
 	return nil
+}
+
+// GetJobStatus to get the job status from job status id.
+func GetJobStatus(jobStatusID int64) string {
+	statusMap := map[int64]string{
+		Running:              "Running",
+		CompletedWithSuccess: "Completed",
+		CompletedWithError:   "Warning",
+		Aborted:              "Aborted",
+		Stopped:              "Stopped",
+		Cancelled:            "Cancelled",
+		NotRun:               "Not Run",
+		Paused:               "Paused",
+		Failed:               "Failed",
+		Queued:               "Queued",
+		Scheduled:            "Scheduled",
+		Starting:             "Starting",
+		New:                  "New",
+	}
+
+	if status, ok := statusMap[jobStatusID]; ok {
+		return status
+	}
+
+	return "Unknown"
 }

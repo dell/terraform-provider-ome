@@ -12,15 +12,15 @@ limitations under the License.
 */
 
 # Get details of all the firmware repositories 
-data "ome_fbc_repository" "fbc-repository-all" {
+data "ome_firmware_repository" "fbc-repository-all" {
 
 }
 output "fbc-repository" {
-  value = data.ome_fbc_repository.fbc-repository-all
+  value = data.ome_firmware_repository.fbc-repository-all
 }
 
 # Get filtered Repositories
-# data "ome_fbc_repository" "fbc-repository-name-filter" {
+# data "ome_firmware_repository" "firmware-repository-name-filter" {
 #        # If names filter is added, it should atleast have one name.Otherwise you will see an error.
 #        # If you do not want to filter and get all repositories then do not pass the name filter(Above configuration)
 #         names = [
@@ -29,5 +29,5 @@ output "fbc-repository" {
 #         ]
 # }
 # output "fbc-repository-name" {
-#   value = data.ome_fbc_repository.fbc-repository-name-filter
+#   value = data.ome_firmware_repository.firmware-repository-name-filter
 # }

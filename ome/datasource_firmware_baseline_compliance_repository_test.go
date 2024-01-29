@@ -50,7 +50,7 @@ func TestDataSource_Fbc_Repository_Read(t *testing.T) {
 			{
 				Config: filterRepos,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.ome_fbc_repository.fbc-repository-name-filter", "fbc_repositories.#", "1"),
+					resource.TestCheckResourceAttr("data.ome_firmware_repository.fbc-repository-name-filter", "fbc_repositories.#", "1"),
 				),
 			},
 			// Error getting FBC Repositories
@@ -77,22 +77,22 @@ func TestDataSource_Fbc_Repository_Read(t *testing.T) {
 }
 
 var allRepos = testProvider + `
-	data "ome_fbc_repository" "fbc-repository-all" {
+	data "ome_firmware_repository" "fbc-repository-all" {
 	}
 	output "fbc-repository" {
-		value = length(data.ome_fbc_repository.fbc-repository-all.fbc_repositories) != 0
+		value = length(data.ome_firmware_repository.fbc-repository-all.fbc_repositories) != 0
 	}
 `
 var filterRepos = testProvider + `
-	data "ome_fbc_repository" "fbc-repository-name-filter" {
+	data "ome_firmware_repository" "fbc-repository-name-filter" {
 			names = ["` + Repository + `"]
 	}
 	output "fbc-repository-name"{
-		value = data.ome_fbc_repository.fbc-repository-name-filter
+		value = data.ome_firmware_repository.fbc-repository-name-filter
 	}
 `
 var filterReposEmptyFilter = testProvider + `
-	data "ome_fbc_repository" "fbc-repository-empty-filter" {
+	data "ome_firmware_repository" "fbc-repository-empty-filter" {
 		names = []
 	}
 `

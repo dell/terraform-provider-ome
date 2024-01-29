@@ -216,3 +216,27 @@ func (c *Client) GetAllDevices(queries map[string]string) (models.Devices, error
 	}, &devices.Value)
 	return devices, err
 }
+
+// GetValidDevicesByNames retrieves devices based on their names.
+func (c *Client) GetValidDevicesByNames(names []string) ([]models.Device, error) {
+	// Retrieve all devices
+	allDevices, err := c.GetAllDevices(nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Filter devices based on names
+	var filteredDevices []models.Device
+	for _, device := range allDevices.Value {
+		for _, name := range names {
+			if device.DeviceName == name {
+				filteredDevices = append(filteredDevices, device)
+				break
+			}
+		}
+	}
+	if len(filteredDevices) == 0 {
+		return nil, fmt.Errorf("no devices found")
+	}
+	return filteredDevices, nil
+}

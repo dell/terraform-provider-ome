@@ -310,3 +310,29 @@ func ValidateCatalogCreate(plan models.OmeSingleCatalogResource) error {
 	}
 	return nil
 }
+
+// GetCatalogFirmwareByName filter catalog firmware
+func GetCatalogFirmwareByName(client *clients.Client, name string) (*models.CatalogsModel, error) {
+	// Get all catalog firmware
+	catalogFirmware, err := GetAllCatalogFirmware(client)
+	if err != nil {
+		return nil, err
+	}
+
+	// Filter catalog firmware based on name
+	var filteredCatalogFirmware *models.CatalogsModel
+	for _, catalog := range catalogFirmware.Value {
+		if catalog.Repository.Name == name {
+			// to resolve implicit memory aliasing
+			cat := catalog
+			filteredCatalogFirmware = &cat
+			break
+		}
+	}
+
+	if filteredCatalogFirmware == nil {
+		return nil, fmt.Errorf("catalog firmware %s not found", name)
+	}
+
+	return filteredCatalogFirmware, nil
+}
