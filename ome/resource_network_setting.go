@@ -650,6 +650,9 @@ func updateTimeSettingState(plan, state *models.OmeNetworkSetting, omeClient *cl
 		if !plan.OmeTimeSetting.SystemTime.IsNull() {
 			state.OmeTimeSetting.SystemTime = plan.OmeTimeSetting.SystemTime
 		}
+		if plan.OmeTimeSetting.SystemTime.IsUnknown() {
+			state.OmeTimeSetting.SystemTime = types.StringValue("")
+		}
 		return true, nil
 	}
 	return false, nil
