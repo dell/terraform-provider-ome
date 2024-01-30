@@ -51,7 +51,7 @@ func (g *fwBaselineCompReportDatasource) Configure(ctx context.Context, req data
 // Metadata implements datasource.DataSource
 func (*fwBaselineCompReportDatasource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 
-	resp.TypeName = req.ProviderTypeName + "fw_baseline_compliance_report_info"
+	resp.TypeName = req.ProviderTypeName + "firmware_baseline_compliance_report"
 }
 
 // Schema implements datasource.DataSource

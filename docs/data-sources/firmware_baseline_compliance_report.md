@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-title: "ome_fw_baseline_compliance_report_info data source"
-linkTitle: "ome_fw_baseline_compliance_report_info"
-page_title: "ome_fw_baseline_compliance_report_info Data Source - terraform-provider-ome"
+title: "ome_firmware_baseline_compliance_report data source"
+linkTitle: "ome_firmware_baseline_compliance_report"
+page_title: "ome_firmware_baseline_compliance_report Data Source - terraform-provider-ome"
 subcategory: ""
 description: |-
   This Terraform DataSource is used to query firmware baseline compliance report of OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 ---
 
-# ome_fw_baseline_compliance_report_info (Data Source)
+# ome_firmware_baseline_compliance_report (Data Source)
 
 This Terraform DataSource is used to query firmware baseline compliance report of OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 
