@@ -141,8 +141,8 @@ type OmeSingleCatalogResource struct {
 	ShareAddress           types.String           `tfsdk:"share_address"`
 	CatalogFilePath        types.String           `tfsdk:"catalog_file_path"`
 	Domain                 types.String           `tfsdk:"domain"`
-	CatalogUser            types.String           `tfsdk:"catalog_user"`
-	CatalogPassword        types.String           `tfsdk:"catalog_password"`
+	ShareUser              types.String           `tfsdk:"share_user"`
+	SharePassword          types.String           `tfsdk:"share_password"`
 
 	// These are the read only resources of the catalog
 	AssociatedBaselines   types.List   `tfsdk:"associated_baselines"`

@@ -79,8 +79,8 @@ func SetStateCatalogFirmware(ctx context.Context, cat models.CatalogsModel, plan
 	state.ShareType = plan.ShareType
 	state.CatalogFilePath = plan.CatalogFilePath
 	state.CatalogRefreshSchedule = plan.CatalogRefreshSchedule
-	state.CatalogUser = plan.CatalogUser
-	state.CatalogPassword = plan.CatalogPassword
+	state.ShareUser = plan.ShareUser
+	state.SharePassword = plan.SharePassword
 	state.Domain = plan.Domain
 	state.ShareAddress = plan.ShareAddress
 
@@ -165,8 +165,8 @@ func MakeCatalogJSONModel(id int64, repoID int64, plan models.OmeSingleCatalogRe
 				Description:           plan.Name.ValueString() + " terraform catalog",
 				Source:                plan.ShareAddress.ValueString(),
 				DomainName:            plan.Domain.ValueString(),
-				Username:              plan.CatalogUser.ValueString(),
-				Password:              plan.CatalogPassword.ValueString(),
+				Username:              plan.ShareUser.ValueString(),
+				Password:              plan.SharePassword.ValueString(),
 				RepositoryType:        plan.ShareType.ValueString(),
 				BackupExistingCatalog: false,
 				Editable:              true,
@@ -187,8 +187,8 @@ func MakeCatalogJSONModel(id int64, repoID int64, plan models.OmeSingleCatalogRe
 			Description:           plan.Name.ValueString() + " terraform catalog",
 			Source:                plan.ShareAddress.ValueString(),
 			DomainName:            plan.Domain.ValueString(),
-			Username:              plan.CatalogUser.ValueString(),
-			Password:              plan.CatalogPassword.ValueString(),
+			Username:              plan.ShareUser.ValueString(),
+			Password:              plan.SharePassword.ValueString(),
 			RepositoryType:        plan.ShareType.ValueString(),
 			BackupExistingCatalog: false,
 			Editable:              true,
@@ -293,9 +293,9 @@ func ValidateCatalogCreate(plan models.OmeSingleCatalogResource) error {
 	case "CIFS":
 		if plan.ShareAddress.ValueString() == "" ||
 			plan.CatalogFilePath.ValueString() == "" ||
-			plan.CatalogUser.ValueString() == "" ||
-			plan.CatalogPassword.ValueString() == "" {
-			return fmt.Errorf("invalid CIFS share configuration, please provide 'share_address', 'catalog_file_path', 'catalog_user', and 'catalog_password'")
+			plan.ShareUser.ValueString() == "" ||
+			plan.SharePassword.ValueString() == "" {
+			return fmt.Errorf("invalid CIFS share configuration, please provide 'share_address', 'catalog_file_path', 'share_user', and 'share_password'")
 		}
 	case "HTTP":
 		if plan.ShareAddress.ValueString() == "" ||

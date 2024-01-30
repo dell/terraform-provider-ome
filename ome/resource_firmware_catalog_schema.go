@@ -162,9 +162,9 @@ func FirmwareCatalogSchema() map[string]schema.Attribute {
 				),
 			},
 		},
-		"catalog_user": schema.StringAttribute{
-			MarkdownDescription: "Catalog User. The username related to the catalog share. This field is required for share_types (CIFS, HTTPS).",
-			Description:         "Catalog User. The username related to the catalog share. This field is required for share_types (CIFS, HTTPS)",
+		"share_user": schema.StringAttribute{
+			MarkdownDescription: "Share User. The username related to the share address. This field is required for share_types (CIFS, HTTPS).",
+			Description:         "Share User. The username related to the share address. This field is required for share_types (CIFS, HTTPS)",
 			Optional:            true,
 			Validators: []validator.String{
 				stringvalidator.LengthAtLeast(1),
@@ -175,9 +175,9 @@ func FirmwareCatalogSchema() map[string]schema.Attribute {
 				),
 			},
 		},
-		"catalog_password": schema.StringAttribute{
-			MarkdownDescription: "Catalog Password. The password related to the catalog share. This field is required for share_types (CIFS, HTTPS)",
-			Description:         "Catalog Password. The password related to the catalog share. This field is required for share_types (CIFS, HTTPS)",
+		"share_password": schema.StringAttribute{
+			MarkdownDescription: "Share Password. The password related to the share address. This field is required for share_types (CIFS, HTTPS)",
+			Description:         "Share Password. The password related to the share address. This field is required for share_types (CIFS, HTTPS)",
 			Optional:            true,
 			Sensitive:           true,
 			Validators: []validator.String{

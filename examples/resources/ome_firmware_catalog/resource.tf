@@ -49,12 +49,12 @@ resource "ome_firmware_catalog" "firmware_catalog_example" {
     am_pm = "PM"
   }
   
-  # Domain optional value for the share (CIFS)
+  # Domain optional value for the share (CIFS), for other share types this will be ignored
   domain = "example"
 
-  # Catalog user required value for the share (CIFS), optional value for the share (HTTPS)
-  catalog_user = "example-user"
+  # Share user required value for the share (CIFS), optional value for the share (HTTPS)
+  share_user = "example-user"
 
-  # Catalog password required value for the share (CIFS), optional value for the share (HTTPS)
-  catalog_password = "example-pass"
+  # Share password required value for the share (CIFS), optional value for the share (HTTPS)
+  share_password = "example-pass"
 }

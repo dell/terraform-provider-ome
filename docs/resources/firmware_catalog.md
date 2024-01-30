@@ -81,14 +81,14 @@ resource "ome_firmware_catalog" "firmware_catalog_example" {
     am_pm = "PM"
   }
   
-  # Domain optional value for the share (CIFS)
+  # Domain optional value for the share (CIFS), for other share types this will be ignored
   domain = "example"
 
-  # Catalog user required value for the share (CIFS), optional value for the share (HTTPS)
-  catalog_user = "example-user"
+  # Share user required value for the share (CIFS), optional value for the share (HTTPS)
+  share_user = "example-user"
 
-  # Catalog password required value for the share (CIFS), optional value for the share (HTTPS)
-  catalog_password = "example-pass"
+  # Share password required value for the share (CIFS), optional value for the share (HTTPS)
+  share_password = "example-pass"
 }
 ```
 
@@ -102,13 +102,13 @@ resource "ome_firmware_catalog" "firmware_catalog_example" {
 ### Optional
 
 - `catalog_file_path` (String) Catalog File Path. Path on the share to gather catalog data. This field is required for share_types (NFS, CIFS, HTTP, HTTPS)
-- `catalog_password` (String, Sensitive) Catalog Password. The password related to the catalog share. This field is required for share_types (CIFS, HTTPS)
 - `catalog_refresh_schedule` (Attributes) Catalog Refresh Schedule, when using automatic catalog update the schedule is required for cadence of the update. If catalog_update_type is set to manual, this field is ignored. (see [below for nested schema](#nestedatt--catalog_refresh_schedule))
 - `catalog_update_type` (String) Catalog Update Type. Sets the frequency of catalog updates. Defaults to Manual. If set to automatic, the catalog_refresh_schedule field will need to be set. Options are (Manual, Automatic).
-- `catalog_user` (String) Catalog User. The username related to the catalog share. This field is required for share_types (CIFS, HTTPS).
 - `domain` (String) Domain. The domain for the catalog. This field is optional and only used for share_types (CIFS).
 - `share_address` (String) Share Address. Gives the Ipv4, Ipv6, or FQDN of the share. This field is required for share_types (NFS, CIFS, HTTP, HTTPS)
+- `share_password` (String, Sensitive) Share Password. The password related to the share address. This field is required for share_types (CIFS, HTTPS)
 - `share_type` (String) Share Type, the type of share the catalog will pull from, Defaults to Dell. The different options will have different required fields to work properly. Options are (DELL, NFS, CIFS, HTTP, HTTPS).
+- `share_user` (String) Share User. The username related to the share address. This field is required for share_types (CIFS, HTTPS).
 
 ### Read-Only
 

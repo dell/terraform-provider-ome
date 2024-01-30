@@ -201,8 +201,8 @@ var updateFirmwareMockError = testProvider + `
           am_pm = "PM"
         }
         domain = "example"
-        catalog_user = "example-user"
-        catalog_password = "example-pass"
+        share_user = "example-user"
+        share_password = "example-pass"
 	}
 `
 
@@ -220,8 +220,8 @@ var updateFirmwareVaildationError = testProvider + `
           am_pm = "PM"
         }
         domain = "example"
-        catalog_user = "example-user"
-        catalog_password = "example-pass"
+        share_user = "example-user"
+        share_password = "example-pass"
 	}
 `
 
@@ -278,8 +278,8 @@ var createFirmwareCatalogResource = testProvider + `
           am_pm = "PM"
         }
         domain = "example"
-        catalog_user = "example-user"
-        catalog_password = "example-pass"
+        share_user = "example-user"
+        share_password = "example-pass"
     }
 `
 
@@ -297,7 +297,7 @@ resource "ome_firmware_catalog" "cat_1" {
       am_pm = "AM"
     }
     domain = "example_update"
-    catalog_user = "example-user_update"
-    catalog_password = "example-pass_update"
+    share_user = "example-user_update"
+    share_password = "example-pass_update"
 }
 `
