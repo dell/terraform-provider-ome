@@ -97,24 +97,24 @@ func TestDataSource_ReadFwCompReportErrRet(t *testing.T) {
 
 var testFwBaselineCompReportDSInvalidBaseline = testProvider + `
 	
-	data "ome_fw_baseline_compliance_report_info" "cr" {
+	data "ome_firmware_baseline_compliance_report" "cr" {
 		baseline_name = "tfacc_baseline_dell_invalid"
 	}
 `
 var testFwBaselineCompReportDSErr = testProvider + `
 
-	data "ome_fw_baseline_compliance_report_info" "report3" {
+	data "ome_firmware_baseline_compliance_report" "report3" {
 		baseline_name = "tfacc_baseline_dell_1"
 
 	}
 
 	output "all" {
-		value = length(data.ome_fw_baseline_compliance_report_info.report3) > 0
+		value = length(data.ome_firmware_baseline_compliance_report.report3) > 0
 	}
 `
 var testFwBaselineCompReportDSFilterKeyErr = testProvider + `
 
-	data "ome_fw_baseline_compliance_report_info" "report2" {
+	data "ome_firmware_baseline_compliance_report" "report2" {
 		
 		filter {
 			key = "DeviceModel-Error"
@@ -124,13 +124,13 @@ var testFwBaselineCompReportDSFilterKeyErr = testProvider + `
 	}
 
 	output "all" {
-		value = length(data.ome_fw_baseline_compliance_report_info.report2) > 0
+		value = length(data.ome_firmware_baseline_compliance_report.report2) > 0
 	}
 `
 
 var testFwBaselineCompReportDS = testProvider + `
 
-	data "ome_fw_baseline_compliance_report_info" "report" {
+	data "ome_firmware_baseline_compliance_report" "report" {
 		
 		filter {
 			key = "DeviceModel"
@@ -140,6 +140,6 @@ var testFwBaselineCompReportDS = testProvider + `
 	}
 
 	output "all" {
-		value = length(data.ome_fw_baseline_compliance_report_info.report) > 0
+		value = length(data.ome_firmware_baseline_compliance_report.report) > 0
 	}
 `
