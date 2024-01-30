@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"terraform-provider-ome/clients"
+	"terraform-provider-ome/helper"
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -510,7 +511,7 @@ func discoveryState(ctx context.Context, resp models.DiscoveryJob, plan models.O
 
 func jobTrackState(ctx context.Context, state models.OmeDiscoveryJob, plan models.OmeDiscoveryJob, omeClient *clients.Client) error {
 	if plan.Timeout.ValueInt64() > 0 && !plan.PartialFailure.IsUnknown() {
-		results, err := DiscoverJobRunner(ctx, omeClient, state.JobID.ValueInt64(), plan.Timeout.ValueInt64(), plan.PartialFailure.ValueBool())
+		results, err := helper.DiscoverJobRunner(ctx, omeClient, state.JobID.ValueInt64(), plan.Timeout.ValueInt64(), plan.PartialFailure.ValueBool())
 		if err != nil && !plan.PartialFailure.ValueBool() {
 			return err
 		}

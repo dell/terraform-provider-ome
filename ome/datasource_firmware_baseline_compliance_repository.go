@@ -48,7 +48,7 @@ func (g *firmwareBaselineComplianceRepositoryDatasource) Configure(ctx context.C
 
 // Metadata implements datasource.DataSource
 func (*firmwareBaselineComplianceRepositoryDatasource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "fbc_repository"
+	resp.TypeName = req.ProviderTypeName + "firmware_repository"
 }
 
 // Schema implements datasource.DataSource
@@ -70,7 +70,7 @@ func (g *firmwareBaselineComplianceRepositoryDatasource) Read(ctx context.Contex
 		return
 	}
 
-	omeClient, d := g.p.createOMESession(ctx, "datasource_fbc_repository Read")
+	omeClient, d := g.p.createOMESession(ctx, "datasource_firmware_repository Read")
 	resp.Diagnostics.Append(d...)
 	if d.HasError() {
 		return

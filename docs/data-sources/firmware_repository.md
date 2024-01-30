@@ -14,15 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-title: "ome_fbc_repository data source"
-linkTitle: "ome_fbc_repository"
-page_title: "ome_fbc_repository Data Source - terraform-provider-ome"
+title: "ome_firmware_repository data source"
+linkTitle: "ome_firmware_repository"
+page_title: "ome_firmware_repository Data Source - terraform-provider-ome"
 subcategory: ""
 description: |-
   This Terraform DataSource is used to query the firmware baseline compliance repository from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 ---
 
-# ome_fbc_repository (Data Source)
+# ome_firmware_repository (Data Source)
 
 This Terraform DataSource is used to query the firmware baseline compliance repository from OME. The information fetched from this data source can be used for getting the details / for further processing in resource block.
 

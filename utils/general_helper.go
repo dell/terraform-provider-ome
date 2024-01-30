@@ -22,6 +22,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -247,4 +248,15 @@ func getFieldJSONTag(sourceValue reflect.Value, i int) string {
 	sourceFieldTag := sourceValue.Type().Field(i).Tag.Get("json")
 	sourceFieldTag = strings.TrimSuffix(sourceFieldTag, ",omitempty")
 	return sourceFieldTag
+}
+
+// ConvertListValueToStringSlice converts a list value to a string slice
+func ConvertListValueToStringSlice(listVal basetypes.ListValue) []string {
+	var strSlice []string
+	for _, elem := range listVal.Elements() {
+		str := elem.String()
+		str = strings.Trim(str, "\"")
+		strSlice = append(strSlice, str)
+	}
+	return strSlice
 }

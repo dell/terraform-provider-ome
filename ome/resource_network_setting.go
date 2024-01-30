@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"terraform-provider-ome/clients"
+	"terraform-provider-ome/helper"
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -501,12 +502,12 @@ func updateAdapterSettingState(ctx context.Context, plan, state *models.OmeNetwo
 	if err != nil {
 		return err
 	}
-	err = NetworkJobRunner(ctx, omeClient, newJob.ID)
+	err = helper.NetworkJobRunner(ctx, omeClient, newJob.ID)
 	if err != nil {
 		if newOmeIP != "" {
 			currentURL := omeClient.GetURL()
 			omeClient.SetURL(fmt.Sprintf("https://%s:%d", newOmeIP, 443))
-			err = NetworkJobRunner(ctx, omeClient, newJob.ID)
+			err = helper.NetworkJobRunner(ctx, omeClient, newJob.ID)
 			if err != nil {
 				return err
 			}

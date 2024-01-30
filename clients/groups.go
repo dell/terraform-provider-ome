@@ -209,3 +209,48 @@ func (c *Client) updateGroupMembers(payload models.GroupMemberPayload, toAdd boo
 	_, err2 := c.Post(path, nil, payloadb)
 	return err2
 }
+
+// GetAllGroups - method to get all groups along with subgroups.
+func (c *Client) GetAllGroups() (models.Groups, error) {
+	response, err := c.Get(GroupAPI, nil, map[string]string{"$expand": "SubGroups"})
+	if err != nil {
+		return models.Groups{}, err
+	}
+	groups := models.Groups{}
+	bodyData, _ := c.GetBodyData(response.Body)
+
+	err = c.JSONUnMarshal(bodyData, &groups)
+	if err != nil {
+		return models.Groups{}, err
+	}
+	return groups, nil
+}
+
+// GetValidGroupsByNames retrieves groups and subgroups based on group names.
+func (c *Client) GetValidGroupsByNames(names []string) ([]models.Group, error) {
+	// Retrieve all groups
+	allGroups, err := c.GetAllGroups()
+	if err != nil {
+		return nil, err
+	}
+
+	// Filter groups based on names
+	var filteredGroups []models.Group
+	for _, group := range allGroups.Value {
+		for _, name := range names {
+			if group.Name == name {
+				filteredGroups = append(filteredGroups, group)
+				// Add all subgroups too is they exist
+				if len(group.SubGroups) != 0 {
+					for _, subGroup := range group.SubGroups {
+						if subGroup.ParentID == group.ID {
+							filteredGroups = append(filteredGroups, subGroup)
+						}
+					}
+				}
+				break
+			}
+		}
+	}
+	return filteredGroups, nil
+}

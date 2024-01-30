@@ -139,8 +139,10 @@ const (
 	DeleteFirmwareCatalogAPI = "/api/UpdateService/Actions/UpdateService.RemoveCatalogs"
 	//FwBaselineComplianceReportsAPI - api to fetch baseline firmware baseline compliance report
 	FwBaselineComplianceReportsAPI = "/api/UpdateService/Baselines(%d)/DeviceComplianceReports"
-	//FwUpdateServiceBaselineAPI - api to fetch baselines
-	FwUpdateServiceBaselineAPI = "/api/UpdateService/Baselines"
+	// FirmwareBaselineAPI - api to manage firmware baselines
+	FirmwareBaselineAPI = "/api/UpdateService/Baselines"
+	// RemoveFirmwareBaseline - api to remove firmware baseline
+	RemoveFirmwareBaseline = "/api/UpdateService/Actions/UpdateService.RemoveBaselines"
 )
 
 // Messages constants
