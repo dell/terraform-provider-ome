@@ -1,5 +1,5 @@
 ---
-# Copyright (c) 2023 Dell Inc., or its subsidiaries. All Rights Reserved.
+# Copyright (c) 2024 Dell Inc., or its subsidiaries. All Rights Reserved.
 # 
 # Licensed under the Mozilla Public License Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ description: |-
 # ome_firmware_catalog (Resource)
 
 This terraform resource is used to manage firmware catalogs entity on OME.We can Create, Update and Delete OME firmware catalogs using this resource. We can also do an 'Import' an existing 'firmware catalog' from OME .
-
 
 ## Example Usage
 
