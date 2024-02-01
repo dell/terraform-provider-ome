@@ -28,7 +28,7 @@ var (
 	_ datasource.DataSourceWithConfigure = &deviceComplianceReportDatasource{}
 )
 
-// Creates a new device compliance report datasource.
+// NewDeviceComplianceReportDataSource - Creates a new device compliance report datasource.
 func NewDeviceComplianceReportDataSource() datasource.DataSource {
 	return &deviceComplianceReportDatasource{}
 }

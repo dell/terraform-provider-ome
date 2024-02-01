@@ -26,7 +26,7 @@ type DeviceComplianceReportModel struct {
 type DeviceComplianceModel struct {
 	ID int64 `json:"Id"`
 
-	DeviceId int64 `json:"DeviceId"`
+	DeviceID int64 `json:"DeviceId"`
 
 	ServiceTag string `json:"ServiceTag"`
 
@@ -40,7 +40,7 @@ type DeviceComplianceModel struct {
 
 	ComplianceStatus string `json:"ComplianceStatus"`
 
-	DeviceTypeId int64 `json:"DeviceTypeId"`
+	DeviceTypeID int64 `json:"DeviceTypeId"`
 
 	RebootRequired bool `json:"RebootRequired"`
 
@@ -53,7 +53,7 @@ type DeviceComplianceModel struct {
 
 // ComplianceDependenciesModel - Model for Compliance Dependencies
 type ComplianceDependenciesModel struct {
-	ComplianceDependencyId int64  `json:"ComplianceDependencyId"`
+	ComplianceDependencyID int64  `json:"ComplianceDependencyId"`
 	IsHardDependency       bool   `json:"IsHardDependency"`
 	Name                   string `json:"Name"`
 	Path                   string `json:"Path"`
@@ -61,7 +61,7 @@ type ComplianceDependenciesModel struct {
 	SourceName             string `json:"SourceName"`
 	UniqueIdentifier       string `json:"UniqueIdentifier"`
 	UpdateAction           string `json:"UpdateAction"`
-	Uri                    string `json:"Uri"`
+	URI                    string `json:"Uri"`
 	Version                string `json:"Version"`
 }
 
@@ -79,7 +79,7 @@ type ComponentComplianceReportModel struct {
 	SourceName                string                        `json:"SourceName"`
 	PrerequisiteInfo          string                        `json:"PrerequisiteInfo"`
 	ImpactAssessment          string                        `json:"ImpactAssessment"`
-	Uri                       string                        `json:"Uri"`
+	URI                       string                        `json:"Uri"`
 	RebootRequired            bool                          `json:"RebootRequired"`
 	ComplianceStatus          string                        `json:"ComplianceStatus"`
 	ComplianceDependencies    []ComplianceDependenciesModel `json:"ComplianceDependencies"`
@@ -98,10 +98,10 @@ type OMEDeviceComplianceData struct {
 type DeviceComplianceData struct {
 	ComplianceStatus                types.String                     `tfsdk:"compliance_status"`
 	ComponentComplianceReport       []ComponentComplianceReportsData `tfsdk:"component_compliance_reports"`
-	DeviceId                        types.Int64                      `tfsdk:"device_id"`
+	DeviceID                        types.Int64                      `tfsdk:"device_id"`
 	DeviceModel                     types.String                     `tfsdk:"device_model"`
 	DeviceName                      types.String                     `tfsdk:"device_name"`
-	DeviceTypeId                    types.Int64                      `tfsdk:"device_type_id"`
+	DeviceTypeID                    types.Int64                      `tfsdk:"device_type_id"`
 	DeviceTypeName                  types.String                     `tfsdk:"device_type_name"`
 	FirmwareStatus                  types.String                     `tfsdk:"firmware_status"`
 	ID                              types.Int64                      `tfsdk:"id"`
@@ -113,7 +113,7 @@ type DeviceComplianceData struct {
 
 // ComplianceDependencies - The representation of Compliance Dependencies
 type ComplianceDependencies struct {
-	ComplianceDependencyId types.Int64  `tfsdk:"compliance_dependency_id"`
+	ComplianceDependencyID types.Int64  `tfsdk:"compliance_dependency_id"`
 	IsHardDependency       types.Bool   `tfsdk:"is_hard_dependency"`
 	Name                   types.String `tfsdk:"name"`
 	Path                   types.String `tfsdk:"path"`
@@ -121,7 +121,7 @@ type ComplianceDependencies struct {
 	SourceName             types.String `tfsdk:"source_name"`
 	UniqueIdentifier       types.String `tfsdk:"unique_identifier"`
 	UpdateAction           types.String `tfsdk:"update_action"`
-	Uri                    types.String `tfsdk:"uri"`
+	URI                    types.String `tfsdk:"uri"`
 	Version                types.String `tfsdk:"version"`
 }
 
@@ -139,7 +139,7 @@ type ComponentComplianceReportsData struct {
 	SourceName                types.String             `tfsdk:"source_name"`
 	PrerequisiteInfo          types.String             `tfsdk:"prerequisite_info"`
 	ImpactAssessment          types.String             `tfsdk:"impact_assessment"`
-	Uri                       types.String             `tfsdk:"uri"`
+	URI                       types.String             `tfsdk:"uri"`
 	RebootRequired            types.Bool               `tfsdk:"reboot_required"`
 	ComplianceStatus          types.String             `tfsdk:"compliance_status"`
 	ComplianceDependencies    []ComplianceDependencies `tfsdk:"compliance_dependencies"`

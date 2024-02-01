@@ -160,7 +160,7 @@ const (
 	// ErrInvalidDeviceIdentifiers - error message for invalid firmware catalog id
 	ErrInvalidFirmwareCatalogIdentifiers = "invalid firmware catalog id"
 	// ErrBaselineId - error message when invalid baseline id is given
-	ErrBaselineDeviceReportsId = "invalid baseline id or Device Report id"
+	ErrBaselineDeviceReportsID = "invalid baseline id or Device Report id"
 	// ErrComplianceTemplateIDOrName - error message when either compliance template ID or name is not given
 	ErrComplianceTemplateIDOrName = "either compliance template ID or template name is expected"
 	// ErrEmptyDeviceDetails - error message when both device service tag and device id not given

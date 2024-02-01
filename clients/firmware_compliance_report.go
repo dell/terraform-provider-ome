@@ -19,16 +19,16 @@ import (
 )
 
 // GetComplianceReportDetails - get compliance report details
-func (c *Client) GetComplianceReportDetails(baselineId int64) (models.DeviceComplianceReportModel, error) {
+func (c *Client) GetComplianceReportDetails(baselineID int64) (models.DeviceComplianceReportModel, error) {
 	response := models.DeviceComplianceReportModel{}
-	resp, err := c.Get(fmt.Sprintf(DeviceComplianceReportAPI, baselineId), nil, nil)
+	resp, err := c.Get(fmt.Sprintf(DeviceComplianceReportAPI, baselineID), nil, nil)
 	if err != nil {
 		return response, err
 	}
 	bodyData, _ := c.GetBodyData(resp.Body)
 	err = c.JSONUnMarshal(bodyData, &response)
 	if err != nil {
-		err = fmt.Errorf(ErrBaselineDeviceReportsId+" %w", err)
+		err = fmt.Errorf(ErrBaselineDeviceReportsID+" %w", err)
 	}
 	return response, err
 }
