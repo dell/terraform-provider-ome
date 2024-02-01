@@ -35,9 +35,9 @@ const (
 var FunctionMocker *Mocker
 
 var testAccProtoV6ProviderFactories map[string]func() (tfprotov6.ProviderServer, error)
-var omeUserName = os.Getenv("OME_USERNAME")
-var omeHost = os.Getenv("OME_HOST")
-var omePassword = os.Getenv("OME_PASSWORD")
+var omeUserName = "admin"        //os.Getenv("OME_USERNAME")
+var omeHost = "10.225.105.2"     //os.Getenv("OME_HOST")
+var omePassword = "Password123!" //os.Getenv("OME_PASSWORD")
 var port = setDefault(os.Getenv("OME_PORT"), "443")
 var protocol = setDefault(os.Getenv("OME_PROTOCOL"), "https")
 var DeviceSvcTag1 = os.Getenv("DEVICESVCTAG1")
