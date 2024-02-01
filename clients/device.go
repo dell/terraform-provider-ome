@@ -149,7 +149,7 @@ func (c *Client) GetDevices(serviceTags []string, devIDs []int64, groupNames []s
 		return uniqueDevices, err
 	}
 
-	return []models.Device{}, fmt.Errorf("unable to fetch valid device ids")
+	return []models.Device{}, fmt.Errorf("unable to fetch valid device ids, please check for valid device ids, service tags, or non empty group names")
 }
 
 // GetUniqueDevices return the unique device from a list of a devices

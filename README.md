@@ -60,6 +60,7 @@ For general information about Terraform, visit the [official website][tf-website
   * Template
   * VLAN Networks
   * Device Datasource
+  * Device Compliance Report
   * Application Certificate Datasource
   * Firmware Baseline Compliance Repository
   * Firmware Baseline Compliance Report

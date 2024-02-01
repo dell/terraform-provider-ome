@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"math/big"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -259,4 +260,16 @@ func ConvertListValueToStringSlice(listVal basetypes.ListValue) []string {
 		strSlice = append(strSlice, str)
 	}
 	return strSlice
+}
+
+// ConvertListValueToIntSlice converts a list value to an int slice
+func ConvertListValueToIntSlice(listVal basetypes.ListValue) []int64 {
+	var intSlice []int64
+	for _, elem := range listVal.Elements() {
+		str := elem.String()
+		str = strings.Trim(str, "\"")
+		num, _ := strconv.ParseInt(str, 10, 64)
+		intSlice = append(intSlice, num)
+	}
+	return intSlice
 }
