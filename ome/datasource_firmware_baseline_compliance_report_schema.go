@@ -17,14 +17,30 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 )
 
+func omeDeviceReportSchema() map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+		"id": schema.Int64Attribute{
+			MarkdownDescription: "Dummy ID of the datasource.",
+			Description:         "Dummy ID of the datasource.",
+			Computed:            true,
+		},
+		"device_compliance_reports": schema.ListNestedAttribute{
+			MarkdownDescription: "Reports fetched.",
+			Description:         "Reports fetched.",
+			Computed:            true,
+			NestedObject:        schema.NestedAttributeObject{Attributes: omeSingleDeviceComplianceReportDataSchema()},
+		},
+		"baseline_name": schema.StringAttribute{
+			MarkdownDescription: "Baseline name, the name related to the device compliance report",
+			Description:         "Baseline name, the name related to the device compliance report.",
+			Required:            true,
+		},
+	}
+}
+
 // The schema for OME Device Compliance Report
 func omeSingleDeviceComplianceReportDataSchema() map[string]schema.Attribute {
 	return map[string]schema.Attribute{
-		"baseline_id": schema.Int64Attribute{
-			MarkdownDescription: "Baseline ID",
-			Description:         "Baseline ID",
-			Required:            true,
-		},
 		"compliance_status": schema.StringAttribute{
 			MarkdownDescription: "Compliance Status",
 			Description:         "Compliance Status",
@@ -36,9 +52,89 @@ func omeSingleDeviceComplianceReportDataSchema() map[string]schema.Attribute {
 			Computed:            true,
 			NestedObject: schema.NestedAttributeObject{
 				Attributes: map[string]schema.Attribute{
-					"category_code": schema.StringAttribute{
-						MarkdownDescription: "Category Code",
-						Description:         "Category Code",
+					"compliance_status": schema.StringAttribute{
+						MarkdownDescription: "Compliance Status",
+						Description:         "Compliance Status",
+						Computed:            true,
+					},
+					"component_type": schema.StringAttribute{
+						MarkdownDescription: "Component Type",
+						Description:         "Component Type",
+						Computed:            true,
+					},
+					"criticality": schema.StringAttribute{
+						MarkdownDescription: "Criticality",
+						Description:         "Criticality",
+						Computed:            true,
+					},
+					"current_version": schema.StringAttribute{
+						MarkdownDescription: "Current Version",
+						Description:         "Current Version",
+						Computed:            true,
+					},
+					"id": schema.Int64Attribute{
+						MarkdownDescription: "Id",
+						Description:         "Id",
+						Computed:            true,
+					},
+					"impact_assessment": schema.StringAttribute{
+						MarkdownDescription: "Impact Assessment",
+						Description:         "Impact Assessment",
+						Computed:            true,
+					},
+					"name": schema.StringAttribute{
+						MarkdownDescription: "Name",
+						Description:         "Name",
+						Computed:            true,
+					},
+					"path": schema.StringAttribute{
+						MarkdownDescription: "Path",
+						Description:         "Path",
+						Computed:            true,
+					},
+					"prerequisite_info": schema.StringAttribute{
+						MarkdownDescription: "Prerequisite Info",
+						Description:         "Prerequisite Info",
+						Computed:            true,
+					},
+					"reboot_required": schema.BoolAttribute{
+						MarkdownDescription: "Reboot Required",
+						Description:         "Reboot Required",
+						Computed:            true,
+					},
+					"source_name": schema.StringAttribute{
+						MarkdownDescription: "Source Name",
+						Description:         "Source Name",
+						Computed:            true,
+					},
+					"target_identifier": schema.StringAttribute{
+						MarkdownDescription: "Target Identifer",
+						Description:         "Target Identifer",
+						Computed:            true,
+					},
+					"unique_identifier": schema.StringAttribute{
+						MarkdownDescription: "Unique Identifier",
+						Description:         "Unique Identifier",
+						Computed:            true,
+					},
+					"update_action": schema.StringAttribute{
+						MarkdownDescription: "Update Action",
+						Description:         "Update Action",
+						Computed:            true,
+					},
+					"uri": schema.StringAttribute{
+						MarkdownDescription: "Uri",
+						Description:         "Uri",
+						Computed:            true,
+					},
+					"dependency_upgrade_required": schema.BoolAttribute{
+						MarkdownDescription: "Dependency Upgrade Required",
+						Description:         "Dependency Upgrade Required",
+						Computed:            true,
+					},
+					"version": schema.StringAttribute{
+						MarkdownDescription: "Version",
+						Description:         "Version",
 						Computed:            true,
 					},
 					"compliance_dependencies": schema.ListNestedAttribute{
@@ -99,91 +195,6 @@ func omeSingleDeviceComplianceReportDataSchema() map[string]schema.Attribute {
 								},
 							},
 						},
-					},
-					"compliance_status": schema.StringAttribute{
-						MarkdownDescription: "Compliance Status",
-						Description:         "Compliance Status",
-						Computed:            true,
-					},
-					"component_type": schema.StringAttribute{
-						MarkdownDescription: "Component Type",
-						Description:         "Component Type",
-						Computed:            true,
-					},
-					"criticality": schema.StringAttribute{
-						MarkdownDescription: "Criticality",
-						Description:         "Criticality",
-						Computed:            true,
-					},
-					"current_version": schema.StringAttribute{
-						MarkdownDescription: "Current Version",
-						Description:         "Current Version",
-						Computed:            true,
-					},
-					"dcm_component_type": schema.StringAttribute{
-						MarkdownDescription: "Dcm Component Type",
-						Description:         "Dcm Component Type",
-						Computed:            true,
-					},
-					"dependency_upgrade_required": schema.BoolAttribute{
-						MarkdownDescription: "Dependency Upgrade Required",
-						Description:         "Dependency Upgrade Required",
-						Computed:            true,
-					},
-					"id": schema.Int64Attribute{
-						MarkdownDescription: "Id",
-						Description:         "Id",
-						Computed:            true,
-					},
-					"impact_assessment": schema.StringAttribute{
-						MarkdownDescription: "Impact Assessment",
-						Description:         "Impact Assessment",
-						Computed:            true,
-					},
-					"name": schema.StringAttribute{
-						MarkdownDescription: "Name",
-						Description:         "Name",
-						Computed:            true,
-					},
-					"path": schema.StringAttribute{
-						MarkdownDescription: "Path",
-						Description:         "Path",
-						Computed:            true,
-					},
-					"prerequisite_info": schema.StringAttribute{
-						MarkdownDescription: "Prerequisite Info",
-						Description:         "Prerequisite Info",
-						Computed:            true,
-					},
-					"reboot_required": schema.BoolAttribute{
-						MarkdownDescription: "Reboot Required",
-						Description:         "Reboot Required",
-						Computed:            true,
-					},
-					"source_name": schema.StringAttribute{
-						MarkdownDescription: "Source Name",
-						Description:         "Source Name",
-						Computed:            true,
-					},
-					"target_identifer": schema.StringAttribute{
-						MarkdownDescription: "Target Identifer",
-						Description:         "Target Identifer",
-						Computed:            true,
-					},
-					"unique_identifier": schema.StringAttribute{
-						MarkdownDescription: "Unique Identifier",
-						Description:         "Unique Identifier",
-						Computed:            true,
-					},
-					"update_action": schema.StringAttribute{
-						MarkdownDescription: "Update Action",
-						Description:         "Update Action",
-						Computed:            true,
-					},
-					"uri": schema.StringAttribute{
-						MarkdownDescription: "Uri",
-						Description:         "Uri",
-						Computed:            true,
 					},
 				},
 			},

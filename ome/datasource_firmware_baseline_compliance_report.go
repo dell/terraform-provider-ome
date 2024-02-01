@@ -17,7 +17,6 @@ import (
 	"context"
 	"terraform-provider-ome/helper"
 	"terraform-provider-ome/models"
-	"terraform-provider-ome/utils"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -48,7 +47,7 @@ func (g *deviceComplianceReportDatasource) Configure(ctx context.Context, req da
 
 // Metadata implements datasource.DataSource
 func (*deviceComplianceReportDatasource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "compliance_report"
+	resp.TypeName = req.ProviderTypeName + "device_compliance_report"
 }
 
 // Schema implements datasource.DataSource
@@ -58,13 +57,13 @@ func (*deviceComplianceReportDatasource) Schema(ctx context.Context, req datasou
 			" The information fetched from this data source can be used for getting the details / for further processing in resource block.",
 		Description: "This Terraform DataSource is used to query device compliance report of a compliance template baseline data from OME." +
 			" The information fetched from this data source can be used for getting the details / for further processing in resource block.",
-		Attributes: omeSingleDeviceComplianceReportDataSchema(),
+		Attributes: omeDeviceReportSchema(),
 	}
 }
 
 // Read implements datasource.DataSource
 func (g *deviceComplianceReportDatasource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var plan models.DeviceComplianceData
+	var plan models.OMEDeviceComplianceData
 	diags := req.Config.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 
@@ -79,19 +78,34 @@ func (g *deviceComplianceReportDatasource) Read(ctx context.Context, req datasou
 	}
 	defer omeClient.RemoveSession()
 
-	complianceReports, err := helper.GetAllDeviceComplianceReport(omeClient, plan.BaselineId.ValueInt64())
+	baselineID, err := omeClient.GetUpdateServiceBaselineIDByName(plan.BaselineName.ValueString())
+	if err != nil || baselineID == -1 {
+		resp.Diagnostics.AddError(
+			"Error fetching baseline", err.Error(),
+		)
+		return
+	}
+
+	complianceReports, err := helper.GetAllDeviceComplianceReport(omeClient, baselineID)
 
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading device compliance report", err.Error())
 		return
 	}
 
-	errCopy := utils.CopyFields(ctx, complianceReports, &plan)
-	if errCopy != nil {
-		resp.Diagnostics.AddError("Error reading device compliance report", errCopy.Error())
+	vals, stateErr := helper.SetStateDeviceComplianceReport(ctx, complianceReports)
+	if stateErr != nil {
+		resp.Diagnostics.AddError(
+			"Error processing device compliance report",
+			stateErr.Error(),
+		)
 		return
 	}
 
-	plan.Id = types.Int64Value(0)
+	if plan.ID.IsNull() {
+		plan.ID = types.Int64Value(0)
+	}
+	plan.Reports = vals
+
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
 }

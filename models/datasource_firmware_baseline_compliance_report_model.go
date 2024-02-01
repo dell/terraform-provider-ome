@@ -24,7 +24,7 @@ type DeviceComplianceReportModel struct {
 
 // DeviceComplianceModel - Model for Device Compliance
 type DeviceComplianceModel struct {
-	Id int64 `json:"Id"`
+	ID int64 `json:"Id"`
 
 	DeviceId int64 `json:"DeviceId"`
 
@@ -67,7 +67,7 @@ type ComplianceDependenciesModel struct {
 
 // ComponentComplianceReportModel - Model for Component Compliance Report
 type ComponentComplianceReportModel struct {
-	Id                        int64                         `json:"Id"`
+	ID                        int64                         `json:"Id"`
 	Version                   string                        `json:"Version"`
 	CurrentVersion            string                        `json:"CurrentVersion"`
 	Path                      string                        `json:"Path"`
@@ -85,13 +85,17 @@ type ComponentComplianceReportModel struct {
 	ComplianceDependencies    []ComplianceDependenciesModel `json:"ComplianceDependencies"`
 	ComponentType             string                        `json:"ComponentType"`
 	DependencyUpgradeRequired bool                          `json:"DependencyUpgradeRequired"`
-	CategoryCode              string                        `json:"CategoryCode"`
-	DcmComponentType          string                        `json:"DcmComponentType"`
+}
+
+// OMEDeviceComplianceData represents the OME Device Compliance
+type OMEDeviceComplianceData struct {
+	ID           types.Int64            `tfsdk:"id"`
+	Reports      []DeviceComplianceData `tfsdk:"device_compliance_reports"`
+	BaselineName types.String           `tfsdk:"baseline_name"`
 }
 
 // DeviceComplianceData - The representation of Device Compliance
 type DeviceComplianceData struct {
-	BaselineId                      types.Int64                      `tfsdk:"baseline_id"`
 	ComplianceStatus                types.String                     `tfsdk:"compliance_status"`
 	ComponentComplianceReport       []ComponentComplianceReportsData `tfsdk:"component_compliance_reports"`
 	DeviceId                        types.Int64                      `tfsdk:"device_id"`
@@ -100,7 +104,7 @@ type DeviceComplianceData struct {
 	DeviceTypeId                    types.Int64                      `tfsdk:"device_type_id"`
 	DeviceTypeName                  types.String                     `tfsdk:"device_type_name"`
 	FirmwareStatus                  types.String                     `tfsdk:"firmware_status"`
-	Id                              types.Int64                      `tfsdk:"id"`
+	ID                              types.Int64                      `tfsdk:"id"`
 	RebootRequired                  types.Bool                       `tfsdk:"reboot_required"`
 	ServiceTag                      types.String                     `tfsdk:"service_tag"`
 	DeviceFirmwareUpdateCapable     types.Bool                       `tfsdk:"device_firmware_update_capable"`
@@ -123,7 +127,7 @@ type ComplianceDependencies struct {
 
 // ComponentComplianceReportsData - The representation of Component Compliance Report
 type ComponentComplianceReportsData struct {
-	Id                        types.Int64              `tfsdk:"id"`
+	ID                        types.Int64              `tfsdk:"id"`
 	Version                   types.String             `tfsdk:"version"`
 	CurrentVersion            types.String             `tfsdk:"current_version"`
 	Path                      types.String             `tfsdk:"path"`
@@ -136,11 +140,9 @@ type ComponentComplianceReportsData struct {
 	PrerequisiteInfo          types.String             `tfsdk:"prerequisite_info"`
 	ImpactAssessment          types.String             `tfsdk:"impact_assessment"`
 	Uri                       types.String             `tfsdk:"uri"`
-	RebootRequired            types.String             `tfsdk:"reboot_required"`
+	RebootRequired            types.Bool               `tfsdk:"reboot_required"`
 	ComplianceStatus          types.String             `tfsdk:"compliance_status"`
 	ComplianceDependencies    []ComplianceDependencies `tfsdk:"compliance_dependencies"`
 	ComponentType             types.String             `tfsdk:"component_type"`
 	DependencyUpgradeRequired types.Bool               `tfsdk:"dependency_upgrade_required"`
-	CategoryCode              types.String             `tfsdk:"category_code"`
-	DcmComponentType          types.String             `tfsdk:"dcm_component_type"`
 }
