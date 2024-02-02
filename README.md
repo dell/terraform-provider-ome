@@ -1,3 +1,20 @@
+<!--
+Copyright (c) 2024 Dell Inc., or its subsidiaries. All Rights Reserved.
+
+Licensed under the Mozilla Public License Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://mozilla.org/MPL/2.0/
+
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
 # Terraform provider for OpenManage Enterprise
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](https://github.com/dell/terraform-provider-ome/blob/main/about/CODE_OF_CONDUCT.md)
@@ -29,11 +46,13 @@ For general information about Terraform, visit the [official website][tf-website
   * [Attribution](https://github.com/dell/terraform-provider-ome/blob/main/about/ATTRIBUTION.md)
 
 ## Supported Platforms
-  * Dell OpenManage Enterprise versions 3.10.x.
+  * Dell OpenManage Enterprise versions 3.10.x and 4.0.1
 
 ## Prerequisites
-  * [Terraform >= 1.4.6](https://www.terraform.io)
-  * Go >= 1.20
+ | **Terraform Provider** | **OS** | **Terraform** | **Golang** |
+ |------------------------|--------|---------------|------------|
+| v1.2.0 |  Ubuntu22.04 <br> RHEL9.x | 1.5.x <br> 1.6.x <br> | 1.21
+
 
 ## List of DataSources in Terraform Provider for Dell OME
   * Configuration Report
@@ -42,6 +61,10 @@ For general information about Terraform, visit the [official website][tf-website
   * VLAN Networks
   * Device Datasource
   * Application Certificate Datasource
+  * Firmware Baseline Compliance Repository
+  * Firmware Baseline Compliance Report
+  * Firmware Catalog
+  
 
 ## List of Resources in Terraform Provider for Dell OME
   * Configuration Baseline
@@ -56,6 +79,8 @@ For general information about Terraform, visit the [official website][tf-website
   * Application CSR Resource
   * Application Certificate Resource
   * Appliance Network Resource
+  * Firmware Catalog
+  * Firmware Baselines
 
 ## Installation
 Install Terraform Provider for OpenManage Enterprise from terraform registry by adding the following block
@@ -63,7 +88,7 @@ Install Terraform Provider for OpenManage Enterprise from terraform registry by 
 terraform {
   required_providers {
     ome = {
-      version = "1.1.0"
+      version = "1.2.0"
       source  = "dell/ome"
     }
   }
@@ -73,6 +98,14 @@ For adding resources, please refer [examples](https://github.com/dell/terraform-
 
 ## About
 Terraform Provider for OpenManage Enterprise is 100% open source and community-driven. All components are available under [MPL-2.0 license](https://www.mozilla.org/en-US/MPL/2.0/) on GitHub.
+
+## Releasing, Maintenance and Deprecation
+
+Terraform Provider for Dell Technnologies PowerMax follows [Semantic Versioning](https://semver.org/).
+
+New versions will be released regularly if significant changes (bug fix or new feature) are made in the provider.
+
+Released code versions are located on tags in the form of "vx.y.z" where x.y.z corresponds to the version number.
 
 ## Documentation
 For more detailed information on the provider, please refer to [Dell Terraform Providers Documentation](https://dell.github.io/terraform-docs/).
