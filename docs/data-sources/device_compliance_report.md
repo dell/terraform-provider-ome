@@ -45,7 +45,7 @@ limitations under the License.
 // Get the details of the device compliance report from device id, service tag or group name
 data "ome_device_compliance_report" "device_compliance_report_data" {
   // This will get the device compliance report for devices based on the filters used. 
-  // Only one of the below filters can be used.
+  // Only one of the below filters can be used at a time.
   # device_ids = [10102]
   # device_service_tags = ["HRPB0M3"]
   # device_group_names = ["Servers"]

@@ -62,7 +62,7 @@ For general information about Terraform, visit the [official website][tf-website
   * Device Datasource
   * Device Compliance Report
   * Application Certificate Datasource
-  * Firmware Baseline Compliance Repository
+  * Firmware Repository
   * Firmware Baseline Compliance Report
   * Firmware Catalog
   
