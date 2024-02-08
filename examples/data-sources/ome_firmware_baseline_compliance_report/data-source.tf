@@ -11,15 +11,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-# Get configuration compliance report for a baseline
+# Gets the firmware baseline compliance report
 data "ome_firmware_baseline_compliance_report" "report1" {
   baseline_name = "tfacc_baseline_dell_1"
 
-  #Supported filter keys are: DeviceName, DeviceModel, ServiceTag
-  #filter {
-			#key = "DeviceModel"
-			#value = "Valid Name"
-	#}
+  # Supported filter keys are: DeviceName, DeviceModel, ServiceTag
+  # Only one filter key/value can be used at a time
+  # filter {
+			# key = "DeviceModel"
+			# value = "Valid Name"
+	# }
 }
 
 output "all" {
