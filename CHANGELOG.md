@@ -1,3 +1,32 @@
+# v1.2.0
+
+# Release Summary
+
+The release supports resources and data sources mentioned in the Features section for Dell OME.
+
+## Features
+
+- List of new Resources and supported operations in Terraform Provider for Dell OME.
+
+  * Firmware Catalog
+  * Firmware Baselines
+  
+- List of new DataSources and supported operations in Terraform Provider for Dell OME.
+
+  * Firmware Repository
+  * Firmware Baseline Compliance Report
+  * Firmware Catalog
+  * Device Compliance Report
+
+## Enhancements
+
+N/A
+
+## Bug Fixes
+
+N/A
+
+
 # v1.1.1
 
 # Release Summary
