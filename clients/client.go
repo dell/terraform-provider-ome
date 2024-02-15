@@ -91,7 +91,7 @@ func NewClient(opts ClientOptions) (*Client, error) {
 	if opts.SkipSSL { // #nosec G402
 		omeClient.httpclient.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: opts.SkipSSL,
+				InsecureSkipVerify: opts.SkipSSL, //#nosec G402
 			},
 		}
 
@@ -107,7 +107,7 @@ func NewClient(opts ClientOptions) (*Client, error) {
 		// #nosec G402
 		omeClient.httpclient.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: opts.SkipSSL,
+				InsecureSkipVerify: opts.SkipSSL, //#nosec G402
 				RootCAs:            pool,
 			},
 		}
