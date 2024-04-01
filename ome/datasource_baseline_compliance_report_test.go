@@ -34,7 +34,7 @@ func TestDataSource_ReadConfigurationReport(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config:      testConfiguratiponReportDSInvalidCreds,
-				ExpectError: regexp.MustCompile(".*invalid credentials.*"),
+				ExpectError: regexp.MustCompile(".*unable to fetch the report*"),
 			},
 			{
 				Config:      testConfiguratiponReportDSInvalid,
@@ -49,14 +49,7 @@ func TestDataSource_ReadConfigurationReport(t *testing.T) {
 	})
 }
 
-var testConfiguratiponReportDSInvalidCreds = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "invalid"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-
+var testConfiguratiponReportDSInvalidCreds = testProvider + `
 	data "ome_configuration_report_info" "cr" {
 		id = "0"
 		baseline_name = "` + "InvalidBaseline" + `"
@@ -64,14 +57,7 @@ var testConfiguratiponReportDSInvalidCreds = `
 	}
 `
 
-var testConfiguratiponReportDSInvalid = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-
+var testConfiguratiponReportDSInvalid = testProvider + `
 	data "ome_configuration_report_info" "cr" {
 		id = "0"
 		baseline_name = "` + "InvalidBaseline" + `"
@@ -79,14 +65,7 @@ var testConfiguratiponReportDSInvalid = `
 	}
 `
 
-var testConfiguratiponReportDS = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-
+var testConfiguratiponReportDS = testProvider + `
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
 		ref_template_name = "` + TestRefTemplateName + `"

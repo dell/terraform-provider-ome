@@ -111,7 +111,7 @@ func (g *deviceDatasource) Read(ctx context.Context, req datasource.ReadRequest,
 			if err2 != nil {
 				resp.Diagnostics.AddError(
 					fmt.Sprintf("Error getting detailed inventory by id: %d", id),
-					err.Error(),
+					err2.Error(),
 				)
 				return
 			}

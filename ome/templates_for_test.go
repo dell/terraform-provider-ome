@@ -49,6 +49,7 @@ func initTemplates(t *testing.T) testTemplates {
 	}
 	templateSvcTag1 := `
 	resource "ome_template" "terraform-acceptance-test-1" {
+		reftemplate_name = "` + TestRefTemplateName + `"
 		view_type = "Compliance"
 		name = "%s"
 		content = file("%s/%s")
@@ -67,6 +68,7 @@ func initTemplates(t *testing.T) testTemplates {
 		view_type = "Compliance"
 		name = "%s"
 		content = file("%s/%s")
+		reftemplate_name = "` + TestRefTemplateName + `"
 	}
 	`
 	templateDeploySvcTag1 := `
