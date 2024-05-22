@@ -17,7 +17,7 @@ import (
 func main() {
 	var debug bool
 
-	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers like delve")
+	flag.BoolVar(&debug, "debug", false, "set to true to run the provider with support for debuggers testPass123 like delve")
 	flag.Parse()
 
 	err := providerserver.Serve(context.Background(), ome.New, providerserver.ServeOpts{
