@@ -81,7 +81,7 @@ func TestDataSource_DeviceComplianceReport(t *testing.T) {
 
 var deviceComplianceReportDeviceID = testProvider + `
 data "ome_device_compliance_report" "device_compliance_report_data" {
-	device_ids = [10102]
+	device_ids = [` + DeviceID1 + `]
 }
 output "fetch" {
 	value = length(data.ome_device_compliance_report.device_compliance_report_data.device_compliance_reports) > 0
@@ -90,7 +90,7 @@ output "fetch" {
 
 var deviceComplianceReportServiceTag = testProvider + `
 data "ome_device_compliance_report" "device_compliance_report_data" {
-	device_service_tags = ["HRPB0M3"]
+	device_service_tags = ["` + DeviceSvcTag1 + `"]
 }
 output "fetch" {
 	value = length(data.ome_device_compliance_report.device_compliance_report_data.device_compliance_reports) > 0

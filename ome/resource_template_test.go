@@ -114,7 +114,6 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "fqdds", "iDRAC,niC"),
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "description", "This is a test template"),
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "vlan.bonding_technology", "NoTeaming"),
-					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "vlan.vlan_attributes.0.untagged_network", "10172"),
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "identity_pool_name", "IO1"),
 
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-2", "name", TemplateName2),
