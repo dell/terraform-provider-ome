@@ -200,7 +200,7 @@ Read-Only:
 - `id` (Number) ID
 
 <a id="nestedatt--devices--detailed_inventory--capabilities--capability_type"></a>
-### Nested Schema for `devices.detailed_inventory.capabilities.id`
+### Nested Schema for `devices.detailed_inventory.capabilities.capability_type`
 
 Read-Only:
 
@@ -315,7 +315,7 @@ Read-Only:
 - `sold_date` (String) Sold Date
 
 <a id="nestedatt--devices--detailed_inventory--licenses--license_type"></a>
-### Nested Schema for `devices.detailed_inventory.licenses.sold_date`
+### Nested Schema for `devices.detailed_inventory.licenses.license_type`
 
 Read-Only:
 
@@ -352,7 +352,7 @@ Read-Only:
 - `management_type` (Attributes) Management Type (see [below for nested schema](#nestedatt--devices--detailed_inventory--management_info--management_type))
 
 <a id="nestedatt--devices--detailed_inventory--management_info--end_point_agents"></a>
-### Nested Schema for `devices.detailed_inventory.management_info.management_type`
+### Nested Schema for `devices.detailed_inventory.management_info.end_point_agents`
 
 Read-Only:
 
@@ -409,18 +409,18 @@ Read-Only:
 - `vendor_name` (String) Vendor Name
 
 <a id="nestedatt--devices--detailed_inventory--nics--ports"></a>
-### Nested Schema for `devices.detailed_inventory.nics.vendor_name`
+### Nested Schema for `devices.detailed_inventory.nics.ports`
 
 Read-Only:
 
 - `link_speed` (Number) Link Speed
 - `link_status` (String) Link Status
-- `partitions` (Attributes List) Partitions (see [below for nested schema](#nestedatt--devices--detailed_inventory--nics--vendor_name--partitions))
+- `partitions` (Attributes List) Partitions (see [below for nested schema](#nestedatt--devices--detailed_inventory--nics--ports--partitions))
 - `port_id` (String) Port ID
 - `product_name` (String) Product Name
 
-<a id="nestedatt--devices--detailed_inventory--nics--vendor_name--partitions"></a>
-### Nested Schema for `devices.detailed_inventory.nics.vendor_name.partitions`
+<a id="nestedatt--devices--detailed_inventory--nics--ports--partitions"></a>
+### Nested Schema for `devices.detailed_inventory.nics.ports.partitions`
 
 Read-Only:
 
@@ -514,7 +514,7 @@ Read-Only:
 - `storage_assignment_allowed` (String) Storage Assignment Allowed
 
 <a id="nestedatt--devices--detailed_inventory--raid_controllers--server_virtual_disks"></a>
-### Nested Schema for `devices.detailed_inventory.raid_controllers.storage_assignment_allowed`
+### Nested Schema for `devices.detailed_inventory.raid_controllers.server_virtual_disks`
 
 Read-Only:
 
