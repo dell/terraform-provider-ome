@@ -100,7 +100,7 @@ func TestDataSource_ReadFwCompReportErrRet(t *testing.T) {
 					if FunctionMocker != nil {
 						FunctionMocker.UnPatch()
 					}
-					FunctionMocker = Mock(helper.GetFwBaselineComplianceReport, OptGeneric).Return(nil, fmt.Errorf("Mock error")).Build()
+					FunctionMocker = Mock(helper.GetFwBaselineComplianceReport).Return(nil, fmt.Errorf("Mock error")).Build()
 				},
 				Config:      testFwBaselineCompReportDSErr,
 				ExpectError: regexp.MustCompile(`.*Mock error*.`),

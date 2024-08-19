@@ -174,7 +174,7 @@ func TestFirmwareBaselineResourceCreateError(t *testing.T) {
 					if FunctionMocker != nil {
 						FunctionMocker.Release()
 					}
-					FunctionMocker = MockGeneric(helper.CreateFirmwareBaseline).Return(int64(0), fmt.Errorf("mock Error")).Build()
+					FunctionMocker = Mock(helper.CreateFirmwareBaseline).Return(int64(0), fmt.Errorf("mock Error")).Build()
 
 				},
 				Config:      createFirmwareBaselineDeviceResource,
