@@ -3,7 +3,7 @@ module terraform-provider-ome
 go 1.22
 
 require (
-	github.com/bytedance/mockey v1.2.10
+	github.com/bytedance/mockey v1.2.11
 	github.com/hashicorp/terraform-plugin-docs v0.19.4
 	github.com/hashicorp/terraform-plugin-framework v1.11.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.13.0
