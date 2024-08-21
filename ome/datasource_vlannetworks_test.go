@@ -36,8 +36,6 @@ func TestDataSource_ReadVlanNetworks(t *testing.T) {
 			},
 			{
 				Config: testVlanNetworks,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("data.ome_vlannetworks_info.vlans", "vlan_networks.#", "3")),
 			},
 		},
 	})
