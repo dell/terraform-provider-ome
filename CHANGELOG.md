@@ -2,9 +2,9 @@
 
 # Release Summary
 
-The release address security vulnerability reported in gRPC library.
+The release addresses security vulnerabilities.
 
-Implemented functionality derived from the netdata library.
+All existing resources and datasources are qualified against OME v4.1.0.
 
 # v1.2.0
 

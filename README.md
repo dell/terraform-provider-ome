@@ -45,8 +45,6 @@ For general information about Terraform, visit the [official website][tf-website
   * [Additional Information](https://github.com/dell/terraform-provider-ome/blob/main/about/ADDITIONAL_INFORMATION.md)
   * [Attribution](https://github.com/dell/terraform-provider-ome/blob/main/about/ATTRIBUTION.md)
 
-## Supported Platforms
-  * Dell OpenManage Enterprise versions 3.10.x and 4.0.1
 
 ## Prerequisites
  | **Terraform Provider** | **OME Version** | **OS** | **Terraform** | **Golang** |
