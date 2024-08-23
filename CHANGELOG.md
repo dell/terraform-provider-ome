@@ -1,3 +1,11 @@
+# v1.2.1
+
+# Release Summary
+
+The release address security vulnerability reported in gRPC library.
+
+Implemented functionality derived from the netdata library.
+
 # v1.2.0
 
 # Release Summary
