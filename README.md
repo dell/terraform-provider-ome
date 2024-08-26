@@ -45,13 +45,11 @@ For general information about Terraform, visit the [official website][tf-website
   * [Additional Information](https://github.com/dell/terraform-provider-ome/blob/main/about/ADDITIONAL_INFORMATION.md)
   * [Attribution](https://github.com/dell/terraform-provider-ome/blob/main/about/ATTRIBUTION.md)
 
-## Supported Platforms
-  * Dell OpenManage Enterprise versions 3.10.x and 4.0.1
 
 ## Prerequisites
- | **Terraform Provider** | **OS** | **Terraform** | **Golang** |
- |------------------------|--------|---------------|------------|
-| v1.2.0 |  Ubuntu22.04 <br> RHEL9.x | 1.5.x <br> 1.6.x <br> | 1.21
+ | **Terraform Provider** | **OME Version** | **OS** | **Terraform** | **Golang** |
+ |------------------------|-----------------|--------|---------------|------------|
+ | v1.2.1 |  3.10.x <br> 4.0.1 <br> 4.1.0 | Ubuntu22.04 <br> RHEL9.x | 1.8.x <br> 1.9.x <br> | 1.22
 
 
 ## List of DataSources in Terraform Provider for Dell OME
@@ -89,7 +87,7 @@ Install Terraform Provider for OpenManage Enterprise from terraform registry by 
 terraform {
   required_providers {
     ome = {
-      version = "1.2.0"
+      version = "1.2.1"
       source  = "dell/ome"
     }
   }

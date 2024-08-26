@@ -1,3 +1,11 @@
+# v1.2.1
+
+# Release Summary
+
+The release addresses security vulnerabilities.
+
+All existing resources and datasources are qualified against OME v4.1.0.
+
 # v1.2.0
 
 # Release Summary

@@ -75,8 +75,9 @@ testacc:
 	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m   
 
 generate:
-	terraform fmt -recursive examples/
-	go generate ./...
+	# Do nothing for now because of vulnerability in terraform-plugin-docs
+	# terraform fmt -recursive examples/
+	# go generate ./...
 
 cover:
 	rm -f coverage.*

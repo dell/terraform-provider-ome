@@ -85,20 +85,20 @@ jobs:
         uses: dell/common-github-actions/gosec-runner@main
         with:
           directories: ./...
-        
- generate:
-    name: Generate
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - run: go generate ./...
-      - name: git diff
-        run: |
-          git diff --compact-summary --exit-code || \
-            (echo; echo "Unexpected difference in directories after code generation. Run 'go generate ./...' command and commit."; exit 1) 
+# Commenting out since the github.com/hashicorp/terraform-plugin-docs v0.19.4 has a vulnerablity
+#  generate:
+#     name: Generate
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: actions/setup-go@v3
+#         with:
+#           go-version: ${{ env.GO_VERSION }}
+#       - run: go generate ./...
+#       - name: git diff
+#         run: |
+#           git diff --compact-summary --exit-code || \
+#             (echo; echo "Unexpected difference in directories after code generation. Run 'go generate ./...' command and commit."; exit 1) 
           
  malware_security_scan:
       name: Malware Scanner
