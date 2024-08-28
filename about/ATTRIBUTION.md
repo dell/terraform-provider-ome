@@ -70,7 +70,7 @@ License: [MIT License](https://github.com/joho/godotenv/blob/main/LICENCE)
 
 ***
 
-#Indirect Dependencies
+# Indirect Dependencies
 
 Package: go-crypto  
 Version: v1.1.0-alpha.2  
