@@ -82,14 +82,14 @@ License: [BSD-3-Clause License](https://github.com/ProtonMail/go-crypto/blob/mai
 Package: go-textseg  
 Version: v15.0.0  
 Copyright: Copyright (c) 2017 Martin Atkins  
-License: [License](https://github.com/apparentlymart/go-textseg/blob/master/LICENSE)
+License: [MIT and Apache License](https://github.com/apparentlymart/go-textseg/blob/master/LICENSE)
 
 ***
 
 Package: circl  
 Version: v1.3.7  
 Copyright: Copyright (c) 2023 Cloudflare  
-License: [License](https://github.com/cloudflare/circl/blob/main/LICENSE)
+License: [BSD-3-Clause License](https://github.com/cloudflare/circl/blob/main/LICENSE)
 
 ***
 
@@ -170,10 +170,10 @@ License: [Apache License 2.0](https://github.com/google/go-genproto/blob/main/LI
 
 ***
 
-Package: check.v1  
+Package: go-check.v1  
 Version: v1.0.0-20201130134442-10cb98267c6c  
 Copyright: Copyright (c) 2010-2013 Gustavo Niemeyer  
-License: [License](https://github.com/go-check/check/blob/v1/LICENSE)
+License: [BSD-3-Clause License](https://github.com/go-check/check/blob/v1/LICENSE)
 
 ***
 
@@ -384,7 +384,7 @@ License: [Apache License 2.0](https://github.com/oklog/run/blob/master/LICENSE)
 Package: go-difflib  
 Version: v1.0.0  
 Copyright: Copyright (c) 2013, Patrick Mezard  
-License: [License](https://github.com/pmezard/go-difflib/blob/master/LICENSE)
+License: [BSD-3-Clause License](https://github.com/pmezard/go-difflib/blob/master/LICENSE)
 
 ***
 
