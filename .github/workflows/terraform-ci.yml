@@ -58,8 +58,9 @@ jobs:
     steps:
       - name: Checkout the code
         uses: actions/checkout@v3
+      - run:  sed -i 's/master/main/g' /github/workspace/about/ATTRIBUTION.md
       - name: Run the forbidden words scan
-        uses: terraform-providers-svc/common-github-actions/code-sanitizer@code_sanitizer
+        uses: dell/common-github-actions/code-sanitizer@main
         with:
           args: /github/workspace
      
