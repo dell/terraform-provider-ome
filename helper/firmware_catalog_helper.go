@@ -91,14 +91,14 @@ func SetStateCatalogFirmware(ctx context.Context, cat models.CatalogsModel, plan
 func GetIDFromNameFirmwareCatalog(client *clients.Client, name string) (int64, error) {
 	allCats, allErr := GetAllCatalogFirmware(client)
 	if allErr != nil {
-		return 0, fmt.Errorf(`Unable to get the Id of the catalog for catalog: `+name+`.`, allErr.Error())
+		return 0, fmt.Errorf("unable to get the Id of the catalog for catalog: %s. %v", name, allErr.Error())
 	}
 	for _, cm := range allCats.Value {
 		if cm.Repository.Name == name {
 			return cm.ID, nil
 		}
 	}
-	return 0, fmt.Errorf(`Unable to get the Id of the catalog for catalog: ` + name + `. catalog was unable to be found.`)
+	return 0, fmt.Errorf("unable to get the Id of the catalog for catalog: %s. catalog was unable to be found", name)
 }
 
 // MapAssociatedBaselines map the associated baselines to the terraform list attribute

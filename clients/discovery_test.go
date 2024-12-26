@@ -72,7 +72,7 @@ func TestClient_DiscoveryUpdateJob(t *testing.T) {
 	c, _ := NewClient(opts)
 
 	var updateDiscoveryJobSuccess models.DiscoveryJob
-	t.Logf(string(payloadUpdateDiscovery))
+	t.Log(string(payloadUpdateDiscovery))
 	err := c.JSONUnMarshal(payloadUpdateDiscovery, &updateDiscoveryJobSuccess)
 	if err != nil {
 		t.Error(err)
