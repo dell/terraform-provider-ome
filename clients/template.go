@@ -297,7 +297,7 @@ func (c *Client) GetPayloadVlanAttribute(networkView models.NetworkSpecificView,
 			}
 		}
 	}
-	return vlanAttrs, fmt.Errorf(ErrInvalidNetworkDetails)
+	return vlanAttrs, fmt.Errorf("%s", ErrInvalidNetworkDetails)
 }
 
 func getVlanAttributeForPayload(networkAttributes []models.NetworkAttribute) models.PayloadVlanAttribute {

@@ -402,7 +402,7 @@ func TestClient_ReadExpandedGroupByName(t *testing.T) {
 	t.Run("Invalid name", func(t *testing.T) {
 		groupName := "invalid_group1"
 		_, err := c.GetExpandedGroupByName(groupName, "")
-		t.Logf(err.Error())
+		t.Log(err.Error())
 		assert.NotNil(t, err)
 	})
 

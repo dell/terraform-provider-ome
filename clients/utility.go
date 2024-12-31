@@ -21,11 +21,11 @@ import (
 func DeviceMutuallyExclusive(serviceTags []string, devIDs []int64) (string, error) {
 	var usedDeviceInput string
 	if len(serviceTags) == 0 && len(devIDs) == 0 {
-		return "", fmt.Errorf(ErrDeviceRequired)
+		return "", fmt.Errorf("%s", ErrDeviceRequired)
 	}
 
 	if len(serviceTags) > 0 && len(devIDs) > 0 {
-		return "", fmt.Errorf(ErrDeviceMutuallyExclusive)
+		return "", fmt.Errorf("%s", ErrDeviceMutuallyExclusive)
 	}
 	if len(serviceTags) > 0 {
 		usedDeviceInput = ServiceTags
