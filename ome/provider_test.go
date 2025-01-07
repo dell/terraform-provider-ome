@@ -111,6 +111,15 @@ func testAccPreCheck(t *testing.T) {
 	if FunctionMocker != nil {
 		FunctionMocker.UnPatch()
 	}
+	if localFunctionalMocker != nil {
+		localFunctionalMocker.UnPatch()
+	}
+	if localMocker != nil {
+		localMocker.UnPatch()
+	}
+	if localMocker2 != nil {
+		localMocker2.UnPatch()
+	}
 
 	// testProvider.Configure(context.Background(), tfsdk.ConfigureProviderRequest{}, &tfsdk.ConfigureProviderResponse{})
 
