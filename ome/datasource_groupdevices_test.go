@@ -22,7 +22,7 @@ import (
 )
 
 func TestDataSource_ReadGroupDevices(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
+	if os.Getenv("TF_ACC") == "0" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 
@@ -89,6 +89,8 @@ var testgroupPreReq = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -139,6 +141,8 @@ var testgroupDeviceDSInvalidGroup = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -153,6 +157,8 @@ var testgroupDeviceDSEmptyGroup = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 

@@ -60,6 +60,8 @@ var testReadTemplate = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -75,6 +77,8 @@ var testReadInvalidTemplate = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 

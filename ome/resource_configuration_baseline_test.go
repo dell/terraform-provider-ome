@@ -210,6 +210,8 @@ var justProvider = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 `
@@ -219,6 +221,8 @@ var testCreateBaselineFailureWithBothTemplateIDName = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -234,6 +238,8 @@ var testCreateBaselineValidationFailureEmptyTemplateIDName = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -247,6 +253,8 @@ var testCreateBaselineValidationFailureInvalidTemplateName = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -261,6 +269,8 @@ var testCreateBaselineValidationFailureNonComplianceTemplateID = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -275,6 +285,8 @@ var testCreateBaselineValidationFailureEmptyDevice = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -289,6 +301,8 @@ var testCreateBaselineValidationFailureInvalidDevice = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -304,6 +318,8 @@ var testCreateBaselineValidationFailureNotificationOnScheduleEmptyCron = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -321,6 +337,8 @@ var testCreateBaselineValidationFailureScheduleNotificationInvalidEmail = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -339,6 +357,8 @@ var testCreateBaselineValidationFailureScheduleNotificationEmptyEmail = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -355,6 +375,8 @@ var testCreateBaselineValidationInvalidOutputFormatCase = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -371,6 +393,8 @@ var testCreateBaselineValidationInvalidOutputFormat = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -387,6 +411,8 @@ var testCreateBaselineValidationDeviceCapable = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
