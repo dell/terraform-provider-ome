@@ -56,9 +56,9 @@ func CreateTargetModel(client *clients.Client, plan models.FirmwareBaselineResou
 		}
 		for _, group := range groups {
 			targetModel := models.TargetModel{}
-			targetModel.ID = (group.ID)
+			targetModel.ID = group.ID
 			targetModeltype := models.TargetTypeModel{}
-			targetModeltype.ID = (group.TypeID)
+			targetModeltype.ID = group.TypeID
 			targetModeltype.Name = "GROUP"
 			targetModel.Type = targetModeltype
 			targets = append(targets, targetModel)
