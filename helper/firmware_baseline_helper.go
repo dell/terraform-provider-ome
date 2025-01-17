@@ -40,9 +40,9 @@ func CreateTargetModel(client *clients.Client, plan models.FirmwareBaselineResou
 
 		for _, device := range devices {
 			targetModel := models.TargetModel{}
-			targetModel.ID = int32(device.ID)
+			targetModel.ID = device.ID
 			targetModeltype := models.TargetTypeModel{}
-			targetModeltype.ID = int32(device.Type)
+			targetModeltype.ID = device.Type
 			targetModeltype.Name = "DEVICE"
 			targetModel.Type = targetModeltype
 			targets = append(targets, targetModel)
@@ -56,9 +56,9 @@ func CreateTargetModel(client *clients.Client, plan models.FirmwareBaselineResou
 		}
 		for _, group := range groups {
 			targetModel := models.TargetModel{}
-			targetModel.ID = int32(group.ID)
+			targetModel.ID = (group.ID)
 			targetModeltype := models.TargetTypeModel{}
-			targetModeltype.ID = int32(group.TypeID)
+			targetModeltype.ID = (group.TypeID)
 			targetModeltype.Name = "GROUP"
 			targetModel.Type = targetModeltype
 			targets = append(targets, targetModel)
@@ -73,9 +73,9 @@ func CreateTargetModel(client *clients.Client, plan models.FirmwareBaselineResou
 
 		for _, device := range devices {
 			targetModel := models.TargetModel{}
-			targetModel.ID = int32(device.ID)
+			targetModel.ID = device.ID
 			targetModeltype := models.TargetTypeModel{}
-			targetModeltype.ID = int32(device.Type)
+			targetModeltype.ID = device.Type
 			targetModeltype.Name = "DEVICE"
 			targetModel.Type = targetModeltype
 			targets = append(targets, targetModel)
