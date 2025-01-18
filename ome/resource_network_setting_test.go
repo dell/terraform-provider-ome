@@ -215,6 +215,10 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 
 // ============================================= Time Setting Test ==============================================
 func TestNetworkSettingTime(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
+
 	testAccCreateNetworkTimeSuccess := testProvider + `
 	resource "ome_appliance_network" "its_ome_time" {
 		time_setting = {

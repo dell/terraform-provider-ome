@@ -16,6 +16,7 @@ limitations under the License.
 package ome
 
 import (
+	"os"
 	"regexp"
 	"testing"
 
@@ -23,6 +24,10 @@ import (
 )
 
 func TestDiscoveryOne(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
+
 	testAccProvider := `
 	provider "ome" {
 		username = "` + omeUserName + `"
@@ -92,6 +97,10 @@ func TestDiscoveryOne(t *testing.T) {
 }
 
 func TestDiscoveryTwo(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
+
 	testAccProvider := `
 	provider "ome" {
 		username = "` + omeUserName + `"
@@ -272,6 +281,10 @@ func TestDiscoveryThree(t *testing.T) {
 }
 
 func TestDiscoveryFour(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
+
 	TrackDiscoveryJob := testProvider + `
 	resource "ome_discovery" "discover1" {
 		name = "discover-lab"

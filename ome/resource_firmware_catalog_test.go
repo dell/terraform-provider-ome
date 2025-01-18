@@ -28,7 +28,7 @@ import (
 var localFunctionalMocker *Mocker
 
 func TestFirmwareCatalogResourceCreate(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
+	if os.Getenv("TF_ACC") == "0" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	var catalogTfName = "ome_firmware_catalog.cat_1"
@@ -106,7 +106,7 @@ func TestFirmwareCatalogResourceValidationCreateError(t *testing.T) {
 }
 
 func TestFirmwareCatalogResourceReadCreateUpdateErrors(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
+	if os.Getenv("TF_ACC") == "0" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	createMock := models.CatalogsModel{
