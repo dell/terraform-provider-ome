@@ -16,6 +16,7 @@ package ome
 import (
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
@@ -79,6 +80,9 @@ func init() {
 }
 
 func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -128,6 +132,9 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 
 // The identity pool and Vlans does not get cloned into the new template in OME.
 func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -165,6 +172,9 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -240,6 +250,9 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 }
 
 func TestTemplateImport_ImportTemplates(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },

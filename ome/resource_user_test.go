@@ -15,6 +15,7 @@ package ome
 
 import (
 	"fmt"
+	"os"
 	"regexp"
 	"terraform-provider-ome/clients"
 	"testing"
@@ -31,6 +32,9 @@ const (
 )
 
 func TestUser(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
 
 	testAccProvider := `
 	provider "ome" {

@@ -14,6 +14,7 @@ limitations under the License.
 package ome
 
 import (
+	"os"
 	"regexp"
 	"testing"
 
@@ -26,6 +27,9 @@ const (
 )
 
 func TestStaticGroup(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
 
 	testAccProvider := `
 	provider "ome" {
