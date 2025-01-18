@@ -280,6 +280,9 @@ func TestTemplateImport_ImportTemplates(t *testing.T) {
 }
 
 func TestTemplateCreation_CreateImportTemplate(t *testing.T) {
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because it will try to create the context")
+	}
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
