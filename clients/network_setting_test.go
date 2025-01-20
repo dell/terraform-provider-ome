@@ -68,7 +68,7 @@ func TestNetwork_UpdateNetworkAdapterConfig(t *testing.T) {
 	c, _ := NewClient(opts)
 
 	var updateNetworkAdapterSuccess models.UpdateNetworkAdapterSetting
-	t.Logf(string(payloadUpdateNetworkSuccess))
+	t.Log(string(payloadUpdateNetworkSuccess))
 	err := c.JSONUnMarshal(payloadUpdateNetworkSuccess, &updateNetworkAdapterSuccess)
 	if err != nil {
 		t.Error(err)
@@ -125,7 +125,7 @@ func TestNetwork_UpdateNetworkSessions(t *testing.T) {
 	c, _ := NewClient(opts)
 
 	var sessionPayload []models.SessionInfo
-	t.Logf(string(payloadUpdateNetworkSession))
+	t.Log(string(payloadUpdateNetworkSession))
 	err := c.JSONUnMarshal(payloadUpdateNetworkSession, &sessionPayload)
 	if err != nil {
 		t.Error(err)
@@ -189,7 +189,7 @@ func TestNetwork_UpdateTimeConfiguration(t *testing.T) {
 	c, _ := NewClient(opts)
 
 	var payloadTC models.TimeConfig
-	t.Logf(string(payloadUpdateNetworkTime))
+	t.Log(string(payloadUpdateNetworkTime))
 	err := c.JSONUnMarshal(payloadUpdateNetworkTime, &payloadTC)
 	if err != nil {
 		t.Error(err)
@@ -271,7 +271,7 @@ func TestNetwork_UpdateProxyConfig(t *testing.T) {
 	c, _ := NewClient(opts)
 
 	var payloadProxy models.PayloadProxyConfiguration
-	t.Logf(string(payloadUpdateNetworkProxy))
+	t.Log(string(payloadUpdateNetworkProxy))
 	err := c.JSONUnMarshal(payloadUpdateNetworkProxy, &payloadProxy)
 	if err != nil {
 		t.Error(err)

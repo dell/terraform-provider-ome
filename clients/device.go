@@ -32,7 +32,7 @@ func (c *Client) GetDevice(serviceTag string, devID int64) (models.Device, error
 	}
 
 	if val == "''" {
-		return device, fmt.Errorf(ErrEmptyDeviceDetails)
+		return device, fmt.Errorf("%s", ErrEmptyDeviceDetails)
 	}
 
 	response, err := c.Get(DeviceAPI, nil, map[string]string{"$filter": fmt.Sprintf("%s eq %s", key, val)})
@@ -75,7 +75,7 @@ func (c *Client) ValidateDevice(serviceTag string, devID int64) (int64, error) {
 	}
 
 	if val == "''" {
-		return deviceID, fmt.Errorf(ErrEmptyDeviceDetails)
+		return deviceID, fmt.Errorf("%s", ErrEmptyDeviceDetails)
 	}
 
 	response, err := c.Get(DeviceAPI, nil, map[string]string{"$filter": fmt.Sprintf("%s eq %s", key, val)})

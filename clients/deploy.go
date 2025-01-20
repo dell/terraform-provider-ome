@@ -66,7 +66,7 @@ func (c *Client) DeleteDeployment(deleteDeploymentReq models.ProfileDeleteReques
 	if jobID != 0 {
 		jobStatus, statusMessage := c.TrackJob(jobID, 10, 10)
 		if !jobStatus {
-			return fmt.Errorf(statusMessage)
+			return fmt.Errorf("%s", statusMessage)
 		}
 	}
 	_, err = c.Post(DeleteProfileAPI, nil, data)

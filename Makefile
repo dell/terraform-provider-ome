@@ -65,11 +65,11 @@ test: check
 
 check:
 	gofmt -s -w .
-	# go vet
+	go vet
 	golangci-lint run --fix --timeout 5m
 
 gosec:
-	gosec -quiet -log gosec.log -out=gosecresults.csv -fmt=csv ./...
+	gosec -quiet ./...
 
 testacc:
 	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m   

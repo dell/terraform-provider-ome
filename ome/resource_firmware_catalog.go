@@ -18,6 +18,7 @@ import (
 	"strconv"
 	"terraform-provider-ome/helper"
 	"terraform-provider-ome/models"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -101,6 +102,9 @@ func (r *firmwareCatalogResource) Create(ctx context.Context, req resource.Creat
 		)
 		return
 	}
+
+	// Adding small timeout because catalog ID is not available in read operation otherwise, so AT and FT were failing.
+	time.Sleep(5 * time.Second)
 
 	// Set the tf state after create
 	state, mapErr := helper.SetStateCatalogFirmware(ctx, cat, plan)
