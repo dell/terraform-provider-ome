@@ -32,15 +32,14 @@ const (
 )
 
 func TestUser(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
 
 	testAccProvider := `
 	provider "ome" {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+ 		protocol = "` + protocol + `"
 		skipssl = true
 	}
 	`
@@ -67,30 +66,6 @@ func TestUser(t *testing.T) {
 		role_id = "10"
 		locked = true
 		enabled = false
-	}
-	`
-
-	testAccCreateFailure := testAccProvider + `
-	resource "ome_user" "code_2" {
-		username = "123456789123456789"
-		password = "Abcde123!"
-		role_id = "101"
-	}
-	`
-
-	testAccCreateUpdate := testAccProvider + `
-	resource "ome_user" "code_3" {
-		username = "` + User1 + `"
-		password = "Abcde123!"
-		role_id = "101"
-	}
-	`
-
-	testAccUpdateFailure := testAccProvider + `
-	resource "ome_user" "code_3" {
-		username = "` + UserUpdate1 + `"
-		password = "Abcde123!"
-		role_id = "invalid"
 	}
 	`
 
@@ -124,6 +99,55 @@ func TestUser(t *testing.T) {
 				ExpectError:       regexp.MustCompile(clients.ErrGnrImportUser),
 				ImportStateId:     "invalid",
 			},
+		},
+	})
+}
+
+func TestUserNegative(t *testing.T) {
+
+	if os.Getenv("TF_ACC") == "0" {
+		t.Skip("Dont run with units tests because negative cases we are not running with mock server")
+	}
+
+	testAccProvider := `
+	provider "ome" {
+		username = "` + omeUserName + `"
+		password = "` + omePassword + `"
+		host = "` + omeHost + `"
+		port = "` + port + `"
+ 		protocol = "` + protocol + `"
+		skipssl = true
+	}
+	`
+
+	testAccCreateFailure := testAccProvider + `
+	resource "ome_user" "code_2" {
+		username = "123456789123456789"
+		password = "Abcde123!"
+		role_id = "101"
+	}
+	`
+
+	testAccCreateUpdate := testAccProvider + `
+	resource "ome_user" "code_3" {
+		username = "` + User1 + `"
+		password = "Abcde123!"
+		role_id = "101"
+	}
+	`
+
+	testAccUpdateFailure := testAccProvider + `
+	resource "ome_user" "code_3" {
+		username = "` + UserUpdate1 + `"
+		password = "Abcde123!"
+		role_id = "invalid"
+	}
+	`
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
 			{
 				Config:      testAccCreateFailure,
 				ExpectError: regexp.MustCompile(clients.ErrGnrCreateUser),
@@ -137,6 +161,7 @@ func TestUser(t *testing.T) {
 			},
 		},
 	})
+
 }
 
 func testAccImportStateIDFunc(resourceName string) resource.ImportStateIdFunc {
