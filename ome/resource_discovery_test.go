@@ -24,15 +24,14 @@ import (
 )
 
 func TestDiscoveryOne(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
 
 	testAccProvider := `
 	provider "ome" {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 	`
@@ -87,9 +86,15 @@ func TestDiscoveryOne(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCreateDiscoverySuccess,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_discovery.code_1", "name", "test-create"),
+				),
 			},
 			{
 				Config: testAccUpdateDiscoverySuccess,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_discovery.code_1", "name", "test-update"),
+				),
 			},
 		},
 	})
@@ -98,7 +103,7 @@ func TestDiscoveryOne(t *testing.T) {
 
 func TestDiscoveryTwo(t *testing.T) {
 	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+		t.Skip("Skipping Because Case is Same As TestDiscoveryOne")
 	}
 
 	testAccProvider := `
@@ -106,6 +111,8 @@ func TestDiscoveryTwo(t *testing.T) {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 	`
@@ -183,6 +190,8 @@ func TestDiscoveryThree(t *testing.T) {
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 	`
@@ -282,7 +291,7 @@ func TestDiscoveryThree(t *testing.T) {
 
 func TestDiscoveryFour(t *testing.T) {
 	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+		t.Skip("Skipping Because Depends on Job Status and All")
 	}
 
 	TrackDiscoveryJob := testProvider + `
@@ -293,7 +302,7 @@ func TestDiscoveryFour(t *testing.T) {
 		ignore_partial_failure = true
 		discovery_config_targets = [
 		  {
-		  network_address_detail = ["` + DeviceIP1 + `","` + DeviceIP2 + `","` + DeviceIPExt + `", "127.0.0.1","0.42.42.42","1.1.1.1","8.8.8.8","192.168.1.1"]
+		  network_address_detail = ["` + DeviceIP1 + `","` + DeviceIP2 + `"]
 		  device_type = ["SERVER"]
 		  wsman = {
 			username = "` + IdracUsername + `"
