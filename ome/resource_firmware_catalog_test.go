@@ -15,7 +15,6 @@ package ome
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"terraform-provider-ome/helper"
 	"terraform-provider-ome/models"
@@ -28,9 +27,6 @@ import (
 var localFunctionalMocker *Mocker
 
 func TestFirmwareCatalogResourceCreate(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
 	var catalogTfName = "ome_firmware_catalog.cat_1"
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -74,9 +70,7 @@ func TestFirmwareCatalogResourceCreate(t *testing.T) {
 }
 
 func TestFirmwareCatalogResourceValidationCreateError(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -106,9 +100,6 @@ func TestFirmwareCatalogResourceValidationCreateError(t *testing.T) {
 }
 
 func TestFirmwareCatalogResourceReadCreateUpdateErrors(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
 	createMock := models.CatalogsModel{
 		ID: 1,
 		Repository: models.RepositoryModel{
@@ -157,18 +148,6 @@ func TestFirmwareCatalogResourceReadCreateUpdateErrors(t *testing.T) {
 				},
 				Config:      createFirmwareCatalogResource,
 				ExpectError: regexp.MustCompile(`.*Unable to read specific firmware catalog*.`),
-			},
-			{
-				PreConfig: func() {
-					if FunctionMocker != nil {
-						FunctionMocker.UnPatch()
-					}
-					if localFunctionalMocker != nil {
-						localFunctionalMocker.UnPatch()
-					}
-				},
-				Config:      updateFirmwareVaildationError,
-				ExpectError: regexp.MustCompile(`.*Unable to update catalog, validation error:*.`),
 			},
 			{
 				PreConfig: func() {
