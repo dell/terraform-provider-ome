@@ -18,6 +18,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strings"
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/models"
 	"testing"
@@ -81,7 +82,7 @@ func init() {
 
 func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+		t.Skip("Dont run with units tests, only for Acceptance Test case")
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -133,7 +134,7 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess(t *testing.T) {
 // The identity pool and Vlans does not get cloned into the new template in OME.
 func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+		t.Skip("Dont run with units tests, only for Acceptance Test case")
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -173,7 +174,7 @@ func TestTemplateCreation_CreateTemplateByCloningSuccess(t *testing.T) {
 
 func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+		t.Skip("Dont run with units tests, only for Acceptance Test case")
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -251,7 +252,7 @@ func TestTemplateCreation_CreateTemplatesInvalidScenarios(t *testing.T) {
 
 func TestTemplateImport_ImportTemplates(t *testing.T) {
 	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+		t.Skip("Dont run with units tests, only for Acceptance Test case")
 	}
 
 	resource.Test(t, resource.TestCase{
@@ -281,7 +282,7 @@ func TestTemplateImport_ImportTemplates(t *testing.T) {
 
 func TestTemplateCreation_CreateImportTemplate(t *testing.T) {
 	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+		t.Skip("Dont run with units tests, only for Acceptance Test case")
 	}
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -299,6 +300,38 @@ func TestTemplateCreation_CreateImportTemplate(t *testing.T) {
 					resource.TestCheckResourceAttr("ome_template.citctest", "view_type", "Compliance"),
 					resource.TestCheckResourceAttr("ome_template.citctest", "view_type_id", "1"),
 					resource.TestCheckResourceAttr("ome_template.citctest", "device_type", "Server"),
+				),
+			},
+		},
+	})
+}
+
+func TestTemplateCreation_CreateAndUpdateTemplateSuccess_UT(t *testing.T) {
+	if os.Getenv("TF_ACC") == "1" {
+		t.Skip("Dont run with Acceptance Test")
+	}
+
+	temps := initTemplates(t)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: justProvider + temps.templateSvcTag1Full,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "name", TestRefTemplateName),
+					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "view_type_id", "1"),
+					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "description", "Imported from a file."),
+				),
+			},
+
+			{
+				Config: justProvider + strings.Replace(temps.templateSvcTag1Full, TestRefTemplateName, "test_acc_update_content_d", -1),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "name", "test_acc_update_content_d"),
+					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "view_type_id", "1"),
+					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "description", "Imported from a file."),
 				),
 			},
 		},
@@ -436,6 +469,8 @@ provider "ome" {
 	username = "` + omeUserName + `"
 	password = "` + omePassword + `"
 	host = "` + omeHost + `"
+	port = "` + port + `"
+        protocol = "` + protocol + `"
 	skipssl = true
 }
 
@@ -451,6 +486,8 @@ provider "ome" {
 	username = "` + omeUserName + `"
 	password = "` + omePassword + `"
 	host = "` + omeHost + `"
+	port = "` + port + `"
+	protocol = "` + protocol + `"
 	skipssl = true
 }
 
@@ -467,6 +504,8 @@ provider "ome" {
 	username = "` + omeUserName + `"
 	password = "` + omePassword + `"
 	host = "` + omeHost + `"
+	port = "` + port + `"
+        protocol = "` + protocol + `"
 	skipssl = true
 }
 
