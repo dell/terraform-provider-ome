@@ -185,25 +185,6 @@ var updateFirmwareMockError = testProvider + `
 	}
 `
 
-var updateFirmwareVaildationError = testProvider + `
-	resource "ome_firmware_catalog" "cat_1" {
-		name = "` + CatalogResource + `"
-		catalog_update_type = "Manual"
-		share_type = "CIFS"
-		catalog_file_path = "catalogs/example_catalog_1.xml"
-        share_address = "https://1.2.2.1"
-        catalog_refresh_schedule = {
-          cadence = "Weekly"
-          day_of_the_week = "Wednesday"
-          time_of_day = "6"
-          am_pm = "PM"
-        }
-        domain = "example"
-        share_user = "example-user"
-        share_password = "example-pass"
-	}
-`
-
 var createFirmwareCatalogResourceValidateErrorAutomatic = testProvider + `
 	resource "ome_firmware_catalog" "cat_1" {
 		name = "` + CatalogResource + `_validate"
