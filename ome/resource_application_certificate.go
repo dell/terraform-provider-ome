@@ -15,7 +15,6 @@ package ome
 
 import (
 	"context"
-	"fmt"
 	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -106,9 +105,6 @@ func (r resourceCert) uploadCert(ctx context.Context, plan models.CertResModel) 
 		return plan, dgs
 	}
 	defer omeClient.RemoveSession()
-
-	devs, errd := omeClient.GetAllDevices(nil)
-	fmt.Sprintln(devs, errd)
 
 	tflog.Info(ctx, "resource_cert uploading Cert")
 
