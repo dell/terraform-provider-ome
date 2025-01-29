@@ -16,7 +16,6 @@ limitations under the License.
 package ome
 
 import (
-	"os"
 	"regexp"
 	"testing"
 

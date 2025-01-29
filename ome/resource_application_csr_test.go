@@ -14,7 +14,6 @@ limitations under the License.
 package ome
 
 import (
-	"os"
 	"regexp"
 	"testing"
 
@@ -22,9 +21,6 @@ import (
 )
 
 func TestCsr(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
