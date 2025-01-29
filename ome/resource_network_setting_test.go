@@ -215,9 +215,6 @@ func TestNetworkSettingAdapterInvalidConfig(t *testing.T) {
 
 // ============================================= Time Setting Test ==============================================
 func TestNetworkSettingTime(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
 
 	testAccCreateNetworkTimeSuccess := testProvider + `
 	resource "ome_appliance_network" "its_ome_time" {
@@ -338,9 +335,9 @@ func TestNetworkSettingTimeInvalidConfig(t *testing.T) {
 // ============================================= Session Setting Test ===========================================
 
 func TestNetworkSettingSession(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
+	// if os.Getenv("TF_ACC") == "0" {
+	// 	t.Skip("Dont run with units tests because it will try to create the context")
+	// }
 	testAccCreateNetworkSessionSuccess := testProvider + `
 	resource "ome_appliance_network" "code_ome" {
 		session_setting = {
@@ -487,9 +484,7 @@ func TestNetworkSettingSessionInValidConfig(t *testing.T) {
 // ============================================== Proxy Setting Test ============================================
 
 func TestNetworkSettingProxy(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
+
 	testAccCreateNetworkProxySuccess := testProvider + `
 	resource "ome_appliance_network" "code_1" {
 		proxy_setting = {
@@ -535,7 +530,7 @@ func TestNetworkSettingProxy(t *testing.T) {
 
 func TestNetworkSettingProxyIsInfraChangeDetected(t *testing.T) {
 	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+		t.Skip("Dont run with units tests")
 	}
 	testAccCreateNetworkProxy := testProvider + `
 	resource "ome_appliance_network" "code_2" {
@@ -575,9 +570,7 @@ func TestNetworkSettingProxyIsInfraChangeDetected(t *testing.T) {
 }
 
 func TestNetworkSettingProxyInValidConfig(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
+
 	testAccNetworkProxyInvalid := testProvider + `
 	resource "ome_appliance_network" "code_1" {
 		proxy_setting = {
@@ -641,7 +634,7 @@ func TestNetworkSettingProxyInValidConfig(t *testing.T) {
 
 func TestNetworkSettingProxyNil(t *testing.T) {
 	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+		t.Skip("Dont run with units tests")
 	}
 
 	testAccNetworkProxyCreateNil := testProvider + `
