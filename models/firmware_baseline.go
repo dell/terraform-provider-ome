@@ -57,14 +57,14 @@ type ComplianceSummaryModel struct {
 // TargetModel struct for TargetModel
 type TargetModel struct {
 	// DeviceIDs can be determined through /api/DeviceService/Devices and GroupIDs can be determined through /api/GroupService/Groups
-	ID   int32           `json:"Id"`
+	ID   int64           `json:"Id"`
 	Type TargetTypeModel `json:"Type"`
 }
 
 // TargetTypeModel struct for TargetTypeModel
 type TargetTypeModel struct {
 	// Device type ID. DeviceType IDs can be determined through /api/DeviceService/DeviceType
-	ID int32 `json:"Id"`
+	ID int64 `json:"Id"`
 	// Type of the target (DEVICE or GROUP)
 	Name string `json:"Name"`
 }

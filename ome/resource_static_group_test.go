@@ -14,10 +14,12 @@ limitations under the License.
 package ome
 
 import (
-	"os"
+	"fmt"
 	"regexp"
+	"terraform-provider-ome/clients"
 	"testing"
 
+	. "github.com/bytedance/mockey"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -26,19 +28,9 @@ const (
 	DeviceGroup1Update = "test_acc_group_device_1_updated"
 )
 
-func TestStaticGroup(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
+func TestAccStaticGroup(t *testing.T) {
 
-	testAccProvider := `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-	`
+	testAccProvider := testProvider
 
 	preReqs := `
 	data "ome_device" "devs" {
@@ -51,8 +43,6 @@ func TestStaticGroup(t *testing.T) {
 		device_group_names = ["Static Groups"]
 	}
 	`
-
-	t.Log(testAccProvider)
 
 	testAccCreateGroupSuccess := testAccProvider + preReqs + `	
 	resource "ome_static_group" "terraform-acceptance-test-1" {
@@ -167,6 +157,10 @@ func TestStaticGroup(t *testing.T) {
 	}
 	`
 
+	if FunctionMocker != nil {
+		FunctionMocker.Release()
+	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -208,11 +202,17 @@ func TestStaticGroup(t *testing.T) {
 				ImportStateId:     "invalid",
 			},
 			{
+				PreConfig: func() {
+					FunctionMocker = Mock((*clients.Client).CreateGroup).Return(0, fmt.Errorf("Duplicate name error")).Build()
+				},
 				// create group with existing group name
 				Config:      testAccDuplicateNameNeg,
 				ExpectError: regexp.MustCompile("Error while creation"),
 			},
 			{
+				PreConfig: func() {
+					FunctionMocker.Release()
+				},
 				// create group with invalid device ids
 				Config:      testAccInvalidDeviceNeg,
 				ExpectError: regexp.MustCompile("Error while adding group devices"),
@@ -222,11 +222,17 @@ func TestStaticGroup(t *testing.T) {
 				Config: testAccCreate2,
 			},
 			{
+				PreConfig: func() {
+					FunctionMocker = Mock((*clients.Client).UpdateGroup).Return(fmt.Errorf("Duplicate name error")).Build()
+				},
 				// update group name to existing group name
 				Config:      testAccDuplicateNameNeg,
 				ExpectError: regexp.MustCompile("Error while updation"),
 			},
 			{
+				PreConfig: func() {
+					FunctionMocker.Release()
+				},
 				// update group by adding invalid device id
 				Config:      testAccInvalidDeviceNeg,
 				ExpectError: regexp.MustCompile("Error while adding group devices"),

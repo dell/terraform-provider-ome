@@ -119,7 +119,7 @@ func TestAccDevicesResUpdate(t *testing.T) {
 
 	DiscoveryJob := `
 	resource "ome_discovery" "discover1" {
-		name = "discover-lab"
+		name = "discover-up-lab"
 		schedule = "RunNow"
 		ignore_partial_failure = true
 		timeout = 10

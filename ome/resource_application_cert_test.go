@@ -17,14 +17,16 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"terraform-provider-ome/clients"
 	"testing"
 	"time"
 
+	"github.com/bytedance/mockey"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestCert(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+func TestAccCert(t *testing.T) {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 
@@ -34,34 +36,11 @@ func TestCert(t *testing.T) {
 	}
 	`
 
-	resource.Test(t, resource.TestCase{
-		PreCheck:                 func() { testAccPreCheck(t) },
-		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
-		Steps: []resource.TestStep{
-			{
-				Config:      testCreateCertInvalid,
-				ExpectError: regexp.MustCompile(".*failed to decode base64.*"),
-			},
-			{
-				SkipFunc: func() (bool, error) {
-					if InvCert == "" {
-						t.Log("Skipping as INV_CERT is not set")
-						return true, nil
-					}
-					return false, nil
-				},
-				Config:      testCertBad,
-				ExpectError: regexp.MustCompile(".*certificate[[:space:]]file[[:space:]]provided[[:space:]]is[[:space:]]invalid.*"),
-			},
-		},
-	})
-
-}
-
-func TestCertPos(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
+	testCertBad := testProvider + `
+	resource "ome_application_certificate" "ome_cert" {
+		certificate_base64 = base64encode("invalid Content")
 	}
+	`
 
 	var testCreateCert = testProvider + `
 	provider "random" {
@@ -121,7 +100,7 @@ func TestCertPos(t *testing.T) {
 			local_file.csr_file.content
 		]
 		provisioner "local-exec" {
-			command = "openssl x509 -req -in ${local_file.csr_file.filename} -days 365 -CA ${local.ca_cert} -CAkey ${local.ca_key} -CAcreateserial -out my_signed_cert.pem"
+			command = "cat ${local_file.csr_file.filename} && openssl x509 -req -in ${local_file.csr_file.filename} -days 365 -CA ${local.ca_cert} -CAkey ${local.ca_key} -CAcreateserial -out my_signed_cert.pem"
 		}
 		provisioner "local-exec" {
 			when = destroy
@@ -142,8 +121,8 @@ func TestCertPos(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
-			if InvCert == "" {
-				t.Skip("Skipping because INV_CERT=", InvCert)
+			if FunctionMocker != nil {
+				FunctionMocker.Release()
 			}
 		},
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -158,6 +137,20 @@ func TestCertPos(t *testing.T) {
 		},
 		Steps: []resource.TestStep{
 			{
+				Config:      testCreateCertInvalid,
+				ExpectError: regexp.MustCompile(".*failed to decode base64.*"),
+			},
+			{
+				PreConfig: func() {
+					FunctionMocker = mockey.Mock((*clients.Client).PostCert).Return("", fmt.Errorf("certificate file provided is invalid")).Build()
+				},
+				Config:      testCertBad,
+				ExpectError: regexp.MustCompile(".*certificate[[:space:]]file[[:space:]]provided[[:space:]]is[[:space:]]invalid.*"),
+			},
+			{
+				PreConfig: func() {
+					FunctionMocker.Release()
+				},
 				Config: fmt.Sprintf(testCreateCert, 0),
 			},
 			{
@@ -166,27 +159,7 @@ func TestCertPos(t *testing.T) {
 				},
 				Config: fmt.Sprintf(testCreateCert, 1),
 			},
-			{
-				PreConfig: func() {
-					time.Sleep(time.Second * 20)
-				},
-				SkipFunc: func() (bool, error) {
-					if InvCert == "" {
-						t.Log("Skipping as INV_CERT is not set")
-						return true, nil
-					}
-					return false, nil
-				},
-				Config:      testCertBad,
-				ExpectError: regexp.MustCompile(".*certificate[[:space:]]file[[:space:]]provided[[:space:]]is[[:space:]]invalid.*"),
-			},
 		},
 	})
 
 }
-
-var testCertBad = testProvider + `
-resource "ome_application_certificate" "ome_cert" {
-	certificate_base64 = filebase64("` + InvCert + `")
-}
-`

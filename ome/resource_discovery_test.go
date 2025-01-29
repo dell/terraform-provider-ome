@@ -23,20 +23,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestDiscoveryOne(t *testing.T) {
-
-	testAccProvider := `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		port = "` + port + `"
-		protocol = "` + protocol + `"
-		skipssl = true
-	}
-	`
-
-	testAccCreateDiscoverySuccess := testAccProvider + `
+func TestAccDiscoveryOne(t *testing.T) {
+	testAccCreateDiscoverySuccess := testProvider + `
 	resource "ome_discovery" "code_1" {
 		name = "test-create"
 		schedule = "RunLater"
@@ -58,7 +46,7 @@ func TestDiscoveryOne(t *testing.T) {
 		}]
 	  }
 	`
-	testAccUpdateDiscoverySuccess := testAccProvider + `
+	testAccUpdateDiscoverySuccess := testProvider + `
 	resource "ome_discovery" "code_1" {
 		name = "test-update"
 		schedule = "RunLater"
@@ -101,23 +89,8 @@ func TestDiscoveryOne(t *testing.T) {
 
 }
 
-func TestDiscoveryTwo(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Skipping Because Case is Same As TestDiscoveryOne")
-	}
-
-	testAccProvider := `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		port = "` + port + `"
-		protocol = "` + protocol + `"
-		skipssl = true
-	}
-	`
-
-	testAccCreateDiscoveryDebug := testAccProvider + `
+func TestAccDiscoveryTwo(t *testing.T) {
+	testAccCreateDiscoveryDebug := testProvider + `
 	resource "ome_discovery" "code_1" {
 		name = "shiva-ganga"
 		schedule = "RunLater"
@@ -139,7 +112,7 @@ func TestDiscoveryTwo(t *testing.T) {
 		}]
 	  }
 	`
-	testAccUpdateDiscoveryDebug := testAccProvider + `
+	testAccUpdateDiscoveryDebug := testProvider + `
 	resource "ome_discovery" "code_1" {
 		name = "kashi-ganga"
 		schedule = "RunLater"
@@ -184,19 +157,9 @@ func TestDiscoveryTwo(t *testing.T) {
 
 }
 
-func TestDiscoveryThree(t *testing.T) {
-	testAccProvider := `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		port = "` + port + `"
-		protocol = "` + protocol + `"
-		skipssl = true
-	}
-	`
+func TestAccDiscoveryThree(t *testing.T) {
 
-	invalidDiscoveryConfigOne := testAccProvider + `
+	invalidDiscoveryConfigOne := testProvider + `
 	resource "ome_discovery" "code_3" {
 		name = "invalid-config"
 		schedule = "RunNow"
@@ -209,7 +172,7 @@ func TestDiscoveryThree(t *testing.T) {
 	  }
 	`
 
-	invalidDiscoveryConfigtwo := testAccProvider + `
+	invalidDiscoveryConfigtwo := testProvider + `
 	resource "ome_discovery" "code_4" {
 		name = "invalid-config"
 		schedule = "RunNow"
@@ -219,7 +182,7 @@ func TestDiscoveryThree(t *testing.T) {
 	  }
 	`
 
-	invalidDiscoveryConfigThree := testAccProvider + `
+	invalidDiscoveryConfigThree := testProvider + `
 	resource "ome_discovery" "code_4" {
 		name = "invalid-config"
 		schedule = "RunNow"
@@ -232,7 +195,7 @@ func TestDiscoveryThree(t *testing.T) {
 	  }
 	`
 
-	invalidDiscoveryConfigFour := testAccProvider + `
+	invalidDiscoveryConfigFour := testProvider + `
 	resource "ome_discovery" "code_4" {
 		name     = "invalid-config"
 		schedule = "RunLater"
@@ -289,11 +252,7 @@ func TestDiscoveryThree(t *testing.T) {
 	})
 }
 
-func TestDiscoveryFour(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Skipping Because Depends on Job Status and All")
-	}
-
+func TestAccDiscoveryFour(t *testing.T) {
 	TrackDiscoveryJob := testProvider + `
 	resource "ome_discovery" "discover1" {
 		name = "discover-lab"
