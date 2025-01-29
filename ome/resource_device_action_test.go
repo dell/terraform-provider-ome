@@ -15,7 +15,6 @@ limitations under the License.
 package ome
 
 import (
-	"os"
 	"regexp"
 	"testing"
 
@@ -23,10 +22,6 @@ import (
 )
 
 func TestAccDeviceActionResInvalid(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
-
 	test := testProvider + `
 	resource "ome_device_action" "code_1" {
 		job_name = "refresh-job"
@@ -46,11 +41,6 @@ func TestAccDeviceActionResInvalid(t *testing.T) {
 }
 
 func TestAccDeviceActionRes(t *testing.T) {
-
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
-
 	getDeviceIds := `
 	data "ome_device" "devs" {
 		filters = {

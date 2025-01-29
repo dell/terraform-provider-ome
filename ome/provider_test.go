@@ -126,7 +126,7 @@ func testAccPreCheck(t *testing.T) {
 }
 
 func skipTest() bool {
-	return os.Getenv("TF_ACC") == "0" || os.Getenv("ACC_DETAIL") == ""
+	return os.Getenv("TF_ACC") == "" || os.Getenv("ACC_DETAIL") == ""
 }
 
 func getTestData(fileName string) string {

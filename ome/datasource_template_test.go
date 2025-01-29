@@ -51,32 +51,15 @@ func TestDataSource_ReadTemplate(t *testing.T) {
 	})
 }
 
-var testReadTemplate = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		port = "` + port + `"
-		protocol = "` + protocol + `"
-		skipssl = true
-	}
-
-	data "ome_template_info" "template" {
+var testReadTemplate = testProvider + `
+		data "ome_template_info" "template" {
 		id = "0"
 		name = "` + TestRefTemplateName + `"
 		depends_on = ["ome_template.terraform-acceptance-test-1"]
 		}
 		`
 
-var testReadInvalidTemplate = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		port = "` + port + `"
-		protocol = "` + protocol + `"
-		skipssl = true
-	}
+var testReadInvalidTemplate = testProvider + `
 
 	data "ome_template_info" "template" {
 		id = "0"

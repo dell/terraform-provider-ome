@@ -76,7 +76,7 @@ func init() {
 }
 
 func TestCreateBaseline_TestValidations(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 
@@ -105,7 +105,7 @@ func TestCreateBaseline_TestValidations(t *testing.T) {
 }
 
 func TestCreateBaseline_TestNotificationValidations(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 
@@ -156,7 +156,7 @@ func TestCreateBaseline_TestNotificationValidations(t *testing.T) {
 }
 
 func TestCreateBaseline_TestValidationsWithValidTemplate(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	temps := initTemplates(t)
@@ -424,7 +424,7 @@ var testCreateBaselineValidationDeviceCapable = `
 `
 
 func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	temps := initTemplates(t)
@@ -551,7 +551,7 @@ var testConfigureBaselinewithDeviceIDUpdate = `
 `
 
 func TestCreateBaseline_CreateBaselineWithSchedule(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	temps := initTemplates(t)
@@ -649,7 +649,7 @@ var testConfigureBaselineWithScheduleUpdate = `
 `
 
 func TestCreateBaseline_CreateBaselineWithScheduleNonCompliant(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	temps := initTemplates(t)
@@ -738,7 +738,7 @@ var testImportConfigurationBaseline = `
 `
 
 func TestCreateBaseline_Update(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	temps := initTemplates(t)

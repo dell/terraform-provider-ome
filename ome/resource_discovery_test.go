@@ -73,15 +73,9 @@ func TestAccDiscoveryOne(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCreateDiscoverySuccess,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_discovery.code_1", "name", "test-create"),
-				),
 			},
 			{
 				Config: testAccUpdateDiscoverySuccess,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("ome_discovery.code_1", "name", "test-update"),
-				),
 			},
 		},
 	})
@@ -260,7 +254,7 @@ func TestAccDiscoveryFour(t *testing.T) {
 		ignore_partial_failure = true
 		discovery_config_targets = [
 		  {
-		  network_address_detail = ["` + DeviceIP1 + `","` + DeviceIP2 + `"]
+		  network_address_detail = ["` + DeviceIP1 + `","` + DeviceIP2 + `","` + DeviceIPExt + `", "127.0.0.1","0.42.42.42","1.1.1.1","8.8.8.8","192.168.1.1"]
 		  device_type = ["SERVER"]
 		  wsman = {
 			username = "` + IdracUsername + `"

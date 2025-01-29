@@ -338,14 +338,7 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess_UT(t *testing.T) {
 	})
 }
 
-var testAccCreateTemplateForClone = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-
+var testAccCreateTemplateForClone = testProvider + `
 	resource "ome_template" "terraform-acceptance-test-1" {
 		name = "` + ReferenceDeploymentTemplateNameForClone + `"
 		refdevice_servicetag = "` + DeviceSvcTag1 + `"
@@ -359,13 +352,7 @@ var testAccCreateTemplateForClone = `
 	}
 `
 
-var testAccCreateTemplateSuccess = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
+var testAccCreateTemplateSuccess = testProvider + `
 
 	resource "ome_template" "terraform-acceptance-test-1" {
 		name = "` + TemplateName1 + `"
@@ -382,13 +369,7 @@ var testAccCreateTemplateSuccess = `
 	}
 `
 
-var testAccUpdateTemplateSuccess = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
+var testAccUpdateTemplateSuccess = testProvider + `
 
 	data "ome_template_info" "template_data" {
 		name = "` + TemplateName1 + `"
@@ -463,16 +444,7 @@ var testAccUpdateTemplateSuccess = `
 	  }
 `
 
-var testAccCreateTemplateInvalidSvcTag = `
-
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	port = "` + port + `"
-        protocol = "` + protocol + `"
-	skipssl = true
-}
+var testAccCreateTemplateInvalidSvcTag = testProvider + `
 
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
@@ -480,16 +452,8 @@ resource "ome_template" "terraform-acceptance-test-3" {
 }
 `
 
-var testAccCreateTemplateMutuallyExclusive1 = `
+var testAccCreateTemplateMutuallyExclusive1 = testProvider + `
 
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	port = "` + port + `"
-	protocol = "` + protocol + `"
-	skipssl = true
-}
 
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
@@ -498,16 +462,8 @@ resource "ome_template" "terraform-acceptance-test-3" {
 }
 `
 
-var testAccCreateTemplateMutuallyExclusive2 = `
+var testAccCreateTemplateMutuallyExclusive2 = testProvider + `
 
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	port = "` + port + `"
-        protocol = "` + protocol + `"
-	skipssl = true
-}
 
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
@@ -516,14 +472,8 @@ resource "ome_template" "terraform-acceptance-test-3" {
 }
 `
 
-var testAccCreateTemplateMutuallyExclusive3 = `
+var testAccCreateTemplateMutuallyExclusive3 = testProvider + `
 
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
 
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
@@ -532,14 +482,8 @@ resource "ome_template" "terraform-acceptance-test-3" {
 }
 `
 
-var testAccCreateTemplateMutuallyExclusive4 = `
+var testAccCreateTemplateMutuallyExclusive4 = testProvider + `
 
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
 
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
@@ -548,13 +492,7 @@ resource "ome_template" "terraform-acceptance-test-3" {
 }
 `
 
-var testAccCreateTemplateWithIOAndVlan = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testAccCreateTemplateWithIOAndVlan = testProvider + `
 
 resource "ome_template" "terraform-acceptance-test-3" {
 	name = "test_acc_template-3"
@@ -596,28 +534,16 @@ resource "ome_template" "terraform-acceptance-test-3" {
 	}
 }`
 
-var testAccCreateTemplateEmptyDevice = `
+var testAccCreateTemplateEmptyDevice = testProvider + `
 
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
 
 resource "ome_template" "terraform-acceptance-test-4" {
 	name = "test_acc_template-4"
 }
 `
 
-var testAccCreateTemplateInvaliddevID = `
+var testAccCreateTemplateInvaliddevID = testProvider + `
 
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
 
 resource "ome_template" "terraform-acceptance-test-4" {
 	name = "test_acc_template-5"
@@ -625,14 +551,8 @@ resource "ome_template" "terraform-acceptance-test-4" {
 }
 `
 
-var testAccCreateTemplateInvalidFqdds = `
+var testAccCreateTemplateInvalidFqdds = testProvider + `
 
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
 
 resource "ome_template" "terraform-acceptance-test-5" {
 	name = "test_acc_template-6"
@@ -641,14 +561,8 @@ resource "ome_template" "terraform-acceptance-test-5" {
 }
 `
 
-var testAccCreateTemplateInvalidViewType = `
+var testAccCreateTemplateInvalidViewType = testProvider + `
 
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
 
 resource "ome_template" "terraform-acceptance-test-5" {
 	name = "test_acc_template-7"
@@ -657,25 +571,13 @@ resource "ome_template" "terraform-acceptance-test-5" {
 }
 `
 
-var testAccImportTemplateError = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
+var testAccImportTemplateError = testProvider + `
 
 	resource "ome_template" "terraform-acceptance-test-6" {
 	}
 `
 
-var testAccImportTemplateSuccess = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
+var testAccImportTemplateSuccess = testProvider + `
 
 	resource "ome_template" "terraform-acceptance-test-6" {
 		name = "` + TemplateName1 + `"
@@ -683,13 +585,7 @@ var testAccImportTemplateSuccess = `
 	}
 `
 
-var testAccUpdateTemplateWithExistingName = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testAccUpdateTemplateWithExistingName = testProvider + `
 
 resource "ome_template" "terraform-acceptance-test-1" {
 	name = "` + TemplateName1 + `"
@@ -706,13 +602,7 @@ resource "ome_template" "terraform-acceptance-test-2" {
 }
 `
 
-var testAccUpdateTemplateWithInvalidVlanNetworkID = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testAccUpdateTemplateWithInvalidVlanNetworkID = testProvider + `
 
 resource "ome_template" "terraform-acceptance-test-1" {
 	name = "` + TemplateName1 + `"
@@ -748,13 +638,7 @@ resource "ome_template" "terraform-acceptance-test-2" {
 	sleep_interval = 60
 }
 `
-var testAccCreateImportTemplateSuccess = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testAccCreateImportTemplateSuccess = testProvider + `
 
 resource "ome_template" "citdtest" {
 	name = "test_acc_import_content_d"
@@ -768,13 +652,7 @@ resource "ome_template" "citctest" {
 }
 `
 
-var testAccCloneTemplateSuccess = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testAccCloneTemplateSuccess = testProvider + `
 
 resource "ome_template" "terraform-acceptance-test-1" {
 	name = "` + ReferenceDeploymentTemplateNameForClone + `"
@@ -805,13 +683,7 @@ resource "ome_template" "clone-template-compliance-compliance" {
 }
 `
 
-var testAccCloneTemplateFailure = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testAccCloneTemplateFailure = testProvider + `
 
 resource "ome_template" "terraform-clone-template-test" {
 	name = "clone-template-test"
@@ -819,13 +691,7 @@ resource "ome_template" "terraform-clone-template-test" {
 }
 `
 
-var testAccCloneTemplateFailureForComplainceToDeployment = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testAccCloneTemplateFailureForComplainceToDeployment = testProvider + `
 
 resource "ome_template" "terraform-clone-template-test" {
 	name = "clone-template-test"
@@ -833,13 +699,7 @@ resource "ome_template" "terraform-clone-template-test" {
 }
 `
 
-var testAccCloneTemplateFailureForDescription = `
-provider "ome" {
-	username = "` + omeUserName + `"
-	password = "` + omePassword + `"
-	host = "` + omeHost + `"
-	skipssl = true
-}
+var testAccCloneTemplateFailureForDescription = testProvider + `
 
 resource "ome_template" "terraform-clone-template-test" {
 	name = "clone-template-test"

@@ -28,13 +28,13 @@ const (
 )
 
 func testConfCompPrecheck(t *testing.T) {
-	if os.Getenv("TF_ACC_CC") == "0" {
+	if os.Getenv("TF_ACC_CC") == "" {
 		t.Skip("Dont run this test because TF_ACC_CC env var must be set to enable this test.")
 	}
 }
 
 func TestConfigurationRemediationErrors(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	temps := initTemplates(t)
@@ -57,7 +57,7 @@ func TestConfigurationRemediationErrors(t *testing.T) {
 
 }
 func TestConfigurationRemediationInvScenarios(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 
@@ -252,7 +252,7 @@ var testConfigureBaselineRemediationComplianceStatus = `
 `
 
 func TestConfigurationRemediation(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 

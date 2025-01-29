@@ -31,16 +31,7 @@ func TestDataSource_ReadVlanNetworks(t *testing.T) {
 	})
 }
 
-var testVlanNetworks = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		port = "` + port + `"
-		protocol = "` + protocol + `"
-		skipssl = true
-	}
-
+var testVlanNetworks = testProvider + `
 	data "ome_vlannetworks_info" "vlans" {
 	}
 `

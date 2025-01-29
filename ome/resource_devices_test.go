@@ -26,7 +26,7 @@ import (
 )
 
 func TestAccDevicesRes(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	testAccCreateDevicesResSuccess := testProvider + `
@@ -110,7 +110,7 @@ func TestAccDevicesRes(t *testing.T) {
 }
 
 func TestAccDevicesResUpdate(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
+	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	if DeviceIPExt == "" {
@@ -215,10 +215,6 @@ func TestAccDevicesResUpdate(t *testing.T) {
 }
 
 func TestAccDevicesResUnk(t *testing.T) {
-	if os.Getenv("TF_ACC") == "0" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
-	
 	testAccCreateDevicesResSuccess := testProvider + `
 	resource "ome_devices" "code_1" {
 	}

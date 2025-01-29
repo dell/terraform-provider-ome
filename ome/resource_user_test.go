@@ -33,17 +33,7 @@ const (
 
 func TestUser(t *testing.T) {
 
-	testAccProvider := `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		port = "` + port + `"
- 		protocol = "` + protocol + `"
-		skipssl = true
-	}
-	`
-	testAccCreateUserSuccess := testAccProvider + `	
+	testAccCreateUserSuccess := testProvider + `	
 	resource "ome_user" "code_1" {
 		user_type_id =  1
 		directory_service_id = 0
@@ -56,7 +46,7 @@ func TestUser(t *testing.T) {
 	}
 	`
 
-	testAccUpdateGroupSuccess := testAccProvider + `	
+	testAccUpdateGroupSuccess := testProvider + `	
 	resource "ome_user" "code_1" {
 		user_type_id =  1
 		directory_service_id = 0
@@ -109,18 +99,7 @@ func TestUserNegative(t *testing.T) {
 		t.Skip("Dont run with units tests because negative cases we are not running with mock server")
 	}
 
-	testAccProvider := `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		port = "` + port + `"
- 		protocol = "` + protocol + `"
-		skipssl = true
-	}
-	`
-
-	testAccCreateFailure := testAccProvider + `
+	testAccCreateFailure := testProvider + `
 	resource "ome_user" "code_2" {
 		username = "123456789123456789"
 		password = "Abcde123!"
@@ -128,7 +107,7 @@ func TestUserNegative(t *testing.T) {
 	}
 	`
 
-	testAccCreateUpdate := testAccProvider + `
+	testAccCreateUpdate := testProvider + `
 	resource "ome_user" "code_3" {
 		username = "` + User1 + `"
 		password = "Abcde123!"
@@ -136,7 +115,7 @@ func TestUserNegative(t *testing.T) {
 	}
 	`
 
-	testAccUpdateFailure := testAccProvider + `
+	testAccUpdateFailure := testProvider + `
 	resource "ome_user" "code_3" {
 		username = "` + UserUpdate1 + `"
 		password = "Abcde123!"
