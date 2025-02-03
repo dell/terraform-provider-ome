@@ -21,7 +21,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestDataSource_ReadGroupDevices(t *testing.T) {
+func TestAccDataSource_ReadGroupDevices(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
@@ -84,14 +84,7 @@ func TestDataSource_ReadGroupDevices(t *testing.T) {
 	})
 }
 
-var testgroupPreReq = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-
+var testgroupPreReq = testProvider + `
 	data "ome_groupdevices_info" "all_father" {
 		id = "0"
 		device_group_names = ["Static Groups"]
@@ -134,28 +127,14 @@ var testgroupDeviceDSWithSubGroups = testgroupPreReq + `
 	}
 `
 
-var testgroupDeviceDSInvalidGroup = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-
+var testgroupDeviceDSInvalidGroup = testProvider + `
 	data "ome_groupdevices_info" "gd" {
 		id = "0"
 		device_group_names = ["NO_GROUP"]
 	}
 `
 
-var testgroupDeviceDSEmptyGroup = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-
+var testgroupDeviceDSEmptyGroup = testProvider + `
 	data "ome_groupdevices_info" "gd" {
 		id = "0"
 		device_group_names = []
