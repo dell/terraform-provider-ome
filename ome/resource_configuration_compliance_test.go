@@ -312,7 +312,7 @@ var testConfigureBaselineRemediation = `
 
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = "` + TestRefTemplateName + `"
+		ref_template_name = "avenger-temp"
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
@@ -340,7 +340,7 @@ var testConfigureBaselineRemediationUpdate = `
 
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = "` + TestRefTemplateName + `"
+		ref_template_name = "avenger-temp"
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
