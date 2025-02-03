@@ -34,6 +34,7 @@ func testConfCompPrecheck(t *testing.T) {
 }
 
 func TestConfigurationRemediationErrors(t *testing.T) {
+
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
@@ -99,6 +100,8 @@ var testConfigureBaselineRemediationDevicePartOfBaseline = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -125,6 +128,8 @@ var testConfigureBaselineRemediationInvalidBaselineName = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -143,6 +148,8 @@ var testConfigureBaselineRemediationInvalidBaselineID = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -161,6 +168,8 @@ var testConfigureBaselineRemediationBaselineMutually = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -188,6 +197,8 @@ var testConfigureBaselineRemediationBaselineInfo = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -213,6 +224,8 @@ var testConfigureBaselineRemediationBaselneDevicesRequired = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -230,6 +243,8 @@ var testConfigureBaselineRemediationComplianceStatus = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -290,12 +305,14 @@ var testConfigureBaselineRemediation = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = "avenger-temp"
+		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
@@ -316,12 +333,14 @@ var testConfigureBaselineRemediationUpdate = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
 	resource "ome_configuration_baseline" "create_baseline" {
 		baseline_name = "` + BaselineName + `"
-		ref_template_name = "avenger-temp"
+		ref_template_name = "` + TestRefTemplateName + `"
 		device_servicetags = ["` + DeviceSvcTag1 + `","` + DeviceSvcTag2 + `"]
 		description = "baseline description"
 	}
