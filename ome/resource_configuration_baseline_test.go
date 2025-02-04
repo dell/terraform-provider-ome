@@ -222,7 +222,7 @@ var justProvider = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-        protocol = "` + protocol + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 `
@@ -233,7 +233,7 @@ var testCreateBaselineFailureWithBothTemplateIDName = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-        protocol = "` + protocol + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -242,7 +242,7 @@ var testCreateBaselineFailureWithBothTemplateIDName = `
 		ref_template_id = ` + "123" + `
 		baseline_name = "` + BaselineName + `"
 	}
-`
+	`
 
 var testCreateBaselineValidationFailureEmptyTemplateIDName = `
 	provider "ome" {
@@ -250,14 +250,14 @@ var testCreateBaselineValidationFailureEmptyTemplateIDName = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-        protocol = "` + protocol + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
-
+	
 	resource "ome_configuration_baseline" "create_baseline_validation_failure_empty_template_id_name" {
 		baseline_name = "` + BaselineName + `"
 	}
-`
+	`
 
 var testCreateBaselineValidationFailureInvalidTemplateName = `
 	provider "ome" {
@@ -265,7 +265,7 @@ var testCreateBaselineValidationFailureInvalidTemplateName = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-        protocol = "` + protocol + `"
+		protocol = "` + protocol + `"
 		skipssl = true
 	}
 

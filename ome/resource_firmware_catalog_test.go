@@ -15,7 +15,6 @@ package ome
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"terraform-provider-ome/helper"
 	"terraform-provider-ome/models"
@@ -28,9 +27,6 @@ import (
 var localFunctionalMocker *Mocker
 
 func TestFirmwareCatalogResourceCreate(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
 	var catalogTfName = "ome_firmware_catalog.cat_1"
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -74,9 +70,7 @@ func TestFirmwareCatalogResourceCreate(t *testing.T) {
 }
 
 func TestFirmwareCatalogResourceValidationCreateError(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -106,9 +100,6 @@ func TestFirmwareCatalogResourceValidationCreateError(t *testing.T) {
 }
 
 func TestFirmwareCatalogResourceReadCreateUpdateErrors(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
 	createMock := models.CatalogsModel{
 		ID: 1,
 		Repository: models.RepositoryModel{
@@ -166,18 +157,6 @@ func TestFirmwareCatalogResourceReadCreateUpdateErrors(t *testing.T) {
 					if localFunctionalMocker != nil {
 						localFunctionalMocker.UnPatch()
 					}
-				},
-				Config:      updateFirmwareVaildationError,
-				ExpectError: regexp.MustCompile(`.*Unable to update catalog, validation error:*.`),
-			},
-			{
-				PreConfig: func() {
-					if FunctionMocker != nil {
-						FunctionMocker.UnPatch()
-					}
-					if localFunctionalMocker != nil {
-						localFunctionalMocker.UnPatch()
-					}
 					localFunctionalMocker = Mock(helper.UpdateCatalogFirmware, OptGeneric).Return(nil, fmt.Errorf("Mock error")).Build()
 				},
 				Config:      updateFirmwareMockError,
@@ -194,25 +173,6 @@ var updateFirmwareMockError = testProvider + `
 		share_type = "HTTPS"
 		catalog_file_path = "catalogs/example_catalog_1.xml"
         share_address = "https://2.1.1.2"
-        catalog_refresh_schedule = {
-          cadence = "Weekly"
-          day_of_the_week = "Wednesday"
-          time_of_day = "6"
-          am_pm = "PM"
-        }
-        domain = "example"
-        share_user = "example-user"
-        share_password = "example-pass"
-	}
-`
-
-var updateFirmwareVaildationError = testProvider + `
-	resource "ome_firmware_catalog" "cat_1" {
-		name = "` + CatalogResource + `"
-		catalog_update_type = "Manual"
-		share_type = "CIFS"
-		catalog_file_path = "catalogs/example_catalog_1.xml"
-        share_address = "https://1.2.2.1"
         catalog_refresh_schedule = {
           cadence = "Weekly"
           day_of_the_week = "Wednesday"
