@@ -23,6 +23,8 @@ import (
 	"terraform-provider-ome/models"
 	"testing"
 
+	. "github.com/bytedance/mockey"
+
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -79,7 +81,9 @@ func TestCreateBaseline_TestValidations(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
-
+	if FunctionMocker != nil {
+		FunctionMocker.UnPatch()
+	}
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -92,13 +96,20 @@ func TestCreateBaseline_TestValidations(t *testing.T) {
 				Config:      testCreateBaselineValidationFailureEmptyTemplateIDName,
 				ExpectError: regexp.MustCompile(clients.ErrGnrCreateBaseline),
 			},
-			{ // Step 3
+			{
+				PreConfig: func() {
+					FunctionMocker = Mock((*clients.Client).GetTemplateByIDOrName).Return(models.OMETemplate{}, nil).Build()
+				},
 				Config:      testCreateBaselineValidationFailureInvalidTemplateName,
-				ExpectError: regexp.MustCompile("reference template id or name should be of type compliance"),
+				ExpectError: regexp.MustCompile(`.*reference template id or name should be of type compliance*.`),
 			},
-			{ // Step 4
+			{
+				PreConfig: func() {
+					FunctionMocker.UnPatch()
+					FunctionMocker = Mock((*clients.Client).GetTemplateByIDOrName).Return(models.OMETemplate{}, nil).Build()
+				},
 				Config:      testCreateBaselineValidationFailureNonComplianceTemplateID,
-				ExpectError: regexp.MustCompile("reference template id or name should be of type compliance"),
+				ExpectError: regexp.MustCompile(`.*reference template id or name should be of type compliance*.`),
 			},
 		},
 	})
@@ -231,7 +242,7 @@ var testCreateBaselineFailureWithBothTemplateIDName = `
 		ref_template_id = ` + "123" + `
 		baseline_name = "` + BaselineName + `"
 	}
-`
+	`
 
 var testCreateBaselineValidationFailureEmptyTemplateIDName = `
 	provider "ome" {
@@ -242,11 +253,11 @@ var testCreateBaselineValidationFailureEmptyTemplateIDName = `
 		protocol = "` + protocol + `"
 		skipssl = true
 	}
-
+	
 	resource "ome_configuration_baseline" "create_baseline_validation_failure_empty_template_id_name" {
 		baseline_name = "` + BaselineName + `"
 	}
-`
+	`
 
 var testCreateBaselineValidationFailureInvalidTemplateName = `
 	provider "ome" {
@@ -270,7 +281,7 @@ var testCreateBaselineValidationFailureNonComplianceTemplateID = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-		protocol = "` + protocol + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -286,7 +297,7 @@ var testCreateBaselineValidationFailureEmptyDevice = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-		protocol = "` + protocol + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -302,7 +313,7 @@ var testCreateBaselineValidationFailureInvalidDevice = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-		protocol = "` + protocol + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -319,7 +330,7 @@ var testCreateBaselineValidationFailureNotificationOnScheduleEmptyCron = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-		protocol = "` + protocol + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -338,7 +349,7 @@ var testCreateBaselineValidationFailureScheduleNotificationInvalidEmail = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-		protocol = "` + protocol + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -358,7 +369,7 @@ var testCreateBaselineValidationFailureScheduleNotificationEmptyEmail = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-		protocol = "` + protocol + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -376,7 +387,7 @@ var testCreateBaselineValidationInvalidOutputFormatCase = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-		protocol = "` + protocol + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -394,7 +405,7 @@ var testCreateBaselineValidationInvalidOutputFormat = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-		protocol = "` + protocol + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -412,7 +423,7 @@ var testCreateBaselineValidationDeviceCapable = `
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
 		port = "` + port + `"
-		protocol = "` + protocol + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -424,7 +435,7 @@ var testCreateBaselineValidationDeviceCapable = `
 `
 
 func TestCreateBaseline_BaselineWithDeviceIDAndTags(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
+	if os.Getenv("TF_ACC") == "0" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	temps := initTemplates(t)
@@ -487,6 +498,8 @@ var testConfigureBaselinewithDeviceTag = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -504,6 +517,8 @@ var testConfigureBaselinewithDeviceTagUpdate = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -521,6 +536,8 @@ var testConfigureBaselinewithDeviceID = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -538,6 +555,8 @@ var testConfigureBaselinewithDeviceIDUpdate = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -610,6 +629,8 @@ var testConfigureBaselineWithSchedule = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -631,6 +652,8 @@ var testConfigureBaselineWithScheduleUpdate = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -694,6 +717,8 @@ var testConfigureBaselineScheduleNonCompliant = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -713,6 +738,8 @@ var testConfigureBaselineScheduleNonCompliantUpdate = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -730,6 +757,8 @@ var testImportConfigurationBaseline = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -738,7 +767,7 @@ var testImportConfigurationBaseline = `
 `
 
 func TestCreateBaseline_Update(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
+	if os.Getenv("TF_ACC") == "0" {
 		t.Skip("Dont run with units tests because it will try to create the context")
 	}
 	temps := initTemplates(t)
@@ -786,6 +815,8 @@ var testCreateBaselineWrongCreds = `
 		username = "` + omeUserName + `"
 		password = "invalid"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -802,6 +833,8 @@ var testUpdateBaselinewithInvalidDeviceSvcTag = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -819,6 +852,8 @@ var testUpdateBaselinewithInvalidTemplate = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -836,6 +871,8 @@ var testUpdateBaselinewithUnexpectedCron = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
@@ -854,6 +891,8 @@ var testUpdateBaselinewithInvalidSchedule = `
 		username = "` + omeUserName + `"
 		password = "` + omePassword + `"
 		host = "` + omeHost + `"
+		port = "` + port + `"
+        protocol = "` + protocol + `"
 		skipssl = true
 	}
 
