@@ -18,11 +18,12 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"terraform-provider-ome/clients"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
+
+	"terraform-provider-ome/clients"
 )
 
 func TestAccDevicesRes(t *testing.T) {
@@ -193,8 +194,6 @@ func TestAccDevicesResUpdate(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_devices.code_3", "devices.#", "3"),
 				),
-				// TBD: non empty plan fix for discovery resource
-				ExpectNonEmptyPlan: true,
 			},
 			{
 				// check that device can be removed from the list
