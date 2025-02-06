@@ -14,16 +14,12 @@ limitations under the License.
 package ome
 
 import (
-	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestDataSource_ReadTemplate(t *testing.T) {
-	if os.Getenv("TF_ACC") == "" {
-		t.Skip("Dont run with units tests because it will try to create the context")
-	}
 	temps := initTemplates(t)
 
 	resource.Test(t, resource.TestCase{
@@ -55,28 +51,15 @@ func TestDataSource_ReadTemplate(t *testing.T) {
 	})
 }
 
-var testReadTemplate = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
-
-	data "ome_template_info" "template" {
+var testReadTemplate = testProvider + `
+		data "ome_template_info" "template" {
 		id = "0"
 		name = "` + TestRefTemplateName + `"
 		depends_on = ["ome_template.terraform-acceptance-test-1"]
-	}
-`
+		}
+		`
 
-var testReadInvalidTemplate = `
-	provider "ome" {
-		username = "` + omeUserName + `"
-		password = "` + omePassword + `"
-		host = "` + omeHost + `"
-		skipssl = true
-	}
+var testReadInvalidTemplate = testProvider + `
 
 	data "ome_template_info" "template" {
 		id = "0"
