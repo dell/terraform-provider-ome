@@ -289,16 +289,12 @@ func TestAccDiscoveryFour(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_discovery.discover1", "name", "discover-lab"),
 				),
-				// TBD: non empty plan fix
-				ExpectNonEmptyPlan: true,
 			},
 			{
 				Config: TrackDiscoveryJobUpdate,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_discovery.discover1", "name", "discover-up-lab"),
 				),
-				// TBD: non empty plan fix
-				ExpectNonEmptyPlan: true,
 			},
 		},
 	},

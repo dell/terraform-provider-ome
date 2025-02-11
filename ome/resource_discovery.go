@@ -21,9 +21,6 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-	"terraform-provider-ome/clients"
-	"terraform-provider-ome/helper"
-	"terraform-provider-ome/models"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -32,6 +29,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/mitchellh/mapstructure"
+
+	"terraform-provider-ome/clients"
+	"terraform-provider-ome/helper"
+	"terraform-provider-ome/models"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -579,7 +580,7 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 	}
 	for _, creds := range connectionProfiles.Credentials {
 		if credMap, ok := creds.Credential.(map[string]interface{}); ok {
-			if creds.Type == "REDFISH" {
+			if creds.Type == "REDFISH" && plan.Redfish != nil {
 				cred := models.CredREDFISH{}
 				state.Redfish = &models.OmeRedfish{}
 				err := mapstructure.Decode(credMap, &cred)
@@ -595,7 +596,7 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 				state.Redfish.Timeout = types.Int64Value(int64(cred.Timeout))
 				state.Redfish.CaCheck = types.BoolValue(cred.CaCheck)
 				state.Redfish.CnCheck = types.BoolValue(cred.CnCheck)
-			} else if creds.Type == "WSMAN" {
+			} else if creds.Type == "WSMAN" && plan.WSMAN != nil {
 				cred := models.CredWSMAN{}
 				state.WSMAN = &models.OmeWSMAN{}
 				err := mapstructure.Decode(credMap, &cred)
@@ -611,7 +612,7 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 				state.WSMAN.Timeout = types.Int64Value(int64(cred.Timeout))
 				state.WSMAN.CaCheck = types.BoolValue(cred.CaCheck)
 				state.WSMAN.CnCheck = types.BoolValue(cred.CnCheck)
-			} else if creds.Type == "SNMP" {
+			} else if creds.Type == "SNMP" && plan.SNMP != nil {
 				cred := models.CredSNMP{}
 				state.SNMP = &models.OmeSNMP{}
 				err := mapstructure.Decode(credMap, &cred)
@@ -622,7 +623,7 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 				state.SNMP.Port = types.Int64Value(int64(cred.Port))
 				state.SNMP.Retries = types.Int64Value(int64(cred.Retries))
 				state.SNMP.Timeout = types.Int64Value(int64(cred.Timeout))
-			} else if creds.Type == "SSH" {
+			} else if creds.Type == "SSH" && plan.SSH != nil {
 				cred := models.CredSSH{}
 				state.SSH = &models.OmeSSH{}
 				err := mapstructure.Decode(credMap, &cred)
