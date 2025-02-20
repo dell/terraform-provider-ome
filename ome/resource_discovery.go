@@ -33,6 +33,7 @@ import (
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/helper"
 	"terraform-provider-ome/models"
+	"terraform-provider-ome/utils"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -379,9 +380,12 @@ func getDiscoveryPayload(ctx context.Context, plan *models.OmeDiscoveryJob, stat
 				}
 				dcm.DeviceType = append(dcm.DeviceType, deviceMap[dt.ValueString()])
 			}
-			for _, networkAddress := range dct.NetworkAddressDetail {
+
+			networAddress := utils.ConvertListValueToStringSlice(dct.NetworkAddressDetail)
+
+			for _, networkAddress := range networAddress {
 				network := models.DiscoveryConfigTargets{
-					NetworkAddressDetail: networkAddress.ValueString(),
+					NetworkAddressDetail: networkAddress,
 					AddressType:          30,
 					Disabled:             false,
 					Exclude:              false,
@@ -570,9 +574,13 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 			state.DeviceType = append(state.DeviceType, types.StringValue(val))
 		}
 	}
+	var networkAddress []string
 	for _, network := range resp.DiscoveryConfigTargets {
-		state.NetworkAddressDetail = append(state.NetworkAddressDetail, types.StringValue(network.NetworkAddressDetail))
+		networkAddress = append(networkAddress, network.NetworkAddressDetail)
 	}
+
+	state.NetworkAddressDetail = utils.ConvertStringListValue(networkAddress)
+
 	err := json.Unmarshal([]byte(resp.ConnectionProfile), &connectionProfiles)
 	if err != nil {
 		tflog.Debug(ctx, "Error unmarshaling JSON: "+err.Error())

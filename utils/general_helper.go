@@ -273,3 +273,13 @@ func ConvertListValueToIntSlice(listVal basetypes.ListValue) []int64 {
 	}
 	return intSlice
 }
+
+// ConvertStringListValue converts a string slice value to an List
+func ConvertStringListValue(inputs []string) types.List {
+	ret, _ := types.ListValueFrom(
+		context.TODO(),
+		types.StringType,
+		inputs,
+	)
+	return ret
+}

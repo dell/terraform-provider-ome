@@ -1,3 +1,16 @@
+# v1.2.2
+
+# Release Summary
+
+The release addresses security vulnerabilities.
+
+All existing resources and datasources are qualified against OME v4.3.0.
+
+## Bug Fixes
+
+- ome_discovery in perpetual drift #135
+- discovery_config_targets.network_address_detail can't handle unknown in OME Discovery Resource #136
+
 # v1.2.1
 
 # Release Summary
