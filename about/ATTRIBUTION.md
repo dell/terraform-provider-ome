@@ -51,9 +51,9 @@ Source: [terraform-plugin-testing](https://github.com/hashicorp/terraform-plugin
 ***
 
 Package: testify  
-Version: v1.9.0  
+Version: v1.10.0  
 Copyright: Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors.  
-License: [MIT License](https://github.com/stretchr/testify/blob/v1.7.2/LICENSE)  
+License: [MIT License](https://github.com/stretchr/testify/blob/master/LICENSE)  
 Source: [testify](https://github.com/stretchr/testify)
 
 ***
@@ -86,7 +86,7 @@ Source: [godotenv](https://github.com/joho/godotenv)
 # Indirect Dependencies
 
 Package: go-crypto  
-Version: v1.1.0-alpha.2  
+Version: v1.1.5
 Copyright: Copyright (c) 2009 The Go Authors  
 License: [BSD-3-Clause License](https://github.com/ProtonMail/go-crypto/blob/main/LICENSE)  
 Source: [go-crypto](https://github.com/ProtonMail/go-crypto)  
@@ -374,7 +374,7 @@ Source: [terraform-svchost](https://github.com/hashicorp/terraform-svchost)
 ***
 
 Package: yamux  
-Version: v0.1.1  
+Version: v0.1.2  
 Copyright: Copyright (c) 2014 HashiCorp, Inc.  
 License: [Mozilla Public License 2.0](https://github.com/hashicorp/yamux/blob/master/LICENSE)  
 Source: [yamux](https://github.com/hashicorp/yamux)
@@ -462,7 +462,7 @@ Source: [go-cty](https://github.com/zclconf/go-cty)
 ***
 
 Package: crypto  
-Version: v0.26.0  
+Version: v0.32.0  
 Copyright: Copyright 2009 The Go Authors  
 License: [BSD-3-Clause License](https://github.com/golang/crypto/blob/master/LICENSE)  
 Source: [crypto](https://github.com/golang/crypto)
@@ -470,7 +470,7 @@ Source: [crypto](https://github.com/golang/crypto)
 ***
 
 Package: net  
-Version: v0.25.0  
+Version: v0.34.0  
 Copyright: Copyright 2009 The Go Authors  
 License: [BSD-3-Clause License](https://github.com/golang/net/blob/master/LICENSE)  
 Source: [net](https://github.com/golang/net)
@@ -486,7 +486,7 @@ Source: [sync](https://github.com/golang/sync)
 ***
 
 Package: sys  
-Version: v0.23.0  
+Version: v0.29.0  
 Copyright: Copyright 2009 The Go Authors  
 License: [BSD-3-Clause License](https://github.com/golang/sys/blob/master/LICENSE)  
 Source: [sys](https://github.com/golang/sys)
@@ -538,3 +538,11 @@ Version: v3.0.1
 Copyright: Copyright (c) 2011-2019 Canonical Ltd  
 License: [MIT and Apache License](https://github.com/go-yaml/yaml/blob/v3/LICENSE)  
 Source: [yaml.v3](https://github.com/go-yaml/yaml)
+
+***
+
+Package: go-git  
+Version: v5.13.2  
+Copyright: Copyright 2018 Sourced Technologies, S.L.  
+License: [Apache License 2.0](https://github.com/go-git/go-git/blob/main/LICENSE)  
+Source: [grpc](https://github.com/grpc/grpc-go)

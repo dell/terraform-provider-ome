@@ -186,7 +186,7 @@ type OmeJobTracking struct {
 
 // OmeDiscoveryConfigTargets for discovery configuration
 type OmeDiscoveryConfigTargets struct {
-	NetworkAddressDetail []types.String `tfsdk:"network_address_detail"`
+	NetworkAddressDetail types.List     `tfsdk:"network_address_detail"`
 	DeviceType           []types.String `tfsdk:"device_type"`
 	Redfish              *OmeRedfish    `tfsdk:"redfish"`
 	SNMP                 *OmeSNMP       `tfsdk:"snmp"`
