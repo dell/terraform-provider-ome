@@ -1,5 +1,5 @@
 <!--
-Copyright (c) 2024 Dell Inc., or its subsidiaries. All Rights Reserved.
+Copyright (c) 2024-2025 Dell Inc., or its subsidiaries. All Rights Reserved.
 
 Licensed under the Mozilla Public License Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -92,6 +92,29 @@ terraform {
     }
   }
 }
+
+# Provider Details
+provider "ome" {
+  username = "username"
+  password = "password"
+  host     = "yourhost.host.com"
+  timeout  = 30
+  port     = 443
+  protocol = "https"
+  skipssl  = false
+
+  ## Can also be set using environment variables
+  ## If environment variables are set it will override this configuration
+  ## Example environment variables
+  # OME_USERNAME="username"
+  # OME_PASSWORD="password"
+  # OME_HOST="yourhost.host.com"
+  # OME_PORT="443"
+  # OME_SKIP_SSL="true"
+  # OME_TIMEOUT="30"
+  # OME_PROTOCOL="https"
+}
+
 ````
 For adding resources, please refer [examples](https://github.com/dell/terraform-provider-ome/blob/main/docs)
 
@@ -120,3 +143,4 @@ For more detailed information on the provider, please refer to [Dell Terraform P
 - Variables: https://developer.hashicorp.com/terraform/language/values/variables
 - Modules: https://developer.hashicorp.com/terraform/language/modules
 - State: https://developer.hashicorp.com/terraform/language/state
+- Environment Variables: https://developer.hashicorp.com/terraform/cli/config/environment-variables 

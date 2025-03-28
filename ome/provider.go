@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Dell Inc., or its subsidiaries. All Rights Reserved.
+Copyright (c) 2024-2025 Dell Inc., or its subsidiaries. All Rights Reserved.
 Licensed under the Mozilla Public License Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -16,6 +16,8 @@ package ome
 import (
 	"context"
 	"fmt"
+	"os"
+	"strconv"
 	"strings"
 	"terraform-provider-ome/clients"
 	"time"
@@ -85,13 +87,53 @@ func (p *omeProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 
-	if data.Username.IsUnknown() {
+	// Attempt to read from Env Variables, otherwise use defaults
+	usernameEnv := os.Getenv("OME_USERNAME")
+	if usernameEnv != "" {
+		data.Username = types.StringValue(usernameEnv)
+	}
+
+	if data.Username.IsUnknown() && usernameEnv == "" {
 		// Cannot connect to client with an unknown value
 		resp.Diagnostics.AddWarning(
 			"Unable to create client",
 			"Cannot use unknown value as username",
 		)
 		return
+	}
+
+	// Attempt to read from Env Variables, otherwise use defaults
+	hostEnv := os.Getenv("OME_HOST")
+	if hostEnv != "" {
+		data.Host = types.StringValue(hostEnv)
+	}
+	passEnv := os.Getenv("OME_PASSWORD")
+	if passEnv != "" {
+		data.Password = types.StringValue(passEnv)
+	}
+	protocolEnv := os.Getenv("OME_PROTOCOL")
+	if protocolEnv != "" {
+		if protocolEnv != "http" && protocolEnv != "https" {
+			resp.Diagnostics.AddError(
+				"Invalid protocol",
+				"Protocol must be http or https",
+			)
+			return
+		}
+		data.Protocol = types.StringValue(protocolEnv)
+	}
+
+	portEnv, errPort := strconv.ParseInt(os.Getenv("OME_PORT"), 10, 64)
+	if errPort == nil {
+		data.Port = types.Int64Value(portEnv)
+	}
+	skipSslEnv, errSkipSsl := strconv.ParseBool(os.Getenv("OME_SKIP_SSL"))
+	if errSkipSsl == nil {
+		data.SkipSSL = types.BoolValue(skipSslEnv)
+	}
+	timeoutEnv, errTimeout := strconv.ParseInt(os.Getenv("OME_TIMEOUT"), 10, 64)
+	if errTimeout == nil {
+		data.Timeout = types.Int64Value(timeoutEnv)
 	}
 
 	if data.Username.ValueString() == "" {
@@ -247,47 +289,54 @@ func (p *omeProvider) Schema(ctx context.Context, _ provider.SchemaRequest, resp
 		MarkdownDescription: "The Terraform Provider for OpenManage Enterprise (OME) is a plugin for Terraform that allows the resource management of PowerEdge servers using OME",
 		Attributes: map[string]schema.Attribute{
 			"host": schema.StringAttribute{
-				MarkdownDescription: "OpenManage Enterprise IP address or hostname.",
-				Description:         "OpenManage Enterprise IP address or hostname.",
-				Required:            true,
+				MarkdownDescription: "OpenManage Enterprise IP address or hostname. This can also be set using the environment variable OME_HOST",
+				Description:         "OpenManage Enterprise IP address or hostname. This can also be set using the environment variable OME_HOST",
+				// This should remain optional so user can use environment variables if they choose.
+				Optional: true,
 			},
 			"username": schema.StringAttribute{
-				MarkdownDescription: "OpenManage Enterprise username.",
-				Description:         "OpenManage Enterprise username.",
-				Required:            true,
+				MarkdownDescription: "OpenManage Enterprise username. This can also be set using the environment variable OME_USERNAME",
+				Description:         "OpenManage Enterprise username. This can also be set using the environment variable OME_USERNAME",
+				// This should remain optional so user can use environment variables if they choose.
+				Optional: true,
 			},
 			"password": schema.StringAttribute{
-				MarkdownDescription: "OpenManage Enterprise password.",
-				Description:         "OpenManage Enterprise password.",
-				Required:            true,
-				Sensitive:           true,
+				MarkdownDescription: "OpenManage Enterprise password. This can also be set using the environment variable OME_PASSWORD",
+				Description:         "OpenManage Enterprise password. This can also be set using the environment variable OME_PASSWORD",
+				// This should remain optional so user can use environment variables if they choose.
+				Optional:  true,
+				Sensitive: true,
 			},
 			"port": schema.Int64Attribute{
-				MarkdownDescription: "OpenManage Enterprise HTTPS port." +
+				MarkdownDescription: "OpenManage Enterprise HTTPS port. This can also be set using the environment variable OME_PORT" +
 					fmt.Sprintf(" Default value is `%d`.", defaultPort),
-				Description: "OpenManage Enterprise HTTPS port." +
+				Description: "OpenManage Enterprise HTTPS port. This can also be set using the environment variable OME_PORT" +
 					fmt.Sprintf(" Default value is '%d'.", defaultPort),
+				// This should remain optional so user can use environment variables if they choose.
 				Optional: true,
 			},
 			"skipssl": schema.BoolAttribute{
-				MarkdownDescription: "Skips SSL certificate validation on OpenManage Enterprise." +
+				MarkdownDescription: "Skips SSL certificate validation on OpenManage Enterprise. This can also be set using the environment variable OME_SKIP_SSL" +
 					" Default value is `false`.",
-				Description: "Skips SSL certificate validation on OpenManage Enterprise." +
+				Description: "Skips SSL certificate validation on OpenManage Enterprise. This can also be set using the environment variable OME_SKIP_SSL" +
 					" Default value is 'false'.",
+				// This should remain optional so user can use environment variables if they choose.
 				Optional: true,
 			},
 			"timeout": schema.Int64Attribute{
-				MarkdownDescription: "HTTPS timeout in seconds for OpenManage Enterprise client." +
+				MarkdownDescription: "HTTPS timeout in seconds for OpenManage Enterprise client. This can also be set using the environment variable OME_TIMEOUT" +
 					fmt.Sprintf(" Default value is `%d`.", defaultTimeoutInSeconds),
-				Description: "HTTPS timeout in seconds for OpenManage Enterprise client." +
+				Description: "HTTPS timeout in seconds for OpenManage Enterprise client. This can also be set using the environment variable OME_TIMEOUT" +
 					fmt.Sprintf(" Default value is '%d'.", defaultTimeoutInSeconds),
+				// This should remain optional so user can use environment variables if they choose.
 				Optional: true,
 			},
 			"protocol": schema.StringAttribute{
-				MarkdownDescription: "Set the Http protocol for OpenManage Enterprise client." +
+				MarkdownDescription: "Set the Http protocol for OpenManage Enterprise client. This can also be set using the environment variable OME_PROTOCOL" +
 					fmt.Sprintf(" Default value is `%s`.", defaultProtocol),
-				Description: "Set the Http protocol for OpenManage Enterprise client." +
+				Description: "Set the Http protocol for OpenManage Enterprise client. This can also be set using the environment variable OME_PROTOCOL" +
 					fmt.Sprintf(" Default value is '%s'.", defaultProtocol),
+				// This should remain optional so user can use environment variables if they choose.
 				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{

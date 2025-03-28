@@ -24,7 +24,21 @@ provider "ome" {
   username = "username"
   password = "password"
   host     = "yourhost.host.com"
+  timeout  = 30
+  port     = 443
+  protocol = "https"
   skipssl  = false
+
+  ## Can also be set using environment variables
+  ## If environment variables are set it will override this configuration
+  ## Example environment variables
+  # OME_USERNAME="username"
+  # OME_PASSWORD="password"
+  # OME_HOST="yourhost.host.com"
+  # OME_PORT="443"
+  # OME_SKIP_SSL="true"
+  # OME_TIMEOUT="30"
+  # OME_PROTOCOL="https"
 }
 
 # creating baseline from a reference device and making other devices complaint with that baseline. 
