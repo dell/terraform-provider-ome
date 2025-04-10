@@ -130,13 +130,22 @@ func findAttributes(displayName string, subAttrGroups []models.SubAttributeGroup
 
 // CreateTemplate creates a template from a reference device id.
 func (c *Client) CreateTemplate(ut models.CreateTemplate) (int64, error) {
-	data, _ := c.JSONMarshal(ut)
+	data, errMarshal := c.JSONMarshal(ut)
+	if errMarshal != nil {
+		return -1, errMarshal
+	}
 	response, err := c.Post(TemplateAPI, nil, data)
 	if err != nil {
 		return -1, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	val, _ := strconv.ParseInt(string(respData), 10, 64)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return -1, getBodyError
+	}
+	val, parseErr := strconv.ParseInt(string(respData), 10, 64)
+	if parseErr != nil {
+		return -1, parseErr
+	}
 	return val, nil
 }
 
@@ -150,7 +159,10 @@ func (c *Client) GetViewTypeID(viewType string) (int64, error) {
 		return -1, err
 	}
 
-	respData, _ := c.GetBodyData(response.Body)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return -1, getBodyError
+	}
 	vt := models.ViewTypes{}
 
 	err = c.JSONUnMarshal(respData, &vt)
@@ -178,7 +190,10 @@ func (c *Client) GetDeviceTypeID(deviceType string) (int64, error) {
 		return -1, err
 	}
 
-	respData, _ := c.GetBodyData(response.Body)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return -1, getBodyError
+	}
 	dt := models.DeviceTypes{}
 
 	err = c.JSONUnMarshal(respData, &dt)
@@ -204,8 +219,10 @@ func (c *Client) GetTemplateByID(id int64) (models.OMETemplate, error) {
 		return omeTemplate, err
 	}
 
-	respData, _ := c.GetBodyData(response.Body)
-
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeTemplate, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeTemplate)
 	if err != nil {
 		return omeTemplate, err
@@ -234,7 +251,10 @@ func (c *Client) GetTemplateByName(name string) (models.OMETemplate, error) {
 
 // UpdateTemplate updates a template from a reference template id.
 func (c *Client) UpdateTemplate(ut models.UpdateTemplate) error {
-	data, _ := c.JSONMarshal(ut)
+	data, errMarshal := c.JSONMarshal(ut)
+	if errMarshal != nil {
+		return errMarshal
+	}
 	uri := fmt.Sprintf(TemplateAPI+"(%d)", ut.ID)
 	_, err := c.Put(uri, nil, data)
 	return err
@@ -246,8 +266,10 @@ func (c *Client) GetIdentityPoolByName(name string) (models.IdentityPool, error)
 	if err != nil {
 		return models.IdentityPool{}, err
 	}
-	b, _ := c.GetBodyData(response.Body)
-
+	b, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return models.IdentityPool{}, getBodyError
+	}
 	omeIdentityPools := models.OMEIdentityPools{}
 	err = c.JSONUnMarshal(b, &omeIdentityPools)
 	if err != nil {
@@ -268,8 +290,10 @@ func (c *Client) GetIdentityPoolByID(id int64) (models.IdentityPool, error) {
 	if err != nil {
 		return models.IdentityPool{}, err
 	}
-	b, _ := c.GetBodyData(response.Body)
-
+	b, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return models.IdentityPool{}, getBodyError
+	}
 	omeIdentityPool := models.IdentityPool{}
 	err = c.JSONUnMarshal(b, &omeIdentityPool)
 	if err != nil {
@@ -319,14 +343,17 @@ func getVlanAttributeForPayload(networkAttributes []models.NetworkAttribute) mod
 
 // GetVlanNetworkModel returns the network view of the template returning all Network attributes
 func (c *Client) GetVlanNetworkModel(templateID int64) (models.NetworkSpecificView, error) {
+	networksView := models.NetworkSpecificView{}
 	uri := fmt.Sprintf(TemplateAPI+"(%d)/Views(4)/AttributeViewDetails", templateID)
 	resp, err := c.Get(uri, nil, nil)
 	if err != nil {
-		return models.NetworkSpecificView{}, err
+		return networksView, err
 	}
-	respBody, _ := c.GetBodyData(resp.Body)
+	respBody, getBodyError := c.GetBodyData(resp.Body)
+	if getBodyError != nil {
+		return networksView, getBodyError
+	}
 
-	networksView := models.NetworkSpecificView{}
 	err = c.JSONUnMarshal(respBody, &networksView)
 	if err != nil {
 		return models.NetworkSpecificView{}, err
@@ -336,7 +363,10 @@ func (c *Client) GetVlanNetworkModel(templateID int64) (models.NetworkSpecificVi
 
 // UpdateNetworkConfig updates the network attributes to the template
 func (c *Client) UpdateNetworkConfig(nwConfig *models.UpdateNetworkConfig) error {
-	data, _ := c.JSONMarshal(nwConfig)
+	data, errMarshal := c.JSONMarshal(nwConfig)
+	if errMarshal != nil {
+		return errMarshal
+	}
 	_, err := c.Post(UpdateNetworkConfigAPI, nil, data)
 	return err
 }
@@ -384,26 +414,44 @@ func (c *Client) GetTemplateByIDOrName(templateID int64, templateName string) (m
 
 // CloneTemplateByRefTemplateID - method to clone template using reference template ID.
 func (c *Client) CloneTemplateByRefTemplateID(cloneTemplateRequest models.OMECloneTemplate) (int64, error) {
-	data, _ := c.JSONMarshal(cloneTemplateRequest)
+	data, errMarshal := c.JSONMarshal(cloneTemplateRequest)
+	if errMarshal != nil {
+		return -1, errMarshal
+	}
 	response, err := c.Post(CloneTemplateAPI, nil, data)
 	if err != nil {
 		return -1, err
 	}
 
-	respData, _ := c.GetBodyData(response.Body)
-	newTemplateID, _ := strconv.ParseInt(string(respData), 10, 64)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return -1, getBodyError
+	}
+	newTemplateID, parseError := strconv.ParseInt(string(respData), 10, 64)
+	if parseError != nil {
+		return -1, parseError
+	}
 	return newTemplateID, nil
 }
 
 // ImportTemplate - method to clone template using reference template ID.
 func (c *Client) ImportTemplate(importTemplateRequest models.OMEImportTemplate) (int64, error) {
-	data, _ := c.JSONMarshal(importTemplateRequest)
+	data, errMarshal := c.JSONMarshal(importTemplateRequest)
+	if errMarshal != nil {
+		return -1, errMarshal
+	}
 	response, err := c.Post(ImportTemplateAPI, nil, data)
 	if err != nil {
 		return -1, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	newTemplateID, _ := strconv.ParseInt(string(respData), 10, 64)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return -1, getBodyError
+	}
+	newTemplateID, parseError := strconv.ParseInt(string(respData), 10, 64)
+	if parseError != nil {
+		return -1, parseError
+	}
 	return newTemplateID, nil
 }
 

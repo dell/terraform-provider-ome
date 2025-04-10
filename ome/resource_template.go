@@ -555,8 +555,13 @@ func (r *resourceTemplate) Read(ctx context.Context, req resource.ReadRequest, r
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	templateID, _ := strconv.ParseInt(template.ID.ValueString(), 10, 64)
-
+	templateID, parseError := strconv.ParseInt(template.ID.ValueString(), 10, 64)
+	if parseError != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrReadTemplate, parseError.Error(),
+		)
+		return
+	}
 	//Create Session and defer the remove session
 	omeClient, d := r.p.createOMESession(ctx, "resource_template Read")
 	resp.Diagnostics.Append(d...)
@@ -665,8 +670,13 @@ func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
-	templateID, _ := strconv.ParseInt(stateTemplate.ID.ValueString(), 10, 64)
-
+	templateID, parseError := strconv.ParseInt(stateTemplate.ID.ValueString(), 10, 64)
+	if parseError != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrUpdateTemplate, parseError.Error(),
+		)
+		return
+	}
 	if isConfigValuesChanged(planTemplate, stateTemplate) {
 		resp.Diagnostics.AddError(
 			clients.ErrUpdateTemplate,
@@ -727,7 +737,13 @@ func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest
 	stateAttributes := getTfsdkStateAttributes(ctx, stateTemplate)
 	// Terraform compares the list elements based on order, hence it is expected that the practitioner gives all attributes
 	// along with the attribute for which modification is expected.
-	da, _ := getDeltaAttributes(ctx, planTemplate, stateAttributes)
+	da, deltaError := getDeltaAttributes(ctx, planTemplate, stateAttributes)
+	if deltaError != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrUpdateTemplate, deltaError.Error(),
+		)
+		return
+	}
 
 	tflog.Trace(ctx, "resource_template update: finished fetching delta attributes")
 

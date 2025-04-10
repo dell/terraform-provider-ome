@@ -22,27 +22,39 @@ import (
 
 // CreateUser - to create ome user
 func (c *Client) CreateUser(user models.UserPayload) (models.User, error) {
-	data, _ := c.JSONMarshal(user)
+	omeUser := models.User{}
+	data, errMarshal := c.JSONMarshal(user)
+	if errMarshal != nil {
+		return omeUser, errMarshal
+	}
 	response, err := c.Post(UserAPI, nil, data)
 	if err != nil {
-		return models.User{}, err
+		return omeUser, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	omeUser := models.User{}
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeUser, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeUser)
 	return omeUser, err
 }
 
 // UpdateUser - to update ome user
 func (c *Client) UpdateUser(user models.User) (models.User, error) {
-	data, _ := c.JSONMarshal(user)
+	omeUser := models.User{}
+	data, errMarshal := c.JSONMarshal(user)
+	if errMarshal != nil {
+		return omeUser, errMarshal
+	}
 	x := UserAPI + fmt.Sprintf("('%s')", user.ID)
 	response, err := c.Put(x, nil, data)
 	if err != nil {
 		return models.User{}, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	omeUser := models.User{}
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeUser, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeUser)
 	fmt.Println(string(respData))
 	return omeUser, err
@@ -66,7 +78,10 @@ func (c *Client) GetUserByID(id string) (models.User, error) {
 	if err != nil {
 		return omeUser, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeUser, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeUser)
 	fmt.Println(string(respData))
 	return omeUser, err

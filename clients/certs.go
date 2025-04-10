@@ -30,7 +30,10 @@ func (c *Client) GetCSR(input models.CSRConfig) (string, error) {
 	}
 
 	resp := make(map[string]string)
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return "", getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &resp)
 	if err != nil {
 		return "", err
@@ -56,7 +59,10 @@ func (c *Client) PostCert(base64Encoded string) (string, error) {
 	if errp != nil {
 		return "", errp
 	}
-	respStr, _ := c.GetBodyData(response.Body)
+	respStr, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return "", getBodyError
+	}
 	return string(respStr), nil
 }
 
@@ -67,7 +73,10 @@ func (c *Client) GetCert() (models.CertInfo, error) {
 	if err != nil {
 		return ret, err
 	}
-	resp, _ := c.GetBodyData(response.Body)
+	resp, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return ret, getBodyError
+	}
 	err = c.JSONUnMarshalSingleValue(resp, &ret)
 	return ret, err
 }

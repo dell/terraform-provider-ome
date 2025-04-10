@@ -115,14 +115,21 @@ func (c *Client) CreateSession() (*http.Response, error) {
 		Password:    c.password,
 		SessionType: SessionType,
 	}
-	body, _ := c.JSONMarshal(ar)
+	body, errMarshal := c.JSONMarshal(ar)
+	if errMarshal != nil {
+		return nil, errMarshal
+	}
 	resp, err := c.Post(SessionAPI, nil, body)
 	if resp != nil {
-		respBody, _ := c.GetBodyData(resp.Body)
-
+		respBody, getBodyError := c.GetBodyData(resp.Body)
+		if getBodyError != nil {
+			return nil, getBodyError
+		}
 		authResp := AuthResp{}
-		_ = c.JSONUnMarshal(respBody, &authResp)
-
+		unmarshalError := c.JSONUnMarshal(respBody, &authResp)
+		if unmarshalError != nil {
+			return resp, unmarshalError
+		}
 		c.SetSessionParams(resp.Header.Get(AuthTokenHeader), authResp.ID)
 	}
 	return resp, err
@@ -158,7 +165,10 @@ func (c *Client) TrackJob(jobID int64, maxRetries int64, sleepInterval int64) (b
 		}
 		if resp != nil {
 			jr := &JobResp{}
-			parseResponse(c, resp, &jr)
+			parseError := parseResponse(c, resp, &jr)
+			if parseError != nil {
+				return false, fmt.Sprintf("Unable to parse response from job %s", parseError)
+			}
 			lrs := jr.LastRunStatus.ID
 			if lrs == SuccessStatusID {
 				status = true
@@ -173,7 +183,10 @@ func (c *Client) TrackJob(jobID int64, maxRetries int64, sleepInterval int64) (b
 					message = err.Error()
 				} else {
 					led := LastExecutionDetail{}
-					parseResponse(c, ledResp, &led)
+					parseError := parseResponse(c, ledResp, &led)
+					if parseError != nil {
+						return false, fmt.Sprintf("Unable to parse response from job %s", parseError)
+					}
 					message = led.Value
 				}
 				break
@@ -195,13 +208,23 @@ func (c *Client) GetJob(jobID int64) (JobResp, error) {
 		return JobResp{}, err
 	}
 	jr := &JobResp{}
-	parseResponse(c, resp, &jr)
+	parseError := parseResponse(c, resp, &jr)
+	if parseError != nil {
+		return *jr, parseError
+	}
 	return *jr, nil
 }
 
-func parseResponse(c *Client, resp *http.Response, in interface{}) {
-	data, _ := c.GetBodyData(resp.Body)
-	_ = c.JSONUnMarshal(data, in)
+func parseResponse(c *Client, resp *http.Response, in interface{}) error {
+	data, getBodyDataError := c.GetBodyData(resp.Body)
+	if getBodyDataError != nil {
+		return getBodyDataError
+	}
+	unmarshalError := c.JSONUnMarshal(data, in)
+	if unmarshalError != nil {
+		return unmarshalError
+	}
+	return nil
 }
 
 func findElementInArray(arr []any, find any) any {
@@ -236,7 +259,10 @@ func (c *Client) GetPaginatedData(url string, in interface{}) error {
 	}
 	var allData []map[string]interface{}
 	pd := PaginationData{}
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &pd)
 	if err != nil {
 		return err
@@ -248,7 +274,10 @@ func (c *Client) GetPaginatedData(url string, in interface{}) error {
 			return err
 		}
 		pd = PaginationData{}
-		bodyData, _ := c.GetBodyData(response.Body)
+		bodyData, getBodyError := c.GetBodyData(response.Body)
+		if getBodyError != nil {
+			return getBodyError
+		}
 		err = c.JSONUnMarshal(bodyData, &pd)
 		if err != nil {
 			return err
@@ -257,7 +286,10 @@ func (c *Client) GetPaginatedData(url string, in interface{}) error {
 	}
 
 	jsonString, _ := json.Marshal(allData)
-	_ = json.Unmarshal(jsonString, &in)
+	unmarshalError := json.Unmarshal(jsonString, &in)
+	if unmarshalError != nil {
+		return unmarshalError
+	}
 
 	return nil
 }
@@ -271,7 +303,10 @@ func (c *Client) GetPaginatedDataWithQueryParam(url string, queryParams map[stri
 	}
 	var allData []map[string]interface{}
 	pd := PaginationData{}
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &pd)
 	if err != nil {
 		return err
@@ -283,7 +318,10 @@ func (c *Client) GetPaginatedDataWithQueryParam(url string, queryParams map[stri
 			return err
 		}
 		pd = PaginationData{}
-		bodyData, _ := c.GetBodyData(response.Body)
+		bodyData, getBodyError := c.GetBodyData(response.Body)
+		if getBodyError != nil {
+			return getBodyError
+		}
 		err = c.JSONUnMarshal(bodyData, &pd)
 		if err != nil {
 			return err
@@ -292,8 +330,10 @@ func (c *Client) GetPaginatedDataWithQueryParam(url string, queryParams map[stri
 	}
 
 	jsonString, _ := json.Marshal(allData)
-	_ = json.Unmarshal(jsonString, &in)
-
+	unmarshalError := json.Unmarshal(jsonString, &in)
+	if unmarshalError != nil {
+		return unmarshalError
+	}
 	return nil
 }
 
@@ -320,7 +360,10 @@ func (c *Client) GetValueWithPagination(opt RequestOptions, in interface{}) erro
 			return err
 		}
 		pd = paginatedResponse{}
-		bodyData, _ := c.GetBodyData(response.Body)
+		bodyData, getBodyError := c.GetBodyData(response.Body)
+		if getBodyError != nil {
+			return getBodyError
+		}
 		err = c.JSONUnMarshal(bodyData, &pd)
 		if err != nil {
 			return err

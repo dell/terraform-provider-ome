@@ -21,13 +21,22 @@ import (
 
 // CreateFirmwareBaseline - Creates a new baseline in the catalog
 func (c *Client) CreateFirmwareBaseline(payload models.CreateUpdateFirmwareBaseline) (int64, error) {
-	data, _ := c.JSONMarshal(payload)
+	data, errMarshal := c.JSONMarshal(payload)
+	if errMarshal != nil {
+		return -1, errMarshal
+	}
 	response, err := c.Post(FirmwareBaselineAPI, nil, data)
 	if err != nil {
 		return -1, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	val, _ := strconv.ParseInt(string(respData), 10, 64)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return -1, getBodyError
+	}
+	val, parseErr := strconv.ParseInt(string(respData), 10, 64)
+	if parseErr != nil {
+		return -1, parseErr
+	}
 	return val, nil
 }
 
@@ -39,8 +48,10 @@ func (c *Client) GetFirmwareBaselineWithID(id int64) (models.FirmwareBaselinesMo
 		return omeBaseline, err
 	}
 
-	respData, _ := c.GetBodyData(response.Body)
-
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeBaseline, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeBaseline)
 	if err != nil {
 		return omeBaseline, err
@@ -84,12 +95,21 @@ func (c *Client) DeleteFirmwareBaseline(ids []int64) error {
 
 // UpdateFirmwareBaseline - Updates the specified baseline
 func (c *Client) UpdateFirmwareBaseline(baseline models.CreateUpdateFirmwareBaseline) (int64, error) {
-	data, _ := c.JSONMarshal(baseline)
+	data, errMarshal := c.JSONMarshal(baseline)
+	if errMarshal != nil {
+		return -1, errMarshal
+	}
 	response, err := c.Put(fmt.Sprintf(FirmwareBaselineAPI+"(%d)", baseline.ID), nil, data)
 	if err != nil {
 		return -1, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	val, _ := strconv.ParseInt(string(respData), 10, 64)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return -1, getBodyError
+	}
+	val, parseErr := strconv.ParseInt(string(respData), 10, 64)
+	if parseErr != nil {
+		return -1, parseErr
+	}
 	return val, nil
 }

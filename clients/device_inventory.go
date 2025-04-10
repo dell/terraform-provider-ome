@@ -27,7 +27,10 @@ func (c *Client) GetDeviceInventory(deviceID int64) (models.DeviceInventory, err
 	if err != nil {
 		return inv, fmt.Errorf("error querying device inventory: %w", err)
 	}
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return inv, getBodyError
+	}
 	err = c.JSONUnMarshalValue(bodyData, &inv)
 	return inv, err
 }
@@ -40,8 +43,10 @@ func (c *Client) GetDeviceInventoryByType(deviceID int64, inventoryType string) 
 	if err != nil {
 		return inv, fmt.Errorf("error querying device inventory with type %s: %w", inventoryType, err)
 	}
-	bodyData, _ := c.GetBodyData(response.Body)
-
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return inv, getBodyError
+	}
 	temp := models.DeviceInventoryInfo{}
 	if err := json.Unmarshal(bodyData, &temp); err != nil {
 		return inv, fmt.Errorf("error unmarshalling device type: %w", err)
