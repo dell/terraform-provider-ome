@@ -40,7 +40,10 @@ func (c *Client) GetComplianceReportDetails(ids []int64) ([]models.FirmwareBasel
 	if err != nil {
 		return response, err
 	}
-	bodyData, _ := c.GetBodyData(resp.Body)
+	bodyData, getBodyError := c.GetBodyData(resp.Body)
+	if getBodyError != nil {
+		return response, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &response)
 	if err != nil {
 		err = fmt.Errorf(ErrBaselineDeviceReportsID+" %w", err)

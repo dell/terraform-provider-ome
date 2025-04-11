@@ -22,7 +22,11 @@ import (
 
 // GetAllDeviceComplianceReport get all device compliance report
 func GetAllDeviceComplianceReport(clients *clients.Client, plan models.OMEDeviceComplianceData) ([]models.FirmwareBaselinesGetModel, error) {
-	devices, err := clients.GetDevices(utils.ConvertListValueToStringSlice(plan.DeviceServiceTags), utils.ConvertListValueToIntSlice(plan.DeviceIDs), utils.ConvertListValueToStringSlice(plan.DeviceGroupNames))
+	deviceIds, convertErr := utils.ConvertListValueToIntSlice(plan.DeviceIDs)
+	if convertErr != nil {
+		return []models.FirmwareBaselinesGetModel{}, convertErr
+	}
+	devices, err := clients.GetDevices(utils.ConvertListValueToStringSlice(plan.DeviceServiceTags), deviceIds, utils.ConvertListValueToStringSlice(plan.DeviceGroupNames))
 	if err != nil {
 		return []models.FirmwareBaselinesGetModel{}, err
 	}

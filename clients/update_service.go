@@ -40,8 +40,10 @@ func (c *Client) GetFwBaselineComplianceReport(ctx context.Context, baseLineID i
 	if err != nil {
 		return &models.ComplianceReport{}, err
 	}
-	respData, _ := c.GetBodyData(resp.Body)
-
+	respData, getBodyError := c.GetBodyData(resp.Body)
+	if getBodyError != nil {
+		return &models.ComplianceReport{}, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &compReports)
 
 	if err != nil {
@@ -67,8 +69,10 @@ func (c *Client) GetUpdateServiceBaselineIDByName(name string) (int64, error) {
 	if err != nil {
 		return -1, err
 	}
-	respData, _ := c.GetBodyData(resp.Body)
-
+	respData, getBodyError := c.GetBodyData(resp.Body)
+	if getBodyError != nil {
+		return -1, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &baseLines)
 
 	if err != nil {

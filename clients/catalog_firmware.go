@@ -34,7 +34,10 @@ func (c *Client) GetSpecificCatalogFirmware(id int64) (models.CatalogsModel, err
 	if err != nil {
 		return catalog, err
 	}
-	bodyData, _ := c.GetBodyData(resp.Body)
+	bodyData, getBodyError := c.GetBodyData(resp.Body)
+	if getBodyError != nil {
+		return catalog, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &catalog)
 	if err != nil {
 		err = fmt.Errorf(ErrInvalidFirmwareCatalogIdentifiers+" %w", err)
@@ -44,13 +47,19 @@ func (c *Client) GetSpecificCatalogFirmware(id int64) (models.CatalogsModel, err
 
 // CreateCatalogFirmware - Create catalog firmware
 func (c *Client) CreateCatalogFirmware(payload models.CatalogsModel) (models.CatalogsModel, error) {
-	data, _ := c.JSONMarshal(payload)
-	response, err := c.Post(CatalogFirmwareAPI, nil, data)
 	var returnVal = models.CatalogsModel{}
+	data, errMarshal := c.JSONMarshal(payload)
+	if errMarshal != nil {
+		return returnVal, errMarshal
+	}
+	response, err := c.Post(CatalogFirmwareAPI, nil, data)
 	if err != nil {
 		return returnVal, err
 	}
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return returnVal, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &returnVal)
 	return returnVal, err
 }
@@ -71,14 +80,20 @@ func (c *Client) DeleteCatalogFirmware(ids []int64) error {
 
 // UpdateCatalogFirmware - Update firmware catalog details
 func (c *Client) UpdateCatalogFirmware(id int64, payload models.CatalogsModel) (models.CatalogsModel, error) {
-	data, _ := c.JSONMarshal(payload)
-	response, err := c.Put(fmt.Sprintf(CatalogFirmwareSpecificAPI, id), nil, data)
 	var returnVal = models.CatalogsModel{}
+	data, errMarshal := c.JSONMarshal(payload)
+	if errMarshal != nil {
+		return returnVal, errMarshal
+	}
+	response, err := c.Put(fmt.Sprintf(CatalogFirmwareSpecificAPI, id), nil, data)
 	if err != nil {
 		return returnVal, err
 	}
 
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return returnVal, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &returnVal)
 	return returnVal, err
 }

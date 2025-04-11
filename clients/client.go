@@ -96,7 +96,10 @@ func NewClient(opts ClientOptions) (*Client, error) {
 		}
 
 	} else {
-		pool, _ := x509.SystemCertPool() //return the system certificate pool
+		pool, copySystemCertError := x509.SystemCertPool() //return the system certificate pool
+		if copySystemCertError != nil {
+			return omeClient, copySystemCertError
+		}
 		if opts.RootCaPath != "" {
 			rootCAsData, readErr := os.ReadFile(opts.RootCaPath)
 			if readErr != nil {
@@ -211,8 +214,10 @@ func (c *Client) Do(
 
 	pathURL := c.url + path
 
-	request, _ := http.NewRequest(method, pathURL, strings.NewReader(string(body)))
-
+	request, createNewRequestErr := http.NewRequest(method, pathURL, strings.NewReader(string(body)))
+	if createNewRequestErr != nil {
+		return nil, createNewRequestErr
+	}
 	//PrereqHook
 	if c.preRequestHook != nil {
 		c.preRequestHook(c, request)
@@ -251,7 +256,10 @@ func (c *Client) DoRequest(request *http.Request) (*http.Response, error) {
 
 	if response != nil && response.StatusCode != http.StatusOK && response.StatusCode != http.StatusAccepted &&
 		response.StatusCode != http.StatusCreated && response.StatusCode != http.StatusNoContent {
-		data, _ := c.GetBodyData(response.Body)
+		data, getBodyError := c.GetBodyData(response.Body)
+		if getBodyError != nil {
+			return nil, getBodyError
+		}
 		return nil, fmt.Errorf(ErrResponseMsg, response.StatusCode, string(data))
 	}
 
@@ -307,8 +315,10 @@ func (c *Client) GetBodyData(body io.ReadCloser) ([]byte, error) {
 		return nil, errors.New(ErrEmptyBodyMsg)
 	}
 
-	data, _ := io.ReadAll(body)
-
+	data, readErr := io.ReadAll(body)
+	if readErr != nil {
+		return nil, readErr
+	}
 	err := body.Close()
 	if err != nil {
 		return nil, err

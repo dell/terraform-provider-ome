@@ -263,15 +263,18 @@ func ConvertListValueToStringSlice(listVal basetypes.ListValue) []string {
 }
 
 // ConvertListValueToIntSlice converts a list value to an int slice
-func ConvertListValueToIntSlice(listVal basetypes.ListValue) []int64 {
+func ConvertListValueToIntSlice(listVal basetypes.ListValue) ([]int64, error) {
 	var intSlice []int64
 	for _, elem := range listVal.Elements() {
 		str := elem.String()
 		str = strings.Trim(str, "\"")
-		num, _ := strconv.ParseInt(str, 10, 64)
+		num, parseError := strconv.ParseInt(str, 10, 64)
+		if parseError != nil {
+			return intSlice, parseError
+		}
 		intSlice = append(intSlice, num)
 	}
-	return intSlice
+	return intSlice, nil
 }
 
 // ConvertStringListValue converts a string slice value to an List

@@ -21,14 +21,20 @@ import (
 
 // CreateJob - creates a job with given payload
 func (c *Client) CreateJob(payload models.JobPayload) (JobResp, error) {
+	temp := JobResp{}
 	payloadb, _ := json.Marshal(payload)
 	response, err := c.Post(JobAPI, nil, payloadb)
 	if err != nil {
-		return JobResp{}, err
+		return temp, err
 	}
-	bodyData, _ := c.GetBodyData(response.Body)
-	temp := JobResp{}
-	_ = json.Unmarshal(bodyData, &temp)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return temp, getBodyError
+	}
+	unmarshalError := json.Unmarshal(bodyData, &temp)
+	if unmarshalError != nil {
+		return temp, unmarshalError
+	}
 	return temp, nil
 }
 

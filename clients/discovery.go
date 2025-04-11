@@ -24,20 +24,30 @@ import (
 
 // CreateDiscoveryJob - create a discovery job in OME.
 func (c *Client) CreateDiscoveryJob(discoveryJob models.DiscoveryJob) (models.DiscoveryJob, error) {
-	data, _ := c.JSONMarshal(discoveryJob)
+	omeDiscoveryJob := models.DiscoveryJob{}
+	data, errMarshal := c.JSONMarshal(discoveryJob)
+	if errMarshal != nil {
+		return omeDiscoveryJob, errMarshal
+	}
 	response, err := c.Post(DiscoveryJobAPI, nil, data)
 	if err != nil {
 		return models.DiscoveryJob{}, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	omeDiscoveryJob := models.DiscoveryJob{}
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeDiscoveryJob, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeDiscoveryJob)
 	return omeDiscoveryJob, err
 }
 
 // UpdateDiscoveryJob - update a discovery job in OME.
 func (c *Client) UpdateDiscoveryJob(discoveryJob models.DiscoveryJob) (models.DiscoveryJob, error) {
-	data, _ := c.JSONMarshal(discoveryJob)
+	omeDiscoveryJob := models.DiscoveryJob{}
+	data, errMarshal := c.JSONMarshal(discoveryJob)
+	if errMarshal != nil {
+		return omeDiscoveryJob, errMarshal
+	}
 	queryParams := map[string]string{
 		"groupId": strconv.Itoa(discoveryJob.DiscoveryConfigGroupID),
 	}
@@ -45,15 +55,20 @@ func (c *Client) UpdateDiscoveryJob(discoveryJob models.DiscoveryJob) (models.Di
 	if err != nil {
 		return models.DiscoveryJob{}, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	omeDiscoveryJob := models.DiscoveryJob{}
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeDiscoveryJob, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeDiscoveryJob)
 	return omeDiscoveryJob, err
 }
 
 // DeleteDiscoveryJob - delete a discovery job in OME.
 func (c *Client) DeleteDiscoveryJob(discoveryGroupIds models.DiscoveryJobDeletePayload) (string, error) {
-	data, _ := c.JSONMarshal(discoveryGroupIds)
+	data, errMarshal := c.JSONMarshal(discoveryGroupIds)
+	if errMarshal != nil {
+		return "", errMarshal
+	}
 	resp, err := c.Post(DiscoveryJobRemoveAPI, nil, data)
 	if err != nil {
 		return "", err
@@ -69,7 +84,10 @@ func (c *Client) GetDiscoveryJobByGroupID(groupID int64) (models.DiscoveryJob, e
 	if err != nil {
 		return omeDiscoveryJob, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeDiscoveryJob, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeDiscoveryJob)
 	return omeDiscoveryJob, err
 }
