@@ -711,8 +711,7 @@ func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest
 		}
 	}
 	planVlan := getVlanForTemplate(ctx, resp, planTemplate)
-
-	if !planTemplate.Vlan.IsUnknown() {
+	if !planTemplate.Vlan.IsUnknown() && len(planVlan.OMEVlanAttributes) > 0 {
 		err := validateVlanNetworkData(omeClient, templateID, planVlan)
 		if err != nil {
 			resp.Diagnostics.AddError(
@@ -990,7 +989,6 @@ func (r resourceTemplate) ImportState(ctx context.Context, req resource.ImportSt
 		)
 		return
 	}
-
 	omeVlan, err := omeClient.GetSchemaVlanData(omeTemplateData.ID)
 	if err != nil {
 		if err != nil {
