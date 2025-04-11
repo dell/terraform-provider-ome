@@ -352,8 +352,13 @@ func (r resourceDeployment) Create(ctx context.Context, req resource.CreateReque
 
 	tflog.Trace(ctx, "resource_deploy create: updating state started")
 
-	_ = updateDeploymentState(&templateDeploymentState, &plan, omeTemplate.ID, omeTemplate.Name, omeClient, usedDeviceInput)
-
+	stateUpdateErr := updateDeploymentState(&templateDeploymentState, &plan, omeTemplate.ID, omeTemplate.Name, omeClient, usedDeviceInput)
+	if stateUpdateErr != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrTemplateDeploymentCreate, stateUpdateErr.Error(),
+		)
+		return
+	}
 	tflog.Trace(ctx, "resource_deploy create: updating state finished, saving ...")
 	// Save into State
 	diags = resp.State.Set(ctx, &templateDeploymentState)
@@ -408,8 +413,13 @@ func (r resourceDeployment) Read(ctx context.Context, req resource.ReadRequest, 
 	defer omeClient.RemoveSession()
 
 	tflog.Trace(ctx, "resource_deploy read: client created started updating state")
-	_ = updateDeploymentState(&stateTemplateDeployment, &stateTemplateDeployment, templateID, templateName, omeClient, usedDeviceInput)
-
+	stateUpdateErr := updateDeploymentState(&stateTemplateDeployment, &stateTemplateDeployment, templateID, templateName, omeClient, usedDeviceInput)
+	if stateUpdateErr != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrTemplateDeploymentRead, stateUpdateErr.Error(),
+		)
+		return
+	}
 	tflog.Trace(ctx, "resource_deploy read: finished reading state")
 	//Save into State
 	diags = resp.State.Set(ctx, &stateTemplateDeployment)
@@ -599,8 +609,13 @@ func (r resourceDeployment) Update(ctx context.Context, req resource.UpdateReque
 
 	tflog.Trace(ctx, "resource_deploy update: started state update")
 
-	_ = updateDeploymentState(&state, &plan, state.TemplateID.ValueInt64(), state.TemplateName.ValueString(), omeClient, usedDeviceInput)
-
+	stateUpdateErr := updateDeploymentState(&state, &plan, state.TemplateID.ValueInt64(), state.TemplateName.ValueString(), omeClient, usedDeviceInput)
+	if stateUpdateErr != nil {
+		resp.Diagnostics.AddError(
+			clients.ErrTemplateDeploymentUpdate, stateUpdateErr.Error(),
+		)
+		return
+	}
 	tflog.Trace(ctx, "resource_deploy update: finished state update")
 	//Save into State
 	diags = resp.State.Set(ctx, &state)

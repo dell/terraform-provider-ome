@@ -21,15 +21,23 @@ import (
 
 // CreateDeployment creates a deployment for a specific template
 func (c *Client) CreateDeployment(deploymentRequest models.OMETemplateDeployRequest) (int64, error) {
-	data, _ := c.JSONMarshal(deploymentRequest)
-
+	data, errMarshal := c.JSONMarshal(deploymentRequest)
+	if errMarshal != nil {
+		return -1, errMarshal
+	}
 	response, err := c.Post(DeployAPI, nil, data)
 	if err != nil {
 		return -1, err
 	}
 
-	respData, _ := c.GetBodyData(response.Body)
-	val, _ := strconv.ParseInt(string(respData), 10, 64)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return -1, getBodyError
+	}
+	val, parseErr := strconv.ParseInt(string(respData), 10, 64)
+	if parseErr != nil {
+		return -1, parseErr
+	}
 	return val, nil
 }
 
@@ -54,14 +62,23 @@ func (c *Client) GetServerProfileInfoByTemplateName(name string) (models.OMEServ
 
 // DeleteDeployment unassigns and deletes the profile corresponding to the deployment
 func (c *Client) DeleteDeployment(deleteDeploymentReq models.ProfileDeleteRequest) error {
-	data, _ := c.JSONMarshal(&deleteDeploymentReq)
+	data, errMarshal := c.JSONMarshal(&deleteDeploymentReq)
+	if errMarshal != nil {
+		return errMarshal
+	}
 	response, err := c.Post(UnAssignProfileAPI, nil, data)
 	if err != nil {
 		return err
 	}
 
-	respData, _ := c.GetBodyData(response.Body)
-	jobID, _ := strconv.ParseInt(string(respData), 10, 64)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return getBodyError
+	}
+	jobID, parseErr := strconv.ParseInt(string(respData), 10, 64)
+	if parseErr != nil {
+		return parseErr
+	}
 
 	if jobID != 0 {
 		jobStatus, statusMessage := c.TrackJob(jobID, 10, 10)

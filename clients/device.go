@@ -40,7 +40,10 @@ func (c *Client) GetDevice(serviceTag string, devID int64) (models.Device, error
 		return device, err
 	}
 
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return device, getBodyError
+	}
 	err = c.JSONUnMarshalSingleValue(bodyData, &device)
 	if err != nil {
 		err = fmt.Errorf(ErrInvalidDeviceIdentifiers+" %s: %w", val, err)
@@ -82,7 +85,10 @@ func (c *Client) ValidateDevice(serviceTag string, devID int64) (int64, error) {
 
 	if err == nil {
 		devices := models.Devices{}
-		bodyData, _ := c.GetBodyData(response.Body)
+		bodyData, getBodyError := c.GetBodyData(response.Body)
+		if getBodyError != nil {
+			return deviceID, getBodyError
+		}
 		err = c.JSONUnMarshal(bodyData, &devices)
 		if err == nil {
 			if len(devices.Value) > 0 {

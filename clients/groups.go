@@ -21,15 +21,18 @@ import (
 
 // GetGroupByID - method to get a group object by id.
 func (c *Client) GetGroupByID(id int64) (models.Group, error) {
+	group := models.Group{}
 	path := fmt.Sprintf(GroupServiceAPI, id)
 	response, err := c.Get(path, nil, nil)
 	if err != nil {
-		return models.Group{}, err
+		return group, err
 	}
 
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return group, getBodyError
+	}
 
-	group := models.Group{}
 	err = c.JSONUnMarshal(bodyData, &group)
 	if err != nil {
 		return models.Group{}, err
@@ -64,8 +67,10 @@ func (c *Client) GetGroupByName(groupName string) (models.Groups, error) {
 		return models.Groups{}, err
 	}
 	groups := models.Groups{}
-	bodyData, _ := c.GetBodyData(response.Body)
-
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return groups, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &groups)
 	if err != nil {
 		return models.Groups{}, err
@@ -83,7 +88,10 @@ func (c *Client) GetExpandedGroupByName(groupName string, expansion string) (mod
 		return models.Group{}, fmt.Errorf("error querying group by name: %w", err)
 	}
 	group := models.Group{}
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return group, getBodyError
+	}
 	err = c.JSONUnMarshalSingleValue(bodyData, &group)
 	if err != nil {
 		return models.Group{}, fmt.Errorf("error getting group by name : %w", err)
@@ -99,7 +107,10 @@ func (c *Client) GetDevicesByGroupID(groupID int64) (models.Devices, error) {
 	}
 	allDevices := models.Devices{}
 	devices := models.Devices{}
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return allDevices, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &devices)
 	if err != nil {
 		return models.Devices{}, err
@@ -111,7 +122,10 @@ func (c *Client) GetDevicesByGroupID(groupID int64) (models.Devices, error) {
 			return allDevices, err
 		}
 		devices = models.Devices{}
-		bodyData, _ := c.GetBodyData(response.Body)
+		bodyData, getBodyError := c.GetBodyData(response.Body)
+		if getBodyError != nil {
+			return allDevices, getBodyError
+		}
 		err = c.JSONUnMarshal(bodyData, &devices)
 		if err != nil {
 			return allDevices, err
@@ -163,8 +177,14 @@ func (c *Client) CreateGroup(group models.Group) (int64, error) {
 	if err2 != nil {
 		return 0, err2
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	val, _ := strconv.ParseInt(string(respData), 10, 64)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return 0, getBodyError
+	}
+	val, parseErr := strconv.ParseInt(string(respData), 10, 64)
+	if parseErr != nil {
+		return 0, parseErr
+	}
 	return val, nil
 }
 
@@ -217,8 +237,10 @@ func (c *Client) GetAllGroups() (models.Groups, error) {
 		return models.Groups{}, err
 	}
 	groups := models.Groups{}
-	bodyData, _ := c.GetBodyData(response.Body)
-
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return groups, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &groups)
 	if err != nil {
 		return models.Groups{}, err

@@ -21,28 +21,38 @@ import (
 
 // CreateBaseline creates a baseline with baseline target devices and notification settings.
 func (c *Client) CreateBaseline(baseline models.ConfigurationBaselinePayload) (models.OmeBaseline, error) {
-	data, _ := c.JSONMarshal(baseline)
+	omeBaseline := models.OmeBaseline{}
+	data, errMarshal := c.JSONMarshal(baseline)
+	if errMarshal != nil {
+		return omeBaseline, errMarshal
+	}
 	response, err := c.Post(BaselineAPI, nil, data)
 	if err != nil {
 		return models.OmeBaseline{}, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-
-	omeBaseline := models.OmeBaseline{}
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeBaseline, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeBaseline)
 	return omeBaseline, err
 }
 
 // UpdateBaseline updates a baseline with baseline target devices and notification settings.
 func (c *Client) UpdateBaseline(baseline models.ConfigurationBaselinePayload) (models.OmeBaseline, error) {
-	data, _ := c.JSONMarshal(baseline)
+	omeBaseline := models.OmeBaseline{}
+	data, errMarshal := c.JSONMarshal(baseline)
+	if errMarshal != nil {
+		return omeBaseline, errMarshal
+	}
 	response, err := c.Put(fmt.Sprintf(BaselineAPI+"(%d)", baseline.ID), nil, data)
 	if err != nil {
 		return models.OmeBaseline{}, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-
-	omeBaseline := models.OmeBaseline{}
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeBaseline, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeBaseline)
 	return omeBaseline, err
 }
@@ -50,7 +60,10 @@ func (c *Client) UpdateBaseline(baseline models.ConfigurationBaselinePayload) (m
 // DeleteBaseline deletea a baseline.
 func (c *Client) DeleteBaseline(baselineIDs []int64) error {
 	baselineIds := models.BaseLineIDsData{BaselineIDs: baselineIDs}
-	body, _ := c.JSONMarshal(baselineIds)
+	body, errMarshal := c.JSONMarshal(baselineIds)
+	if errMarshal != nil {
+		return errMarshal
+	}
 	_, err := c.Post(BaseLineRemoveAPI, nil, body)
 	if err != nil {
 		return err
@@ -66,7 +79,10 @@ func (c *Client) GetBaselineByID(id int64) (models.OmeBaseline, error) {
 		return omeBaseline, err
 	}
 
-	respData, _ := c.GetBodyData(response.Body)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return omeBaseline, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeBaseline)
 	return omeBaseline, err
 }
@@ -96,7 +112,10 @@ func (c *Client) GetBaselineDevAttrComplianceReportsByID(baselineID int64, devic
 	if err != nil {
 		return "", err
 	}
-	respData, _ := c.GetBodyData(response.Body)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return "", getBodyError
+	}
 	return string(respData), err
 }
 
@@ -107,7 +126,10 @@ func (c *Client) getBaseline(url, name string) (models.OmeBaseline, error) {
 		return models.OmeBaseline{}, err
 	}
 
-	respData, _ := c.GetBodyData(response.Body)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return models.OmeBaseline{}, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &omeBaselines)
 	if err != nil {
 		return models.OmeBaseline{}, err
@@ -125,13 +147,22 @@ func (c *Client) getBaseline(url, name string) (models.OmeBaseline, error) {
 
 // RemediateBaseLineDevices remdiats the baseline devices
 func (c *Client) RemediateBaseLineDevices(cr models.ConfigurationRemediationPayload) (int64, error) {
-	data, _ := c.JSONMarshal(cr)
+	data, errMarshal := c.JSONMarshal(cr)
+	if errMarshal != nil {
+		return 0, errMarshal
+	}
 	response, err := c.Post(BaseLineConfigRemediationAPI, nil, data)
 	if err != nil {
 		return 0, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	val, _ := strconv.ParseInt(string(respData), 10, 64)
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return 0, getBodyError
+	}
+	val, parseErr := strconv.ParseInt(string(respData), 10, 64)
+	if parseErr != nil {
+		return 0, parseErr
+	}
 	return val, nil
 }
 
@@ -154,7 +185,10 @@ func (c *Client) GetConfiBaselineDeviceReport(baseLineID int64, deviceSt string)
 	if err != nil {
 		return models.OMEDeviceComplianceReport{}, err
 	}
-	respData, _ := c.GetBodyData(resp.Body)
+	respData, getBodyError := c.GetBodyData(resp.Body)
+	if getBodyError != nil {
+		return models.OMEDeviceComplianceReport{}, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &deviceCompReports)
 	if err != nil {
 		return models.OMEDeviceComplianceReport{}, err

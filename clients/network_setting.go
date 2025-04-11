@@ -37,108 +37,142 @@ func (c *Client) GetNetworkAdapterConfigByInterface(interfaceName string) (model
 
 // UpdateNetworkAdapterConfig to update the network adapter.
 func (c *Client) UpdateNetworkAdapterConfig(networkAdapter models.UpdateNetworkAdapterSetting) (JobResp, error) {
-	data, _ := c.JSONMarshal(networkAdapter)
+	jobResponse := JobResp{}
+	data, errMarshal := c.JSONMarshal(networkAdapter)
+	if errMarshal != nil {
+		return jobResponse, errMarshal
+	}
 	response, err := c.Post(UpdateNetworkAdapterAPI, nil, data)
 	if err != nil {
 		return JobResp{}, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	jobResponse := JobResp{}
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return jobResponse, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &jobResponse)
 	return jobResponse, err
 }
 
 // GetNetworkSessions to get the all sessions setting in the OME.
 func (c *Client) GetNetworkSessions() (models.NetworkSessions, error) {
+	networkSessions := models.NetworkSessions{}
 	response, err := c.Get(GetNetworkSessions, nil, nil)
 	if err != nil {
-		return models.NetworkSessions{}, err
+		return networkSessions, err
 	}
 
-	bodyData, _ := c.GetBodyData(response.Body)
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return networkSessions, getBodyError
+	}
 
-	networkSessions := models.NetworkSessions{}
 	err = c.JSONUnMarshal(bodyData, &networkSessions)
 	return networkSessions, err
 }
 
 // UpdateNetworkSessions to update the network session setting in the OME.
 func (c *Client) UpdateNetworkSessions(sessionPayload []models.SessionInfo) ([]models.SessionInfo, error) {
-	data, _ := c.JSONMarshal(sessionPayload)
+	sessionResponse := []models.SessionInfo{}
+	data, errMarshal := c.JSONMarshal(sessionPayload)
+	if errMarshal != nil {
+		return sessionResponse, errMarshal
+	}
 	response, err := c.Post(UpdateNetworkSessions, nil, data)
 	if err != nil {
 		return []models.SessionInfo{}, err
 	}
-	respData, _ := c.GetBodyData(response.Body)
-	sessionResponse := []models.SessionInfo{}
+	respData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return sessionResponse, getBodyError
+	}
 	err = c.JSONUnMarshal(respData, &sessionResponse)
 	return sessionResponse, err
 }
 
 // GetTimeConfiguration to get the time configuration of the OME.
 func (c *Client) GetTimeConfiguration() (models.TimeConfig, error) {
+	timeConfig := models.TimeConfig{}
 	response, err := c.Get(TimeConfigurationAPI, nil, nil)
 	if err != nil {
-		return models.TimeConfig{}, err
+		return timeConfig, err
 	}
-	bodyData, _ := c.GetBodyData(response.Body)
-	timeConfig := models.TimeConfig{}
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return timeConfig, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &timeConfig)
 	return timeConfig, err
 }
 
 // UpdateTimeConfiguration to update the time configuration of the OME.
 func (c *Client) UpdateTimeConfiguration(payloadTC models.TimeConfig) (models.TimeConfig, error) {
-	data, _ := c.JSONMarshal(payloadTC)
+	timeConfig := models.TimeConfig{}
+	data, errMarshal := c.JSONMarshal(payloadTC)
+	if errMarshal != nil {
+		return timeConfig, errMarshal
+	}
 	response, err := c.Put(TimeConfigurationAPI, nil, data)
 	if err != nil {
 		return models.TimeConfig{}, err
 	}
 
-	bodyData, _ := c.GetBodyData(response.Body)
-	timeConfig := models.TimeConfig{}
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return timeConfig, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &timeConfig)
 	return timeConfig, err
 }
 
 // GetTimeZone to get all time zone.
 func (c *Client) GetTimeZone() (models.TimeZones, error) {
+	timeZones := models.TimeZones{}
 	response, err := c.Get(GetTimeZone, nil, nil)
 	if err != nil {
-		return models.TimeZones{}, err
+		return timeZones, err
 	}
 
-	bodyData, _ := c.GetBodyData(response.Body)
-
-	timeZones := models.TimeZones{}
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return timeZones, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &timeZones)
 	return timeZones, err
 }
 
 // GetProxyConfig to get the proxy configuration of the OME.
 func (c *Client) GetProxyConfig() (models.ProxyConfiguration, error) {
+	proxyConfig := models.ProxyConfiguration{}
 	response, err := c.Get(ProxyConfigurationAPI, nil, nil)
 	if err != nil {
-		return models.ProxyConfiguration{}, err
+		return proxyConfig, err
 	}
 
-	bodyData, _ := c.GetBodyData(response.Body)
-
-	proxyConfig := models.ProxyConfiguration{}
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return proxyConfig, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &proxyConfig)
 	return proxyConfig, err
 }
 
 // UpdateProxyConfig to update the proxy configuration of the OME.
 func (c *Client) UpdateProxyConfig(payloadProxy models.PayloadProxyConfiguration) (models.ProxyConfiguration, error) {
-	data, _ := c.JSONMarshal(payloadProxy)
+	proxyConfig := models.ProxyConfiguration{}
+	data, errMarshal := c.JSONMarshal(payloadProxy)
+	if errMarshal != nil {
+		return proxyConfig, errMarshal
+	}
 	response, err := c.Put(ProxyConfigurationAPI, nil, data)
 	if err != nil {
 		return models.ProxyConfiguration{}, err
 	}
 
-	bodyData, _ := c.GetBodyData(response.Body)
-	proxyConfig := models.ProxyConfiguration{}
+	bodyData, getBodyError := c.GetBodyData(response.Body)
+	if getBodyError != nil {
+		return proxyConfig, getBodyError
+	}
 	err = c.JSONUnMarshal(bodyData, &proxyConfig)
 	return proxyConfig, err
 }
