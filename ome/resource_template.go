@@ -375,7 +375,7 @@ func (r *resourceTemplate) Create(ctx context.Context, req resource.CreateReques
 			return
 		}
 
-		omeTemplateData, err = omeClient.GetTemplateByID(templateID)
+		omeTemplateData, _, err = omeClient.GetTemplateByID(templateID)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				clients.ErrCreateTemplate, err.Error(),
@@ -407,7 +407,7 @@ func (r *resourceTemplate) Create(ctx context.Context, req resource.CreateReques
 			return
 		}
 
-		omeTemplateData, err = omeClient.GetTemplateByID(templateID)
+		omeTemplateData, _, err = omeClient.GetTemplateByID(templateID)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				clients.ErrCreateTemplate, err.Error(),
@@ -443,7 +443,7 @@ func (r *resourceTemplate) Create(ctx context.Context, req resource.CreateReques
 
 		tflog.Trace(ctx, fmt.Sprintf("template created with id %d", templateID))
 		time.Sleep(SleepTimeBeforeJob * time.Second)
-		omeTemplateData, err = omeClient.GetTemplateByID(templateID)
+		omeTemplateData, _, err = omeClient.GetTemplateByID(templateID)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				clients.ErrCreateTemplate, err.Error(),
@@ -584,8 +584,16 @@ func (r *resourceTemplate) Read(ctx context.Context, req resource.ReadRequest, r
 		"templateid": templateID,
 	})
 
-	omeTemplateData, err := omeClient.GetTemplateByID(templateID)
+	omeTemplateData, httpResponse, err := omeClient.GetTemplateByID(templateID)
 	if err != nil {
+		// If status code is 400 during a read, that means the ID is no longer valid
+		// clear state and create again
+		tflog.Info(ctx, fmt.Sprintf("httpStatus Code: %v", httpResponse.StatusCode))
+		if httpResponse.StatusCode == 400 {
+			tflog.Info(ctx, fmt.Sprintf("Unable to find id (%v), clearing state", templateID))
+			resp.State.RemoveResource(ctx)
+			return
+		}
 		resp.Diagnostics.AddError(
 			clients.ErrReadTemplate, err.Error(),
 		)
@@ -842,7 +850,7 @@ func (r resourceTemplate) Update(ctx context.Context, req resource.UpdateRequest
 	}
 
 	tflog.Trace(ctx, "resource_template update: fetching template by id")
-	omeTemplateData, err := omeClient.GetTemplateByID(templateID)
+	omeTemplateData, _, err := omeClient.GetTemplateByID(templateID)
 
 	if err != nil {
 		resp.Diagnostics.AddError(

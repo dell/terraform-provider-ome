@@ -49,7 +49,7 @@ For general information about Terraform, visit the [official website][tf-website
 ## Prerequisites
  | **Terraform Provider** | **OME Version** | **OS** | **Terraform** | **Golang** |
  |------------------------|-----------------|--------|---------------|------------|
- | v1.2.2 |  3.10.x <br> 4.0.1 <br> 4.1.0 | Ubuntu22.04 <br> RHEL9.x | 1.8.x <br> 1.9.x <br> | 1.22
+ | v1.2.3 |  3.10.x <br> 4.0.1 <br> 4.1.0 <br> 4.3.1 | Ubuntu22.04 <br> RHEL9.x | 1.9.x <br> 1.10.x <br> | 1.22
 
 
 ## List of DataSources in Terraform Provider for Dell OME

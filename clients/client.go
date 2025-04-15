@@ -260,7 +260,7 @@ func (c *Client) DoRequest(request *http.Request) (*http.Response, error) {
 		if getBodyError != nil {
 			return nil, getBodyError
 		}
-		return nil, fmt.Errorf(ErrResponseMsg, response.StatusCode, string(data))
+		return response, fmt.Errorf(ErrResponseMsg, response.StatusCode, string(data))
 	}
 
 	return response, err

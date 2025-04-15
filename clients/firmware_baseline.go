@@ -33,10 +33,8 @@ func (c *Client) CreateFirmwareBaseline(payload models.CreateUpdateFirmwareBasel
 	if getBodyError != nil {
 		return -1, getBodyError
 	}
-	val, parseErr := strconv.ParseInt(string(respData), 10, 64)
-	if parseErr != nil {
-		return -1, parseErr
-	}
+	// The error is intentionally ignored it sometimes returns job id sometimes returns full object
+	val, _ := strconv.ParseInt(string(respData), 10, 64)
 	return val, nil
 }
 
@@ -107,9 +105,7 @@ func (c *Client) UpdateFirmwareBaseline(baseline models.CreateUpdateFirmwareBase
 	if getBodyError != nil {
 		return -1, getBodyError
 	}
-	val, parseErr := strconv.ParseInt(string(respData), 10, 64)
-	if parseErr != nil {
-		return -1, parseErr
-	}
+	// The error is intentionally ignored it sometimes returns job id sometimes returns full object
+	val, _ := strconv.ParseInt(string(respData), 10, 64)
 	return val, nil
 }
