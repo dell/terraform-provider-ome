@@ -50,10 +50,7 @@ func (c *Client) GetFwBaselineComplianceReport(ctx context.Context, baseLineID i
 		tflog.Info(ctx, fmt.Sprintf("Comp Reports %v", compReports))
 		return &models.ComplianceReport{}, err
 	}
-	if len(compReports.Value) != 0 {
-		return &compReports, nil
-	}
-	return &models.ComplianceReport{}, fmt.Errorf(ErrFwBaselineReport, baseLineID)
+	return &compReports, nil
 }
 
 // GetUpdateServiceBaselineIDByName retrieves the Update Service baseline ID

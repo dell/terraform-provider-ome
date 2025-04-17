@@ -550,7 +550,7 @@ func TestClient_GetTemplateByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			template, err := c.GetTemplateByID(tt.templateID)
+			template, _, err := c.GetTemplateByID(tt.templateID)
 			if tt.templateID <= 23 {
 				assert.Nil(t, err)
 				assert.Equal(t, tt.template.ID, template.ID)

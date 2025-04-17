@@ -310,7 +310,6 @@ const (
 	ErrGnrDeleteDiscovery = "error deleting a discovery"
 	// ErrDiscoveryJobIsRunning - device capablity
 	ErrDiscoveryJobIsRunning = "job with id %d is already running please wait for sometime and try again"
-	ErrFwBaselineReport      = "device compliance reports not found for baseline %d with given filter"
 )
 
 // FailureStatusIDs - list of failure status IDs from OME for a job

@@ -16,6 +16,7 @@ package clients
 import (
 	"fmt"
 	"io"
+	"net/http"
 	"strconv"
 	"strings"
 	"terraform-provider-ome/models"
@@ -212,23 +213,23 @@ func (c *Client) GetDeviceTypeID(deviceType string) (int64, error) {
 }
 
 // GetTemplateByID gets the viewTypeID based on the view_type .
-func (c *Client) GetTemplateByID(id int64) (models.OMETemplate, error) {
+func (c *Client) GetTemplateByID(id int64) (models.OMETemplate, *http.Response, error) {
 	omeTemplate := models.OMETemplate{}
 	response, err := c.Get(fmt.Sprintf(TemplateAPI+"(%d)", id), nil, nil)
 	if err != nil {
-		return omeTemplate, err
+		return omeTemplate, response, err
 	}
 
 	respData, getBodyError := c.GetBodyData(response.Body)
 	if getBodyError != nil {
-		return omeTemplate, getBodyError
+		return omeTemplate, response, getBodyError
 	}
 	err = c.JSONUnMarshal(respData, &omeTemplate)
 	if err != nil {
-		return omeTemplate, err
+		return omeTemplate, response, err
 	}
 
-	return omeTemplate, nil
+	return omeTemplate, response, nil
 }
 
 // GetTemplateByName returns the template for the given template name
@@ -405,7 +406,7 @@ func (c *Client) GetSchemaVlanData(templateID int64) (models.OMEVlan, error) {
 
 // GetTemplateByIDOrName - method to get template information by ID or name.
 func (c *Client) GetTemplateByIDOrName(templateID int64, templateName string) (models.OMETemplate, error) {
-	template, err := c.GetTemplateByID(templateID)
+	template, _, err := c.GetTemplateByID(templateID)
 	if err != nil && templateName != "" {
 		template, err = c.GetTemplateByName(templateName)
 	}

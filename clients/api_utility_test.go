@@ -51,9 +51,10 @@ func TestClienCreateSession(t *testing.T) {
 				assert.Nil(t, err)
 				assert.Equal(t, "13bc3f63-9376-44dc-a09f-3a94591a7c5d", c.GetSessionToken())
 				assert.Equal(t, "e1817fe6-97e5-4ea0-88a9-d865c73021529", c.GetSessionID())
+				assert.NotNil(t, resp)
 			} else {
 				assert.NotNil(t, err)
-				assert.Nil(t, resp)
+				assert.NotNil(t, resp)
 			}
 		})
 	}

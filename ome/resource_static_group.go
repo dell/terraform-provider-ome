@@ -361,7 +361,7 @@ func (r resourceStaticGroup) ImportState(ctx context.Context, req resource.Impor
 	devs, err2 := omeClient.GetDevicesByGroupID(group.ID)
 	if err2 != nil {
 		resp.Diagnostics.AddError(
-			"Error importing devices of group", err.Error(),
+			"Error importing devices of group", err2.Error(),
 		)
 		return
 	}

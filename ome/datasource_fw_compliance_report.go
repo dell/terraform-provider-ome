@@ -122,12 +122,7 @@ func (g *fwBaselineCompReportDatasource) Read(ctx context.Context, req datasourc
 		)
 		return
 	}
-	tflog.Debug(ctx, "got report", map[string]interface{}{
-		"report": report.Value[0].DeviceName,
-	})
-	if plan.ID.IsNull() {
-		plan.ID = types.Int64Value(1)
-	}
+	plan.ID = types.Int64Value(baselineID)
 
 	plan.Report = helper.NewOmeFwComplianceReportList(report.Value)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
