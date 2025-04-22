@@ -26,10 +26,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-const (
-	numOfDevicesForInv = 1
-)
-
 var (
 	_ datasource.DataSource              = &deviceDatasource{}
 	_ datasource.DataSourceWithConfigure = &deviceDatasource{}
@@ -104,7 +100,11 @@ func (g *deviceDatasource) Read(ctx context.Context, req datasource.ReadRequest,
 		vals = append(vals, val)
 	}
 
-	if len(devs) <= numOfDevicesForInv {
+	// If at least one of the filters are set then do detailed inventory
+	if !filters.FilterExpr.IsNull() ||
+		len(filters.IDs.Elements()) > 0 ||
+		len(filters.SvcTags.Elements()) > 0 ||
+		len(filters.IPExprs.Elements()) > 0 {
 		for i, dev := range devs {
 			id := dev.ID
 			inv, err2 := g.ReadDeviceInventory(ctx, omeClient, id, plan.InventoryTypes)

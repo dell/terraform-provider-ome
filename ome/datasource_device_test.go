@@ -30,44 +30,53 @@ func TestDataSource_ReadDevice(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			//1
 			{
 				Config:      testGetDevicesWithEmptyIP,
 				ExpectError: regexp.MustCompile(".*filters.ip_expressions.*string length must be at least 1.*"),
 				PlanOnly:    true,
 			},
+			//2
 			{
 				Config:      testGetDevicesWithEmptySvcTag,
 				ExpectError: regexp.MustCompile(".*filters.device_service_tags.*string length must be at least 1.*"),
 				PlanOnly:    true,
 			},
+			//3
 			{
 				Config:      testGetDevicesWithEmptyQuerys,
 				ExpectError: regexp.MustCompile(".*Attribute filters.filter_expression string length must be at least 1.*"),
 				PlanOnly:    true,
 			},
+			//4
 			{
 				Config:      testGetDevicesWithNoIDs,
 				ExpectError: regexp.MustCompile(".*Attribute filters.ids list must contain at least 1 elements.*"),
 				PlanOnly:    true,
 			},
+			//5
 			{
 				Config:      testGetDevicesWithNoIPs,
 				ExpectError: regexp.MustCompile(".*Attribute filters.ip_expressions list must contain at least 1 elements.*"),
 				PlanOnly:    true,
 			},
+			//6
 			{
 				Config:      testGetDevicesWithNoSvcTags,
 				ExpectError: regexp.MustCompile(".*Attribute filters.device_service_tags list must contain at least 1 elements.*"),
 				PlanOnly:    true,
 			},
+			//7
 			{
 				Config:      testGetDevicesWithInvalidInventory,
 				ExpectError: regexp.MustCompile(".*Invalid Attribute Value Match.*"),
 			},
+			//8
 			{
 				Config:      testGetInvalidDevices,
 				ExpectError: regexp.MustCompile(".*Error fetching devices.*"),
 			},
+			//9
 			{
 				Config: testGetAllDevicesWithoutFilters + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
@@ -76,6 +85,7 @@ func TestDataSource_ReadDevice(t *testing.T) {
 					resource.TestCheckOutput("fetched_inventory", "false"),
 				),
 			},
+			//10
 			{
 				Config: testGetAllDevices + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
@@ -84,22 +94,25 @@ func TestDataSource_ReadDevice(t *testing.T) {
 					resource.TestCheckOutput("fetched_inventory", "false"),
 				),
 			},
+			//11
 			{
 				Config: testGetDevicesWithIDs + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckOutput("fetched_any", "true"),
 					resource.TestCheckOutput("fetched_multiple", "true"),
-					resource.TestCheckOutput("fetched_inventory", "false"),
+					resource.TestCheckOutput("fetched_inventory", "true"),
 				),
 			},
+			// 12
 			{
 				Config: testGetDevicesWithSTags + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckOutput("fetched_any", "true"),
 					resource.TestCheckOutput("fetched_multiple", "true"),
-					resource.TestCheckOutput("fetched_inventory", "false"),
+					resource.TestCheckOutput("fetched_inventory", "true"),
 				),
 			},
+			// 13
 			{
 				Config: testGetDevicesWithIPs + devDataOut,
 				Check: resource.ComposeTestCheckFunc(
