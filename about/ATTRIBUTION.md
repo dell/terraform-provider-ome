@@ -59,7 +59,7 @@ Source: [testify](https://github.com/stretchr/testify)
 ***
 
 Package: mockey  
-Version: v1.2.11  
+Version: v1.2.14  
 Copyright: Copyright 2022 ByteDance Inc.  
 License: [APACHE-2.0 License](https://github.com/bytedance/mockey/blob/main/LICENSE-APACHE)  
 Source: [mockey](https://github.com/bytedance/mockey)
@@ -190,7 +190,7 @@ Source: [mod](https://github.com/golang/mod)
 ***
 
 Package: genproto/googleapis/rpc  
-Version: v0.0.0-20240227224415-6ceb2ff114de  
+Version: v0.0.0-20250115164207-1a7da9e5054f 
 Copyright: Copyright (c) 2024 The Google Authors  
 License: [Apache License 2.0](https://github.com/google/go-genproto/blob/main/LICENSE)  
 Source: [genproto/googleapis/rpc](https://github.com/google/go-genproto)  
@@ -462,7 +462,7 @@ Source: [go-cty](https://github.com/zclconf/go-cty)
 ***
 
 Package: crypto  
-Version: v0.32.0  
+Version: v0.36.0  
 Copyright: Copyright 2009 The Go Authors  
 License: [BSD-3-Clause License](https://github.com/golang/crypto/blob/master/LICENSE)  
 Source: [crypto](https://github.com/golang/crypto)
@@ -470,7 +470,7 @@ Source: [crypto](https://github.com/golang/crypto)
 ***
 
 Package: net  
-Version: v0.34.0  
+Version: v0.38.0  
 Copyright: Copyright 2009 The Go Authors  
 License: [BSD-3-Clause License](https://github.com/golang/net/blob/master/LICENSE)  
 Source: [net](https://github.com/golang/net)
@@ -518,7 +518,7 @@ Source: [appengine](https://github.com/golang/appengine)
 ***
 
 Package: grpc  
-Version: v1.63.2  
+Version: v1.71.0  
 Copyright: Copyright (c) 2018 The Go Authors  
 License: [Apache License 2.0](https://github.com/grpc/grpc-go/blob/master/LICENSE)  
 Source: [grpc](https://github.com/grpc/grpc-go)
@@ -526,7 +526,7 @@ Source: [grpc](https://github.com/grpc/grpc-go)
 ***
 
 Package: protobuf  
-Version: v1.34.0  
+Version: v1.36.4  
 Copyright: Copyright (c) 2018 The Go Authors  
 License: [BSD-3-Clause License](https://github.com/protocolbuffers/protobuf-go/blob/master/LICENSE)  
 Source: [protobuf](https://github.com/protocolbuffers/protobuf-go)

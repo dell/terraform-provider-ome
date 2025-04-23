@@ -1,3 +1,8 @@
+# v1.2.3
+
+- Addresses Github Issues: #152, #126, #69, #68
+- Addresses security vulnerablilites
+
 # v1.2.2
 
 # Release Summary
