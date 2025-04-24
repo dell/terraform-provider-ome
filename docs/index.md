@@ -47,7 +47,7 @@ limitations under the License.
 terraform {
   required_providers {
     ome = {
-      version = "1.2.2"
+      version = "1.2.3"
       source  = "registry.terraform.io/dell/ome"
     }
   }
