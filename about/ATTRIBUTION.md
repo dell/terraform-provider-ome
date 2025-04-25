@@ -66,23 +66,6 @@ Source: [mockey](https://github.com/bytedance/mockey)
 
 ***
 
-Package: mapstructure  
-Version: v1.5.0  
-Copyright: Copyright (c) 2013 Mitchell Hashimoto  
-License: [MIT License](https://github.com/mitchellh/mapstructure/blob/main/LICENSE)  
-Source: [mapstructure](https://github.com/mitchellh/mapstructure)
-
-***
-
-Package: godotenv  
-Version: v1.5.1  
-Copyright: Copyright (c) 2013 John Barton  
-License: [MIT License](https://github.com/joho/godotenv/blob/main/LICENCE)   
-Source: [godotenv](https://github.com/joho/godotenv)
-
-***
-
-
 # Indirect Dependencies
 
 Package: go-crypto  

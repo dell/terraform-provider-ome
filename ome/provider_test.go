@@ -14,6 +14,8 @@ limitations under the License.
 package ome
 
 import (
+	"bufio"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,7 +24,6 @@ import (
 	. "github.com/bytedance/mockey"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-	"github.com/joho/godotenv"
 )
 
 const (
@@ -34,38 +35,39 @@ const (
 // Used for Mocking responses from functions
 var FunctionMocker *Mocker
 
+var globalEnvMap = getEnvMap()
 var testAccProtoV6ProviderFactories map[string]func() (tfprotov6.ProviderServer, error)
-var omeUserName = os.Getenv("OME_USERNAME")
-var omeHost = os.Getenv("OME_HOST")
-var omePassword = os.Getenv("OME_PASSWORD")
-var port = setDefault(os.Getenv("OME_PORT"), "443")
-var protocol = setDefault(os.Getenv("OME_PROTOCOL"), "https")
-var DeviceSvcTag1 = os.Getenv("DEVICESVCTAG1")
-var DeviceSvcTag2 = os.Getenv("DEVICESVCTAG2")
-var DeviceID1 = os.Getenv("DEVICEID1")
-var DeviceID2 = os.Getenv("DEVICEID2")     // Not capable for deployment
-var DeviceIPExt = os.Getenv("DEVICEIPEXT") // Must be external to OME environment but discoverable
-var ShareUser = os.Getenv("SHAREUSERNAME")
-var SharePassword = os.Getenv("SHAREPASSWORD")
-var ShareIP = os.Getenv("SHAREIP")
-var DeviceIP1 = os.Getenv("DEVICEIP1")
-var DeviceIP2 = os.Getenv("DEVICEIP2")
-var Catalog1 = setDefault(os.Getenv("CATALOG1"), "tfacc_catalog_dell_online_1")
-var Repository = setDefault(os.Getenv("REPOSITORY"), "tfacc_catalog_dell_online_1")
-var CatalogResource = setDefault(os.Getenv("CATALOG_RESOURCE"), "tfacc_firmware_catalog_resource")
+var omeUserName = globalEnvMap["OME_USERNAME"]
+var omeHost = globalEnvMap["OME_HOST"]
+var omePassword = globalEnvMap["OME_PASSWORD"]
+var port = setDefault(globalEnvMap["OME_PORT"], "443")
+var protocol = setDefault(globalEnvMap["OME_PROTOCOL"], "https")
+var DeviceSvcTag1 = globalEnvMap["DEVICESVCTAG1"]
+var DeviceSvcTag2 = globalEnvMap["DEVICESVCTAG2"]
+var DeviceID1 = globalEnvMap["DEVICEID1"]
+var DeviceID2 = globalEnvMap["DEVICEID2"]     // Not capable for deployment
+var DeviceIPExt = globalEnvMap["DEVICEIPEXT"] // Must be external to OME environment but discoverable
+var ShareUser = globalEnvMap["SHAREUSERNAME"]
+var SharePassword = globalEnvMap["SHAREPASSWORD"]
+var ShareIP = globalEnvMap["SHAREIP"]
+var DeviceIP1 = globalEnvMap["DEVICEIP1"]
+var DeviceIP2 = globalEnvMap["DEVICEIP2"]
+var Catalog1 = setDefault(globalEnvMap["CATALOG1"], "tfacc_catalog_dell_online_1")
+var Repository = setDefault(globalEnvMap["REPOSITORY"], "tfacc_catalog_dell_online_1")
+var CatalogResource = setDefault(globalEnvMap["CATALOG_RESOURCE"], "tfacc_firmware_catalog_resource")
 
 // Device Model to be used in DS test
 // Must have multiple devices of this model
-var DeviceModel = os.Getenv("DEVICE_MODEL")
+var DeviceModel = globalEnvMap["DEVICE_MODEL"]
 
 // an invalid cert - can be set to any text file
-var InvCert = os.Getenv("INV_CERT")
+var InvCert = globalEnvMap["INV_CERT"]
 
 // idrac username
-var IdracUsername = os.Getenv("IDRAC_USERNAME")
+var IdracUsername = globalEnvMap["IDRAC_USERNAME"]
 
 // idrac password
-var IdracPassword = os.Getenv("IDRAC_PASSWORD")
+var IdracPassword = globalEnvMap["IDRAC_PASSWORD"]
 
 var testProvider = `
 provider "ome" {
@@ -83,15 +85,52 @@ func init() {
 	// acceptance testing. The factory function will be invoked for every Terraform
 	// CLI command executed to create a provider server to which the CLI can
 	// reattach.
-	err := godotenv.Load("ome_test.env")
-	if err != nil {
-		panic(err)
-	}
+	os.Setenv("TF_ACC", globalEnvMap["TF_ACC"])
 	testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
 		// newProvider is an example function that returns a tfsdk.Provider
 		"ome": providerserver.NewProtocol6WithError(New()),
 	}
 
+}
+
+func getEnvMap() map[string]string {
+	envMap, err := loadEnvFile("ome_test.env")
+	if err != nil {
+		log.Fatal("Error loading .env file: ", err)
+		return envMap
+	}
+	return envMap
+}
+
+func loadEnvFile(path string) (map[string]string, error) {
+	envMap := make(map[string]string)
+
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if len(line) == 0 || line[0] == '#' {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+		envMap[key] = value
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return envMap, nil
 }
 
 func testAccPreCheck(t *testing.T) {
@@ -126,7 +165,7 @@ func testAccPreCheck(t *testing.T) {
 }
 
 func skipTest() bool {
-	return os.Getenv("TF_ACC") == "" || os.Getenv("ACC_DETAIL") == ""
+	return globalEnvMap["TF_ACC"] == "" || globalEnvMap["ACC_DETAIL"] == ""
 }
 
 func getTestData(fileName string) string {

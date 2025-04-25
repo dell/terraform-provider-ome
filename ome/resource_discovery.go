@@ -28,7 +28,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/mitchellh/mapstructure"
 
 	"terraform-provider-ome/clients"
 	"terraform-provider-ome/helper"
@@ -588,27 +587,33 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 	}
 	for _, creds := range connectionProfiles.Credentials {
 		if credMap, ok := creds.Credential.(map[string]interface{}); ok {
+			tflog.Info(ctx, fmt.Sprintf("Creds %v, Type: %s", credMap, creds.Type))
 			if creds.Type == "REDFISH" && plan.Redfish != nil {
-				cred := models.CredREDFISH{}
+				cred := &models.CredREDFISH{}
 				state.Redfish = &models.OmeRedfish{}
-				err := mapstructure.Decode(credMap, &cred)
-				if err != nil {
+				bytes := getCredMapByteArray(ctx, credMap)
+				unmarshalErr := json.Unmarshal(bytes, cred)
+				if unmarshalErr != nil {
+					tflog.Error(ctx, unmarshalErr.Error())
 					continue
 				}
 				state.Redfish.Username = types.StringValue(cred.Username)
 				if plan.Redfish != nil {
 					state.Redfish.Password = plan.Redfish.Password
 				}
+
 				state.Redfish.Port = types.Int64Value(int64(cred.Port))
 				state.Redfish.Retries = types.Int64Value(int64(cred.Retries))
 				state.Redfish.Timeout = types.Int64Value(int64(cred.Timeout))
 				state.Redfish.CaCheck = types.BoolValue(cred.CaCheck)
 				state.Redfish.CnCheck = types.BoolValue(cred.CnCheck)
 			} else if creds.Type == "WSMAN" && plan.WSMAN != nil {
-				cred := models.CredWSMAN{}
+				cred := &models.CredWSMAN{}
 				state.WSMAN = &models.OmeWSMAN{}
-				err := mapstructure.Decode(credMap, &cred)
-				if err != nil {
+				bytes := getCredMapByteArray(ctx, credMap)
+				unmarshalErr := json.Unmarshal(bytes, cred)
+				if unmarshalErr != nil {
+					tflog.Error(ctx, unmarshalErr.Error())
 					continue
 				}
 				state.WSMAN.Username = types.StringValue(cred.Username)
@@ -621,10 +626,12 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 				state.WSMAN.CaCheck = types.BoolValue(cred.CaCheck)
 				state.WSMAN.CnCheck = types.BoolValue(cred.CnCheck)
 			} else if creds.Type == "SNMP" && plan.SNMP != nil {
-				cred := models.CredSNMP{}
+				cred := &models.CredSNMP{}
 				state.SNMP = &models.OmeSNMP{}
-				err := mapstructure.Decode(credMap, &cred)
-				if err != nil {
+				bytes := getCredMapByteArray(ctx, credMap)
+				unmarshalErr := json.Unmarshal(bytes, cred)
+				if unmarshalErr != nil {
+					tflog.Error(ctx, unmarshalErr.Error())
 					continue
 				}
 				state.SNMP.Community = types.StringValue(cred.Community)
@@ -632,10 +639,12 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 				state.SNMP.Retries = types.Int64Value(int64(cred.Retries))
 				state.SNMP.Timeout = types.Int64Value(int64(cred.Timeout))
 			} else if creds.Type == "SSH" && plan.SSH != nil {
-				cred := models.CredSSH{}
+				cred := &models.CredSSH{}
 				state.SSH = &models.OmeSSH{}
-				err := mapstructure.Decode(credMap, &cred)
-				if err != nil {
+				bytes := getCredMapByteArray(ctx, credMap)
+				unmarshalErr := json.Unmarshal(bytes, cred)
+				if unmarshalErr != nil {
+					tflog.Error(ctx, unmarshalErr.Error())
 					continue
 				}
 				state.SSH.Username = types.StringValue(cred.Username)
@@ -651,4 +660,12 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 		}
 	}
 	return state
+}
+
+func getCredMapByteArray(ctx context.Context, credMap map[string]interface{}) []byte {
+	bytes, errMarshal := json.Marshal(credMap)
+	if errMarshal != nil {
+		tflog.Error(ctx, errMarshal.Error())
+	}
+	return bytes
 }
