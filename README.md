@@ -46,6 +46,9 @@ For general information about Terraform, visit the [official website][tf-website
   * [Attribution](https://github.com/dell/terraform-provider-ome/blob/main/about/ATTRIBUTION.md)
   * [New to Terraform?](#new-to-terraform)
 
+## Support
+For any Terraform Provider for Dell OME issues, questions or feedback, please follow our [support process](https://github.com/dell/dell-terraform-providers/blob/main/docs/SUPPORT.md). You can interact with us on [GitHub](https://github.com/dell/dell-terraform-providers) by creating various types of [GitHub Issues](https://github.com/dell/dell-terraform-providers/issues/new/choose) such as bugs, feature requests, and questions.
+
 ## Prerequisites
  | **Terraform Provider** | **OME Version** | **OS** | **Terraform** | **Golang** |
  |------------------------|-----------------|--------|---------------|------------|
@@ -123,7 +126,7 @@ Terraform Provider for OpenManage Enterprise is 100% open source and community-d
 
 ## Releasing, Maintenance and Deprecation
 
-Terraform Provider for Dell Technnologies PowerMax follows [Semantic Versioning](https://semver.org/).
+Terraform Provider for Dell Technnologies OME follows [Semantic Versioning](https://semver.org/).
 
 New versions will be released regularly if significant changes (bug fix or new feature) are made in the provider.
 
