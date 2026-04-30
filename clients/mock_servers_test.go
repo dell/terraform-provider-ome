@@ -102,7 +102,9 @@ func createNewTLSServer(t *testing.T) *httptest.Server {
 
 	// NewUnstartedServer creates a listener. Close that listener and replace
 	// with the one we created.
-	ts.Listener.Close()
+	if err := ts.Listener.Close(); err != nil {
+		t.Fatalf("failed to close test server listener: %v", err)
+	}
 	ts.Listener = l
 
 	// Start the server.
@@ -122,7 +124,9 @@ func createNewTLSServerWithPort(t *testing.T, port int64, handler http.HandlerFu
 
 	// NewUnstartedServer creates a listener. Close that listener and replace
 	// with the one we created.
-	ts.Listener.Close()
+	if err := ts.Listener.Close(); err != nil {
+		t.Fatalf("failed to close test server listener: %v", err)
+	}
 	ts.Listener = l
 
 	// Start the server.
@@ -2133,10 +2137,11 @@ func mockDeployAPIs(r *http.Request, w http.ResponseWriter) bool {
 		if err != nil {
 			return false
 		}
-		if requestStruct.ID == 1 {
+		switch requestStruct.ID {
+		case 1:
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`1234`))
-		} else if requestStruct.ID == 2 {
+		case 2:
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(`{
 				"error": {
@@ -2898,10 +2903,11 @@ func mockConfigRemediationAPIs(r *http.Request, w http.ResponseWriter) bool {
 		if err != nil {
 			return false
 		}
-		if requestStruct.ID == 100 {
+		switch requestStruct.ID {
+		case 100:
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(`12345`))
-		} else if requestStruct.ID == 101 {
+		case 101:
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte(`{
 				"error": {

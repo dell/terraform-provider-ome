@@ -290,7 +290,7 @@ func (r resourceDeviceAction) convertJobRespToTfsdk(ctx context.Context, resp cl
 
 func (r resourceDeviceAction) getJobModel(resp clients.JobResp, pstate models.DeviceActionModel) models.DeviceActionModel {
 	cron := types.StringNull()
-	if !(resp.Schedule == clients.RunNowSchedule || resp.Schedule == "") {
+	if resp.Schedule != clients.RunNowSchedule && resp.Schedule != "" {
 		cron = types.StringValue(resp.Schedule)
 	}
 	return models.DeviceActionModel{

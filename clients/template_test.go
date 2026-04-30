@@ -855,9 +855,10 @@ func TestUpdateNetworkConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := c.UpdateNetworkConfig(tt.nwConfig)
-			if tt.nwConfig.TemplateID == 50 {
+			switch tt.nwConfig.TemplateID {
+			case 50:
 				assert.Nil(t, err)
-			} else if tt.nwConfig.TemplateID == 51 {
+			case 51:
 				assert.NotNil(t, err)
 				assert.ErrorContains(t, err, tt.errormessage)
 			}

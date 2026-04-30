@@ -85,7 +85,9 @@ func init() {
 	// acceptance testing. The factory function will be invoked for every Terraform
 	// CLI command executed to create a provider server to which the CLI can
 	// reattach.
-	os.Setenv("TF_ACC", globalEnvMap["TF_ACC"])
+	if err := os.Setenv("TF_ACC", globalEnvMap["TF_ACC"]); err != nil {
+		log.Printf("failed to set TF_ACC environment variable: %v", err)
+	}
 	testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
 		// newProvider is an example function that returns a tfsdk.Provider
 		"ome": providerserver.NewProtocol6WithError(New()),
@@ -109,7 +111,11 @@ func loadEnvFile(path string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() {
+		if closeErr := file.Close(); closeErr != nil {
+			log.Printf("error closing env file %s: %v", path, closeErr)
+		}
+	}()
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {

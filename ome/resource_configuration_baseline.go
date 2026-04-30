@@ -825,7 +825,7 @@ func validateNotification(plan models.ConfigureBaselines) error {
 			return fmt.Errorf(clients.ErrBaseLineScheduleValid)
 		}
 	} else {
-		if !(plan.NotifyOnSchedule.ValueBool() || plan.Cron.IsNull()) {
+		if !plan.NotifyOnSchedule.ValueBool() && !plan.Cron.IsNull() {
 			return fmt.Errorf(clients.ErrBaseLineNotifyValid)
 		}
 	}

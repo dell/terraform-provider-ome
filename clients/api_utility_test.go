@@ -119,22 +119,23 @@ func TestClient_TrackJob(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, message := c.TrackJob(tt.args.jobID, tt.args.maxRetries, tt.args.sleepInterval)
-			if tt.args.jobID == 12345 || tt.args.jobID == 45678 {
+			switch tt.args.jobID {
+			case 12345, 45678:
 				assert.Equal(t, true, got)
 				assert.Equal(t, SuccessMsg, message)
-			} else if tt.args.jobID == 23456 {
+			case 23456:
 				assert.Equal(t, false, got)
 				assert.Equal(t, "LastExecutionDetail Failure", message)
-			} else if tt.args.jobID == 34567 {
+			case 34567:
 				assert.Equal(t, false, got)
 				assert.Equal(t, "LastExecutionDetail Warning", message)
-			} else if tt.args.jobID == 56789 {
+			case 56789:
 				assert.Equal(t, false, got)
 				assert.Equal(t, fmt.Sprintf(JobIncompleteMsg, tt.args.jobID, tt.args.maxRetries), message)
-			} else if tt.args.jobID == 13456 {
+			case 13456:
 				assert.Equal(t, false, got)
 				assert.Contains(t, message, "status: 400")
-			} else if tt.args.jobID == 14567 {
+			case 14567:
 				assert.Equal(t, false, got)
 				assert.Contains(t, message, "No recent execution details were found for the provided job id.")
 			}

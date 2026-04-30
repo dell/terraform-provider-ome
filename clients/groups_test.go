@@ -80,23 +80,24 @@ func TestClientGetDevicesByGroupID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			response, err := c.GetDevicesByGroupID(tt.groupID)
-			if tt.groupID == 1011 {
+			switch tt.groupID {
+			case 1011:
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 1, len(response.Value))
 				assert.Equal(t, tt.devices.Value[0].ID, response.Value[0].ID)
-			} else if tt.groupID == 1013 {
+			case 1013:
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 2, len(response.Value))
 				assert.Equal(t, tt.devices.Value[0].ID, response.Value[0].ID)
 				assert.Equal(t, tt.devices.Value[1].ID, response.Value[1].ID)
-			} else if tt.groupID == 1014 || tt.groupID == 1016 {
+			case 1014, 1016:
 				assert.NotNil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 1, len(response.Value))
 				assert.Equal(t, tt.devices.Value[0].ID, response.Value[0].ID)
-			} else if tt.groupID == -1 || tt.groupID == 1015 {
+			case -1, 1015:
 				assert.NotNil(t, err)
 			}
 		})

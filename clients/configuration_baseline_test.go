@@ -246,11 +246,12 @@ func TestClient_GetBaselineDeviceComplianceReportByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			baselineDevComplianceReport, err := c.GetBaselineDevComplianceReportsByID(tt.baselineID)
-			if tt.baselineID == 14 {
+			switch tt.baselineID {
+			case 14:
 				assert.Nil(t, err)
 				assert.NotEmpty(t, baselineDevComplianceReport)
 				assert.Equal(t, baselineDevComplianceReport[0].ID, tt.deviceID)
-			} else if tt.baselineID == -1 {
+			case -1:
 				assert.NotNil(t, err)
 				assert.Empty(t, baselineDevComplianceReport)
 			}
