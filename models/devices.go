@@ -266,7 +266,8 @@ func NewDevicesResModelFromID(id string) (types.List, diag.Diagnostics) {
 	dids := strings.Split(didst, ",")
 	devs := make([]DeviceItemModel, 0)
 	ips := make([]string, 0)
-	if did == "id" {
+	switch did {
+	case "id":
 		for _, did := range dids {
 			didInt, err := strconv.ParseInt(did, 10, 64)
 			if err != nil {
@@ -281,7 +282,7 @@ func NewDevicesResModelFromID(id string) (types.List, diag.Diagnostics) {
 				IPs:        stringListValue(ips),
 			})
 		}
-	} else if did == "svc_tag" {
+	case "svc_tag":
 		for _, did := range dids {
 			devs = append(devs, DeviceItemModel{
 				ServiceTag: types.StringValue(did),
@@ -289,7 +290,7 @@ func NewDevicesResModelFromID(id string) (types.List, diag.Diagnostics) {
 				IPs:        stringListValue(ips),
 			})
 		}
-	} else {
+	default:
 		dgs.AddError(
 			"Wrong \"id\" format.",
 			fmt.Sprintf("Identifier of type %s is not recognised, valid values are [id, svc_tag].", did),

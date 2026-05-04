@@ -303,7 +303,7 @@ func (r resourceDevices) getDevIDsToRmv(ctx context.Context, state, plan models.
 	for _, v := range sdevs {
 		_, oki := mid[v.ID.ValueInt64()]
 		_, okt := mstag[v.ServiceTag.ValueString()]
-		if !(oki || okt) {
+		if !oki && !okt {
 			// this condition means that device v must be removed
 			idsToRmv = append(idsToRmv, v.ID.ValueInt64())
 		}

@@ -327,7 +327,7 @@ func TestTemplateCreation_CreateAndUpdateTemplateSuccess_UT(t *testing.T) {
 			},
 
 			{
-				Config: justProvider + strings.Replace(temps.templateSvcTag1Full, TestRefTemplateName, "test_acc_update_content_d", -1),
+				Config: justProvider + strings.ReplaceAll(temps.templateSvcTag1Full, TestRefTemplateName, "test_acc_update_content_d"),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "name", "test_acc_update_content_d"),
 					resource.TestCheckResourceAttr("ome_template.terraform-acceptance-test-1", "view_type_id", "1"),

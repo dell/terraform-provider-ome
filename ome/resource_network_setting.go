@@ -619,7 +619,7 @@ func isTimeConfigValid(planTime *models.OmeTimeSetting) (bool, error) {
 		return true, nil
 	}
 
-	if !(planTime.PrimaryNTPAddress.IsNull() && planTime.SecondaryNTPAddress1.IsNull() && planTime.SecondaryNTPAddress2.IsNull()) {
+	if !planTime.PrimaryNTPAddress.IsNull() || !planTime.SecondaryNTPAddress1.IsNull() || !planTime.SecondaryNTPAddress2.IsNull() {
 		return false, fmt.Errorf("primary_ntp_address, secondary_ntp_address1 and secondary_ntp_address2 should not be set when enable_ntp is disable")
 	}
 
@@ -693,7 +693,7 @@ func isSessionConfigValid(planSession *models.OmeSessionSetting) (bool, error) {
 		return true, nil
 	}
 	if planSession.EnableUniversalTimeout.ValueBool() {
-		if !(planSession.APITimeout.IsNull() && planSession.GUITimeout.IsNull() && planSession.SSHTimeout.IsNull() && planSession.SerialTimeout.IsNull()) {
+		if !planSession.APITimeout.IsNull() || !planSession.GUITimeout.IsNull() || !planSession.SSHTimeout.IsNull() || !planSession.SerialTimeout.IsNull() {
 			return false, fmt.Errorf("api_timeout, gui_timeout, ssh_timeout and serial_timeout should not be set when enable_universal_timeout option is active")
 		}
 		if planSession.UniversalTimeout.IsNull() {
@@ -869,20 +869,20 @@ func isProxyConfigValid(planProxy *models.OmeProxySetting) (bool, error) {
 			return false, fmt.Errorf("both IP address and port are required when enabling proxy")
 		}
 
-		if !(planProxy.EnableAuthentication.IsNull() || planProxy.EnableAuthentication.IsUnknown()) {
+		if !planProxy.EnableAuthentication.IsNull() && !planProxy.EnableAuthentication.IsUnknown() {
 			if planProxy.EnableAuthentication.ValueBool() {
 				if planProxy.Username.IsNull() || planProxy.Password.IsNull() {
 					return false, fmt.Errorf("both username and password are required when enabling proxy authentication")
 				}
 				return true, nil
 			}
-			if !(planProxy.Username.IsNull() && planProxy.Password.IsNull()) {
+			if !planProxy.Username.IsNull() || !planProxy.Password.IsNull() {
 				return false, fmt.Errorf("enable authentication should be set to true before setting username and password")
 			}
 		}
 		return true, nil
 	}
-	if !(planProxy.IPAddress.IsNull() && planProxy.ProxyPort.IsNull() && planProxy.EnableAuthentication.IsNull() && planProxy.Username.IsNull() && planProxy.Password.IsNull()) {
+	if !planProxy.IPAddress.IsNull() || !planProxy.ProxyPort.IsNull() || !planProxy.EnableAuthentication.IsNull() || !planProxy.Username.IsNull() || !planProxy.Password.IsNull() {
 		return false, fmt.Errorf("enable proxy should be set to true before setting any ome proxy configuration")
 	}
 	return true, nil
