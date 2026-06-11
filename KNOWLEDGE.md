@@ -1,8 +1,8 @@
-# Dell Terraform Providers — Knowledge Base
+# KNOWLEDGE.md — terraform-provider-ome
 
 <!-- yaml-metadata-start -->
 scope_paths: ["./"]
-capture_git_sha: "a1f90dc513c304c1a94158f8b2d3021cd557629d"
+capture_git_sha: "aa83a72e8e01871bd84c97a8d37caf9f322727b4"
 status: "current"
 auto_update: false
 preview_before_apply: true
@@ -10,56 +10,150 @@ scaffold_version: "1.0"
 # session_state: { is_complete: true }
 <!-- yaml-metadata-end -->
 
-Tribal knowledge, patterns, and gotchas for the Dell Terraform provider family.
+<!-- quick-reference-start -->
+## Agent Quick Reference
+
+| Section | Heading | Summary | never_again_count |
+|---------|---------|---------|-------------------|
+| Component Overview | `## Component Overview` | Dell OpenManage Enterprise fleet management provider | — |
+| Architectural Rationale | `## Architectural Rationale` | Internal SDK strategy; Plugin Framework architecture | — |
+| Failure Modes & Gotchas | `## Failure Modes & Gotchas` | Endpoint format, SDK versioning, state secrets | 0 |
+| Implicit Contracts | `## Implicit Contracts` | Env var precedence, auth validation, TLS defaults | — |
+<!-- quick-reference-end -->
+
+## Five Questions Quick Reference
+
+### What does it do?
+Terraform provider for Dell OpenManage Enterprise fleet management. Exposes 14 resources and 11 data sources covering templates, baselines, firmware repositories, configuration compliance, devices, discovery, user management, VLAN profiles, and deployment operations
+through HashiCorp's Terraform Plugin Framework. Communicates with
+the hardware REST API via Internal client (no external SDK).
+
+### How do you modify it?
+Create `resource_<name>.go` (or `*_resource.go`) implementing
+`resource.Resource`, add model structs, register in `provider.go`,
+add unit tests with mockey mocks, add acceptance tests, create
+example HCL, and run `make generate` for docs.
+
+### What breaks?
+**Endpoint is the OpenManage Enterprise console IP or FQDN.** Requires OME to be installed and running. Acceptance tests against live hardware create real
+resources — failed test runs may leave orphaned resources. State files
+contain secrets — use encrypted remote backends.
+
+### What depends on it?
+Terraform Core (gRPC go-plugin), Internal client (no external SDK),
+`hashicorp/terraform-plugin-framework` v1.19.0.
+
+### What's undocumented?
+The `clients/` package implements the OME REST API client directly — no external SDK. Session management and authentication are handled internally.
 
 ---
 
-## Repository Structure
+## Component Overview
 
-```
-terraform-providers/
-├── terraform-provider-powerstore/   # PowerStore arrays
-├── terraform-provider-powerflex/    # PowerFlex (VxFlex OS)
-├── terraform-provider-powerscale/   # PowerScale / Isilon
-├── terraform-provider-powermax/     # PowerMax (VMAX)
-├── terraform-provider-objectscale/  # ObjectScale (S3-compatible)
-├── terraform-provider-redfish/      # iDRAC Redfish API
-└── terraform-provider-ome/          # OpenManage Enterprise
-```
-
-Each provider is a standalone Go module with its own `go.mod`, `Makefile`,
-and release pipeline.
+Terraform provider for Dell OpenManage Enterprise fleet management.
+14 resources and 11 data sources covering templates, baselines, firmware repositories, configuration compliance, devices, discovery, user management, VLAN profiles, and deployment operations. Resources use `resource_*.go` naming under `ome/`. Data sources use `datasource_*.go` naming.
 
 ---
 
-## Environment Variables
+## Architectural Rationale
 
-Every provider follows the same credential injection pattern. Replace
-`<PROVIDER>` with the uppercase provider name (e.g., `POWERSTORE`, `POWERFLEX`).
+The provider follows the standard Terraform Plugin Framework architecture
+— a standalone Go binary communicating with Terraform Core over gRPC.
 
-| Variable | Purpose |
-|----------|---------|
-| `<PROVIDER>_ENDPOINT` | Array/server management IP or FQDN |
-| `<PROVIDER>_USERNAME` | API username |
-| `<PROVIDER>_PASSWORD` | API password |
-| `<PROVIDER>_INSECURE` | `true` to skip TLS verification (lab only) |
-| `<PROVIDER>_TIMEOUT` | Request timeout in seconds (default: 120) |
+**SDK strategy (Internal):** No external SDK dependency. REST calls implemented in provider code via `clients/` package. The internal client handles OME REST API session management, authentication, and API operations.
 
-**Example (PowerStore):**
-```bash
-export POWERSTORE_ENDPOINT="https://10.0.0.1/api/rest"
-export POWERSTORE_USERNAME="admin"
-export POWERSTORE_PASSWORD="secret"
-export POWERSTORE_INSECURE="true"
-```
+All providers in the Dell Terraform family share this architecture:
+Terraform Plugin Framework interfaces, `resource.Resource` for CRUD
+resources, `datasource.DataSource` for read-only queries, models with
+`tfsdk` struct tags, and mockey-based unit testing.
 
-Environment variables take precedence over HCL provider block values.
+### Evolution
+
+TBD — requires SME input on how the architecture changed over time.
 
 ---
 
-## Makefile Targets
+## Failure Modes & Gotchas
 
-All providers share these standard targets:
+### 1. Endpoint URL format
+
+**Endpoint is the OpenManage Enterprise console IP or FQDN.** Requires OME to be installed and running.
+
+### 2. Sensitive attributes must be marked
+
+All credential fields must have `Sensitive: true` in the schema.
+Without this, passwords appear in `terraform plan` output and state
+files. This is enforced by code convention, not by the framework.
+
+### 3. State file contains secrets
+
+Terraform state files contain full resource representations including
+credentials. Always use encrypted remote backends (S3+KMS, Terraform
+Cloud) in production.
+
+
+### Never Again
+
+No incident-derived constraints recorded. If you know of past
+incidents affecting this component, please record them during the
+next Knowledge Extraction session.
+
+### Evolution
+
+TBD — requires SME input.
+
+---
+
+## Performance Characteristics
+
+TBD — requires SME input for bottlenecks, scaling limits, tuning
+parameters, benchmarks, and known performance cliffs.
+
+### Evolution
+
+TBD — requires SME input.
+
+---
+
+## Implicit Contracts
+
+**Environment variable precedence:** env vars (`OME_*`)
+override HCL provider block values when both are set. This is
+implemented in `Configure()` and is not documented as an explicit
+contract.
+
+**Authentication validation:** `Configure()` makes a dummy API call
+to validate credentials before any resource operations proceed. If
+this call fails, all resource operations are blocked.
+
+**TLS verification default:** `insecure` defaults to `false` —
+TLS verification is on by default. Setting `insecure = true` is
+a lab-only setting and must never be used in production.
+
+**Acceptance test gating:** tests guarded by `TF_ACC=1` — never
+run without live hardware credentials. Tests create real resources
+that must be cleaned up manually if the test run fails.
+
+### Evolution
+
+TBD — requires SME input.
+
+---
+
+## Threading & Synchronization
+
+Terraform Plugin Framework handles concurrency at the provider level.
+Individual resource operations are not concurrent by default.
+
+### Evolution
+
+TBD — requires SME input.
+
+---
+
+## Build System & Configuration
+
+Standard Makefile targets shared across all Dell Terraform providers:
 
 | Target | Purpose | Hardware Required |
 |--------|---------|-------------------|
@@ -72,268 +166,54 @@ All providers share these standard targets:
 | `make cover` | Generate coverage report | No |
 | `make generate` | Generate documentation | No |
 
-**Never run `make testacc` without live hardware credentials.** Acceptance
-tests perform real CRUD operations against arrays/servers.
+GoReleaser configuration: CGO_ENABLED=0, platforms (freebsd, windows,
+linux, darwin), architectures (amd64, 386, arm, arm64).
+
+### Evolution
+
+TBD — requires SME input.
 
 ---
 
-## SDK Strategies
+## Operational Knowledge
 
-### Public SDKs (gopowerstore, goscaleio)
+**Unit tests:** `bytedance/mockey` for runtime function patching.
+No hardware required. Run with `make test`.
 
-```go
-// go.mod
-require github.com/dell/gopowerstore v1.18.0
-```
+**Acceptance tests:** `terraform-plugin-testing` against live hardware.
+Creates real resources. Run with `TF_ACC=1 make testacc`. Clean up
+manually if tests fail mid-run.
 
-- Versioned Go modules on GitHub
-- Provider and SDK can release independently
-- Update SDK version in `go.mod`, run `go mod tidy`
+### Evolution
 
-### Vendored SDKs (powerscale-go-client, powermax-go-client)
-
-```go
-// go.mod
-require dell/powerscale-go-client v0.0.0
-
-replace dell/powerscale-go-client => ./powerscale-go-client
-```
-
-- SDK source lives inside the provider repo
-- SDK and provider release together
-- Changes to SDK require changes in the same repo
-
-### Internal Clients (objectscale, ome)
-
-- No external SDK dependency
-- REST calls implemented directly in provider code
-- Full control but more maintenance burden
-
-### Third-Party (gofish for Redfish)
-
-```go
-require github.com/stmcginnis/gofish v0.20.0
-```
-
-- Vendor-neutral Redfish library (not Dell-specific)
-- Community-maintained
-- May lag behind iDRAC firmware features
+TBD — requires SME input.
 
 ---
 
-## Provider Pattern
+## General Context
 
-Every provider follows this structure:
+### Open Issues
 
-```go
-// provider.go
-type Provider struct {
-    client  *client.Client
-    version string
-}
+TBD — requires code scanning for TODO/FIXME/HACK markers.
 
-func (p *Provider) Configure(ctx context.Context, req provider.ConfigureRequest,
-    resp *provider.ConfigureResponse) {
-    // 1. Read config from HCL or environment variables
-    // 2. Initialize SDK client
-    // 3. Validate authentication (dummy API call)
-    // 4. Set resp.ResourceData and resp.DataSourceData
-}
+### Glossary
 
-func (p *Provider) Resources(ctx context.Context) []func() resource.Resource {
-    return []func() resource.Resource{
-        newVolumeResource,
-        newSnapshotRuleResource,
-        // ...
-    }
-}
-
-func (p *Provider) DataSources(ctx context.Context) []func() datasource.DataSource {
-    return []func() datasource.DataSource{
-        newVolumeDataSource,
-        // ...
-    }
-}
-```
-
----
-
-## Resource Pattern
-
-```go
-// resource_volume.go
-type volumeResource struct {
-    client *client.Client
-}
-
-func (r *volumeResource) Create(ctx context.Context,
-    req resource.CreateRequest, resp *resource.CreateResponse) {
-    // 1. Read plan into model struct
-    // 2. Call SDK to create resource
-    // 3. Map response to state
-    // 4. Set resp.State
-}
-
-func (r *volumeResource) Read(ctx context.Context,
-    req resource.ReadRequest, resp *resource.ReadResponse) {
-    // 1. Read state into model struct
-    // 2. Call SDK to get current state
-    // 3. Map response to state (detect drift)
-    // 4. Set resp.State
-}
-
-func (r *volumeResource) Update(ctx context.Context,
-    req resource.UpdateRequest, resp *resource.UpdateResponse) {
-    // 1. Read plan and state
-    // 2. Compute diff
-    // 3. Call SDK to update
-    // 4. Set resp.State
-}
-
-func (r *volumeResource) Delete(ctx context.Context,
-    req resource.DeleteRequest, resp *resource.DeleteResponse) {
-    // 1. Read state
-    // 2. Call SDK to delete
-    // 3. State is automatically removed
-}
-
-func (r *volumeResource) ImportState(ctx context.Context,
-    req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-    // 1. Parse import ID
-    // 2. Call SDK to get resource
-    // 3. Populate state
-}
-```
-
----
-
-## Testing Patterns
-
-### Unit Tests (mockey)
-
-```go
-func TestVolumeResource_Create(t *testing.T) {
-    // Mock SDK calls using bytedance/mockey
-    mockey.PatchConvey("Create volume", t, func() {
-        mockey.Mock((*client.Client).CreateVolume).Return(&Volume{ID: "123"}, nil).Build()
-        // ... test logic
-    })
-}
-```
-
-- No hardware required
-- Fast execution
-- Run with `make test`
-
-### Acceptance Tests (terraform-plugin-testing)
-
-```go
-func TestAccVolumeResource(t *testing.T) {
-    resource.Test(t, resource.TestCase{
-        ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
-        Steps: []resource.TestStep{
-            {
-                Config: testAccVolumeConfig("test-vol", 10),
-                Check: resource.ComposeTestCheckFunc(
-                    resource.TestCheckResourceAttr("powerstore_volume.test", "name", "test-vol"),
-                    resource.TestCheckResourceAttr("powerstore_volume.test", "size", "10737418240"),
-                ),
-            },
-        },
-    })
-}
-```
-
-- **Requires live hardware**
-- Creates real resources (clean up after!)
-- Run with `TF_ACC=1 make testacc`
-
----
-
-## GoReleaser Configuration
-
-All providers use identical GoReleaser settings:
-
-```yaml
-builds:
-  - env:
-      - CGO_ENABLED=0  # Static binary, no C dependencies
-    goos:
-      - freebsd
-      - windows
-      - linux
-      - darwin
-    goarch:
-      - amd64
-      - '386'
-      - arm
-      - arm64
-    ignore:
-      - goos: darwin
-        goarch: '386'  # No 32-bit macOS
-```
-
----
-
-## Common Gotchas
-
-### 1. Endpoint URL format varies by provider
-
-- **PowerStore:** Must end with `/api/rest`
-- **PowerFlex:** Gateway URL (not MDM directly)
-- **PowerScale:** Platform API port (typically 8080)
-- **Redfish:** iDRAC IP with `/redfish/v1` path
-
-### 2. Sensitive attributes must be marked
-
-```go
-"password": schema.StringAttribute{
-    Sensitive: true,  // Required for credentials
-}
-```
-
-Without this, passwords appear in `terraform plan` output and state files.
-
-### 3. Vendored SDK updates
-
-For powerscale/powermax, SDK changes require:
-1. Edit files in `./powerscale-go-client/` or `./powermax-go-client-100/`
-2. No `go mod tidy` needed (local replace directive)
-3. Commit SDK and provider changes together
-
-### 4. Acceptance test cleanup
-
-If acceptance tests fail mid-run, resources may be left on the array.
-Clean up manually before re-running tests.
-
-### 5. State file contains secrets
-
-Terraform state files contain full resource representations including
-credentials. Always use encrypted remote backends (S3+KMS, Terraform Cloud)
-in production.
-
----
-
-## Version Compatibility
-
-| Provider | Min Terraform | Plugin Framework |
-|----------|---------------|------------------|
-| powerstore | 1.4+ | v1.13.0 |
-| powerflex | 1.4+ | v1.13.0 |
-| powerscale | 1.4+ | v1.15.1 |
-| powermax | 1.4+ | v1.19.0 |
-| objectscale | 1.4+ | v1.15.1 |
-| redfish | 1.4+ | v1.19.0 |
-| ome | 1.4+ | v1.19.0 |
-
-**Note:** powerstore still has partial `terraform-plugin-sdk/v2` dependency
-alongside the framework (migration in progress).
+| Term | Definition |
+|------|------------|
+| Plugin Framework | HashiCorp's Terraform Plugin Framework (`terraform-plugin-framework`) |
+| mockey | `bytedance/mockey` — runtime function patching for unit tests |
+| OME | Environment variable prefix for this provider |
 
 ---
 
 ## References
 
 - [Terraform Plugin Framework Docs](https://developer.hashicorp.com/terraform/plugin/framework)
-- [GoReleaser Docs](https://goreleaser.com/intro/)
-- [bytedance/mockey](https://github.com/bytedance/mockey)
 - [Dell Terraform Registry](https://registry.terraform.io/namespaces/dell)
+
+---
+
+## Governance Spec Discrepancies
+
+No discrepancies detected between code/SME knowledge and loaded
+governance specs.
