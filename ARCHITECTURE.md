@@ -4,7 +4,7 @@
 
 <!-- yaml-metadata-start -->
 scope_paths: ["./"]
-capture_git_sha: "aa83a72e8e01871bd84c97a8d37caf9f322727b4"
+capture_git_sha: "5233a73c5de7345d3287c33f39b8ab09cf0200ff"
 status: "current"
 auto_update: false
 preview_before_apply: true
@@ -16,7 +16,7 @@ scaffold_version: "1.0"
 ## Purpose and Structure
 
 Terraform provider for Dell OpenManage Enterprise fleet management.
-Implements 14 managed resources and 11 data sources
+Implements 14 managed resources and 10 data sources
 using HashiCorp's Terraform Plugin Framework, enabling
 infrastructure-as-code management via REST API.
 
@@ -34,7 +34,7 @@ Core over gRPC (go-plugin protocol).
 | Entry point | `main.go` | `providerserver.Serve` — starts gRPC server |
 | Provider | `ome/provider.go` | Schema, Configure, resource/datasource registration |
 | Resources | `ome/*_resource.go` | CRUD lifecycle for 14 managed resources |
-| Data sources | `ome/*_datasource.go` | Read-only queries for 11 data sources |
+| Data sources | `ome/*_datasource.go` | Read-only queries for 10 data sources |
 | Internal clients | `clients/` | OME REST API client implementations |
 | Models | `models/` | Terraform state model structs |
 | Helper | `helper/` | Type mapping and utility functions |
