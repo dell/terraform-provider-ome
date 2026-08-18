@@ -56,7 +56,6 @@ func (c *Client) UpdateUser(user models.User) (models.User, error) {
 		return omeUser, getBodyError
 	}
 	err = c.JSONUnMarshal(respData, &omeUser)
-	fmt.Println(string(respData))
 	return omeUser, err
 }
 
@@ -83,6 +82,5 @@ func (c *Client) GetUserByID(id string) (models.User, error) {
 		return omeUser, getBodyError
 	}
 	err = c.JSONUnMarshal(respData, &omeUser)
-	fmt.Println(string(respData))
 	return omeUser, err
 }

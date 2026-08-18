@@ -287,7 +287,7 @@ func TestClient_GetIdentityPoolByID(t *testing.T) {
 			Name: "IdPool1",
 			ID:   123,
 		}, ""},
-		{"Get IdentityPool By Name - Get IdentityPool for invalid id", args{124}, models.IdentityPool{}, "Unable to process the request because the Identity Pool ID 124 provided is invalid."},
+		{"Get IdentityPool By Name - Get IdentityPool for invalid id", args{124}, models.IdentityPool{}, "HTTP request failed with status: 400"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -338,7 +338,7 @@ func TestClient_GetNetworkAttributes(t *testing.T) {
 			} else {
 				assert.NotNil(t, err)
 				assert.Equal(t, len(response.NetworkAttributeGroups), 0)
-				assert.ErrorContains(t, err, "Unable to complete the operation because the value provided for TemplateId is invalid")
+				assert.ErrorContains(t, err, "HTTP request failed with status: 400")
 			}
 		})
 	}
@@ -391,11 +391,11 @@ func TestClient_createTemplate(t *testing.T) {
 			ViewTypeID:     2,
 			SourceDeviceID: 12345,
 			Name:           "TestTemplate"}},
-		{"Create Template Existing Fail", -1, "Unable to create the template because the template name ExtTemplate already exists.", models.CreateTemplate{Fqdds: "All",
+		{"Create Template Existing Fail", -1, "HTTP request failed with status: 400", models.CreateTemplate{Fqdds: "All",
 			ViewTypeID:     2,
 			SourceDeviceID: 12345,
 			Name:           "ExtTemplate"}},
-		{"Create Template Fail", -1, "Unable to create or deploy the template because the device ID 23456 is invalid.", models.CreateTemplate{Fqdds: "All",
+		{"Create Template Fail", -1, "HTTP request failed with status: 400", models.CreateTemplate{Fqdds: "All",
 			ViewTypeID:     2,
 			SourceDeviceID: 23456,
 			Name:           "TemplateInvalidDevice"}},
@@ -635,7 +635,7 @@ func TestClient_UpdateTemplate(t *testing.T) {
 			if tt.templateID != 124 {
 				assert.Nil(t, err)
 			} else {
-				assert.ErrorContains(t, err, "Unable to complete the operation because the requested URI is invalid.")
+				assert.ErrorContains(t, err, "HTTP request failed with status: 400")
 			}
 		})
 	}
@@ -850,7 +850,7 @@ func TestUpdateNetworkConfig(t *testing.T) {
 					IsNICBonded: false,
 				},
 			},
-		}, "invalid value is entered"},
+		}, "HTTP request failed with status: 400"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -983,7 +983,7 @@ func TestClient_CloneTemplateByRefTemplateID(t *testing.T) {
 			SourceTemplateID: -1,
 			NewTemplateName:  "test-invalid-template-id",
 			ViewTypeID:       ComplainceViewTypeID,
-		}, "Unable to clone the template clone example because Source template does not exist.", -1},
+		}, "HTTP request failed with status: 400", -1},
 		{"CloneTemplateByRefTemplateID - Invalid view type id", models.OMECloneTemplate{
 			SourceTemplateID: TestComplianceTemplateID,
 			NewTemplateName:  "test-invalid-viewtype-id",
@@ -993,7 +993,7 @@ func TestClient_CloneTemplateByRefTemplateID(t *testing.T) {
 			SourceTemplateID: TestComplianceTemplateID,
 			NewTemplateName:  "test-existing-template-name",
 			ViewTypeID:       DeploymentViewTypeID,
-		}, "Unable to create the template because the template name test-existing-template-name already exists.", -1},
+		}, "HTTP request failed with status: 400", -1},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

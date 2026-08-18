@@ -74,7 +74,7 @@ func TestClient_CreateBaseline(t *testing.T) {
 			if err != nil {
 				assert.NotNil(t, err)
 				assert.Empty(t, baseline.ID)
-				assert.ErrorContains(t, err, "Unable to process the request because the template ID -1 provided is invalid.")
+				assert.ErrorContains(t, err, "HTTP request failed with status: 400")
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, tt.args.Name, baseline.Name)
@@ -145,7 +145,7 @@ func TestClient_UpdateBaseline(t *testing.T) {
 			if err != nil {
 				assert.NotNil(t, err)
 				assert.Empty(t, baseline.ID)
-				assert.ErrorContains(t, err, "Unable to process the request because the template ID -1 provided is invalid.")
+				assert.ErrorContains(t, err, "HTTP request failed with status: 400")
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, tt.args.Name, baseline.Name)
@@ -211,7 +211,7 @@ func TestClient_GetBaselineByID(t *testing.T) {
 			if tt.baselineID == -1 {
 				assert.NotNil(t, err)
 				assert.Empty(t, baseline.ID)
-				assert.ErrorContains(t, err, "Unable to process the request because an error occurred.")
+				assert.ErrorContains(t, err, "HTTP request failed with status: 400")
 			} else {
 				assert.Nil(t, err)
 				assert.Equal(t, "Baseline Name", baseline.Name)

@@ -256,11 +256,13 @@ func (c *Client) DoRequest(request *http.Request) (*http.Response, error) {
 
 	if response != nil && response.StatusCode != http.StatusOK && response.StatusCode != http.StatusAccepted &&
 		response.StatusCode != http.StatusCreated && response.StatusCode != http.StatusNoContent {
-		data, getBodyError := c.GetBodyData(response.Body)
+		// Read body to consume response body, but don't include in error message for security
+		_, getBodyError := c.GetBodyData(response.Body)
 		if getBodyError != nil {
 			return nil, getBodyError
 		}
-		return response, fmt.Errorf(ErrResponseMsg, response.StatusCode, string(data))
+		// Return sanitized error without body content to prevent information leakage
+		return response, fmt.Errorf(ErrResponseSanitizedMsg, response.StatusCode)
 	}
 
 	return response, err
