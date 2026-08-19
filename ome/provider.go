@@ -222,7 +222,6 @@ func (p *omeProvider) Configure(ctx context.Context, req provider.ConfigureReque
 	resp.DataSourceData = p
 	resp.ResourceData = p
 
-	tflog.Trace(ctx, p.clientOpt.Username)
 	tflog.Trace(ctx, "Finished configuring the provider")
 }
 
