@@ -153,6 +153,8 @@ const (
 	ErrRetryTimeoutMsg = "request time out after retrying %d times"
 	// ErrResponseMsg - error response message
 	ErrResponseMsg = "status: %d, body: %s"
+	// ErrResponseSanitizedMsg - sanitized error response message (no body content)
+	ErrResponseSanitizedMsg = "HTTP request failed with status: %d"
 	// ErrEmptyBodyMsg - error empty body message
 	ErrEmptyBodyMsg = "body cannot be empty"
 	// ErrInvalidDeviceIdentifiers - error message for invalid device service tag

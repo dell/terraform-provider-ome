@@ -38,7 +38,7 @@ func TestPostDeployTemplate(t *testing.T) {
 			ID:        1,
 			TargetIDS: []int64{1, 2, 3},
 		}},
-		{"Create Deployment Failure - Deployment exist for the device id and template id", 2, "Unable to deploy the template test_deployment because 100.96.24.28 has a profile assigned.",
+		{"Create Deployment Failure - Deployment exist for the device id and template id", 2, "HTTP request failed with status: 400",
 			models.OMETemplateDeployRequest{
 				ID:        2,
 				TargetIDS: []int64{1},

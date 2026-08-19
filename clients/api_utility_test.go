@@ -137,7 +137,7 @@ func TestClient_TrackJob(t *testing.T) {
 				assert.Contains(t, message, "status: 400")
 			case 14567:
 				assert.Equal(t, false, got)
-				assert.Contains(t, message, "No recent execution details were found for the provided job id.")
+				assert.Contains(t, message, "HTTP request failed with status: 400")
 			}
 
 		})
