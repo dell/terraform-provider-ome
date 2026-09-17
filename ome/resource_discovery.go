@@ -587,7 +587,7 @@ func getOmeDiscoveryConfigTargets(ctx context.Context, resp models.DiscoveryConf
 	}
 	for _, creds := range connectionProfiles.Credentials {
 		if credMap, ok := creds.Credential.(map[string]interface{}); ok {
-			tflog.Info(ctx, fmt.Sprintf("Creds %v, Type: %s", credMap, creds.Type))
+			tflog.Info(ctx, fmt.Sprintf("Type: %s", creds.Type))
 			if creds.Type == "REDFISH" && plan.Redfish != nil {
 				cred := &models.CredREDFISH{}
 				state.Redfish = &models.OmeRedfish{}
