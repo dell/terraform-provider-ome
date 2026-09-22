@@ -1,3 +1,13 @@
+# v1.2.4
+
+- Addresses security vulnerabilities:
+  - Sanitized HTTP error responses to prevent raw BMC/OME error bodies from leaking into Terraform diagnostics (CWE-209)
+  - Removed sensitive credential and username logging at INFO/TRACE levels (CWE-532)
+- Updated Go version to 1.26.0 and upgraded dependencies to remediate known vulnerabilities
+- Removed unused dependencies (mapstructure, godotenv) to reduce operational risk
+- Updated CI workflows to use actions/setup-go and securego/gosec for formatting, vetting, and security scanning
+- Added direct link to GitHub Issue creation in README
+
 # v1.2.3
 
 - Addresses Github Issues: #152, #126, #69, #68

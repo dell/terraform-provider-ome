@@ -1,5 +1,5 @@
 <!--
-Copyright (c) 2024-2025 Dell Inc., or its subsidiaries. All Rights Reserved.
+Copyright (c) 2024-2026 Dell Inc., or its subsidiaries. All Rights Reserved.
 
 Licensed under the Mozilla Public License Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ For any Terraform Provider for Dell OME issues, questions or feedback, please fo
 ## Prerequisites
  | **Terraform Provider** | **OME Version** | **OS** | **Terraform** | **Golang** |
  |------------------------|-----------------|--------|---------------|------------|
- | v1.2.3 | 4.0.1 <br> 4.1.0 <br> 4.3.1 | Ubuntu22.04 <br> RHEL9.x | 1.9.x <br> 1.10.x <br> | 1.24
+ | v1.2.4 | 4.0.1 <br> 4.1.0 <br> 4.3.1 | Ubuntu22.04 <br> RHEL9.x | 1.9.x <br> 1.10.x <br> | 1.26
 
 
 ## List of DataSources in Terraform Provider for Dell OME
@@ -90,7 +90,7 @@ Install Terraform Provider for OpenManage Enterprise from terraform registry by 
 terraform {
   required_providers {
     ome = {
-      version = "1.2.3"
+      version = "1.2.4"
       source  = "dell/ome"
     }
   }
